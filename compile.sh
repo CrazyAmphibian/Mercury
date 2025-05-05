@@ -1,2 +1,2 @@
 g++ -fpermissive -pthread -DMERCURY_DYNAMIC_LIBRARY_COMPILE -shared -fPIC -o mercury.so src/mercury.cpp src/mercury_error.cpp src/mercury_bytecode.cpp src/mercury_compiler.cpp src/libs/mercury_lib_std.cpp src/libs/mercury_lib_math.cpp src/libs/mercury_lib_array.cpp src/libs/mercury_lib_string.cpp src/libs/mercury_lib_thread.cpp src/libs/mercury_lib_io.cpp src/libs/mercury_lib_os.cpp
-g++ -fpermissive -pthread -o mercury_runtime src/mercury_runtime.cpp -ldl mercury.so -Wl,-rpath=.
+g++ -fpermissive -pthread -o mercury src/mercury_runtime.cpp -ldl mercury.so -Wl,-rpath=.
