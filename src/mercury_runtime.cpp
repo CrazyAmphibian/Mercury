@@ -169,6 +169,15 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 		case M_OPCODE_CNCT:
 			printf("CNCT\n");
 			break;
+		case M_OPCODE_SWPT:
+			printf("SWPT\n");
+			break;
+		case M_OPCODE_CLS:
+			printf("CLS \n");
+			break;
+		case M_OPCODE_EXIT:
+			printf("EXIT\n");
+			break;
 		case M_OPCODE_JRNI:
 			printf("JRNI ");
 			{
@@ -334,7 +343,7 @@ int main(int argc, char** argv) {
 
 	mercury_function* compiled = (mercury_function*)funcy->data.p;
 	
-#ifdef _DEBUG
+#if defined(DEBUG) || defined(_DEBUG)
 	mercury_debugdumpbytecode(compiled->instructions, compiled->numberofinstructions);
 #endif
 

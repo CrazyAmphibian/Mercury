@@ -1,5 +1,6 @@
 # Mercury
-**current version: Alpha 1**
+**current version: Alpha 2**
+
 is an interpreted programming language
 
 Some features include:
@@ -28,7 +29,7 @@ Some features include:
 to not compile with a library, modify mercury.cpp so that it does not include the library's header. next, remove the library's files from the build. On windows, this is done by removing them from the solution. On unix-like systems, this is done by removing them from the file list in the compile script.
 
 
-##how to contribute
+## how to contribute
 * expanding documentation
 * enhancing stability
 * adding new library functions

@@ -176,13 +176,13 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 		return;
 	}
 	for (mercury_int a = args_in; a > 2; a--) {
-		argt[a-2]=mercury_popstack(M);
+		argt[args_in-a]=mercury_popstack(M);
 	}
 
 	mercury_variable* tab = mercury_popstack(M);
 	mercury_variable* func = mercury_popstack(M);
 
-	if (tab->type != M_TYPE_FUNCTION) {
+	if (tab->type != M_TYPE_TABLE) {
 		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)M_TYPE_TABLE , (void*)tab->type );
 		free(argt);
 		return;
@@ -203,6 +203,9 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 	mercury_destroytable(iso_M->enviroment);
 	iso_M->enviroment = (mercury_table*)tab->data.p;
 
+	for (mercury_int i = 0; i < args_in - 2; i++) {
+		mercury_pushstack(iso_M, argt[i]);
+	}
 	if (func->type == M_TYPE_FUNCTION) {
 		mercury_function* func2 = (mercury_function*)func->data.p;
 		void* nbl = realloc(iso_M->instructions, func2->numberofinstructions * sizeof(uint32_t));
@@ -217,9 +220,6 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 		memcpy(iso_M->instructions, func2->instructions, func2->numberofinstructions * sizeof(uint32_t));
 	}
 
-	for (mercury_int i = 0; i < args_in - 2; i++) {
-		mercury_pushstack(iso_M,argt[i]);
-	}
 
 	if (func->type == M_TYPE_CFUNC) {
 		((mercury_cfunc)func->data.p)(iso_M, 2, 0);

@@ -37,7 +37,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 		}
 		#ifdef MERCURY_64BIT
 			M->programcounter += 2;
-		#elif MERCURY_32BIT
+		#else
 			M->programcounter += 1;
 		#endif
 	}
@@ -77,7 +77,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 		}
 		#ifdef MERCURY_64BIT
 			M->programcounter += 2;
-		#elif MERCURY_32BIT
+		#else
 			M->programcounter += 1;
 		#endif
 	}
@@ -144,7 +144,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -184,7 +184,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -251,7 +251,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -291,7 +291,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -358,7 +358,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -398,7 +398,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -465,7 +465,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -505,7 +505,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -573,7 +573,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -613,7 +613,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -693,7 +693,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -733,7 +733,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -797,7 +797,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -836,7 +836,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -900,7 +900,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -939,7 +939,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1003,7 +1003,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1042,7 +1042,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1105,7 +1105,7 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1138,7 +1138,7 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 		outv->type = M_TYPE_FLOAT;
 #ifdef MERCURY_64BIT
 		outv->data.i = 0xffffffffffffffff ^ i1;
-#elif MERCURY_32BIT
+#else
 		outv->data.i = 0xffffffff ^ i1;
 #endif
 		outv->data.i = 0xf ^ i1;
@@ -1147,7 +1147,7 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 		outv->type = M_TYPE_INT;
 #ifdef MERCURY_64BIT
 		outv->data.i = 0xffffffffffffffff ^ i1;
-#elif MERCURY_32BIT
+#else
 		outv->data.i = 0xffffffff ^ i1;
 #endif
 		
@@ -1179,7 +1179,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1218,7 +1218,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1282,7 +1282,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1321,7 +1321,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1531,7 +1531,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1571,7 +1571,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1644,7 +1644,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1684,7 +1684,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1757,7 +1757,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1797,7 +1797,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1870,7 +1870,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -1910,7 +1910,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 		}
 #ifdef MERCURY_64BIT
 		M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 		M->programcounter += 1;
 #endif
 	}
@@ -2084,7 +2084,7 @@ void M_BYTECODE_SREG(mercury_state* M, uint16_t flags) {
 
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 
@@ -2103,7 +2103,7 @@ void M_BYTECODE_GREG(mercury_state* M, uint16_t flags) {
 
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 
@@ -2127,7 +2127,7 @@ void M_BYTECODE_NINT(mercury_state* M, uint16_t flags) { //New INTeger
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 
@@ -2145,7 +2145,7 @@ void M_BYTECODE_NFLO(mercury_state* M, uint16_t flags) { //New FLOat
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 
@@ -2196,7 +2196,7 @@ void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 
@@ -2247,7 +2247,7 @@ void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 
@@ -2329,7 +2329,7 @@ void M_BYTECODE_JMP(mercury_state* M, uint16_t flags) { //JuMP
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 
@@ -2343,7 +2343,7 @@ void M_BYTECODE_JMPR(mercury_state* M, uint16_t flags) { //JuMP Relative
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 	mercury_int instruction = *(mercury_int*)offset;
@@ -2355,7 +2355,7 @@ void M_BYTECODE_JIF(mercury_state* M, uint16_t flags) { //Jump IF
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 	mercury_int instruction = *(mercury_int*)offset;
@@ -2372,7 +2372,7 @@ void M_BYTECODE_JNIF(mercury_state* M, uint16_t flags) { //Jump Not IF
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 	mercury_int instruction = *(mercury_int*)offset;
@@ -2389,7 +2389,7 @@ void M_BYTECODE_JRIF(mercury_state* M, uint16_t flags) { //Jump Relative IF
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 	mercury_int instruction = *(mercury_int*)offset;
@@ -2406,7 +2406,7 @@ void M_BYTECODE_JRNI(mercury_state* M, uint16_t flags) { //Jump Relative Not If
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 	mercury_int instruction = *(mercury_int*)offset;
@@ -2423,7 +2423,7 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 	void* offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 	mercury_int args_in = *(mercury_int*)offset;
@@ -2431,7 +2431,7 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 	offset = M->instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
-#elif MERCURY_32BIT
+#else
 	M->programcounter += 1;
 #endif
 	mercury_int args_out = *(mercury_int*)offset;

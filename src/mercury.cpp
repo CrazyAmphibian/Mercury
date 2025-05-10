@@ -483,15 +483,15 @@ void mercury_destroystate(mercury_state* M) {
 	}
 	free(M->unassignedstack);
 
-	if (M->masterstate == M) {
+	if (M->masterstate == M && M->registers) {
 		for (mercury_int i = 0; i < register_max; i++) {
-			free(M->registers[i]);
+			if(M->registers[i])free(M->registers[i]);
 		}
 		free(M->registers);
 	}
 
-	mercury_destroytable(M->enviroment);
-	free(M->instructions);
+	if(M->enviroment)mercury_destroytable(M->enviroment);
+	if(M->instructions)free(M->instructions);
 	free(M);
 }
 

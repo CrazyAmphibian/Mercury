@@ -62,10 +62,12 @@ void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1, void
 	mercury_stringliteral* str = mercury_generate_error_string(M,errorcode,data1 , data2, data3);
 	if (str != nullptr) {
 		for (mercury_int i = 0; i < str->size; i++) {
-			printf("%c",str->ptr[i]);
+			//printf("%c",str->ptr[i]);
+			putchar(str->ptr[i]);
 		}
 	}
 
+	putchar('\n');
 	
 }
 

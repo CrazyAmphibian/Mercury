@@ -460,7 +460,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 				if (c_char == '\"') {
 					readstring = true;
 				}
-				else if (c_char=='/') {
+				else if (c_char=='/' && (n_char == '/' || n_char == '*') ) {
 					if (n_char == '/') {
 						commentmode = COMMENT_LINE;
 					}
@@ -863,7 +863,7 @@ void m_compile_number_string_load(compiler_function* func, char* str, mercury_in
 #ifdef MERCURY_64BIT
 		m_compile_add_rawdatadouble(func, i);
 #else
-		m_compile_add_rawdata(func, i)
+		m_compile_add_rawdata(func, i);
 #endif
 			return;
 	}
@@ -877,7 +877,7 @@ void m_compile_number_string_load(compiler_function* func, char* str, mercury_in
 #ifdef MERCURY_64BIT
 		m_compile_add_rawdatadouble(func, d);
 #else
-		m_compile_add_rawdata(func, d)
+		m_compile_add_rawdata(func, d);
 #endif
 			return;
 
@@ -1069,6 +1069,7 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 			return 0;
 		}
 	}
+	m_compile_add_instruction(fvarget, M_OPCODE_CLS); // clear the stack after assigning variables so that if more variables are given than we need, it won't result in bad return values
 
 
 	// compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercury_int num_tokens , mercury_int* endatend=nullptr )
@@ -2271,7 +2272,7 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 	mercury_int num_t = 0;
 	while (tokens[num_t]) { num_t++; }
 
-#ifdef _DEBUG
+#if defined(DEBUG) || defined(_DEBUG)
 	for (mercury_int i = 0; i < num_t; i++) {
 		compiler_token* t = tokens[i];
 		for (mercury_int n = 0; n < t->num_chars; n++) {

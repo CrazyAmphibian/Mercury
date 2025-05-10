@@ -15,7 +15,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 
 //what the fuck is an LPVOID?
-DWORD threadfunction(LPVOID param) {
+DWORD WINAPI threadfunction(LPVOID param) {
 	if (!param)return 0;
 	mercury_threadholder* threadvar= (mercury_threadholder*)param;
 
@@ -137,7 +137,6 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 #if defined(_WIN32) || defined(_WIN64)
 
 		HANDLE h = CreateThread(NULL, 0, threadfunction, (LPVOID)t, 0, NULL);
-		
 		if (h) {
 			t->threadobject = h;
 			out->type = M_TYPE_THREAD;
