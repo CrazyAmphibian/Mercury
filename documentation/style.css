@@ -1,0 +1,30 @@
+body{
+	background-color:#ddd;
+	
+}
+
+
+.m_comment{
+	color:DarkGreen;
+}
+.m_string{
+	color:ForestGreen;
+}
+.m_number{
+	color:olive;
+}
+.m_static{
+	color:DarkViolet
+}
+.m_keyword{
+	color:MediumBlue;
+}
+.m_symbol{
+	color:SaddleBrown;
+}
+.m_scoped{
+	color:blue;
+}
+.m_builtin{
+	color:DarkSlateGray;
+}

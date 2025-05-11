@@ -1,0 +1,735 @@
+<html>
+<head>
+<title>Mercury: libraries</title>
+<link rel='stylesheet' href='style.css'>
+<style>
+
+.type{
+color:#888;
+}
+.fdec{
+font-size:125%;
+font-family:monospace;
+}
+.example{
+font-family:monospace;
+}
+.desc{
+margin-left:2em;
+}
+
+</style>
+</head>
+<body>
+
+<h1>Mercury</h1>
+
+
+
+
+<h2>grouped types</h2>
+Some types can be grouped together, due to shared functionality, function usage, or internal semantics.
+
+<ul>
+<li>variable</li>
+<ul><li>represents any variable type</li></ul>
+<li>number</li>
+<ul><li>represents a float or int</li></ul>
+<ul><li>any number can have math performed on it</li></ul>
+<li>traversable</li>
+<ul><li>represents a table, array, or string</li></ul>
+<ul><li>these types can have the index and length operators ued on them</li></ul>
+<li>callable</li>
+<ul><li>represents a C function or Mercury function</li></ul>
+<ul><li>these types can be called, and execute code.</li></ul>
+<li>structure</li>
+<ul><li>represents a table or array</li></ul>
+<ul><li>these types hold other variables</li></ul>
+<li>serializable</li>
+<ul><li>represents a table, array, int, nil, float, bool, or string</li></ul>
+<ul><li>these types can be saved easily and portably</li></ul>
+</ul>
+
+
+<hr>
+
+<h2>Standard library</h2>
+<h3>constants</h3>
+<p>
+<table>
+<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
+<tr><td>M_TYPE_NIL</td><td>Integer</td><td>0</td><td>The numeric type of nil</td></tr>
+<tr><td>M_TYPE_INT</td><td>Integer</td><td>1</td><td>The numeric type of integers</td></tr>
+<tr><td>M_TYPE_FLOAT</td><td>Integer</td><td>2</td><td>The numeric type of floats</td></tr>
+<tr><td>M_TYPE_BOOL</td><td>Integer</td><td>3</td><td>The numeric type of bools</td></tr>
+<tr><td>M_TYPE_TABLE</td><td>Integer</td><td>4</td><td>The numeric type of tables</td></tr>
+<tr><td>M_TYPE_STRING</td><td>Integer</td><td>5</td><td>The numeric type of strings</td></tr>
+<tr><td>M_TYPE_CFUNC</td><td>Integer</td><td>6</td><td>The numeric type of C functions</td></tr>
+<tr><td>M_TYPE_ARRAY</td><td>Integer</td><td>7</td><td>The numeric type of arrays</td></tr>
+<tr><td>M_TYPE_FUNCTION</td><td>Integer</td><td>8</td><td>The numeric type of Mercury functions</td></tr>
+<tr><td>M_TYPE_FILE</td><td>Integer</td><td>9</td><td>The numeric type of files</td></tr>
+<tr><td>M_TYPE_THREAD</td><td>Integer</td><td>10</td><td>The numeric type of threads</td></tr>
+</table>
+</p>
+<h3>functions</h3>
+
+<div class='fdec'>print (<span class='type'>variable</span> ...)</div>
+<div class='desc'>
+<p>
+takes any number of arguments, converts them into a string, then adds them to stdout.<br>
+arguments are separated by tab characters, and a newline (\n) will be added at the end.<br>
+<br>
+for more refined control, use io.post.<br>
+</p>
+<p class='example'>
+<span class='m_builtin'>print</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//hello, world!</span><br>
+a<span class='m_symbol'>=</span><span class='m_number'>5</span><br>
+b<span class='m_symbol'>=</span><span class='m_number'>12</span><br>
+<span class='m_builtin'>print</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,</span>b<span class='m_symbol'>,</span>a<span class='m_symbol'>+</span>b<span class='m_symbol'>)</span> <span class='m_comment'>//5&emsp;12&emsp;17</span> <br>
+</p>
+</div>
+
+<div class='fdec'>iterate (<span class='type'>structure</span> data, <span class='type'>callable</span> executor)</div>
+<div class='desc'>
+<p>
+takes a traversable and a callable. for each element, both the index and associated data will be sent to the callable. The key will be the first argument, and the value will be the second<br>
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>,</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span>  <br>
+<span class='m_builtin'>iterate</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,</span><span class='m_builtin'>print</span><span class='m_symbol'>)</span> <br>
+<span class='m_comment'>/*  <br>
+output: <br>
+0&emsp;1 <br>
+1&emsp;2 <br>
+2&emsp;hello <br>
+3&emsp;4 <br>
+*/ <br>
+</span>
+</p>
+</div>
+
+<div class='fdec'>rcall (<span class='type'>callable</span> function, <span class='type'>table</span> enviroment, <span class='type'>variable</span> ...)</div>
+<div class='desc'>
+<p>
+takes a function and calls it with a restricted environment given by a table.<br>
+the function will run its code as normal, but will not have access to any variables that were not supplied in the table.<br>
+any number of args can be sent to the function.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_keyword'>function</span><span class='m_symbol'>()</span> <br>
+<span class='m_builtin'>print</span><span class='m_symbol'>(</span><span class='m_string'>"hello"</span><span class='m_symbol'>)</span> <br>
+<span class='m_keyword'>end</span> <br>
+<br>
+<span class='m_builtin'>rcall</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,{})</span> //this will result in an error being thrown, because a is trying to call a nil value (print). <br>
+</p>
+</div>
+
+
+<div class='fdec'>dump (<span class='type'>serializable</span> variable</div>
+<div class='desc'>
+<p>
+takes a variable, and returns a string containing data which represents that variable. this string, when compiled back, will be read as that variable.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
+<span class='m_builtin'>dump</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns as a string [[0]="hello",[1]=1,[3]=true]</span> <br>
+</p>
+</div>
+
+<div class='fdec'> compile (<span class='type'>string</span> code)</div>
+<div class='desc'>
+<p>
+attempts to compile a string as if it were mercury code. if successful, it will return a function which does that code. otherwise, returns nil.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>compile</span><span class='m_symbol'>(</span><span class='m_string'>"print(\"hello, world!\")"</span><span class='m_symbol'>)</span> <br>
+a<span class='m_symbol'>()</span> <span class='m_comment'>//hello, world!</span> <br>
+</p>
+</div>
+
+<div class='fdec'>type (<span class='type'>variable</span> variable)</div>
+<div class='desc'>
+<p>
+returns the type of a variable as an integer
+</p>
+<p class='example'>
+<span class='m_keyword'>if</span> <span class='m_builtin'>type</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)!=</span><span class='m_builtin'>M_TYPE_INT</span> <span class='m_keyword'>then</span> <br>
+a<span class='m_symbol'>=</span>0 <br>
+<span class='m_builtin'>print</span><span class='m_symbol'>(</span><span class='m_string'>"something went wrong!"</span><span class='m_symbol'>)</span> <br>
+<span class='m_keyword'>end</span> <br>
+</p>
+</div>
+
+<div class='fdec'>tostring (<span class='type'>variable</span> variable)</div>
+<div class='desc'>
+<p>
+returns a string representing a variable
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span>17 <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tostring</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns "17"</span> <br>
+a<span class='m_symbol'>={}</span> <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tostring</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns "table 0x00000000". the pointer will differ with each program launch.</span> <br>
+</p>
+</div>
+
+<div class='fdec'>tonumber (<span class='type'>variable</span> variable)</div>
+<div class='desc'>
+<p>
+returns a number which represents another variable. attempts to return an integer first, then a float. otherwise, returns nil.
+</p>
+<p class='example'>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span class='m_symbol'>(</span><span class='m_string'>"12.47"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12.47</span> <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span class='m_symbol'>(</span><span class='m_static'>true</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1</span> <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span class='m_symbol'>({</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>})</span> <span class='m_comment'>//returns nil</span> <br>
+</p>
+</div>
+
+
+
+
+
+</div>
+
+<h2>Math library</h2>
+<h3>constants</h3>
+<p>
+<table>
+<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
+<tr><td>pi</td><td>Float</td><td>3.141592653589793</td><td>The value of Pi</td></tr>
+<tr><td>root2</td><td>Float</td><td>1.41421356237309504</td><td>The value of the square root of 2</td></tr>
+<tr><td>e</td><td>Float</td><td>2.718281828459045</td><td>The value of euler's number</td></tr>
+<tr><td>root3</td><td>Float</td><td>1.7320508075688772</td><td>The value of the square root of 3</td></tr>
+<tr><td>golden</td><td>Float</td><td>1.6180339887498948</td><td>The value of the golden ratio</td></tr>
+<tr><td>int_max</td><td>Int</td><td>0x7FFFFFFF (32 bit) / 0x7FFFFFFFFFFFFFFF (64 bit)</td><td>The value of the largest signed integer.</td></tr>
+<tr><td>uint_max</td><td>Int</td><td>0xFFFFFFFF (32 bit) / 0xFFFFFFFFFFFFFFFF (64 bit)</td><td>The value of the largest unsigned integer.</td></tr>
+</table>
+</p>
+
+
+<h3>functions</h3>
+<div class='fdec'>min (<span class='type'>number</span> ...)</div>
+<div class='desc'>
+<p>
+returns the lowest number provided
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>min</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>,</span><span class='m_number'>1.3</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.3</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>min</span><span class='m_symbol'>(</span><span class='m_number'>-7</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>0.4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns -7</span> <br>
+</p>
+</div>
+
+<div class='fdec'>max (<span class='type'>number</span> ...)</div>
+<div class='desc'>
+<p>
+returns the highest number provided
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>max</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>,</span><span class='m_number'>1.3</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12.1</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>max</span><span class='m_symbol'>(</span><span class='m_number'>-7</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>0.4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1</span> <br>
+</p>
+</div>
+
+<div class='fdec'>floor (<span class='type'>number</span> number)</div>
+<div class='desc'>
+<p>
+returns the next smallest integer of a number
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>floor</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>floor</span><span class='m_symbol'>(</span><span class='m_number'>-3.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns -4</span> <br>
+</p>
+</div>
+
+<div class='fdec'>ceil (<span class='type'>number</span> number)</div>
+<div class='desc'>
+<p>
+returns the next highest integer of a number
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>ceil</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 13</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>ceil</span><span class='m_symbol'>(</span><span class='m_number'>-3.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns -3</span> <br>
+</p>
+</div>
+
+<div class='fdec'>radians (<span class='type'>number</span> angle)</div>
+<div class='desc'>
+<p>
+returns a float converting the supplied angle from degrees into radians
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>radians</span><span class='m_symbol'>(</span><span class='m_number'>90.0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.57...</span> <br>
+</div>
+
+<div class='fdec'>degrees (<span class='type'>number</span> angle)</div>
+<div class='desc'>
+<p>
+returns a float converting the supplied angle from radians into degrees
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>degrees</span><span class='m_symbol'>(</span><span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>pi</span><span class='m_symbol'>/</span><span class='m_number'>2.0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 90.0</span> <br>
+</div>
+
+<div class='fdec'>log (<span class='type'>number</span> number, [<span class='type'>number</span> base=math.e])</div>
+<div class='desc'>
+<p>
+returns the logarithm of a number given a base. if a base is not provided, e will be used instead.
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>log</span><span class='m_symbol'>(</span><span class='m_number'>64</span><span class='m_symbol'>,</span><span class='m_number'>2.0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 6.0</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>log</span><span class='m_symbol'>(</span><span class='m_number'>105</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2.02...</span> <br>
+</div>
+
+<div class='fdec'>abs (<span class='type'>number</span> number)</div>
+<div class='desc'>
+<p>
+returns the absolute value of a number
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>abs</span><span class='m_symbol'>(</span><span class='m_number'>-64</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 64</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>abs</span><span class='m_symbol'>(</span><span class='m_number'>-3.7</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 3.7</span> <br>
+</div>
+
+<div class='fdec'>sin (<span class='type'>number</span> angle)</div>
+<div class='fdec'>cos (<span class='type'>number</span> angle)</div>
+<div class='fdec'>tan (<span class='type'>number</span> angle)</div>
+<div class='desc'>
+<p>
+returns the sine, cosine, or tangent of a given angle as a float. the angle is assumed to be in radians.
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>sin</span><span class='m_symbol'>(</span><span class='m_number'>1.2</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 0.93...</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>cos</span><span class='m_symbol'>(</span><span class='m_number'>1.2</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 0.36...</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>tan</span><span class='m_symbol'>(</span><span class='m_number'>1.2</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2.57...</span> <br>
+</div>
+
+<div class='fdec'>asin (<span class='type'>number</span> ratio)</div>
+<div class='fdec'>acos (<span class='type'>number</span> ratio)</div>
+<div class='fdec'>atan (<span class='type'>number</span> ratio)</div>
+<div class='desc'>
+<p>
+returns the arcsine, arccosine, or arctangent of a given length ratio as a float. the result is in radians.
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>asin</span><span class='m_symbol'>(</span><span class='m_number'>0.93</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.2...</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>acos</span><span class='m_symbol'>(</span><span class='m_number'>0.36</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.2...</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>atan</span><span class='m_symbol'>(</span><span class='m_number'>2.57</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.2...</span> <br>
+</div>
+
+<div class='fdec'>atan2 (<span class='type'>number</span> y, <span class='type'>number</span> x)</div>
+<div class='desc'>
+<p>
+returns an angle as a float in radians to reach another point at the relative coordinates x,y
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>atan2</span><span class='m_symbol'>(</span><span class='m_number'>10</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>10</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 0.78...</span> <br>
+</div>
+
+<div class='fdec'>randomseed (<span class='type'>int</span> seed)</div>
+<div class='desc'>
+<p>
+sets the random seed to a desired number. resets the random state.
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>randomseed</span><span class='m_symbol'>(</span><span class='m_builtin'>os</span><span class='m_symbol'></span><span class='m_symbol'>.</span><span class='m_symbol'></span><span class='m_builtin'>time</span><span class='m_symbol'>())</span> <span class='m_comment'></span> <br>
+</div>
+
+<div class='fdec'>random ([<span class='type'>number</span> minimum, <span class='type'>number</span> maximum])</div>
+<div class='desc'>
+<p>
+returns a random number as a float. if no arguments are provided, the number will be between 0 and 1, otherwise, it will be between minimum and maximum.
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>random</span><span class='m_symbol'>(</span><span class='m_number'>1</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>5</span><span class='m_symbol'>)</span> <span class='m_comment'>//may return 4.671...</span> <br>
+</div>
+
+<div class='fdec'>randomint (<span class='type'>int</span> minimum, <span class='type'>int</span> maximum)</div>
+<div class='desc'>
+<p>
+returns a random number as an int. the random number will be between minimum and maximum inclusive.
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>random</span><span class='m_symbol'>(</span><span class='m_number'>1</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>5</span><span class='m_symbol'>)</span> <span class='m_comment'>//may return 4</span> <br>
+</div>
+
+
+<h2>String library</h2>
+<h3>functions</h3>
+
+<div class='fdec'>sub (<span class='type'>string</span> string, <span class='type'>int</span> start, <span class='type'>int</span> end)</div>
+<div class='desc'>
+<p>
+returns a sub string of a given string with a specified offset.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>sub</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_number'>0</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "hello"</span> <br>
+</div>
+
+<div class='fdec'>reverse (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+returns a string which contains the reverse copy of the input string
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>reverse</span><span class='m_symbol'>(</span><span class='m_string'>"hello"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "olleh"</span> <br>
+</div>
+
+<div class='fdec'>find (<span class='type'>string</span> string, <span class='type'>string</span> match, [<span class='type'>int</span> start=0])</div>
+<div class='desc'>
+<p>
+attempts to find the string match inside of the provided string. if found, returns the position in the string where it occurs. otherwise, returns nil.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>find</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_string'>"ll"</span><span class='m_symbol'></span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2</span> <br>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>find</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_string'>"ll"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_number'>3</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns nil</span> <br>
+</div>
+
+<div class='fdec'>replace (<span class='type'>string</span> string, <span class='type'>string</span> match, <span class='type'>string</span> replacement, [<span class='type'>int</span> max replacments=infinity])</div>
+<div class='desc'>
+<p>
+searches a string for all occurrences of a match, and replaces them with another string. if the max replacements argument is provided, it can be used to limit the number of replacements done.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>replace</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l"</span><span class='m_symbol'></span><span class='m_symbol'><span class='m_symbol'>,</span><span class='m_string'>"t"</span><span class='m_symbol'>,</span><span class='m_number'>2</span>)</span> <span class='m_comment'>//returns "hetto, world!"</span> <br>
+</div>
+
+<div class='fdec'>toarray (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+returns an array representing the characters in a string.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>toarray</span><span class='m_symbol'>(</span><span class='m_string'>"hello"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns [104,101,108,108,111]</span> <br>
+</div>
+
+<div class='fdec'>fromarray (<span class='type'>array</span> array)</div>
+<div class='desc'>
+<p>
+converts an array into a string. integers will have their lower 8 bits turned into a character. all other types will be ignored, and replaced with the null character (\x00).
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>fromarray</span><span class='m_symbol'>([</span><span class='m_number'>104<span class='m_symbol'>,</span>101<span class='m_symbol'>,</span>108<span class='m_symbol'>,</span>108<span class='m_symbol'>,</span>111</span><span class='m_symbol'>])</span> <span class='m_comment'>//returns "hello" </span> <br>
+</div>
+
+<div class='fdec'>upper (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+takes a string and returns it with all uppercase characters.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>upper</span><span class='m_symbol'>(</span><span class='m_string'>"Hello, World!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "HELLO, WORLD!" </span> <br>
+</div>
+
+<div class='fdec'>lower (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+takes a string and returns it with all lowercase characters.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>lower</span><span class='m_symbol'>(</span><span class='m_string'>"Hello, World!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "hello, world!" </span> <br>
+</div>
+
+<h2>Array library</h2>
+<h3>constants</h3>
+<p>
+<table>
+<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
+<tr><td>SORTING_GREATER_TO_LESSER</td><td>C function</td><td>n/a</td><td>sorting function. largest number to smallest</td></tr>
+<tr><td>SORTING_LESSER_TO_GREATER</td><td>C function</td><td>n/a</td><td>sorting function. smallest number to largest</td></tr>
+<tr><td>SORTING_GREATER_TO_LESSER_MAGNITUDE</td><td>C function</td><td>n/a</td><td>sorting function. biggest number to smallest, takes absolute value</td></tr>
+<tr><td>SORTING_LESSER_TO_GREATER_MAGNITUDE</td><td>C function</td><td>n/a</td><td>sorting function. smallest number to biggest, takes absolute value</td></tr>
+<tr><td>SORTING_ALPHABETICAL_A_TO_Z</td><td>C function</td><td>n/a</td><td>sorting function. arranges strings to be alphabetical A to Z</td></tr>
+<tr><td>SORTING_ALPHABETICAL_Z_TO_A</td><td>C function</td><td>n/a</td><td>sorting function. arranges strings to be alphabetical Z to A</td></tr>
+</table>
+</p>
+<h3>functions</h3>
+
+<div class='fdec'>flush (<span class='type'>array</span> array)</div>
+<div class='desc'>
+<p>
+removes all nil entries from an array, so that all values spanning 0 to the maximum have a value
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
+<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>flush</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//a is now ["hello",1,true] </span> <br>
+</div>
+
+<div class='fdec'>copy (<span class='type'>array</span> array)</div>
+<div class='desc'>
+<p>
+returns a new array containing the same values as the old one, but as a seperate object.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
+b<span class='m_symbol'>=</span><span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>copy</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+<span class='m_builtin'>print</span><span class='m_symbol'>(</span>a<span class='m_symbol'>==</span>b<span class='m_symbol'>)</span> <span class='m_comment'>//false </span> <br>
+</div>
+
+<div class='fdec'>insert (<span class='type'>array</span> array, <span class='type'>variable</span> element, [<span class='type'>int</span> index=end])</div>
+<div class='desc'>
+<p>
+adds element to array. if index is specified, the new element will be at that location, shifting all other elements forward to make space. if not provided, it will instead add the element to the end of the array.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
+<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>insert</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_number'>4</span>,<span class='m_number'>1</span>)</span> <span class='m_comment'>//array is now ["hello",4,1,true] </span> <br>
+</div>
+
+<div class='fdec'>remove (<span class='type'>array</span> array, <span class='type'>int</span> index)</div>
+<div class='desc'>
+<p>
+removes an element from an array. shifts all other elements backwards to fill in the removed element's space.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
+<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>remove</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_number'>1</span>)</span> <span class='m_comment'>//array is now ["hello",true] </span> <br>
+</div>
+
+<div class='fdec'>swap (<span class='type'>array</span> array, <span class='type'>int</span> index1, <span class='type'>int</span> index2)</div>
+<div class='desc'>
+<p>
+swaps the positions of 2 variables in an array. if a position does not exist, nil will be used instead.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
+<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>swap</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_number'>0</span>,<span class='m_number'>2</span>)</span> <span class='m_comment'>//array is now [true,1,"hello"] </span> <br>
+</div>
+
+<div class='fdec'>sort (<span class='type'>array</span> array, <span class='type'>callable</span> sorting function</div>
+<div class='desc'>
+<p>
+takes an array, and runs a storting function through it.<br>
+mercury functions take 2 values and should return 1, 0, or -1.<br>
+the array library adds sorting functions. these are given the type of C functions, but should not be called, and undefined behavior will result if they are.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_number'>7</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>3</span></span><span class='m_symbol'>]</span> <br>
+<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>sort</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_builtin'>array</span>.<span class='m_builtin'>SORTING_GREATER_TO_LESSER</span>)</span> <span class='m_comment'>//array is now [7,3,1] </span> <br>
+</div>
+
+
+<h2>IO library</h2>
+<h3>functions</h3>
+<div class='fdec'>open (<span class='type'>string</span> path, <span class='type'>string</span> mode)</div>
+<div class='desc'>
+<p>
+attempts to open a file at the specified path. if succesful, returns a file, otherwise, returns nil.<br>
+mode specifies how the file is treated and what can be done. mode can be any C file mode.
+</p>
+<p class='example'>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'>//returns a file if test.txt exists. </span> <br>
+</div>
+
+<div class='fdec'>close (<span class='type'>file</span> file)</div>
+<div class='desc'>
+<p>
+closes an open file. this is needed to allow other programs to modify the files.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'> </span> <br>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>close</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>read (<span class='type'>file</span> file)</div>
+<div class='desc'>
+<p>
+returns a string containing a file's entire contents. returns nil if a file was unable to be read.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'> </span> <br>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>read</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns the contents of the file. </span> <br> 
+</div>
+
+<div class='fdec'>write (<span class='type'>file</span> file, <span class='type'>string</span> data)</div>
+<div class='desc'>
+<p>
+attempts to write data to a file.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"w"</span>)</span> <span class='m_comment'> </span> <br>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>write</span><span class='m_symbol'>(</span>a<span class='m_symbol'><span class='m_symbol'>,<span class='m_string'>"hello!"</span>)</span> <span class='m_comment'> </span> <br> 
+</div>
+
+<div class='fdec'>getfiles (<span class='type'>string</span> path)</div>
+<div class='desc'>
+<p>
+returns an array of strings containing the files in a specified directory. if the directory could not be located, returns an empty array instead. If an empty string is given, returns the files in the current working directory. Does not include implicit paths . or ..
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>getfiles</span><span class='m_symbol'>(</span><span class='m_string'>"data"</span>)</span> <span class='m_comment'>//might return something like ["test.txt","image.jpg","cool_song.mp3"] </span> <br>
+</div>
+
+<div class='fdec'>getdirs (<span class='type'>string</span> path)</div>
+<div class='desc'>
+<p>
+returns an array of strings containing the directories in another specified directory. if the directory could not be located, returns an empty array instead. If an empty string is given, returns the directories in the current working directory. Does not include implicit paths . or ..
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>getdirs</span><span class='m_symbol'>(</span><span class='m_string'>""</span>)</span> <span class='m_comment'>//might return something like ["data","stuff"] </span> <br>
+</div>
+
+<div class='fdec'>lines (<span class='type'>file</span> file)</div>
+<div class='desc'>
+<p>
+returns an array of strings containing each line in a file. The file must be in read mode for any results to return. Does not include the newline characters themselves.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'> </span> <br>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>lines</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//might return ["this","is","","a test"] </span> <br> 
+</div>
+
+<div class='fdec'>post (<span class='type'>string</span> text)</div>
+<div class='desc'>
+<p>
+writes a string to stdout. unlike print, the input must be a string. additionally, this function is not variadic, and will not add any terminating newlines.
+</p>
+<p class='example'>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>post</span><span class='m_symbol'>(</span><span class='m_string'>"hello!\n"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>prompt ()</div>
+<div class='desc'>
+<p>
+awaits input from stdin. input will be accepted after the user hits enter. returns a string containing the text, minus newlines.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>prompt</span><span class='m_symbol'>()</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>remove (<span class='type'>string</span> path)</div>
+<div class='desc'>
+<p>
+attempts to remove a file with the given path. if successful, returns true, otherwise false.
+</p>
+<p class='example'>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>remove</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>removedir (<span class='type'>string</span> path)</div>
+<div class='desc'>
+<p>
+attempts to remove a directory with the given name/path. if successful, returns true, otherwise false. can only remove empty directories.
+</p>
+<p class='example'>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>remove</span><span class='m_symbol'>(</span><span class='m_string'>"data"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>createdir (<span class='type'>string</span> path)</div>
+<div class='desc'>
+<p>
+attempts to create a directory with the given name/path. if successful, returns true, otherwise false.
+</p>
+<p class='example'>
+<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>createdir</span><span class='m_symbol'>(</span><span class='m_string'>"data"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<h2>OS library</h2>
+<h3>constants</h3>
+<p>
+<table>
+<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
+<tr><td>IS_POSIX</td><td>Bool</td><td>depends on system</td><td>whether or not the mercury is running on a POSIX system (eg, Linux, MacOS)</td></tr>
+<tr><td>IS_UNIX</td><td>Bool</td><td>depends on system</td><td>same value as IS_POSIX</td></tr>
+<tr><td>IS_64BIT</td><td>Bool</td><td>false (32 bit) / true (64 bit)</td><td>whether or not the mercury is running on a 64 bit system</td></tr>
+</table>
+</p>
+
+<h3>functions</h3>
+
+<div class='fdec'>time ()</div>
+<div class='desc'>
+<p>
+returns an integer of the current time in seconds since the epoch (unix time)
+</p>
+<p class='example'>
+<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>time</span><span class='m_symbol'>()</span> <span class='m_comment'> //result varies when program is executed </span> <br>
+</div>
+
+<div class='fdec'>clock ()</div>
+<div class='desc'>
+<p>
+returns a float of how long the program has been running
+</p>
+<p class='example'>
+<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>clock</span><span class='m_symbol'>()</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>execute (<span class='type'>string</span> command)</div>
+<div class='desc'>
+<p>
+executes a string as if it were a shell command. input is platform-dependent. returns any text the command writes.
+</p>
+<p class='example'>
+<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>execute</span><span class='m_symbol'>(<span class='m_string'>"curl www.test-site.com"</span>)</span> <span class='m_comment'> //returns a web request result </span> <br>
+</div>
+
+<h2>Thread library</h2>
+<h3>functions</h3>
+
+<div class='fdec'>new (<span class='type'>function</span> function, [<span class='type'>table</span> enviroment=_ENV], <span class='type'>variable</span> ...)</div>
+<div class='desc'>
+<p>
+creates a new thread with a given function, and immedietly begins execution. caution is advised when multithreading, as no safeguards are put in place to prevent data races. Some datatypes are unsafe to access across threads.<br>
+optional second arg specifies an environment override to prevent the thread from modifying global data. can be supplied with nil to ignore it.<br>
+accepts any number of further arguments, which will be supplied to the thread function as parameters.<br>
+returns a thread object. if no return value is specified, the thread will not be created.
+</p>
+<p class='example'>
+function a() <br>
+&emsp;return 20 <br>
+end <br>
+t=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>new</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>isfinished (<span class='type'>thread</span> thread)</div>
+<div class='desc'>
+<p>
+returns a bool if a thread has finished execution.
+</p>
+b=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>isfinished</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>isrunning (<span class='type'>thread</span> thread)</div>
+<div class='desc'>
+<p>
+returns a bool if a thread is executing code. will always returns the inverse result of isfinished.
+</p>
+b=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>isrunning</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+</div>
+
+<div class='fdec'>fetch (<span class='type'>thread</span> thread)</div>
+<div class='desc'>
+<p>
+returns the next variable from a finished thread. if there are no more variables returned by the thread, nil will be given instead. Will halt execution of the main thread to wait for the thread to finish.
+</p>
+b=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>fetch</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'> //would return 20 in the above example. </span> <br>
+</div>
+
+<div class='fdec'>abort (<span class='type'>thread</span> thread)</div>
+<div class='desc'>
+<p>
+kills a thread. This should only be used in dire circumstances where a thread is held up indefinitely, as resources will not properly be freed.
+</p>
+<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>abort</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'>  </span> <br>
+</div>
+
+<div class='fdec'>getcount (<span class='type'>thread</span> thread)</div>
+<div class='desc'>
+<p>
+returns the next number of results that a thread has in the form of an integer, or 0, if the thread is still running.
+</p>
+while thread.getcount(t) do <br>
+&emsp;thread.fetch(t) <br>
+end <br>
+</div>
+
+<div class='fdec'>await (<span class='type'>thread</span> thread)</div>
+<div class='desc'>
+<p>
+halts the main thread until the supplied thread is finished.
+</p>
+<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>await</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'>  </span> <br>
+</div>
+
+</body>
+</html>
