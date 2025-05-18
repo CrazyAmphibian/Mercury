@@ -185,7 +185,15 @@ s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span cla
 </p>
 </div>
 
-
+<div class='fdec'>loadlibrary (<span class='type'>string</span> path)</div>
+<div class='desc'>
+<p>
+attempts to load a dynamic library at the specified location. The library it looks for is a precompiled C/C++ file. The file is platform dependent. On windows, it will be a dll, and on unix systems, it will be an so. Returns a bool if the library was loaded correctly.
+</p>
+<p class='example'>
+s<span class='m_symbol'>=</span><span class='m_builtin'>loadlibrary</span><span class='m_symbol'>(</span><span class='m_string'>"mylib.dll"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns true if on windows and the file is present</span> <br>
+</p>
+</div>
 
 
 

@@ -77,6 +77,7 @@ bool m_compile_register_jump_point_goto(char* label, mercury_int label_size, mer
 
 	COMPILER_JUMP_DATABASE[COMPILER_JUMP_NUMBERS]=J;
 	COMPILER_JUMP_NUMBERS++;
+	return true;
 }
 
 bool m_compile_register_jump_point_label(char* label, mercury_int label_size, mercury_int position) {
@@ -111,6 +112,7 @@ bool m_compile_register_jump_point_label(char* label, mercury_int label_size, me
 
 	COMPILER_JUMP_DATABASE[COMPILER_JUMP_NUMBERS] = J;
 	COMPILER_JUMP_NUMBERS++;
+	return true;
 }
 
 
@@ -150,6 +152,7 @@ compiler_function* init_comp_func() {
 	out->instructions = nullptr;
 	out->number_instructions = 0;
 	out->token_error_num = 0;
+	out->instruction_tokens = nullptr;
 
 	return out;
 }
@@ -166,6 +169,7 @@ compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercu
 void delete_comp_func(compiler_function* func) {
 	if (!func)return;
 	if (func->instructions)free(func->instructions);
+	if (func->instruction_tokens)free(func->instruction_tokens);
 	free(func);
 }
 
@@ -176,6 +180,11 @@ void concat_comp_func_appends(compiler_function* fb , compiler_function* fa) { /
 	if (!np)return;
 	fb->instructions = np;
 	memcpy(fb->instructions + fb->number_instructions, fa->instructions, fa->number_instructions * sizeof(uint32_t));
+
+	mercury_int* np2 = (mercury_int*)realloc(fb->instruction_tokens, sizeof(mercury_int) * (fb->number_instructions + fa->number_instructions));
+	if (!np2)return;
+	fb->instruction_tokens = np2;
+	memcpy(fb->instruction_tokens + fb->number_instructions, fa->instruction_tokens, fa->number_instructions * sizeof(mercury_int));
 	fb->number_instructions += fa->number_instructions;
 }
 
@@ -787,7 +796,7 @@ uint16_t m_compile_get_operator_bytecode(compiler_token* token,int forcetype) {
 }
 
 
-void m_compile_add_instruction(compiler_function* func , uint16_t opcode ,uint16_t flags=0) {
+void m_compile_add_instruction(compiler_function* func , uint16_t opcode ,uint16_t flags=0,mercury_int tokennum=0) {
 	uint32_t* naddr= (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions+1) );
 	if (!naddr) {
 		return;
@@ -798,20 +807,38 @@ void m_compile_add_instruction(compiler_function* func , uint16_t opcode ,uint16
 	inst <<= 16;
 	inst |= opcode;
 	func->instructions[func->number_instructions] = inst;
+
+	mercury_int* naddr2 =(mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + 1));
+	if (!naddr2) {
+		return;
+	}
+	func->instruction_tokens = naddr2;
+	func->instruction_tokens[func->number_instructions]= tokennum;
+
 	func->number_instructions++;
+
+	
 	return;
 }
-void m_compile_add_rawdata(compiler_function* func, uint32_t dat) {
+void m_compile_add_rawdata(compiler_function* func, uint32_t dat, mercury_int tokennum = 0) {
 	uint32_t* naddr = (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions + 1));
 	if (!naddr) {
 		return;
 	}
 	func->instructions = naddr;
 	func->instructions[func->number_instructions] = dat;
+
+	mercury_int* naddr2 = (mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + 1));
+	if (!naddr2) {
+		return;
+	}
+	func->instruction_tokens = naddr2;
+	func->instruction_tokens[func->number_instructions] = tokennum;
+
 	func->number_instructions++;
 	return;
 }
-void m_compile_add_rawdatadouble(compiler_function* func, uint64_t dat) {
+void m_compile_add_rawdatadouble(compiler_function* func, uint64_t dat, mercury_int tokennum = 0) {
 	uint32_t* naddr = (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions + 2));
 	if (!naddr) {
 		return;
@@ -820,16 +847,24 @@ void m_compile_add_rawdatadouble(compiler_function* func, uint64_t dat) {
 	uint64_t* ad = (uint64_t*)(func->instructions + func->number_instructions);
 	*ad = dat;
 
+	mercury_int* naddr2 = (mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + 2));
+	if (!naddr2) {
+		return;
+	}
+	func->instruction_tokens = naddr2;
+	func->instruction_tokens[func->number_instructions] = tokennum;
+	func->instruction_tokens[func->number_instructions+1] = tokennum;
+
 	func->number_instructions +=2;
 	return;
 }
 
 
 
-void m_compile_cstring_load(compiler_function* func, char* str, mercury_int len=-1) {
+void m_compile_cstring_load(compiler_function* func, char* str, mercury_int len=-1, mercury_int position=0) {
 	len = len < 0 ? strlen(str) : len;
 
-	m_compile_add_instruction(func,M_OPCODE_NSTR);
+	m_compile_add_instruction(func,M_OPCODE_NSTR,0);
 	#ifdef MERCURY_64BIT
 	m_compile_add_rawdatadouble(func,len);
 	#else
@@ -845,10 +880,20 @@ void m_compile_cstring_load(compiler_function* func, char* str, mercury_int len=
 	func->instructions = naddr;
 	char* ad = (char*)(func->instructions + func->number_instructions);
 	memcpy(ad,str,len);
+
+	mercury_int* naddr2 = (mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + sizetoallocate));
+	if (!naddr2) {
+		return;
+	}
+	func->instruction_tokens = naddr2;
+	for (mercury_int i = 0; i < sizetoallocate; i++) {
+		func->instruction_tokens[func->number_instructions + i] = position; //PLACEHOLDER
+	}
+
 	func->number_instructions += sizetoallocate;
 }
 
-void m_compile_number_string_load(compiler_function* func, char* str, mercury_int len = -1) {
+void m_compile_number_string_load(compiler_function* func, char* str, mercury_int len = -1, mercury_int position = 0) {
 	len = len < 0 ? strlen(str) : len;
 	char* cstr = (char*)malloc(len + 1);
 	memcpy(cstr, str,len);
@@ -859,11 +904,11 @@ void m_compile_number_string_load(compiler_function* func, char* str, mercury_in
 
 		mercury_int i = strtoll(cstr, &end, 0);
 		if (*end=='\0') {
-		m_compile_add_instruction(func, M_OPCODE_NINT);
+		m_compile_add_instruction(func, M_OPCODE_NINT,0, position);
 #ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, i);
+		m_compile_add_rawdatadouble(func, i, position);
 #else
-		m_compile_add_rawdata(func, i);
+		m_compile_add_rawdata(func, i, position);
 #endif
 			return;
 	}
@@ -872,12 +917,12 @@ void m_compile_number_string_load(compiler_function* func, char* str, mercury_in
 
 
 	mercury_float f = strtod(cstr, &end);
-		m_compile_add_instruction(func, M_OPCODE_NFLO);
+		m_compile_add_instruction(func, M_OPCODE_NFLO,0, position);
 		mercury_int d = *((mercury_int*)&f);
 #ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, d);
+		m_compile_add_rawdatadouble(func, d, position);
 #else
-		m_compile_add_rawdata(func, d);
+		m_compile_add_rawdata(func, d, position);
 #endif
 			return;
 
@@ -897,7 +942,7 @@ int m_compile_read_stored_variable(compiler_function* func, compiler_token** tok
 
 	if (t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0] == '[') { //either create a new array, or index. we need to find out which.
 		mercury_int o = 1;
-		m_compile_add_instruction(func, M_OPCODE_CPYT);
+		m_compile_add_instruction(func, M_OPCODE_CPYT, 0,offset+o);
 		mercury_int a = m_compile_read_var_statment_recur(func, tokens, offset + o, token_max);
 		if (!a)return 0;
 		o += a;
@@ -908,7 +953,7 @@ int m_compile_read_stored_variable(compiler_function* func, compiler_token** tok
 			if (t->token_flags & TOKEN_OPERATOR && t->num_chars==1 && t->chars[0] == '=') { // it is an indexed setting
 				o++;
 				a= m_compile_read_var_statment_recur(func, tokens, offset + o, token_max);
-				if (a)m_compile_add_instruction(func, M_OPCODE_SET);
+				if (a)m_compile_add_instruction(func, M_OPCODE_SET, 0, offset + o);
 				return o + a;
 			}
 			else {
@@ -923,23 +968,23 @@ int m_compile_read_stored_variable(compiler_function* func, compiler_token** tok
 			return 0;
 		} //nevermind, it's actually just a new array.
 
-		m_compile_add_instruction(func, M_OPCODE_NINT);
+		m_compile_add_instruction(func, M_OPCODE_NINT,0, offset + o);
 #ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, POSITION_IN_DATASTRUCTURE);
+		m_compile_add_rawdatadouble(func, POSITION_IN_DATASTRUCTURE, offset + o);
 #else
-		m_compile_add_rawdata(func, POSITION_IN_DATASTRUCTURE);
+		m_compile_add_rawdata(func, POSITION_IN_DATASTRUCTURE, offset + o);
 #endif
 		POSITION_IN_DATASTRUCTURE++;
 		a=m_compile_read_variable(func, tokens, offset, token_max);
-		if (a)m_compile_add_instruction(func, M_OPCODE_SET);
+		if (a)m_compile_add_instruction(func, M_OPCODE_SET, 0, offset + a);
 		if(a)return a;
 	}
 	else {
 		compiler_function* f2=init_comp_func();
 		if (!f2)return 0;
 
-		m_compile_add_instruction(f2, M_OPCODE_CPYT);
-		m_compile_add_instruction(f2, M_OPCODE_NINT);
+		m_compile_add_instruction(f2, M_OPCODE_CPYT, 0, offset);
+		m_compile_add_instruction(f2, M_OPCODE_NINT, 0, offset);
 #ifdef MERCURY_64BIT
 		m_compile_add_rawdatadouble(f2, POSITION_IN_DATASTRUCTURE);
 #else
@@ -948,7 +993,7 @@ int m_compile_read_stored_variable(compiler_function* func, compiler_token** tok
 		POSITION_IN_DATASTRUCTURE++;
 		mercury_int a=m_compile_read_var_statment_recur(f2, tokens, offset, token_max);
 		if (a) { 
-			m_compile_add_instruction(f2, M_OPCODE_SET);
+			m_compile_add_instruction(f2, M_OPCODE_SET, 0, offset+a);
 			concat_comp_func_appends(func,f2);
 			delete_comp_func(f2);
 		}
@@ -1003,7 +1048,7 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 
 	if (requiresname) {
 		if (token->token_flags & TOKEN_ENVVARNAME) {
-			m_compile_cstring_load(ffunc,token->chars,token->num_chars);
+			m_compile_cstring_load(ffunc,token->chars,token->num_chars,offset+adv);
 			adv++;
 			token = tokens[offset + adv];
 		}
@@ -1038,9 +1083,9 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 		else if (token->token_flags & TOKEN_ENVVARNAME) { //set var from stack
 			// fvarget
 
-			m_compile_cstring_load(fvarget, token->chars, token->num_chars); //first we need to get the string
-			m_compile_add_instruction(fvarget, M_OPCODE_SWPT); // but, the key must be second on the stack
-			m_compile_add_instruction(fvarget, M_OPCODE_SETL); //now set it as a local.
+			m_compile_cstring_load(fvarget, token->chars, token->num_chars, offset + adv); //first we need to get the string
+			m_compile_add_instruction(fvarget, M_OPCODE_SWPT, 0,offset+adv); // but, the key must be second on the stack
+			m_compile_add_instruction(fvarget, M_OPCODE_SETL, 0, offset + adv); //now set it as a local.
 			adv++;
 			token = tokens[offset + adv];
 			if (token->token_flags & TOKEN_OPERATOR) {
@@ -1069,7 +1114,7 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 			return 0;
 		}
 	}
-	m_compile_add_instruction(fvarget, M_OPCODE_CLS); // clear the stack after assigning variables so that if more variables are given than we need, it won't result in bad return values
+	m_compile_add_instruction(fvarget, M_OPCODE_CLS, 0, offset + adv); // clear the stack after assigning variables so that if more variables are given than we need, it won't result in bad return values
 
 
 	// compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercury_int num_tokens , mercury_int* endatend=nullptr )
@@ -1084,7 +1129,7 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 	delete_comp_func(fnfunc);
 
 
-	m_compile_add_instruction(ffunc, M_OPCODE_NFUN);
+	m_compile_add_instruction(ffunc, M_OPCODE_NFUN, 0, offset + adv);
 #ifdef MERCURY_64BIT
 	m_compile_add_rawdatadouble(ffunc, fvarget->number_instructions);
 #else
@@ -1093,7 +1138,7 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 
 
 	if (requiresname) {
-		m_compile_add_instruction(fvarget, M_OPCODE_SENV);
+		m_compile_add_instruction(fvarget, M_OPCODE_SENV, 0, offset + adv);
 	}
 
 	concat_comp_func_appends(func, ffunc);
@@ -1112,12 +1157,12 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 	if (t->token_flags & TOKEN_SCOPESPECIFIER) {
 		compiler_token* t2 = tokens[offset + 1];
 		if (t2->token_flags & TOKEN_ENVVARNAME) {
-			m_compile_cstring_load(func, t2->chars, t2->num_chars);
+			m_compile_cstring_load(func, t2->chars, t2->num_chars, offset);
 			if (t->chars[0] == 'l') { //local
-				m_compile_add_instruction(func, M_OPCODE_GETL);
+				m_compile_add_instruction(func, M_OPCODE_GETL, 0,offset);
 			}
 			else if (t->chars[0] == 'g') { //global
-				m_compile_add_instruction(func, M_OPCODE_GETG);
+				m_compile_add_instruction(func, M_OPCODE_GETG, 0, offset);
 			}
 			return 2;
 		}
@@ -1126,24 +1171,24 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 		}
 	}
 	else if (t->token_flags & TOKEN_ENVVARNAME) {
-		m_compile_cstring_load(func,t->chars, t->num_chars);
-		m_compile_add_instruction(func, M_OPCODE_GENV);
+		m_compile_cstring_load(func,t->chars, t->num_chars, offset);
+		m_compile_add_instruction(func, M_OPCODE_GENV, 0, offset);
 		return 1;
 	}
 	else if (t->token_flags & TOKEN_STATICSTRING) {
-		m_compile_cstring_load(func, t->chars, t->num_chars);
+		m_compile_cstring_load(func, t->chars, t->num_chars, offset);
 		return 1;
 	}
 	else if (t->token_flags & TOKEN_STATICNIL) {
-		m_compile_add_instruction(func,M_OPCODE_NNIL);
+		m_compile_add_instruction(func,M_OPCODE_NNIL, 0, offset);
 		return 1;
 	}
 	else if (t->token_flags & TOKEN_STATICBOOLEAN) {
 		if (t->chars[0] == 't') {
-			m_compile_add_instruction(func, M_OPCODE_NTRU);
+			m_compile_add_instruction(func, M_OPCODE_NTRU, 0, offset);
 		}
 		else {
-			m_compile_add_instruction(func, M_OPCODE_NFAL);
+			m_compile_add_instruction(func, M_OPCODE_NFAL, 0, offset);
 		}
 		return 1;
 	}
@@ -1160,7 +1205,7 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 						memcpy(s2, t->chars, t->num_chars);
 						memcpy(s2 + t->num_chars, t2->chars, t2->num_chars);
 						memcpy(s2 + t->num_chars + t2->num_chars, t3->chars, t3->num_chars);
-						m_compile_number_string_load(func, s2, t->num_chars + t2->num_chars + t3->num_chars);
+						m_compile_number_string_load(func, s2, t->num_chars + t2->num_chars + t3->num_chars,offset);
 						return 3;
 					}
 				}
@@ -1168,18 +1213,18 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 				if (!s)return 0;
 				memcpy(s, t->chars, t->num_chars);
 				memcpy(s + t->num_chars, t2->chars, t2->num_chars);
-				m_compile_number_string_load(func, s, t->num_chars + t2->num_chars);
+				m_compile_number_string_load(func, s, t->num_chars + t2->num_chars, offset);
 				return 2;
 			}
 		}
-		m_compile_number_string_load(func,t->chars,t->num_chars);
+		m_compile_number_string_load(func,t->chars,t->num_chars, offset);
 		return 1;
 	}
 	else if (t->token_flags & TOKEN_SPECIALVARIABLECREATE) { //arrays and tables
 		mercury_int o = 0;
 		if (t->chars[0] == '[') { // a ray
 			o++;
-			m_compile_add_instruction(func, M_OPCODE_NARR);
+			m_compile_add_instruction(func, M_OPCODE_NARR, 0, offset+o);
 			mercury_int prev_datapos = POSITION_IN_DATASTRUCTURE;
 			POSITION_IN_DATASTRUCTURE = 0;
 			while (true) {
@@ -1206,7 +1251,7 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 		else if (t->chars[0] == '{'){// ta ble
 			//printf("reading table\n");
 			o++;
-			m_compile_add_instruction(func, M_OPCODE_NTAB);
+			m_compile_add_instruction(func, M_OPCODE_NTAB, 0,offset + o);
 			mercury_int prev_datapos = POSITION_IN_DATASTRUCTURE;
 			POSITION_IN_DATASTRUCTURE = 0;
 			while (true) {
@@ -1244,7 +1289,7 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 			if (!s)return 0;
 			memcpy(s, t->chars, t->num_chars);
 			memcpy(s + t->num_chars, t2->chars, t2->num_chars);
-			m_compile_number_string_load(func, s, t->num_chars + t2->num_chars);
+			m_compile_number_string_load(func, s, t->num_chars + t2->num_chars,offset);
 			return 2;
 		}
 	}
@@ -1259,7 +1304,7 @@ int m_compile_read_unary_op(compiler_function* func, compiler_token** tokens, me
 	compiler_token* t = tokens[offset];
 	if ( (t->token_flags & TOKEN_OPERATOR) && (t->token_flags & TOKEN_UANRY) ) {
 		uint16_t op = m_compile_get_operator_bytecode(t, 0);
-		m_compile_add_instruction(func, op);
+		m_compile_add_instruction(func, op, 0, offset);
 		return 1;
 	}
 	return 0;
@@ -1270,7 +1315,7 @@ int m_compile_read_binary_op(compiler_function* func, compiler_token** tokens, m
 	compiler_token* t = tokens[offset];
 	if ( (t->token_flags & TOKEN_OPERATOR ) && (t->token_flags & TOKEN_BINARY) ) {
 		uint16_t op = m_compile_get_operator_bytecode(t, 0);
-		m_compile_add_instruction(func, op);
+		m_compile_add_instruction(func, op, 0,offset);
 		return 1;
 	}
 	return 0;
@@ -1305,7 +1350,7 @@ int m_compile_read_indexing(compiler_function* func, compiler_token** tokens, me
 	if (periodmode) {
 		compiler_token* t = tokens[offset];
 		if (t->token_flags & TOKEN_ENVVARNAME) {
-			m_compile_cstring_load(func, t->chars, t->num_chars);
+			m_compile_cstring_load(func, t->chars, t->num_chars, offset);
 			a = 1;
 		}
 		else {
@@ -1329,7 +1374,7 @@ int m_compile_read_indexing(compiler_function* func, compiler_token** tokens, me
 		}
 	}
 
-	if(adv)m_compile_add_instruction(func, M_OPCODE_GET);
+	if(adv)m_compile_add_instruction(func, M_OPCODE_GET, 0,offset);
 
 	if(!periodmode)adv++;
 
@@ -1373,13 +1418,13 @@ int m_compile_read_fcall(compiler_function* func, compiler_token** tokens, mercu
 
 	concat_comp_func_appends(func, get_var_bytecode);
 	
-	m_compile_add_instruction(func, M_OPCODE_CALL);
+	m_compile_add_instruction(func, M_OPCODE_CALL, 0, offset-advanced+1);
 #ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(func, args_in);
-	m_compile_add_rawdatadouble(func, args_out);
+	m_compile_add_rawdatadouble(func, args_in, offset - advanced + 1);
+	m_compile_add_rawdatadouble(func, args_out, offset - advanced + 1);
 #else
-	m_compile_add_rawdata(func, args_in);
-	m_compile_add_rawdata(func, args_out);
+	m_compile_add_rawdata(func, args_in, offset);
+	m_compile_add_rawdata(func, args_out, offset);
 #endif
 
 	return advanced;
@@ -1557,7 +1602,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 	if (cur_tok->token_flags & TOKEN_LOOP_MODIFIER) {
 		if (COMPILER_INSIDE_LOOP) {
 			if (cur_tok->chars[0] == 'c') { //continue
-				m_compile_add_instruction(func, M_OPCODE_JMPR);
+				m_compile_add_instruction(func, M_OPCODE_JMPR, 0,offset);
 #ifdef MERCURY_64BIT
 				m_compile_add_rawdatadouble(func, COMPILER_CONTINUE_JUMP_POSITION - func->number_instructions-2);
 #else
@@ -1572,7 +1617,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 					return 0;
 				}
 				COMPILER_BREAK_ADDRS = (mercury_int*)nptr;
-				m_compile_add_instruction(func, M_OPCODE_JMPR);
+				m_compile_add_instruction(func, M_OPCODE_JMPR, 0,offset);
 				COMPILER_BREAK_ADDRS[COMPILER_BREAK_AMOUNTS] = func->number_instructions;
 				COMPILER_BREAK_AMOUNTS++;
 #ifdef MERCURY_64BIT
@@ -1606,11 +1651,11 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 			func->token_error_num = offset;
 			return 0;
 		}
-		m_compile_add_instruction(func, M_OPCODE_JMPR);
+		m_compile_add_instruction(func, M_OPCODE_JMPR, 0,offset);
 #ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, 0);
+		m_compile_add_rawdatadouble(func, 0, offset);
 #else
-		m_compile_add_rawdata(func, 0);
+		m_compile_add_rawdata(func, 0, offset);
 #endif
 
 		return 2;
@@ -1640,7 +1685,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 			}
 		}
 
-		m_compile_add_instruction(func, M_OPCODE_EXIT);
+		m_compile_add_instruction(func, M_OPCODE_EXIT, 0, offset);
 		return addoff;
 	}
 
@@ -1682,7 +1727,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 				break;
 			}
 
-			m_compile_cstring_load(var_code, cur_tok->chars, cur_tok->num_chars);
+			m_compile_cstring_load(var_code, cur_tok->chars, cur_tok->num_chars, offset+addoff);
 			//m_compile_add_instruction(var_code, get_opcode);
 			addoff++;
 			cur_tok = tokens[offset + addoff];
@@ -1693,13 +1738,13 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 
 		if (cur_tok->token_flags & TOKEN_OPERATOR) {
 			if (cur_tok->chars[0] == '.' && cur_tok->num_chars == 1) { //period indexing will skip to the next itteration so that cstring_load will capture what you're trying to get.
-				m_compile_add_instruction(var_code, get_opcode);
+				m_compile_add_instruction(var_code, get_opcode, 0, offset+addoff);
 				addoff++;
 				get_opcode = M_OPCODE_GET;
 				set_opcode = M_OPCODE_SET;
 			}
 			else if (cur_tok->chars[0] == '[' && cur_tok->num_chars == 1) { // bracket indexing must first read a statment, and will additonally not call cstring_load.
-				m_compile_add_instruction(var_code, get_opcode);
+				m_compile_add_instruction(var_code, get_opcode, 0, offset + addoff);
 				addoff++;
 				tokenpass = true;
 				get_opcode = M_OPCODE_GET;
@@ -1727,7 +1772,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 		if (cur_tok->chars[0] == '(' && cur_tok->num_chars == 1) {
 			mercury_int PREV_COMP_NUM_ARG_OUT = COMPILER_NUMBER_ARGS_OUT;
 			COMPILER_NUMBER_ARGS_OUT = 0;
-			m_compile_add_instruction(var_code, get_opcode);
+			m_compile_add_instruction(var_code, get_opcode, 0, offset + addoff);
 			int ad = m_compile_read_fcall(func, tokens, offset + addoff, token_max, var_code);
 			delete_comp_func(var_code);
 
@@ -1749,7 +1794,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 				ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
 			}
 			addoff += ad;
-			m_compile_add_instruction(func, set_opcode);
+			m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
 			return addoff;
 		}
 		else {
@@ -1821,12 +1866,12 @@ int mercury_compile_read_if_statment(compiler_function* func, compiler_token** t
 		return 0;
 	}
 
-	m_compile_add_instruction(func, M_OPCODE_JRNI);
+	m_compile_add_instruction(func, M_OPCODE_JRNI, 0,cur_off);
 	instruction_position = func->number_instructions;
 	#ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(func, 0);
+	m_compile_add_rawdatadouble(func, 0, cur_off);
 	#else
-	m_compile_add_rawdata(func, 0);
+	m_compile_add_rawdata(func, 0, cur_off);
 	#endif
 
 	while (true)
@@ -1854,7 +1899,7 @@ int mercury_compile_read_if_statment(compiler_function* func, compiler_token** t
 					adv++;
 					cur_off++;
 					bodycount++;
-					m_compile_add_instruction(func, M_OPCODE_JMPR);
+					m_compile_add_instruction(func, M_OPCODE_JMPR, 0, cur_off);
 
 					mercury_int* nptr = (mercury_int*)realloc(instruction_position_blockends, sizeof(mercury_int) * bodycount);
 					if (!nptr) {
@@ -1867,9 +1912,9 @@ int mercury_compile_read_if_statment(compiler_function* func, compiler_token** t
 					instruction_position_blockends[bodycount - 1] = func->number_instructions;
 
 					#ifdef MERCURY_64BIT
-					m_compile_add_rawdatadouble(func, 0);
+					m_compile_add_rawdatadouble(func, 0, cur_off);
 					#else
-					m_compile_add_rawdata(func, 0);
+					m_compile_add_rawdata(func, 0, cur_off);
 					#endif
 
 #ifdef MERCURY_64BIT
@@ -1901,12 +1946,12 @@ int mercury_compile_read_if_statment(compiler_function* func, compiler_token** t
 						return 0;
 					}
 
-					m_compile_add_instruction(func, M_OPCODE_JRNI);
+					m_compile_add_instruction(func, M_OPCODE_JRNI, 0, cur_off);
 					instruction_position = func->number_instructions;
 					#ifdef MERCURY_64BIT
-					m_compile_add_rawdatadouble(func, 0);
+					m_compile_add_rawdatadouble(func, 0, cur_off);
 					#else
-					m_compile_add_rawdata(func, 0);
+					m_compile_add_rawdata(func, 0, cur_off);
 					#endif
 
 					a =mercury_compile_compile_blocks_until_keyword(func,tokens,offset,token_max,0);
@@ -1919,7 +1964,7 @@ int mercury_compile_read_if_statment(compiler_function* func, compiler_token** t
 					cur_off++;
 
 					bodycount++;
-					m_compile_add_instruction(func, M_OPCODE_JMPR);
+					m_compile_add_instruction(func, M_OPCODE_JMPR, 0, cur_off);
 
 					mercury_int* nptr = (mercury_int*)realloc(instruction_position_blockends, sizeof(mercury_int) * bodycount);
 					if (!nptr) {
@@ -1935,9 +1980,9 @@ int mercury_compile_read_if_statment(compiler_function* func, compiler_token** t
 					mercury_int ip2= func->number_instructions;
 
 					#ifdef MERCURY_64BIT
-					m_compile_add_rawdatadouble(func, 0);
+					m_compile_add_rawdatadouble(func, 0, cur_off);
 					#else
-					m_compile_add_rawdata(func, 0);
+					m_compile_add_rawdata(func, 0, cur_off);
 					#endif
 
 #ifdef MERCURY_64BIT
@@ -2044,7 +2089,7 @@ int mercury_compile_read_while_statment(compiler_function* func, compiler_token*
 	adv++;
 	cur_off++;
 
-	m_compile_add_instruction(func, M_OPCODE_JRNI);
+	m_compile_add_instruction(func, M_OPCODE_JRNI, 0, cur_off);
 	mercury_int addrjmp = func->number_instructions;
 
 
@@ -2062,9 +2107,9 @@ int mercury_compile_read_while_statment(compiler_function* func, compiler_token*
 
 
 	#ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(func, 0);
+	m_compile_add_rawdatadouble(func, 0, cur_off);
 	#else
-	m_compile_add_rawdata(func, 0);
+	m_compile_add_rawdata(func, 0, cur_off);
 	#endif
 
 
@@ -2088,11 +2133,11 @@ int mercury_compile_read_while_statment(compiler_function* func, compiler_token*
 			if (ct->num_chars == 3 && ct->chars[0]=='e' && ct->chars[1] == 'n' && ct->chars[2] == 'd') {
 
 
-				m_compile_add_instruction(func, M_OPCODE_JMPR );
+				m_compile_add_instruction(func, M_OPCODE_JMPR, 0, cur_off);
 #ifdef MERCURY_64BIT
-				m_compile_add_rawdatadouble(func, addrstart - func->number_instructions-2 );
+				m_compile_add_rawdatadouble(func, addrstart - func->number_instructions-2, cur_off);
 #else
-				m_compile_add_rawdata(func, addrstart - func->number_instructions -2);
+				m_compile_add_rawdata(func, addrstart - func->number_instructions -2, cur_off);
 #endif
 
 #ifdef MERCURY_64BIT
@@ -2346,9 +2391,49 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 		return out;
 	}
 
+
+
 	out->type = M_TYPE_FUNCTION;
 	mercury_function* mf=(mercury_function*)malloc(sizeof(mercury_function));
 	if (!mf)return nullptr;
+
+	mf->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token)*f->number_instructions);
+	if (!mf->debug_info) {
+		free(mf);
+		return nullptr;
+	}
+
+	for (mercury_int i = 0; i < f->number_instructions; i++) {
+		mercury_int token_n = f->instruction_tokens[i];
+		
+		//printf("%i %i\n",i,token_n);
+		
+
+		compiler_token* t = tokens[token_n];
+
+		mf->debug_info[i].col = t->line_col;
+		mf->debug_info[i].line = t->line_num;
+		mf->debug_info[i].token = (char*)malloc(sizeof(char) * (t->num_chars+1));
+		memcpy((void*)mf->debug_info[i].token, t->chars, t->num_chars);
+		mf->debug_info[i].token[t->num_chars] = '\0';
+
+		mf->debug_info[i].token_next = nullptr;
+		mf->debug_info[i].token_prev = nullptr;
+
+		if (token_n < num_t-1) {
+			compiler_token* t = tokens[token_n+1];
+			mf->debug_info[i].token_next = (char*)malloc(sizeof(char) * (t->num_chars + 1));
+			memcpy((void*)mf->debug_info[i].token_next, t->chars, t->num_chars);
+			mf->debug_info[i].token_next[t->num_chars] = '\0';
+		}
+		if (token_n > 0) {
+			compiler_token* t = tokens[token_n-1];
+			mf->debug_info[i].token_prev = (char*)malloc(sizeof(char) * (t->num_chars + 1));
+			memcpy((void*)mf->debug_info[i].token_prev, t->chars, t->num_chars);
+			mf->debug_info[i].token_prev[t->num_chars] = '\0';
+		}
+	}
+
 	mf->refrences = 1;
 	mf->numberofinstructions = f->number_instructions;
 	mf->instructions = (uint32_t*)malloc(f->number_instructions * sizeof(uint32_t));

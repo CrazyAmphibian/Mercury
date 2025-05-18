@@ -7,6 +7,13 @@
 #include"string.h"
 #include <stdlib.h>
 
+
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 //throws stuff into stdout. adds a newline at the end, seperates with a tab. designed to be variadic.
 void mercury_lib_std_print(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 
@@ -74,15 +81,15 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	mercury_state* SubM = mercury_newstate(M);
 	if (function->type == M_TYPE_FUNCTION) {
 		mercury_function* func = (mercury_function*)function->data.p;
-		void* nbl = realloc(SubM->instructions, func->numberofinstructions * sizeof(uint32_t));
+		void* nbl = realloc(SubM->bytecode.instructions, func->numberofinstructions * sizeof(uint32_t));
 		if (!nbl) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
 			mercury_destroystate(SubM);
 			return;
 		}
-		SubM->instructions = (uint32_t*)nbl;
-		SubM->numberofinstructions = func->numberofinstructions;
-		memcpy(SubM->instructions, func->instructions, func->numberofinstructions * sizeof(uint32_t));
+		SubM->bytecode.instructions = (uint32_t*)nbl;
+		SubM->bytecode.numberofinstructions = func->numberofinstructions;
+		memcpy(SubM->bytecode.instructions, func->instructions, func->numberofinstructions * sizeof(uint32_t));
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
@@ -208,16 +215,16 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 	}
 	if (func->type == M_TYPE_FUNCTION) {
 		mercury_function* func2 = (mercury_function*)func->data.p;
-		void* nbl = realloc(iso_M->instructions, func2->numberofinstructions * sizeof(uint32_t));
+		void* nbl = realloc(iso_M->bytecode.instructions, func2->numberofinstructions * sizeof(uint32_t));
 		if (!nbl) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
 			mercury_destroystate(iso_M);
 			free(argt);
 			return;
 		}
-		iso_M->instructions = (uint32_t*)nbl;
-		iso_M->numberofinstructions = func2->numberofinstructions;
-		memcpy(iso_M->instructions, func2->instructions, func2->numberofinstructions * sizeof(uint32_t));
+		iso_M->bytecode.instructions = (uint32_t*)nbl;
+		iso_M->bytecode.numberofinstructions = func2->numberofinstructions;
+		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(uint32_t));
 	}
 
 
@@ -598,6 +605,66 @@ void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int
 
 	mercury_pushstack(M, o);
 	mercury_unassign_var(M, i);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+
+
+
+void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in, mercury_int args_out) { //dangerous, hell yeah!
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		return;
+	}
+
+	for (mercury_int a = 1; a < args_in; a++) { //remove extra input args
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	mercury_variable* i = mercury_popstack(M);
+
+	if (i->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)i->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	char* c=mercury_mstring_to_cstring((mercury_stringliteral*)i->data.p);
+
+
+	mercury_variable* o = mercury_assign_var(M);
+	o->type = M_TYPE_BOOL;
+	
+
+#ifdef _WIN32
+	HMODULE lib = LoadLibraryA(c);
+	if (!lib) {
+		o->data.i = 0;
+	}
+	else {
+		FreeLibrary(lib);
+		o->data.i = 1;
+	}
+#else
+	void* lib = dlopen(c, RTLD_NOW);
+	if (!lib) {
+		o->data.i = 0;
+	}
+	else {
+		dlclose(lib);
+		o->data.i = 1;
+	}
+#endif
+
+	free(c);
+	mercury_unassign_var(M, i);
+	
+
+	mercury_pushstack(M, o);
 
 	for (mercury_int a = 1; a < args_out; a++) {
 		mercury_variable* mv = mercury_assign_var(M);

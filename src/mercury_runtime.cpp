@@ -263,7 +263,7 @@ int main(int argc, char** argv) {
 	dlclose(mercury_main);
 #endif
 
-
+	bool interactivemode = false;
 
 	
 	mercury_array* arg_arr=mercury_newarray();
@@ -280,6 +280,7 @@ int main(int argc, char** argv) {
 	}
 	
 	char* code;// = (char*)"";
+
 
 	if (argc>=2) {
 		const char* fpath= argv[1];
@@ -317,35 +318,12 @@ int main(int argc, char** argv) {
 
 	}
 	else {
-		printf("no file supplied.\n");
-		return -1;
+		//printf("no file supplied.\n");
+		//return -1;
+		code = (char*)"print(\"hello, world!\")";
+		interactivemode = true;
 	}
 
-
-	mercury_stringliteral* tstr = mercury_cstring_const_to_mstring((char*)code,strlen(code));
-
-	mercury_variable* funcy = mercury_compile_mstring(tstr);
-
-
-	if (funcy->type != M_TYPE_FUNCTION) {
-		if (funcy->type == M_TYPE_STRING) {
-			mercury_stringliteral* s = (mercury_stringliteral*)funcy->data.p;
-			for (mercury_int n = 0; n < s->size; n++) {
-				putchar(s->ptr[n]);
-			}
-			putchar('\n');
-		}
-		return 1;
-	}
-
-
-
-
-	mercury_function* compiled = (mercury_function*)funcy->data.p;
-	
-#if defined(DEBUG) || defined(_DEBUG)
-	mercury_debugdumpbytecode(compiled->instructions, compiled->numberofinstructions);
-#endif
 
 	
 
@@ -359,13 +337,78 @@ int main(int argc, char** argv) {
 	atk_v->type = M_TYPE_STRING;
 	atk_v->data.p = mercury_cstring_const_to_mstring((char*)"_ARGS",5);
 	mercury_setkey(M->enviroment, atk_v, at_v);
-
 	mercury_populate_enviroment_with_libs(M);
 
-	M->instructions = compiled->instructions;
-	M->numberofinstructions = compiled->numberofinstructions;
 
-	while(mercury_stepstate(M));
+	start:
+	if (interactivemode) {
+		mercury_int sizec = 200;
+		mercury_int len = 0;
+		char* c = (char*)malloc(sizec);
+		if (!c) {
+			return -1;
+		}
+
+
+		int ch = 0;
+		while ((ch = fgetc(stdin)) != EOF && ch != '\n' && ch != '\r') {
+				c[len] = ch;
+				len++;
+				if (len >= sizec) {
+					sizec += 200;
+					void* n = realloc(c, sizec);
+					if (!n) {
+						return -1;
+					}
+					c = (char*)n;
+				}
+		}
+		c[len] = '\0';
+		code = c;
+		printf("%s\n", code);
+	}
+
+
+	mercury_stringliteral* tstr = mercury_cstring_const_to_mstring((char*)code, strlen(code));
+	mercury_variable* funcy = mercury_compile_mstring(tstr);
+
+	if (funcy->type != M_TYPE_FUNCTION) {
+		if (funcy->type == M_TYPE_STRING) {
+			mercury_stringliteral* s = (mercury_stringliteral*)funcy->data.p;
+			for (mercury_int n = 0; n < s->size; n++) {
+				putchar(s->ptr[n]);
+			}
+			putchar('\n');
+		}
+		if (!interactivemode)return 1;
+	}
+	else {
+
+		mercury_function* compiled = (mercury_function*)funcy->data.p;
+
+#if defined(DEBUG) || defined(_DEBUG)
+		mercury_debugdumpbytecode(compiled->instructions, compiled->numberofinstructions);
+#endif
+
+		M->programcounter = 0;
+
+		M->bytecode.instructions = compiled->instructions;
+		M->bytecode.numberofinstructions = compiled->numberofinstructions;
+		M->bytecode.debug_info = compiled->debug_info;
+
+		//printf("current stack: %i\n", M->sizeofstack);
+
+		while (mercury_stepstate(M));
+	}
+
+	if (interactivemode) {
+
+		free(code);
+		free(M->bytecode.instructions);
+		M->bytecode.numberofinstructions = 0;
+		free(M->bytecode.debug_info);
+		goto start;
+	}
 
 	return 0;
 }

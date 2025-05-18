@@ -12,6 +12,7 @@ struct compiler_token {
 
 struct compiler_function {
 	uint32_t* instructions = nullptr;
+	mercury_int* instruction_tokens = nullptr; //which token each instruction points to
 	mercury_int number_instructions = 0;
 	mercury_int token_error_num = 0;
 	int errorcode = 0;

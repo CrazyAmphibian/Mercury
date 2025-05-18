@@ -73,6 +73,14 @@ struct mercury_table {
 
 //typedef mercury_subtable** mercury_table;
 
+struct mercury_debug_token {
+	char* token_prev=	nullptr;
+	char* token	  =	nullptr;
+	char* token_next=	nullptr;
+	mercury_int col=0;
+	mercury_int line=0;
+};
+
 struct mercury_array { //gee bill, two storage types?
 	mercury_int size = 0;
 	mercury_uint refrences = 0;
@@ -83,6 +91,8 @@ struct mercury_function {
 	mercury_uint refrences = 0;
 	mercury_uint numberofinstructions = 0;
 	uint32_t* instructions = nullptr;
+	bool enviromental = false;
+	mercury_debug_token* debug_info=nullptr;
 };
 
 struct mercury_filewrapper {
@@ -109,8 +119,8 @@ struct mercury_state {
 	mercury_variable** registers = nullptr;
 
 	mercury_int programcounter = 0;
-	mercury_uint numberofinstructions = 0;
-	uint32_t* instructions = nullptr;
+	mercury_function bytecode;
+
 
 	mercury_table* enviroment;
 

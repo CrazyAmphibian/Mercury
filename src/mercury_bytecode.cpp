@@ -27,7 +27,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset= M->instructions+M->programcounter;
+		void* offset= M->bytecode.instructions+M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount++;
@@ -67,7 +67,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount++;
@@ -134,7 +134,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount++;
@@ -174,7 +174,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount++;
@@ -241,7 +241,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount++;
@@ -281,7 +281,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount++;
@@ -348,7 +348,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount++;
@@ -388,7 +388,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount++;
@@ -455,7 +455,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount++;
@@ -495,7 +495,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount++;
@@ -563,7 +563,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount++;
@@ -603,7 +603,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount++;
@@ -683,7 +683,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount++;
@@ -723,7 +723,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount++;
@@ -788,7 +788,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			i1 = *(mercury_int*)offset;
 		}
@@ -826,7 +826,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			i2 = *(mercury_int*)offset;
 			outfloat = true;
@@ -891,7 +891,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			i1 = *(mercury_int*)offset;
 		}
@@ -929,7 +929,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			i2 = *(mercury_int*)offset;
 			outfloat = true;
@@ -994,7 +994,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			i1 = *(mercury_int*)offset;
 		}
@@ -1032,7 +1032,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			i2 = *(mercury_int*)offset;
 			outfloat = true;
@@ -1096,7 +1096,7 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			i1 = *(mercury_int*)offset;
 		}
@@ -1170,7 +1170,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			i1 = *(mercury_int*)offset;
 		}
@@ -1208,7 +1208,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			i2 = *(mercury_int*)offset;
 			outfloat = true;
@@ -1273,7 +1273,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			i1 = *(mercury_int*)offset;
 		}
@@ -1311,7 +1311,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			i2 = *(mercury_int*)offset;
 			outfloat = true;
@@ -1521,7 +1521,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount |= 2;
@@ -1561,7 +1561,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount |= 1;
@@ -1634,7 +1634,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount |= 2;
@@ -1674,7 +1674,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount |= 1;
@@ -1747,7 +1747,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount |= 2;
@@ -1787,7 +1787,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount |= 1;
@@ -1860,7 +1860,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
 			f1 = *(mercury_float*)offset;
 			floatcount |= 2;
@@ -1900,7 +1900,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 	}
 
 	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->instructions + M->programcounter;
+		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
 			floatcount |= 1;
@@ -2078,7 +2078,7 @@ void M_BYTECODE_GET(mercury_state* M, uint16_t flags) {
 
 
 void M_BYTECODE_SREG(mercury_state* M, uint16_t flags) {
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 
 	mercury_int regnum = *(mercury_int*)offset;
 
@@ -2097,7 +2097,7 @@ void M_BYTECODE_SREG(mercury_state* M, uint16_t flags) {
 
 
 void M_BYTECODE_GREG(mercury_state* M, uint16_t flags) {
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 
 	mercury_int regnum = *(mercury_int*)offset;
 
@@ -2124,7 +2124,7 @@ void M_BYTECODE_GREG(mercury_state* M, uint16_t flags) {
 }
 
 void M_BYTECODE_NINT(mercury_state* M, uint16_t flags) { //New INTeger
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2142,7 +2142,7 @@ void M_BYTECODE_NINT(mercury_state* M, uint16_t flags) { //New INTeger
 }
 
 void M_BYTECODE_NFLO(mercury_state* M, uint16_t flags) { //New FLOat
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2193,7 +2193,7 @@ void M_BYTECODE_NNIL(mercury_state* M, uint16_t flags) { //New NIL
 }
 
 void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2221,11 +2221,11 @@ void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
 			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
 			return;
 		}
-		memcpy(sc, (char*)(M->instructions + M->programcounter), string_size * sizeof(char));
+		memcpy(sc, (char*)(M->bytecode.instructions + M->programcounter), string_size * sizeof(char));
 		
 		so->ptr = sc;
 		*/
-		so->ptr = (char*)(M->instructions + M->programcounter);
+		so->ptr = (char*)(M->bytecode.instructions + M->programcounter);
 		so->constant = true;
 	}
 	else so->ptr = nullptr;
@@ -2236,7 +2236,7 @@ void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
 
 
 	out->type = M_TYPE_STRING;
-	//out->data.p = mercury_cstring_to_mstring( (char*)(M->instructions + M->programcounter),string_size); //avoid function call overhead
+	//out->data.p = mercury_cstring_to_mstring( (char*)(M->bytecode.instructions + M->programcounter),string_size); //avoid function call overhead
 	M->programcounter += (string_size+3)/4;
 
 	mercury_pushstack(M, out);
@@ -2244,7 +2244,7 @@ void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
 }
 
 void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2259,7 +2259,7 @@ void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 		return;
 	}
 
-	if (M->numberofinstructions < M->programcounter + function_size) {
+	if (M->bytecode.numberofinstructions < M->programcounter + function_size) {
 		mercury_raise_error(M, M_ERROR_INSTRUCTION_FAILIURE, (void*)(M->programcounter - 1));
 		return;
 	}
@@ -2268,7 +2268,7 @@ void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 	fptr->numberofinstructions = function_size;
 	fptr->instructions = (uint32_t*)malloc(function_size * sizeof(uint32_t));
 
-	memcpy(fptr->instructions , M->instructions+M->programcounter , function_size * sizeof(uint32_t));
+	memcpy(fptr->instructions , M->bytecode.instructions+M->programcounter , function_size * sizeof(uint32_t));
 
 	if (fptr->instructions == nullptr) {
 		free(fptr);
@@ -2326,7 +2326,7 @@ void M_BYTECODE_NARR(mercury_state* M, uint16_t flags) { //New ARRay
 }
 
 void M_BYTECODE_JMP(mercury_state* M, uint16_t flags) { //JuMP
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2340,7 +2340,7 @@ void M_BYTECODE_JMP(mercury_state* M, uint16_t flags) { //JuMP
 }
 
 void M_BYTECODE_JMPR(mercury_state* M, uint16_t flags) { //JuMP Relative
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2352,7 +2352,7 @@ void M_BYTECODE_JMPR(mercury_state* M, uint16_t flags) { //JuMP Relative
 }
 
 void M_BYTECODE_JIF(mercury_state* M, uint16_t flags) { //Jump IF
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2369,7 +2369,7 @@ void M_BYTECODE_JIF(mercury_state* M, uint16_t flags) { //Jump IF
 }
 
 void M_BYTECODE_JNIF(mercury_state* M, uint16_t flags) { //Jump Not IF
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2386,7 +2386,7 @@ void M_BYTECODE_JNIF(mercury_state* M, uint16_t flags) { //Jump Not IF
 }
 
 void M_BYTECODE_JRIF(mercury_state* M, uint16_t flags) { //Jump Relative IF
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2403,7 +2403,7 @@ void M_BYTECODE_JRIF(mercury_state* M, uint16_t flags) { //Jump Relative IF
 }
 
 void M_BYTECODE_JRNI(mercury_state* M, uint16_t flags) { //Jump Relative Not If
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2420,7 +2420,7 @@ void M_BYTECODE_JRNI(mercury_state* M, uint16_t flags) { //Jump Relative Not If
 }
 
 void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
-	void* offset = M->instructions + M->programcounter;
+	void* offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2428,7 +2428,7 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 #endif
 	mercury_int args_in = *(mercury_int*)offset;
 
-	offset = M->instructions + M->programcounter;
+	offset = M->bytecode.instructions + M->programcounter;
 #ifdef MERCURY_64BIT
 	M->programcounter += 2;
 #else
@@ -2444,8 +2444,8 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 		{
 		mercury_state* FM=mercury_newstate(M);
 		mercury_function* func = (mercury_function*)ck->data.p;
-		FM->instructions = func->instructions;
-		FM->numberofinstructions = func->numberofinstructions;
+		FM->bytecode.instructions = func->instructions;
+		FM->bytecode.numberofinstructions = func->numberofinstructions;
 		for (mercury_int i = 0; i < args_in;i++) {
 			mercury_pushstack(FM, mercury_popstack(M));
 		}
@@ -2472,7 +2472,7 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 }
 
 void M_BYTECODE_END(mercury_state* M, uint16_t flags) { //end state execution
-	M->programcounter = M->numberofinstructions;
+	M->programcounter = M->bytecode.numberofinstructions;
 }
 
 void M_BYTECODE_LEN(mercury_state* M, uint16_t flags) { //LENgth

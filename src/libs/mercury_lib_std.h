@@ -17,6 +17,7 @@ void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int 
 void mercury_lib_std_type(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_std_tostring(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in, mercury_int args_out);
 
 const mercury_int m_const_type_nil = M_TYPE_NIL;
 const mercury_int m_const_type_int = M_TYPE_INT;

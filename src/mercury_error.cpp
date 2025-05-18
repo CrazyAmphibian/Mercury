@@ -24,14 +24,24 @@ const char* typetostring[256] = {
 
 
 mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t errorcode , void* data1, void* data2, void* data3) {
-	char buffer[255] = {0};
+	char* buffer = (char*)calloc(255,sizeof(char));
+	if (!buffer)return nullptr;
+	//char buffer[255] = {0};
 	int result = 0;
+
+	char header[255] = {0};
+	if (M->bytecode.debug_info) {
+
+
+		mercury_debug_token T = M->bytecode.debug_info[M->programcounter-1];
+		snprintf(header,255,"line %lli col %lli at %s%s%s",T.line+1,T.col+1 , T.token_prev? T.token_prev:"" , T.token, T.token_next ? T.token_next : "");
+	}
 
 	switch (errorcode) {
 	case M_ERROR_NONE:
 		return nullptr;
 	case M_ERROR_ALLOCATION:
-		result=snprintf(buffer, 255, "instruction %li: memory allocation error\n", (long)data1);
+		result=snprintf(buffer, 255, "%smemory allocation error\n",header, (long)data1);
 		return mercury_cstring_const_to_mstring(buffer,strlen(buffer));
 	case M_ERROR_WRONG_TYPE:
 		result = snprintf(buffer, 255, "instruction %li: wrong type. got %s, expected %s\n", (long)data1 , typetostring[(int)data3] , typetostring[(int)data2]);
@@ -43,7 +53,7 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 		result = snprintf(buffer, 255, "instruction %li: failiure to execute instruction\n", (long)data1);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_CALL_NOT_FUNCTION:
-		result = snprintf(buffer, 255, "instruction %li: attempt to call non-function value %s \n", (long)data1 , typetostring[(int)data2] );
+		result = snprintf(buffer, 255, "%s instruction %li: attempt to call non-function value %s \n", header , (long)data1 , typetostring[(int)data2] );
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_INDEX_INVALID_TYPE:
 		result = snprintf(buffer, 255, "instruction %li: attempt to index invalid variable type %s \n", (long)data1, typetostring[(int)data2]);
@@ -56,8 +66,6 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 
 
 void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1, void* data2, void* data3) {
-	M->programcounter = M->numberofinstructions; //push to end to stop execution
-
 
 	mercury_stringliteral* str = mercury_generate_error_string(M,errorcode,data1 , data2, data3);
 	if (str != nullptr) {
@@ -68,7 +76,10 @@ void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1, void
 	}
 
 	putchar('\n');
-	
+	free(str->ptr);
+	free(str);
+
+	M->programcounter = M->bytecode.numberofinstructions; //push to end to stop execution
 }
 
 

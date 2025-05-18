@@ -304,8 +304,8 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 	mercury_variable* var_b = *(mercury_variable**)b;
 
 	mercury_state* M=mercury_newstate(SORTING_M_STATE);
-	M->instructions = SORTING_M_FUNCTION->instructions;
-	M->numberofinstructions = SORTING_M_FUNCTION->numberofinstructions;
+	M->bytecode.instructions = SORTING_M_FUNCTION->instructions;
+	M->bytecode.numberofinstructions = SORTING_M_FUNCTION->numberofinstructions;
 	mercury_pushstack(M,var_b);
 	mercury_pushstack(M,var_a);
 	while (mercury_stepstate(M));

@@ -123,8 +123,8 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 	out->type = M_TYPE_NIL;
 	
 	if (t->state) {
-		t->state->numberofinstructions = ((mercury_function*)func_var->data.p)->numberofinstructions;
-		t->state->instructions = ((mercury_function*)func_var->data.p)->instructions;
+		t->state->bytecode.numberofinstructions = ((mercury_function*)func_var->data.p)->numberofinstructions;
+		t->state->bytecode.instructions = ((mercury_function*)func_var->data.p)->instructions;
 
 		if (vart) {
 			for (mercury_int i = 0; i < args_in - 2; i++) {
@@ -144,7 +144,7 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 		}
 		else {
 			if (table_var)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
-			t->state->instructions = nullptr; //don't mess with the host function's data
+			t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
 			mercury_destroystate(t->state);
 			free(t);
 		}

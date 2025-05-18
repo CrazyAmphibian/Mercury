@@ -442,8 +442,13 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 	newstate->sizeunassignedstack = 0;
 
 	newstate->programcounter = 0;
-	newstate->numberofinstructions = 0;
-	newstate->instructions = nullptr;
+
+	newstate->bytecode.enviromental = true;
+	newstate->bytecode.instructions = nullptr;
+	newstate->bytecode.numberofinstructions = 0;
+	newstate->bytecode.refrences = 0xFFFF;
+	//newstate->numberofinstructions = 0;
+	//newstate->instructions = nullptr;
 
 
 	return newstate;
@@ -452,9 +457,9 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 
 
 bool mercury_stepstate(mercury_state* M) {
-	if (M->programcounter >= M->numberofinstructions) return false;
+	if (M->programcounter >= M->bytecode.numberofinstructions) return false;
 
-	uint32_t instr = M->instructions[M->programcounter];
+	uint32_t instr = M->bytecode.instructions[M->programcounter];
 
 	uint16_t opcode= instr&0xFFFF;
 	uint16_t iflags= instr>>16;
@@ -491,7 +496,7 @@ void mercury_destroystate(mercury_state* M) {
 	}
 
 	if(M->enviroment)mercury_destroytable(M->enviroment);
-	if(M->instructions)free(M->instructions);
+	if(M->bytecode.instructions)free(M->bytecode.instructions);
 	free(M);
 }
 
@@ -596,7 +601,7 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 			if (t->customenv) {
 				t->state->enviroment = nullptr;
 			}
-			t->state->instructions = nullptr;
+			t->state->bytecode.instructions = nullptr;
 			mercury_destroystate(t->state);
 			free(t);
 		}
@@ -1425,6 +1430,8 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_std_type, "type", nullptr);
 	mercury_register_library(mercury_lib_std_tostring, "tostring", nullptr);
 	mercury_register_library(mercury_lib_std_tonumber, "tonumber", nullptr);
+	mercury_register_library(mercury_lib_std_dynamic_library_load, "loadlibrary", nullptr);
+
 
 	mercury_register_library((void*)&m_const_type_nil, "TYPE_NIL", nullptr, M_TYPE_INT);
 	mercury_register_library((void*)&m_const_type_int, "TYPE_INT", nullptr, M_TYPE_INT);
@@ -1539,7 +1546,7 @@ return TRUE;
 
 
 
-/*
+ /*
 int main(int argc, char** argv) {
 	
 
@@ -1558,58 +1565,8 @@ int main(int argc, char** argv) {
 	}
 	
 
+	const char* code = "print(6)";
 
-
-	//"a=function (v) global print(local v) end  b=thread.new(a,5) print(thread.fetch(b)) ";
-	// a=function(w,x) local a=100000 while a do a=a-1 end  return w/x  end    b=thread.new(a,nil,3,4) while !!thread.isfinished(b) do print(\"running\") end print(thread.fetch(b))
-	// "local a=1000000 st=os.clock() while local a do local a=local a-1 end time=os.clock()-st  ";
-
-	// local a=1000000 st=os.clock() while local a do local a=local a-1 end time=os.clock()-st
-
-	//" local a=1000000 st=os.clock() while local a do local a=local a-1 end time=os.clock()-st";
-
-
-	char* code;// = (char*)"";
-
-	if (argc>=2) {
-		const char* fpath= argv[1];
-		FILE* f=fopen(fpath,"rb");
-		if (!f) {
-			printf("error opening file.\n");
-			return 1;
-		}
-		if (fseek(f, 0, SEEK_END)) {
-			printf("error reading file (1).\n");
-			return 1;
-		}
-		else {
-			mercury_int len = ftell(f);
-			//printf("length is %lli\n",len);
-			if (len == -1) {
-				printf("error reading file (2).\n");
-				return 1;
-			}
-			else {
-				char* s = (char*)malloc(sizeof(char) * (len+1) );
-				if (!s) {
-					printf("error reading file (3).\n");
-					return 1;
-				}
-				rewind(f);
-				fread(s, 1, len, f);
-				s[len] = '\0';
-
-				code = s;
-				//printf("%s", code);
-			}
-		}
-		fclose(f);
-
-	}
-	else {
-		printf("no file supplied.\n");
-		return -1;
-	}
 
 
 	mercury_stringliteral* tstr = mercury_cstring_const_to_mstring((char*)code,strlen(code));
@@ -1630,7 +1587,7 @@ int main(int argc, char** argv) {
 
 	mercury_function* compiled = (mercury_function*)funcy->data.p;
 
-	/*
+	
 	int o = 0;
 	while (o < compiled->numberofinstructions)
 	{
@@ -1640,7 +1597,6 @@ int main(int argc, char** argv) {
 		printf("0x%X (%i) 0x%X (%i)\n", flags, flags, instr, instr);
 		o++;
 	}
-	* /
 
 
 	//mercury_debugdumpbytecode(compiled->instructions, compiled->numberofinstructions);
@@ -1659,14 +1615,15 @@ int main(int argc, char** argv) {
 
 	mercury_populate_enviroment_with_libs(M);
 
-	M->instructions = compiled->instructions;
-	M->numberofinstructions = compiled->numberofinstructions;
+	M->bytecode.instructions = compiled->instructions;
+	M->bytecode.numberofinstructions = compiled->numberofinstructions;
+	M->bytecode.debug_info = compiled->debug_info;
 
 	while(mercury_stepstate(M));
 
 
-	//mercury_debugdumptable(M->enviroment, 0);
+	mercury_debugdumptable(M->enviroment, 0);
 
 	return 0;
 }
-*/
+ */
