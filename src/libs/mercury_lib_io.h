@@ -18,7 +18,9 @@ void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int a
 void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_io_post(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_io_prompt(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_io_input(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_io_remove(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_io_removedir(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_io_createdir(mercury_state* M, mercury_int args_in, mercury_int args_out);
+
 

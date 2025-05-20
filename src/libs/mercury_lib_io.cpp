@@ -9,11 +9,13 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #include <direct.h>
+#include <conio.h>
 #else
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <termios.h>
 #endif
 
 
@@ -697,3 +699,51 @@ void mercury_lib_io_createdir(mercury_state* M, mercury_int args_in, mercury_int
 	}
 }
 
+
+
+void mercury_lib_io_input(mercury_state* M, mercury_int args_in, mercury_int args_out) { //read a single char stdin. no newline required! (platform dependant, though. :/)
+	for (mercury_int i = 1; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	//got rid of it. should just be raw input. on the coder to not read it in a while loop (you can also manually check for ctrl+c)
+	//mercury_variable* ck = mercury_popstack(M);
+
+	char c;
+
+#ifdef _WIN32
+	c = _getch();
+#else
+	termios oldt, newt;
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	c = getchar();
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+#endif
+
+	//ctrl+c interuption.
+	//if (c == '\3' ){//&& mercury_checkbool(ck) ) {
+	//	M->programcounter = M->bytecode.numberofinstructions;
+	//}
+
+	//mercury_free_var(ck);
+
+	if (args_out) {
+		mercury_stringliteral* s = mercury_cstring_to_mstring(&c, 1);
+		mercury_variable* v = mercury_assign_var(M);
+		v->type = M_TYPE_STRING;
+		v->data.p = s;
+		mercury_pushstack(M, v);
+	}
+
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}

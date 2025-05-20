@@ -604,6 +604,16 @@ awaits input from stdin. input will be accepted after the user hits enter. retur
 a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>prompt</span><span class='m_symbol'>()</span> <span class='m_comment'> </span> <br>
 </div>
 
+<div class='fdec'>input ()</div>
+<div class='desc'>
+<p>
+awaits a single keypress from stdin. does not require pressing enter. returns the input as a single character.<br>
+use caution if using this in a loop, as the control+C break sequence will not be captured by the program, and instead be sent as raw input. instead. you should check for the sequence 0x03
+</p>
+<p class='example'>
+a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>input</span><span class='m_symbol'>()</span> <span class='m_comment'> </span> <br>
+</div>
+
 <div class='fdec'>remove (<span class='type'>string</span> path)</div>
 <div class='desc'>
 <p>

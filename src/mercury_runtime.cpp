@@ -365,7 +365,6 @@ int main(int argc, char** argv) {
 		}
 		c[len] = '\0';
 		code = c;
-		printf("%s\n", code);
 	}
 
 

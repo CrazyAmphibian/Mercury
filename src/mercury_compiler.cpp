@@ -214,11 +214,11 @@ bool add_char_to_token(compiler_token* t, char c) {
 	return true;
 }
 
-int read_char_from_hex_chars(char* chars) { //this isn't pretty
+int read_char_from_hex_chars(char* chars,int* offset_out) { //this isn't pretty
 	int num = 0;
 	char c1 = chars[1];
 	char c2 = chars[2];
-
+	*offset_out = 0;
 	switch (c1) {
 	case '0':
 		num |= 0x0;
@@ -278,6 +278,7 @@ int read_char_from_hex_chars(char* chars) { //this isn't pretty
 		return 0xBEEF;
 	}
 	num <<= 4;
+	*offset_out = 1;
 	switch (c2) {
 	case '0':
 		num |= 0x0;
@@ -334,8 +335,39 @@ int read_char_from_hex_chars(char* chars) { //this isn't pretty
 		num |= 0xF;
 		break;
 	default:
+		return num>>4;
+	}
+	*offset_out = 2;
+	return num;
+}
+
+
+int read_char_from_dec_chars(char* chars,int* offset_out) {
+	int num = 0;
+	char c1 = chars[1];
+	char c2 = chars[2];
+	char c3 = chars[3];
+
+	printf("%c %c %c\n", c1, c2, c3);
+
+	if (c1 < '0' || c1>'9') {
+		*offset_out = 0;
 		return 0xBEEF;
 	}
+	num += (c1 - '0');
+	if (c2 < '0' || c2>'9') {
+		*offset_out = 1;
+		return num;
+	}
+	num *= 10;
+	num += (c2 - '0');
+	if (c3 < '0' || c3>'9') {
+		*offset_out = 2;
+		return num;
+	}
+	num *= 10;
+	num += (c3 - '0');
+	*offset_out = 3;
 	return num;
 }
 
@@ -443,14 +475,36 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 							break;
 						case 'x': //hex input
 						{
-							int  r = read_char_from_hex_chars(cstr + c + 2);
+							int off = 0;
+							int  r = read_char_from_hex_chars(cstr + c + 1,&off);
 							if (r != 0xBEEF) { //magic numbers, yay
 								add_char_to_token(temp_token, (char)r);
 							}
+							c += off;
+							col += off;
 						}
-						c += 2;
-						col += 2;
 						break;
+						case '0':
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+						{
+							int adv = 0;
+							int  r = read_char_from_dec_chars(cstr + c ,&adv);
+							if (r != 0xBEEF) { //magic numbers, yay
+								add_char_to_token(temp_token, (char)r);
+							}
+							adv -= 1;
+							c += adv;
+							col += adv;
+						}
+							break;
 						default:
 							break;
 						}
