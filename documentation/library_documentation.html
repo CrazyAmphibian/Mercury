@@ -441,18 +441,23 @@ takes a string and returns it with all lowercase characters.
 <div class='desc'>
 <p>
 takes a formatted string and adds in received values. works with similar syntax to C's printf.<br>
-formats start with a %, followed by a character depending on the value. this function will type coerce, and will never cause an error from the variadic arguments.
-
-types
+formats start with a %, followed by a character depending on the value. this function will type coerce, and will never cause an error from the variadic arguments.<br>
+<br>
+<b>types</b>
 <table>
 <tr><th>character</th><th>type</th><th>extra</th></tr>
 <tr><td>%</td><td>the character %</td></tr>
-<tr><td>i, I</td><td>an integer value</td><td>flags, width, percision</td></tr>
+<tr><td>i, I</td><td>an integer value</td><td>flags, width</td></tr>
 <tr><td>f, F</td><td>a float value</td><td>flags, width, percision</td></tr>
+<tr><td>e, E</td><td>a float value in scientific notation</td><td>flags, width, percision</td></tr>
+<tr><td>g, G</td><td>a float value. changes from fixed-point (f) and scientific (e) depending on the value and precision.</td><td>flags, width, percision</td></tr>
 <tr><td>s, S</td><td>a string value</td></tr>
+<tr><td>x, X</td><td>an integer value as hexadecimal</td><td>flags, width</td></tr>
+<tr><td>a, A</td><td>a float value as hexadecimal</td><td>flags, width, percision</td></tr>
+<tr><td>p, P</td><td>a pointer value for complex datatypes. other datatypes will be 0</td><td>flags, width</td></tr>
 </table>
-
-flags
+<br>
+<b>flags</b>
 <table>
 <tr><th>character</th><th>effect</th></tr>
 <tr><td>-</td><td>aligns left instead of right. overrides 0.</td></tr>
@@ -464,7 +469,7 @@ flags
 
 </p>
 <p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>format</span><span class='m_symbol'>(</span><span class='m_string'>"the time is %2i:%2i"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "hello, world!" </span> <br>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>format</span><span class='m_symbol'>(</span><span class='m_string'>"the time is %2i:%02i"</span><span class='m_symbol'>,</span>hours<span class='m_symbol'>,</span>minutes<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
 </div>
 
 

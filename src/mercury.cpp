@@ -1000,6 +1000,19 @@ mercury_float mercury_checkfloat(mercury_variable* var) {
 		return 0.0;
 	}
 }
+//ditto
+void* mercury_checkpointer(mercury_variable* var) {
+	switch (var->type) {
+	case M_TYPE_NIL:
+	case M_TYPE_BOOL:
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+		return nullptr;
+	default:
+		return var->data.p;
+	}
+}
+
 
 bool mercury_vars_equal(mercury_variable* var1, mercury_variable* var2) {
 	if (var1->type != var2->type) {

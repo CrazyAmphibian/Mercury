@@ -680,6 +680,9 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 
 	char printfbuffer[1024] = {'0'};
 
+	const char* type=nullptr;
+	mercury_int value = 0;
+
 	while (true) {
 		if (add_off + offset >= str->size)break;
 		char c = str->ptr[add_off + offset];
@@ -691,79 +694,188 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto exit;
 		case 'I':
 		case 'i': // integer
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "lli";
+#else
+				type = "i";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					value = mercury_checkint(v_arr[*num_vars]);
+				}		
+			}
+		case 'x': // hex int
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llx";
+#else
+				type = "x";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					value = mercury_checkint(v_arr[*num_vars]);
+				}
+			}
+		case 'X': // hex int (capital)
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llX";
+#else
+				type = "X";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					value = mercury_checkint(v_arr[*num_vars]);
+				}
+			}
+		case 'f':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llf";
+#else
+				type = "f";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'F':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llF";
+#else
+				type = "F";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'e':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "lle";
+#else
+				type = "e";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'E':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llE";
+#else
+				type = "E";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'g':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llg";
+#else
+				type = "g";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'G':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llG";
+#else
+				type = "G";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'a':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "lla";
+#else
+				type = "a";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'A':
+			if (!type) {
+#ifdef MERCURY_64BIT
+				type = "llA";
+#else
+				type = "A";
+#endif
+				if (*num_vars) {
+					(*num_vars)--;
+					mercury_float f = mercury_checkfloat(v_arr[*num_vars]);
+					value = *(mercury_int*)&f;
+				}
+			}
+		case 'p':
+		case 'P':
+			if (!type) {
+				type = "p";
+				if (*num_vars) {
+					(*num_vars)--;
+					void* p = mercury_checkpointer(v_arr[*num_vars]);
+					value = (mercury_int)p;
+				}
+			}
+
 			{
-			mercury_int v = 0;
+
 			mercury_int l = 0;
 			mercury_int p = 0;
-			if (*num_vars) {
-				(*num_vars)--;
-				v = mercury_checkint(v_arr[*num_vars]);
-			}
 			if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
 			if (args_def[ARG_PERCISION])p = args[ARG_PERCISION];
 
-			char* printf_fstr = getprintfstring(args,args_def,"lli");
+			char* printf_fstr = getprintfstring(args,args_def,type);
 			if (!printf_fstr)break;
 
 			if (args_def[ARG_WIDTH]) {
 				if (args_def[ARG_PERCISION]) {
-					snprintf(printfbuffer, 1024, printf_fstr,l,p,v);
+					snprintf(printfbuffer, 1024, printf_fstr,l,p, value);
 				}
 				else {
-					snprintf(printfbuffer, 1024, printf_fstr, l,v);
+					snprintf(printfbuffer, 1024, printf_fstr, l, value);
 				}
 			}
 			else {
 				if(args_def[ARG_PERCISION]) {
-					snprintf(printfbuffer, 1024, printf_fstr, p,v);
+					snprintf(printfbuffer, 1024, printf_fstr, p, value);
 				}
 				else {
-					snprintf(printfbuffer, 1024, printf_fstr, v);
+					snprintf(printfbuffer, 1024, printf_fstr, value);
 				}
 			}
 			free(printf_fstr);
 			mercury_mstring_addchars(str_out, printfbuffer, strlen(printfbuffer));
 			goto exit;
 			}
-		case 'F':
-		case 'f': // float
-		{
-			mercury_float v = 0;
-			mercury_int l = 0;
-			mercury_int p = 0;
-			if (*num_vars) {
-				(*num_vars)--;
-				v = mercury_checkfloat(v_arr[*num_vars]);
-			}
-			if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
-			if (args_def[ARG_PERCISION])p = args[ARG_PERCISION];
+		
 
-			char* printf_fstr = getprintfstring(args, args_def, "llf");
-			if (!printf_fstr)break;
-
-			if (args_def[ARG_WIDTH]) {
-				if (args_def[ARG_PERCISION]) {
-					snprintf(printfbuffer, 1024, printf_fstr, l, p, v);
-				}
-				else {
-					snprintf(printfbuffer, 1024, printf_fstr, l, v);
-				}
-			}
-			else {
-				if (args_def[ARG_PERCISION]) {
-					snprintf(printfbuffer, 1024, printf_fstr, p, v);
-				}
-				else {
-					snprintf(printfbuffer, 1024, printf_fstr, v);
-				}
-			}
-
-			free(printf_fstr);
-
-			mercury_mstring_addchars(str_out, printfbuffer, strlen(printfbuffer));
-			//add_off++;
-			goto exit;
-		}
 		case 'S':
 		case 's': // string
 		{
