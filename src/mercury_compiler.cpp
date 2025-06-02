@@ -2363,6 +2363,8 @@ compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercu
 
 mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 
+	static const char const* empty_token_string = "";
+
 	mercury_variable* out = (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (!out)return nullptr;
 
@@ -2471,8 +2473,10 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 		memcpy((void*)mf->debug_info[i].token, t->chars, t->num_chars);
 		mf->debug_info[i].token[t->num_chars] = '\0';
 
-		mf->debug_info[i].token_next = nullptr;
-		mf->debug_info[i].token_prev = nullptr;
+		mf->debug_info[i].token_next = (char*)empty_token_string;
+		mf->debug_info[i].token_next_next = (char*)empty_token_string;
+		mf->debug_info[i].token_prev = (char*)empty_token_string;
+		mf->debug_info[i].token_prev_prev = (char*)empty_token_string;
 
 		if (token_n < num_t-1) {
 			compiler_token* t = tokens[token_n+1];
@@ -2480,11 +2484,23 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 			memcpy((void*)mf->debug_info[i].token_next, t->chars, t->num_chars);
 			mf->debug_info[i].token_next[t->num_chars] = '\0';
 		}
+		if (token_n < num_t - 2) {
+			compiler_token* t = tokens[token_n + 2];
+			mf->debug_info[i].token_next_next = (char*)malloc(sizeof(char) * (t->num_chars + 1));
+			memcpy((void*)mf->debug_info[i].token_next_next, t->chars, t->num_chars);
+			mf->debug_info[i].token_next_next[t->num_chars] = '\0';
+		}
 		if (token_n > 0) {
 			compiler_token* t = tokens[token_n-1];
 			mf->debug_info[i].token_prev = (char*)malloc(sizeof(char) * (t->num_chars + 1));
 			memcpy((void*)mf->debug_info[i].token_prev, t->chars, t->num_chars);
 			mf->debug_info[i].token_prev[t->num_chars] = '\0';
+		}
+		if (token_n > 1) {
+			compiler_token* t = tokens[token_n - 2];
+			mf->debug_info[i].token_prev_prev = (char*)malloc(sizeof(char) * (t->num_chars + 1));
+			memcpy((void*)mf->debug_info[i].token_prev_prev, t->chars, t->num_chars);
+			mf->debug_info[i].token_prev_prev[t->num_chars] = '\0';
 		}
 	}
 

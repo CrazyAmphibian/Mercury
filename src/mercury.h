@@ -74,9 +74,11 @@ struct mercury_table {
 //typedef mercury_subtable** mercury_table;
 
 struct mercury_debug_token {
+	char* token_prev_prev=	nullptr;
 	char* token_prev=	nullptr;
-	char* token	  =	nullptr;
+	char* token	  =	nullptr;	//you get 5 tokens.
 	char* token_next=	nullptr;
+	char* token_next_next=	nullptr;
 	mercury_int col=0;
 	mercury_int line=0;
 };

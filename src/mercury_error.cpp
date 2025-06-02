@@ -34,32 +34,32 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 
 
 		mercury_debug_token T = M->bytecode.debug_info[M->programcounter-1];
-		snprintf(header,255,"line %lli col %lli at %s%s%s",T.line+1,T.col+1 , T.token_prev? T.token_prev:"" , T.token, T.token_next ? T.token_next : "");
+		snprintf(header,255,"line %lli col %lli at \"%s%s%s%s%s\"",T.line+1,T.col+1 ,T.token_prev_prev, T.token_prev , T.token, T.token_next, T.token_next_next);
 	}
 
 	switch (errorcode) {
 	case M_ERROR_NONE:
 		return nullptr;
 	case M_ERROR_ALLOCATION:
-		result=snprintf(buffer, 255, "%smemory allocation error\n",header, (long)data1);
+		result=snprintf(buffer, 255, "%s: memory allocation error\n",header, (long)data1);
 		return mercury_cstring_const_to_mstring(buffer,strlen(buffer));
 	case M_ERROR_WRONG_TYPE:
-		result = snprintf(buffer, 255, "instruction %li: wrong type. got %s, expected %s\n", (long)data1 , typetostring[(int)data3] , typetostring[(int)data2]);
+		result = snprintf(buffer, 255, "%s: wrong type. got %s, expected %s\n", header , typetostring[(int)data3] , typetostring[(int)data2]);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_DIV_ZERO:
-		result = snprintf(buffer, 255, "instruction %li: integer division by 0\n", (long)data1);
+		result = snprintf(buffer, 255, "%s: integer division by 0\n", header);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_INSTRUCTION_FAILIURE:
-		result = snprintf(buffer, 255, "instruction %li: failiure to execute instruction\n", (long)data1);
+		result = snprintf(buffer, 255, "%s: failiure to execute instruction\n", header);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_CALL_NOT_FUNCTION:
-		result = snprintf(buffer, 255, "%s instruction %li: attempt to call non-function value %s \n", header , (long)data1 , typetostring[(int)data2] );
+		result = snprintf(buffer, 255, "%s: attempt to call non-function value %s \n", header , typetostring[(int)data2] );
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_INDEX_INVALID_TYPE:
-		result = snprintf(buffer, 255, "instruction %li: attempt to index invalid variable type %s \n", (long)data1, typetostring[(int)data2]);
+		result = snprintf(buffer, 255, "%s: attempt to index invalid variable type %s \n", header, typetostring[(int)data2]);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	default:
-		result = snprintf(buffer, 255, "unknown error\n");
+		result = snprintf(buffer, 255, "%s: unknown error\n",header);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	}
 }
