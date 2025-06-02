@@ -960,6 +960,47 @@ bool mercury_checkbool(mercury_variable* var) {
 	}
 }
 
+//type coersion when you really need it
+mercury_int mercury_checkint(mercury_variable* var) {
+	switch (var->type) {
+	case M_TYPE_NIL:
+		return 0;
+	case M_TYPE_BOOL:
+		if (var->data.i) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	case M_TYPE_INT:
+		return var->data.i;
+	case M_TYPE_FLOAT:
+		return (mercury_int)var->data.f;
+	default:
+		return 0;
+	}
+}
+//see above
+mercury_float mercury_checkfloat(mercury_variable* var) {
+	switch (var->type) {
+	case M_TYPE_NIL:
+		return 0.0;
+	case M_TYPE_BOOL:
+		if (var->data.i) {
+			return 1.0;
+		}
+		else {
+			return 0.0;
+		}
+	case M_TYPE_INT:
+		return (mercury_float)var->data.i;
+	case M_TYPE_FLOAT:
+		return var->data.f;
+	default:
+		return 0.0;
+	}
+}
+
 bool mercury_vars_equal(mercury_variable* var1, mercury_variable* var2) {
 	if (var1->type != var2->type) {
 		return false;
@@ -1500,6 +1541,7 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_string_separate, "separate", "string");
 	mercury_register_library(mercury_lib_string_upper, "upper", "string");
 	mercury_register_library(mercury_lib_string_lower, "lower", "string");
+	mercury_register_library(mercury_lib_string_format, "format", "string");
 
 #endif
 #ifdef MERCURY_LIB_OS

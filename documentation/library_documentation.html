@@ -437,6 +437,37 @@ takes a string and returns it with all lowercase characters.
 <span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>lower</span><span class='m_symbol'>(</span><span class='m_string'>"Hello, World!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "hello, world!" </span> <br>
 </div>
 
+<div class='fdec'>format (<span class='type'>string</span> formatstring ,<span class='type'>variable</span>  ...)</div>
+<div class='desc'>
+<p>
+takes a formatted string and adds in received values. works with similar syntax to C's printf.<br>
+formats start with a %, followed by a character depending on the value. this function will type coerce, and will never cause an error from the variadic arguments.
+
+types
+<table>
+<tr><th>character</th><th>type</th><th>extra</th></tr>
+<tr><td>%</td><td>the character %</td></tr>
+<tr><td>i, I</td><td>an integer value</td><td>flags, width, percision</td></tr>
+<tr><td>f, F</td><td>a float value</td><td>flags, width, percision</td></tr>
+<tr><td>s, S</td><td>a string value</td></tr>
+</table>
+
+flags
+<table>
+<tr><th>character</th><th>effect</th></tr>
+<tr><td>-</td><td>aligns left instead of right. overrides 0.</td></tr>
+<tr><td>+</td><td>positive numbers will start with +. overrides " "</td></tr>
+<tr><td> </td><td>positive numbers will add a space in front</td></tr>
+<tr><td>#</td><td>changes how certain types are displayed.</td></tr>
+<tr><td>0</td><td>width padding will use 0 instead of space for numbers.</td></tr>
+</table>
+
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>format</span><span class='m_symbol'>(</span><span class='m_string'>"the time is %2i:%2i"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "hello, world!" </span> <br>
+</div>
+
+
 <h2>Array library</h2>
 <h3>constants</h3>
 <p>

@@ -610,3 +610,314 @@ void mercury_lib_string_lower(mercury_state* M, mercury_int args_in, mercury_int
 	}
 
 }
+
+enum stringformat_argpositons {
+	ARG_WIDTH = 1,
+	ARG_PERCISION = 2,
+	ARG_PADDINGISZERO = 3,
+	ARG_LEFTALIGN = 4,
+	ARG_FORCEPLUS = 5,
+	ARG_ALTERNATENUM = 6
+};
+
+char* getprintfstring(mercury_int* args, bool* args_def, const char* type) {
+	char* str=(char*)malloc(sizeof(char) * 256);
+	if (!str)return nullptr;
+	int ptr = 1;
+	str[0] = '%';
+
+	if (args_def[ARG_FORCEPLUS]) {
+		switch (args[ARG_FORCEPLUS]) {
+		case 1:
+			str[ptr] = '+';
+			break;
+		case 2:
+			str[ptr] = ' ';
+			break;
+		}
+		ptr++;
+	}
+	if (args_def[ARG_LEFTALIGN]) {
+		str[ptr] = '-';
+		ptr++;
+	}
+	if (args_def[ARG_ALTERNATENUM]) {
+		str[ptr] = '#';
+		ptr++;
+	}
+	if (args_def[ARG_PADDINGISZERO]) {
+		str[ptr] = '0';
+		ptr++;
+	}
+
+	if (args_def[ARG_WIDTH]) {
+		str[ptr] = '*';
+		ptr++;
+	}
+
+	if (args_def[ARG_PERCISION]) {
+		str[ptr] = '.';
+		str[ptr+1] = '*';
+		ptr+=2;
+	}
+
+	memcpy(str+ptr,type,strlen(type));
+	ptr+=strlen(type);
+
+	str[ptr] = '\0';
+	return str;
+}
+
+
+// TODO: add a, x, g, e, p, u, o
+int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringliteral* str_out, mercury_variable** v_arr, mercury_int* num_vars) {
+	mercury_int add_off = 0;
+
+	unsigned char nargs = 0;
+	bool args_def[256] = { false }; //if the arg is defined.
+	mercury_int args[256] = {0}; // the value of that arg.
+	char mode = 0;
+
+	char printfbuffer[1024] = {'0'};
+
+	while (true) {
+		if (add_off + offset >= str->size)break;
+		char c = str->ptr[add_off + offset];
+		add_off++;
+		switch (c) {
+		case '%':
+			mercury_mstring_addchars(str_out,(char*)"%",1);
+			//add_off++;
+			goto exit;
+		case 'I':
+		case 'i': // integer
+			{
+			mercury_int v = 0;
+			mercury_int l = 0;
+			mercury_int p = 0;
+			if (*num_vars) {
+				(*num_vars)--;
+				v = mercury_checkint(v_arr[*num_vars]);
+			}
+			if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
+			if (args_def[ARG_PERCISION])p = args[ARG_PERCISION];
+
+			char* printf_fstr = getprintfstring(args,args_def,"lli");
+			if (!printf_fstr)break;
+
+			if (args_def[ARG_WIDTH]) {
+				if (args_def[ARG_PERCISION]) {
+					snprintf(printfbuffer, 1024, printf_fstr,l,p,v);
+				}
+				else {
+					snprintf(printfbuffer, 1024, printf_fstr, l,v);
+				}
+			}
+			else {
+				if(args_def[ARG_PERCISION]) {
+					snprintf(printfbuffer, 1024, printf_fstr, p,v);
+				}
+				else {
+					snprintf(printfbuffer, 1024, printf_fstr, v);
+				}
+			}
+			free(printf_fstr);
+			mercury_mstring_addchars(str_out, printfbuffer, strlen(printfbuffer));
+			goto exit;
+			}
+		case 'F':
+		case 'f': // float
+		{
+			mercury_float v = 0;
+			mercury_int l = 0;
+			mercury_int p = 0;
+			if (*num_vars) {
+				(*num_vars)--;
+				v = mercury_checkfloat(v_arr[*num_vars]);
+			}
+			if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
+			if (args_def[ARG_PERCISION])p = args[ARG_PERCISION];
+
+			char* printf_fstr = getprintfstring(args, args_def, "llf");
+			if (!printf_fstr)break;
+
+			if (args_def[ARG_WIDTH]) {
+				if (args_def[ARG_PERCISION]) {
+					snprintf(printfbuffer, 1024, printf_fstr, l, p, v);
+				}
+				else {
+					snprintf(printfbuffer, 1024, printf_fstr, l, v);
+				}
+			}
+			else {
+				if (args_def[ARG_PERCISION]) {
+					snprintf(printfbuffer, 1024, printf_fstr, p, v);
+				}
+				else {
+					snprintf(printfbuffer, 1024, printf_fstr, v);
+				}
+			}
+
+			free(printf_fstr);
+
+			mercury_mstring_addchars(str_out, printfbuffer, strlen(printfbuffer));
+			//add_off++;
+			goto exit;
+		}
+		case 'S':
+		case 's': // string
+		{
+			mercury_stringliteral* v = nullptr;
+			if (*num_vars) {
+				(*num_vars)--;
+				mercury_variable* var = v_arr[*num_vars];
+				mercury_variable* sv=mercury_tostring(var);
+				v = (mercury_stringliteral*)sv->data.p;
+				free(sv);
+
+			}
+			if (v) {
+				mercury_mstrings_append(str_out, v);
+				free(v);
+			}
+			add_off++;
+			goto exit;
+		}
+		case '-':
+			if (!mode) {
+				args_def[ARG_LEFTALIGN] = true;
+				args[ARG_LEFTALIGN] = 1;
+			}
+			break;
+		case '#':
+			if (!mode) {
+				args_def[ARG_ALTERNATENUM] = true;
+				args[ARG_ALTERNATENUM] = 1;
+			}
+			break;
+		case '+':
+			if (!mode) {
+				args_def[ARG_FORCEPLUS] = true;
+				args[ARG_FORCEPLUS] = 1;
+			}
+			break;
+		case ' ':
+			if (!mode && !args[ARG_FORCEPLUS]) {
+				args_def[ARG_FORCEPLUS] = true;
+				args[ARG_FORCEPLUS] = 2;
+			}
+			break;
+		case '.': // X.Y notation. swap to another mode.
+			mode = ARG_PERCISION;
+			//add_off++;
+			break;
+		case '0':
+			if (!mode) {
+				args_def[ARG_PADDINGISZERO]=true;
+				args[ARG_PADDINGISZERO] = 1;
+			}
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			if (!mode) { mode = ARG_WIDTH; }
+			args_def[mode] = true;
+			args[mode] *= 10;
+			args[mode] += (c-'0');
+			//add_off++;
+			break;
+		default:
+			//break;
+			goto exit;
+		}
+	}
+	exit:
+
+	return add_off;
+}
+
+
+
+void mercury_lib_string_format(mercury_state* M, mercury_int args_in, mercury_int args_out) { //c-style printf formatting.
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		return;
+	};
+	if (!args_out) {
+		return;
+	}
+
+	mercury_int var_s = args_in - 1;
+	mercury_variable** var_t = (mercury_variable**)malloc(sizeof(mercury_variable*)*args_in-1);
+	if (!var_t) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		return;
+	}
+
+	for (mercury_int i = 1; i < args_in; i++) {
+		var_t[i-1]=mercury_popstack(M);
+	}
+
+	mercury_variable* strvar=mercury_popstack(M);
+	if (strvar->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)strvar->type, (void*)M_TYPE_STRING);
+		return;
+	}
+	mercury_stringliteral* s = (mercury_stringliteral*)strvar->data.p;
+
+	mercury_int pc = 0;
+	char* buffer = (char*)malloc(sizeof(char) * 200);
+	mercury_int sbuf = 200;
+	mercury_int cc = 0;
+
+	mercury_stringliteral* outstr = mercury_cstring_const_to_mstring((char*)"",0);
+	
+	/*
+	ARG1 = 1
+	ARG2 = 2
+	*/
+
+	while (pc<s->size) {
+		mercury_int na1 = 0; //numeric argument 1
+		mercury_int na2 = 0; //numeric argument 2
+		unsigned char setargs = 0;
+		unsigned char tacker = 0;
+		char c = s->ptr[pc];
+		if (c == '%') {
+			pc++;
+			if (pc < s->size) {
+				pc+=m_readformat(s,pc, outstr,var_t,&var_s);
+			}
+		}
+		else {
+			mercury_mstring_addchars(outstr, s->ptr+pc, 1);
+			pc++;
+		}
+	next_char:
+		{}
+	}
+
+
+	mercury_variable* out = mercury_assign_var(M);
+	out->type = M_TYPE_STRING;
+	out->data.p = outstr; //mercury_cstring_to_mstring(buffer, cc);
+
+	free(buffer);
+
+
+	mercury_pushstack(M, out);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+
+

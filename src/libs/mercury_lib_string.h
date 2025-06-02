@@ -18,4 +18,4 @@ void mercury_lib_string_fromarray(mercury_state* M, mercury_int args_in, mercury
 void mercury_lib_string_separate(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_string_upper(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_string_lower(mercury_state* M, mercury_int args_in, mercury_int args_out);
-
+void mercury_lib_string_format(mercury_state* M, mercury_int args_in, mercury_int args_out);

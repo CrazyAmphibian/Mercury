@@ -219,6 +219,8 @@ MERCURY_DYNAMIC_LIBRARY void mercury_free_var(mercury_variable* var, bool keep_s
 
 //misc
 MERCURY_DYNAMIC_LIBRARY bool mercury_checkbool(mercury_variable* var);
+MERCURY_DYNAMIC_LIBRARY mercury_int mercury_checkint(mercury_variable* var);
+MERCURY_DYNAMIC_LIBRARY mercury_float mercury_checkfloat(mercury_variable* var);
 MERCURY_DYNAMIC_LIBRARY bool mercury_vars_equal(mercury_variable* var1, mercury_variable* var2);
 
 
