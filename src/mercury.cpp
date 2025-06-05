@@ -670,10 +670,28 @@ bool mercury_pushstack(mercury_state* M, mercury_variable* var) {
 		a->refrences++;
 	}
 		break;
+	case M_TYPE_TABLE:
+	{
+		mercury_table* t = (mercury_table*)var->data.p;
+		t->refrences++;
+	}
+		break;
+	case M_TYPE_FUNCTION:
+	{
+		mercury_function* f = (mercury_function*)var->data.p;
+		f->refrences++;
+	}
+		break;
 	case M_TYPE_FILE:
 	{
 		mercury_filewrapper* w = (mercury_filewrapper*)var->data.p;
 		w->refrences++;
+	}
+		break;
+	case M_TYPE_THREAD:
+	{
+		mercury_threadholder* t = (mercury_threadholder*)var->data.p;
+		t->refrences++;
 	}
 		break;
 	}

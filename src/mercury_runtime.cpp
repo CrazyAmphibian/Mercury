@@ -24,7 +24,7 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 	{
 		uint16_t instr = instructions[offset] & 0xFFFF;
 		uint16_t flags = instructions[offset] >> 16;
-		printf("%2llu] ", offset);
+		printf("%3llu] ", offset);
 		switch (instr) {
 		case M_OPCODE_NOP:
 			printf(" NOP\n"); break;

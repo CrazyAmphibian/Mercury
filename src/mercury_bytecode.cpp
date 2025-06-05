@@ -2444,6 +2444,7 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 			mercury_pushstack(M, mercury_pullstack(FM));
 			
 		}
+		FM->bytecode.instructions = nullptr; //so the bytecode isn't freed
 		mercury_destroystate(FM);
 
 
