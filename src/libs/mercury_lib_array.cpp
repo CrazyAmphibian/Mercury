@@ -9,7 +9,7 @@
 
 void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int args_out) { //discards nil values.
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	for (mercury_int i = 1; i < args_in; i++) {
@@ -18,7 +18,7 @@ void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int 
 
 	mercury_variable* arr_var = mercury_popstack(M);
 	if (arr_var->type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
 		return;
 	}
 
@@ -28,7 +28,7 @@ void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int 
 
 	mercury_array* newarr=mercury_newarray();
 	if (!newarr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -63,7 +63,7 @@ void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int 
 
 void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int args_out) { //creates a copy of all values. not recursive. arrays are refrences so this will make a new one.
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1) {
@@ -75,19 +75,19 @@ void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int a
 
 	mercury_variable* arr_var = mercury_popstack(M);
 	if (arr_var->type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
 		return;
 	}
 
 	mercury_variable* new_arr_var = mercury_assign_var(M);
 	if (!new_arr_var) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
 	mercury_array* arr2= (mercury_array*)malloc(sizeof(mercury_array));
 	if (!arr2) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -99,7 +99,7 @@ void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int a
 	arr2->values = (mercury_variable***)malloc(sizeof(mercury_variable**)*arr1->size );
 
 	if (!arr2->values) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -111,7 +111,7 @@ void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int a
 				for (mercury_int n = 0; n<i1; n++) {
 					free(arr2->values[n]);
 				}
-				mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
 				return;
 			}
 			for (mercury_int i2 = 0; i2 < (1 << MERCURY_ARRAY_BLOCKSIZE); i2++) {
@@ -152,7 +152,7 @@ void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int a
 
 void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int args_out) { //add at index, shifts values forward.
 	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 
@@ -163,7 +163,7 @@ void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int
 	if (args_in > 2) {
 		len_var = mercury_popstack(M);
 		if (len_var->type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)len_var->type, (void*)M_TYPE_INT);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)len_var->type, (void*)M_TYPE_INT);
 			return;
 		}
 	}
@@ -171,7 +171,7 @@ void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int
 
 	mercury_variable* arr_var = mercury_popstack(M);
 	if (arr_var->type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
 		return;
 	}
 
@@ -200,7 +200,7 @@ void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_array_remove(mercury_state* M, mercury_int args_in, mercury_int args_out) { //gets rid of a value and shifts ones after down.
 	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)2);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
 	};
 
@@ -210,13 +210,13 @@ void mercury_lib_array_remove(mercury_state* M, mercury_int args_in, mercury_int
 
 	mercury_variable* len_var = mercury_popstack(M);
 	if (len_var->type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)len_var->type, (void*)M_TYPE_INT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)len_var->type, (void*)M_TYPE_INT);
 		return;
 	}
 
 	mercury_variable* arr_var = mercury_popstack(M);
 	if (arr_var->type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var->type, (void*)M_TYPE_ARRAY);
 		return;
 	}
 
@@ -251,7 +251,7 @@ void mercury_lib_array_remove(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_array_swap(mercury_state* M, mercury_int args_in, mercury_int args_out) { //duh.
 	if (args_in < 3) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)3);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
 		return;
 	};
 
@@ -261,19 +261,19 @@ void mercury_lib_array_swap(mercury_state* M, mercury_int args_in, mercury_int a
 
 	mercury_variable* pos_var1 = mercury_popstack(M);
 	if (pos_var1->type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)pos_var1->type, (void*)M_TYPE_INT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)pos_var1->type, (void*)M_TYPE_INT);
 		return;
 	}
 
 	mercury_variable* pos_var2 = mercury_popstack(M);
 	if (pos_var2->type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)pos_var2->type, (void*)M_TYPE_INT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)pos_var2->type, (void*)M_TYPE_INT);
 		return;
 	}
 
 	mercury_variable* var_array = mercury_popstack(M);
 	if (var_array->type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)var_array->type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_array->type, (void*)M_TYPE_ARRAY);
 		return;
 	}
 
@@ -322,7 +322,7 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 
 void mercury_lib_array_sort(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)2);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
 	};
 	for (mercury_int i = 2; i < args_in; i++) {
@@ -331,13 +331,13 @@ void mercury_lib_array_sort(mercury_state* M, mercury_int args_in, mercury_int a
 
 	mercury_variable* var_func = mercury_popstack(M);
 	if (var_func->type != M_TYPE_FUNCTION && var_func->type != M_TYPE_CFUNC) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)var_func->type, (void*)M_TYPE_FUNCTION);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_func->type, (void*)M_TYPE_FUNCTION);
 		return;
 	}
 
 	mercury_variable* var_array = mercury_popstack(M);
 	if (var_array->type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)var_array->type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_array->type, (void*)M_TYPE_ARRAY);
 		return;
 	}
 
@@ -345,7 +345,7 @@ void mercury_lib_array_sort(mercury_state* M, mercury_int args_in, mercury_int a
 	mercury_int arr_size=mercury_array_len(arr);
 	mercury_variable** tlist=(mercury_variable**)malloc(sizeof(mercury_variable*)*arr_size);
 	if (!tlist) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	for (mercury_int i = 0; i < arr_size; i++) { //this could probably be optimized with a memcpy. oh well.

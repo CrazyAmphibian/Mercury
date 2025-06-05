@@ -6,15 +6,15 @@
 
 enum M_ERROR_TYPES:uint32_t {
 	M_ERROR_NONE = 0,			// args: 
-	M_ERROR_ALLOCATION = 1,		//args: instruction
-	M_ERROR_WRONG_TYPE = 2,		//args: instruction, expected, provided
-	M_ERROR_DIV_ZERO = 3,		//args: instruction
-	M_ERROR_INVALID_INDEX = 4, // args: instruction, expected, provided
-	M_ERROR_INSTRUCTION_FAILIURE = 5, //args:instruction
-	M_ERROR_CALL_NOT_FUNCTION = 6 ,// args: instruction, provided
-	M_ERROR_INDEX_INVALID_TYPE = 7, // args: instruction, provided
-	M_ERROR_NOT_ENOUGH_ARGS = 8, //args: instruction, expected, provided
-
+	M_ERROR_ALLOCATION = 1,		//args:
+	M_ERROR_WRONG_TYPE = 2,		//args: expected, provided
+	M_ERROR_DIV_ZERO = 3,		//args:
+	M_ERROR_INVALID_INDEX = 4, // args: expected, provided
+	M_ERROR_INSTRUCTION_FAILIURE = 5, //args:
+	M_ERROR_CALL_NOT_FUNCTION = 6 ,// args: provided
+	M_ERROR_INDEX_INVALID_TYPE = 7, // args: provided
+	M_ERROR_NOT_ENOUGH_ARGS = 8, //args: expected, provided
+	M_ERROR_CUSTOM_STRING = 9 //args: string
 };
 
 enum M_COMPILER_ERRORS :uint32_t {

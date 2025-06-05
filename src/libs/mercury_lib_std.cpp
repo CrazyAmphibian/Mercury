@@ -19,7 +19,7 @@ void mercury_lib_std_print(mercury_state* M, mercury_int args_in, mercury_int ar
 
 	mercury_variable** vartable = (mercury_variable**)malloc(sizeof(mercury_variable*) * args_in);
 	if (vartable == nullptr && args_in) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -60,7 +60,7 @@ void mercury_lib_std_print(mercury_state* M, mercury_int args_in, mercury_int ar
 //traverses a list-like variable entry-by-entry. useful for serializing tables, most likley. arg 1 is the thing, and arg 2 is the function.
 void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 
@@ -73,7 +73,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 
 
 	if (function->type != M_TYPE_CFUNC && function->type != M_TYPE_FUNCTION) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)M_TYPE_FUNCTION, (void*)function->type);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_FUNCTION, (void*)function->type);
 		return;
 	}
 
@@ -83,7 +83,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 		mercury_function* func = (mercury_function*)function->data.p;
 		void* nbl = realloc(SubM->bytecode.instructions, func->numberofinstructions * sizeof(uint32_t));
 		if (!nbl) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_destroystate(SubM);
 			return;
 		}
@@ -151,7 +151,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)M_TYPE_TABLE, (void*)listlike->type);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_TABLE, (void*)listlike->type);
 		mercury_destroystate(SubM);
 		return;
 	}
@@ -174,12 +174,12 @@ get return args
 */
 void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 2) {
-		mercury_raise_error(M,M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M,M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 	mercury_variable** argt = (mercury_variable**)malloc(sizeof(mercury_variable*) * (args_in - 2));
 	if (!argt && args_in>2) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	for (mercury_int a = args_in; a > 2; a--) {
@@ -190,12 +190,12 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 	mercury_variable* func = mercury_popstack(M);
 
 	if (tab->type != M_TYPE_TABLE) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)M_TYPE_TABLE , (void*)tab->type );
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_TABLE , (void*)tab->type );
 		free(argt);
 		return;
 	}
 	if (func->type != M_TYPE_CFUNC && func->type != M_TYPE_FUNCTION) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)M_TYPE_FUNCTION, (void*)func->type);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_FUNCTION, (void*)func->type);
 		free(argt);
 		return;
 	}
@@ -203,7 +203,7 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 
 	mercury_state* iso_M=mercury_newstate();
 	if (!iso_M) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		free(argt);
 		return;
 	}
@@ -217,7 +217,7 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 		mercury_function* func2 = (mercury_function*)func->data.p;
 		void* nbl = realloc(iso_M->bytecode.instructions, func2->numberofinstructions * sizeof(uint32_t));
 		if (!nbl) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_destroystate(iso_M);
 			free(argt);
 			return;
@@ -423,7 +423,7 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 //takes a variable and generates a string which represents that variable.
 void mercury_lib_std_dump(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 	if (!args_out) {
@@ -441,7 +441,7 @@ void mercury_lib_std_dump(mercury_state* M, mercury_int args_in, mercury_int arg
 	if (!dmp_str) {
 		dmp_str = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 		if (!dmp_str) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
 		dmp_str->ptr = nullptr;
@@ -463,7 +463,7 @@ void mercury_lib_std_dump(mercury_state* M, mercury_int args_in, mercury_int arg
 
 void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 	if (!args_out) {
@@ -475,7 +475,7 @@ void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int 
 
 	mercury_variable* codestr = mercury_popstack(M);
 	if (codestr->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)codestr->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)codestr->type, (void*)M_TYPE_STRING);
 		return;
 	}
 
@@ -495,7 +495,7 @@ void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int 
 
 void mercury_lib_std_type(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 	if (!args_out) {
@@ -526,7 +526,7 @@ void mercury_lib_std_type(mercury_state* M, mercury_int args_in, mercury_int arg
 
 void mercury_lib_std_tostring(mercury_state* M, mercury_int args_in, mercury_int args_out) { //pretty easy, actually. we already have a function.
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 	if (!args_out) {
@@ -552,7 +552,7 @@ void mercury_lib_std_tostring(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int args_out) { //bit more complicated.
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 	if (!args_out) {
@@ -618,7 +618,7 @@ void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in, mercury_int args_out) { //dangerous, hell yeah!
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
 	}
 
@@ -629,7 +629,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in,
 	mercury_variable* i = mercury_popstack(M);
 
 	if (i->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)i->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)i->type, (void*)M_TYPE_STRING);
 		return;
 	}
 

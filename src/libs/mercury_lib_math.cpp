@@ -108,7 +108,7 @@ void mercury_lib_math_max(mercury_state* M, mercury_int args_in, mercury_int arg
 //will return an int.
 void mercury_lib_math_floor(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -127,7 +127,7 @@ void mercury_lib_math_floor(mercury_state* M, mercury_int args_in, mercury_int a
 		out->data.i=(mercury_int)floor(val->data.f);
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 	mercury_unassign_var(M, val);
@@ -142,7 +142,7 @@ void mercury_lib_math_floor(mercury_state* M, mercury_int args_in, mercury_int a
 //will return an int.
 void mercury_lib_math_ceil(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -161,7 +161,7 @@ void mercury_lib_math_ceil(mercury_state* M, mercury_int args_in, mercury_int ar
 		out->data.i = (mercury_int)ceil(val->data.f);
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 	mercury_unassign_var(M, val);
@@ -177,7 +177,7 @@ void mercury_lib_math_ceil(mercury_state* M, mercury_int args_in, mercury_int ar
 
 void mercury_lib_math_to_radians(mercury_state* M, mercury_int args_in, mercury_int args_out) { //degrees to radians
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -196,7 +196,7 @@ void mercury_lib_math_to_radians(mercury_state* M, mercury_int args_in, mercury_
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -213,7 +213,7 @@ void mercury_lib_math_to_radians(mercury_state* M, mercury_int args_in, mercury_
 
 void mercury_lib_math_to_degrees(mercury_state* M, mercury_int args_in, mercury_int args_out) { //radians to degrees
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -232,7 +232,7 @@ void mercury_lib_math_to_degrees(mercury_state* M, mercury_int args_in, mercury_
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -249,7 +249,7 @@ void mercury_lib_math_to_degrees(mercury_state* M, mercury_int args_in, mercury_
 
 void mercury_lib_math_log(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)2);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
 	};
 	if (args_out < 1)return;
@@ -278,7 +278,7 @@ void mercury_lib_math_log(mercury_state* M, mercury_int args_in, mercury_int arg
 		num->type = M_TYPE_FLOAT;
 	}
 	else if (num->type != M_TYPE_FLOAT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE,(void*)M->programcounter, (void*)num->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE,(void*)num->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -288,7 +288,7 @@ void mercury_lib_math_log(mercury_state* M, mercury_int args_in, mercury_int arg
 			base->type = M_TYPE_FLOAT;
 		}
 		else if (base->type != M_TYPE_FLOAT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)base->type, (void*)M_TYPE_FLOAT);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)base->type, (void*)M_TYPE_FLOAT);
 			return;
 		}
 	}
@@ -313,7 +313,7 @@ void mercury_lib_math_log(mercury_state* M, mercury_int args_in, mercury_int arg
 
 void mercury_lib_math_to_absolute(mercury_state* M, mercury_int args_in, mercury_int args_out) { //absolute value
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -337,7 +337,7 @@ void mercury_lib_math_to_absolute(mercury_state* M, mercury_int args_in, mercury
 #endif
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -354,7 +354,7 @@ void mercury_lib_math_to_absolute(mercury_state* M, mercury_int args_in, mercury
 
 void mercury_lib_math_to_sin(mercury_state* M, mercury_int args_in, mercury_int args_out) { //sine
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -373,7 +373,7 @@ void mercury_lib_math_to_sin(mercury_state* M, mercury_int args_in, mercury_int 
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -389,7 +389,7 @@ void mercury_lib_math_to_sin(mercury_state* M, mercury_int args_in, mercury_int 
 
 void mercury_lib_math_to_cos(mercury_state* M, mercury_int args_in, mercury_int args_out) { //cosine
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -408,7 +408,7 @@ void mercury_lib_math_to_cos(mercury_state* M, mercury_int args_in, mercury_int 
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -425,7 +425,7 @@ void mercury_lib_math_to_cos(mercury_state* M, mercury_int args_in, mercury_int 
 
 void mercury_lib_math_to_tan(mercury_state* M, mercury_int args_in, mercury_int args_out) { //tangent
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -444,7 +444,7 @@ void mercury_lib_math_to_tan(mercury_state* M, mercury_int args_in, mercury_int 
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -460,7 +460,7 @@ void mercury_lib_math_to_tan(mercury_state* M, mercury_int args_in, mercury_int 
 
 void mercury_lib_math_to_asin(mercury_state* M, mercury_int args_in, mercury_int args_out) { //arcsine
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -479,7 +479,7 @@ void mercury_lib_math_to_asin(mercury_state* M, mercury_int args_in, mercury_int
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -495,7 +495,7 @@ void mercury_lib_math_to_asin(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_math_to_acos(mercury_state* M, mercury_int args_in, mercury_int args_out) { //arccosine
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -514,7 +514,7 @@ void mercury_lib_math_to_acos(mercury_state* M, mercury_int args_in, mercury_int
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -531,7 +531,7 @@ void mercury_lib_math_to_acos(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_math_to_atan(mercury_state* M, mercury_int args_in, mercury_int args_out) { //arctangent
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -550,7 +550,7 @@ void mercury_lib_math_to_atan(mercury_state* M, mercury_int args_in, mercury_int
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -566,7 +566,7 @@ void mercury_lib_math_to_atan(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (args_out < 1)return;
@@ -585,7 +585,7 @@ void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_in
 		out->data.f = val->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -597,7 +597,7 @@ void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_in
 		y->data.f = y->data.f;
 	}
 	else {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)val->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)val->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -617,7 +617,7 @@ void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_in
 
 void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in ==1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)2);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
 	};
 	for (mercury_int i = 2; i < args_in; i++) {
@@ -628,12 +628,12 @@ void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int 
 	mercury_variable* v1 = mercury_popstack(M);
 
 	if (args_in && (v1->type != M_TYPE_INT) && (v1->type != M_TYPE_FLOAT) ) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)v1->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)v1->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
 	if (args_in &&  (v2->type != M_TYPE_INT) && (v2->type != M_TYPE_FLOAT)) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)v2->type, (void*)M_TYPE_FLOAT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)v2->type, (void*)M_TYPE_FLOAT);
 		return;
 	}
 
@@ -680,7 +680,7 @@ void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int 
 
 void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)2);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
 	};
 	for (mercury_int i = 2; i < args_in; i++) {
@@ -691,12 +691,12 @@ void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_i
 	mercury_variable* v1 = mercury_popstack(M);
 
 	if ( (v1->type != M_TYPE_INT)) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)v1->type, (void*)M_TYPE_INT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)v1->type, (void*)M_TYPE_INT);
 		return;
 	}
 
 	if ( (v2->type != M_TYPE_INT)) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)v2->type, (void*)M_TYPE_INT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)v2->type, (void*)M_TYPE_INT);
 		return;
 	}
 
@@ -727,7 +727,7 @@ void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_i
 
 void mercury_lib_math_randomseed(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 
@@ -738,7 +738,7 @@ void mercury_lib_math_randomseed(mercury_state* M, mercury_int args_in, mercury_
 	mercury_variable* v1 = mercury_popstack(M);
 
 	if ((v1->type != M_TYPE_INT)) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)v1->type, (void*)M_TYPE_INT);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)v1->type, (void*)M_TYPE_INT);
 		return;
 	}
 

@@ -22,7 +22,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) { 
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter-1) );
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return; 
 	}
 
@@ -44,7 +44,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) { 
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -58,7 +58,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1),  (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE,  (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -84,7 +84,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) { 
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return; 
 		}
@@ -98,7 +98,7 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT) , (void*)var->type );
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT) , (void*)var->type );
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -129,7 +129,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -151,7 +151,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -165,7 +165,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -191,7 +191,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -205,7 +205,7 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -236,7 +236,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -258,7 +258,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -272,7 +272,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -298,7 +298,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -312,7 +312,7 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -343,7 +343,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -365,7 +365,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -379,7 +379,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -405,7 +405,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -419,7 +419,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -450,7 +450,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -472,7 +472,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -486,7 +486,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_FLOAT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_FLOAT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -512,7 +512,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -526,7 +526,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -558,7 +558,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -580,7 +580,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -594,7 +594,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -620,7 +620,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -634,7 +634,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -645,7 +645,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 	if (floatcount) {
 
 		if ((mercury_int)f1 == 0) {
-			mercury_raise_error(M, M_ERROR_DIV_ZERO, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_DIV_ZERO);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -655,7 +655,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 	}
 	else {
 		if ((mercury_int)i1 == 0) {
-			mercury_raise_error(M, M_ERROR_DIV_ZERO, (void*)(M->programcounter - 1) );
+			mercury_raise_error(M, M_ERROR_DIV_ZERO);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -678,7 +678,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -700,7 +700,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -714,7 +714,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -740,7 +740,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -754,7 +754,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 			floatcount++;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -783,7 +783,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -804,7 +804,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -817,7 +817,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 			i1 = var->data.i;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -843,7 +843,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -857,7 +857,7 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 			outfloat = true;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -886,7 +886,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -907,7 +907,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -920,7 +920,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 			i1 = var->data.i;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -946,7 +946,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -960,7 +960,7 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 			outfloat = true;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -989,7 +989,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1010,7 +1010,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1023,7 +1023,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 			i1 = var->data.i;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1049,7 +1049,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1063,7 +1063,7 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 			outfloat = true;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1091,7 +1091,7 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1112,7 +1112,7 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1125,7 +1125,7 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 			i1 = var->data.i;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1165,7 +1165,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1186,7 +1186,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1199,7 +1199,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 			i1 = var->data.i;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1225,7 +1225,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1239,7 +1239,7 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 			outfloat = true;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1268,7 +1268,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1289,7 +1289,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1302,7 +1302,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 			i1 = var->data.i;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1328,7 +1328,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1342,7 +1342,7 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 			outfloat = true;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1516,7 +1516,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1538,7 +1538,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1552,7 +1552,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 			floatcount |= 2;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1578,7 +1578,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1592,7 +1592,7 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 			floatcount |= 1;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1629,7 +1629,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1651,7 +1651,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1665,7 +1665,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 			floatcount |= 2;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1691,7 +1691,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1705,7 +1705,7 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 			floatcount |= 1;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1742,7 +1742,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1764,7 +1764,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1778,7 +1778,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 			floatcount |= 2;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1804,7 +1804,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1818,7 +1818,7 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 			floatcount |= 1;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1855,7 +1855,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 
 	mercury_variable* outv = mercury_assign_var(M);
 	if (outv == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1877,7 +1877,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1891,7 +1891,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 			floatcount |= 2;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)M_TYPE_INT, (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -1917,7 +1917,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* var = mercury_popstack(M);
 		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_unassign_var(M, outv);
 			return;
 		}
@@ -1931,7 +1931,7 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 			floatcount |= 1;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
@@ -2007,7 +2007,7 @@ void M_BYTECODE_SET(mercury_state* M, uint16_t flags) {
 		break;
 	case M_TYPE_ARRAY:
 		if (key->type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)table->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)table->type);
 			mercury_unassign_var(M, value);
 			mercury_unassign_var(M, key);
 			mercury_unassign_var(M, table);
@@ -2017,7 +2017,7 @@ void M_BYTECODE_SET(mercury_state* M, uint16_t flags) {
 		mercury_unassign_var(M, key);
 		break;
 	default:
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_TABLE), (void*)table->type);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_TABLE), (void*)table->type);
 		mercury_unassign_var(M, value);
 		mercury_unassign_var(M, key);
 		mercury_unassign_var(M, table);
@@ -2041,7 +2041,7 @@ void M_BYTECODE_GET(mercury_state* M, uint16_t flags) {
 		break;
 	case M_TYPE_ARRAY:
 		if (key->type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)table->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)table->type);
 			mercury_unassign_var(M, out);
 			mercury_unassign_var(M, key);
 			mercury_unassign_var(M, table);
@@ -2051,7 +2051,7 @@ void M_BYTECODE_GET(mercury_state* M, uint16_t flags) {
 		break;
 	case M_TYPE_STRING:
 		if (key->type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_INT), (void*)table->type);
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)table->type);
 			mercury_unassign_var(M, out);
 			mercury_unassign_var(M, key);
 			mercury_unassign_var(M, table);
@@ -2062,7 +2062,7 @@ void M_BYTECODE_GET(mercury_state* M, uint16_t flags) {
 		out->data.p = mercury_mstring_substring((mercury_stringliteral*)table->data.p, key->data.i, key->data.i);
 		break;
 	default:
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M->programcounter - 1), (void*)(M_TYPE_TABLE), (void*)table->type);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_TABLE), (void*)table->type);
 		mercury_unassign_var(M, out);
 		mercury_unassign_var(M, key);
 		mercury_unassign_var(M, table);
@@ -2113,7 +2113,7 @@ void M_BYTECODE_GREG(mercury_state* M, uint16_t flags) {
 	else {
 		mercury_variable* out = mercury_assign_var(M);
 		if (out == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
 		out->type = M_TYPE_NIL;
@@ -2133,7 +2133,7 @@ void M_BYTECODE_NINT(mercury_state* M, uint16_t flags) { //New INTeger
 
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	out->type = M_TYPE_INT;
@@ -2151,7 +2151,7 @@ void M_BYTECODE_NFLO(mercury_state* M, uint16_t flags) { //New FLOat
 
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	out->type = M_TYPE_FLOAT;
@@ -2162,7 +2162,7 @@ void M_BYTECODE_NFLO(mercury_state* M, uint16_t flags) { //New FLOat
 void M_BYTECODE_NTRU(mercury_state* M, uint16_t flags) { //New TRUe
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	out->type = M_TYPE_BOOL;
@@ -2173,7 +2173,7 @@ void M_BYTECODE_NTRU(mercury_state* M, uint16_t flags) { //New TRUe
 void M_BYTECODE_NFAL(mercury_state * M, uint16_t flags) { //New FALse
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	out->type = M_TYPE_BOOL;
@@ -2184,7 +2184,7 @@ void M_BYTECODE_NFAL(mercury_state * M, uint16_t flags) { //New FALse
 void M_BYTECODE_NNIL(mercury_state* M, uint16_t flags) { //New NIL
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	out->type = M_TYPE_NIL;
@@ -2204,27 +2204,17 @@ void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
 
 	mercury_variable* out = mercury_assign_var(M);
 	if (!out) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
 
 	mercury_stringliteral* so = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!so) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	if (string_size) {
-		/*
-		char* sc = (char*)malloc(sizeof(char) * string_size);
-		if (!sc) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
-			return;
-		}
-		memcpy(sc, (char*)(M->bytecode.instructions + M->programcounter), string_size * sizeof(char));
-		
-		so->ptr = sc;
-		*/
 		so->ptr = (char*)(M->bytecode.instructions + M->programcounter);
 		so->constant = true;
 	}
@@ -2255,12 +2245,12 @@ void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 
 	mercury_function* fptr= (mercury_function*)malloc(sizeof(mercury_function));
 	if (fptr == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
 	if (M->bytecode.numberofinstructions < M->programcounter + function_size) {
-		mercury_raise_error(M, M_ERROR_INSTRUCTION_FAILIURE, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_INSTRUCTION_FAILIURE);
 		return;
 	}
 
@@ -2272,7 +2262,7 @@ void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 
 	if (fptr->instructions == nullptr) {
 		free(fptr);
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -2280,7 +2270,7 @@ void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 	if (out == nullptr) {
 		free(fptr->instructions);
 		free(fptr);
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	out->type = M_TYPE_FUNCTION;
@@ -2294,12 +2284,12 @@ void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 void M_BYTECODE_NTAB(mercury_state* M, uint16_t flags) { //New TABle
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	mercury_table* ntab = mercury_newtable();
 	if (ntab == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		mercury_unassign_var(M,out);
 		return;
 	}
@@ -2311,12 +2301,12 @@ void M_BYTECODE_NTAB(mercury_state* M, uint16_t flags) { //New TABle
 void M_BYTECODE_NARR(mercury_state* M, uint16_t flags) { //New ARRay
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	mercury_array* narr = mercury_newarray();
 	if (narr == nullptr) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		mercury_unassign_var(M, out);
 		return;
 	}
@@ -2464,7 +2454,7 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 		((mercury_cfunc)(ck->data.p))(M,args_in,args_out);
 		break;
 	default:
-		mercury_raise_error(M, M_ERROR_CALL_NOT_FUNCTION, (void*)(M->programcounter - 1) , (void*)(ck->type) );
+		mercury_raise_error(M, M_ERROR_CALL_NOT_FUNCTION, (void*)(ck->type) );
 		mercury_unassign_var(M, ck);
 		return;
 	}
@@ -2501,7 +2491,7 @@ void M_BYTECODE_LEN(mercury_state* M, uint16_t flags) { //LENgth
 		}
 		break;
 	default:
-		mercury_raise_error(M, M_ERROR_INDEX_INVALID_TYPE, (void*)(M->programcounter - 1), (void*)var->type);
+		mercury_raise_error(M, M_ERROR_INDEX_INVALID_TYPE, (void*)var->type);
 		mercury_unassign_var(M, var);
 		return;
 	}
@@ -2590,7 +2580,7 @@ void M_BYTECODE_CPYT(mercury_state* M, uint16_t flags) { // CoPY Top (of stack)
 	mercury_variable* val= M->stack[M->sizeofstack - 1];
 	mercury_variable* out = mercury_assign_var(M);
 	if (!out) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)(M->programcounter - 1));
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 

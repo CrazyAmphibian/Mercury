@@ -1,10 +1,11 @@
 #include "mercury_error.h"
 #include "mercury_compiler.h"
 #include "mercury.h"
+
 #include "stdio.h"
 #include "malloc.h"
 #include "string.h"
-
+#include <stdarg.h>
 
 
 
@@ -23,7 +24,7 @@ const char* typetostring[256] = {
 };
 
 
-mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t errorcode , void* data1, void* data2, void* data3) {
+mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t errorcode, void* data1, void* data2, void* data3) {
 	char* buffer = (char*)calloc(255,sizeof(char));
 	if (!buffer)return nullptr;
 	//char buffer[255] = {0};
@@ -36,15 +37,18 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 		mercury_debug_token T = M->bytecode.debug_info[M->programcounter-1];
 		snprintf(header,255,"line %lli col %lli at \"%s%s%s%s%s\"",T.line+1,T.col+1 ,T.token_prev_prev, T.token_prev , T.token, T.token_next, T.token_next_next);
 	}
+	else {
+		snprintf(header, 255, "line ? col ? at ????? - instruction #%lli (%04X)",M->programcounter,0xFFFF&M->bytecode.instructions[M->programcounter]);
+	}
 
 	switch (errorcode) {
 	case M_ERROR_NONE:
 		return nullptr;
 	case M_ERROR_ALLOCATION:
-		result=snprintf(buffer, 255, "%s: memory allocation error\n",header, (long)data1);
+		result=snprintf(buffer, 255, "%s: memory allocation error\n",header);
 		return mercury_cstring_const_to_mstring(buffer,strlen(buffer));
 	case M_ERROR_WRONG_TYPE:
-		result = snprintf(buffer, 255, "%s: wrong type. got %s, expected %s\n", header , typetostring[(int)data3] , typetostring[(int)data2]);
+		result = snprintf(buffer, 255, "%s: wrong type. got %s, expected %s\n", header , typetostring[(int)data2] , typetostring[(int)data3]);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_DIV_ZERO:
 		result = snprintf(buffer, 255, "%s: integer division by 0\n", header);
@@ -53,10 +57,13 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 		result = snprintf(buffer, 255, "%s: failiure to execute instruction\n", header);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_CALL_NOT_FUNCTION:
-		result = snprintf(buffer, 255, "%s: attempt to call non-function value %s \n", header , typetostring[(int)data2] );
+		result = snprintf(buffer, 255, "%s: attempt to call non-function value %s \n", header , typetostring[(int)data1] );
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_INDEX_INVALID_TYPE:
-		result = snprintf(buffer, 255, "%s: attempt to index invalid variable type %s \n", header, typetostring[(int)data2]);
+		result = snprintf(buffer, 255, "%s: attempt to index invalid variable type %s \n", header, typetostring[(int)data1]);
+		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
+	case M_ERROR_CUSTOM_STRING:
+		result = snprintf(buffer, 255, "%s: %s \n", header, (char*)data1);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	default:
 		result = snprintf(buffer, 255, "%s: unknown error\n",header);
@@ -64,10 +71,11 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 	}
 }
 
-
 void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1, void* data2, void* data3) {
 
-	mercury_stringliteral* str = mercury_generate_error_string(M,errorcode,data1 , data2, data3);
+	mercury_stringliteral* str = mercury_generate_error_string(M,errorcode, data1, data2, data3);
+
+
 	if (str != nullptr) {
 		for (mercury_int i = 0; i < str->size; i++) {
 			//printf("%c",str->ptr[i]);
@@ -84,9 +92,6 @@ void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1, void
 
 
 
-
-
-
 mercury_stringliteral* mercury_generate_compiler_error_string(compiler_token** tokens, uint32_t errorcode, mercury_int token_err, mercury_int token_max) {
 	char buffer[255] = { 0 };
 	int result = 0;
@@ -96,6 +101,7 @@ mercury_stringliteral* mercury_generate_compiler_error_string(compiler_token** t
 	if (ct == nullptr) {
 		errorcode = M_COMPERR_UNKNOWN;
 	}
+
 
 	switch (errorcode) {
 	case M_COMPERR_DID_NOT_CALL_OR_SET:

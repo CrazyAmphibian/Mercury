@@ -43,7 +43,7 @@ void* threadfunction(void* param) {
 //creates a thread, given a function and input variable. optional table to act as the enviroment. defaults current env.
 void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	}
 	if (!args_out)return;
@@ -56,7 +56,7 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 	if (args_in > 2) {
 		vart = (mercury_variable**)malloc(sizeof(mercury_variable*) * args_in - 2);
 		if (!vart) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
 	}
@@ -86,18 +86,18 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 
 
 	if ( func_var->type != M_TYPE_FUNCTION) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)func_var->type, (void*)M_TYPE_FUNCTION);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)func_var->type, (void*)M_TYPE_FUNCTION);
 		return;
 	}
 	if ((table_var && table_var->type != M_TYPE_TABLE)) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)table_var->type, (void*)M_TYPE_TABLE);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)table_var->type, (void*)M_TYPE_TABLE);
 		return;
 	}
 
 
 	mercury_threadholder* t=(mercury_threadholder*)malloc(sizeof(mercury_threadholder));
 	if (!t) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -183,7 +183,7 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 //bool if thread is finished. simple.
 void mercury_lib_thread_checkfinish(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	}
 	if (!args_out)return;
@@ -193,7 +193,7 @@ void mercury_lib_thread_checkfinish(mercury_state* M, mercury_int args_in, mercu
 
 	mercury_variable* in = mercury_popstack(M);
 	if (in->type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)in->type, (void*)M_TYPE_THREAD);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in->type, (void*)M_TYPE_THREAD);
 		return;
 	}
 
@@ -217,7 +217,7 @@ void mercury_lib_thread_checkfinish(mercury_state* M, mercury_int args_in, mercu
 //gets a value
 void mercury_lib_thread_getvalue(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	}
 	if (!args_out)return;
@@ -227,7 +227,7 @@ void mercury_lib_thread_getvalue(mercury_state* M, mercury_int args_in, mercury_
 
 	mercury_variable* in = mercury_popstack(M);
 	if (in->type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)in->type, (void*)M_TYPE_THREAD);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in->type, (void*)M_TYPE_THREAD);
 		return;
 	}
 
@@ -257,7 +257,7 @@ void mercury_lib_thread_getvalue(mercury_state* M, mercury_int args_in, mercury_
 //dire circumstances. use with caution
 void mercury_lib_thread_abort(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	}
 	for (mercury_int i = 1; i < args_in; i++) {
@@ -266,7 +266,7 @@ void mercury_lib_thread_abort(mercury_state* M, mercury_int args_in, mercury_int
 
 	mercury_variable* in = mercury_popstack(M);
 	if (in->type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)in->type, (void*)M_TYPE_THREAD);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in->type, (void*)M_TYPE_THREAD);
 		return;
 	}
 
@@ -298,7 +298,7 @@ void mercury_lib_thread_abort(mercury_state* M, mercury_int args_in, mercury_int
 //returns number of values. 0 if not finished.
 void mercury_lib_thread_getnumvalues(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	}
 	if (!args_out)return;
@@ -308,7 +308,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* M, mercury_int args_in, merc
 
 	mercury_variable* in = mercury_popstack(M);
 	if (in->type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)in->type, (void*)M_TYPE_THREAD);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in->type, (void*)M_TYPE_THREAD);
 		return;
 	}
 
@@ -339,7 +339,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* M, mercury_int args_in, merc
 //waits for a closure
 void mercury_lib_thread_waitfor(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	}
 	for (mercury_int i = 1; i < args_in; i++) {
@@ -348,7 +348,7 @@ void mercury_lib_thread_waitfor(mercury_state* M, mercury_int args_in, mercury_i
 
 	mercury_variable* in = mercury_popstack(M);
 	if (in->type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)in->type, (void*)M_TYPE_THREAD);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in->type, (void*)M_TYPE_THREAD);
 		return;
 	}
 
@@ -376,7 +376,7 @@ void mercury_lib_thread_waitfor(mercury_state* M, mercury_int args_in, mercury_i
 //inverse of is finished.
 void mercury_lib_thread_checkrunning(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	}
 	if (!args_out)return;
@@ -386,7 +386,7 @@ void mercury_lib_thread_checkrunning(mercury_state* M, mercury_int args_in, merc
 
 	mercury_variable* in = mercury_popstack(M);
 	if (in->type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)in->type, (void*)M_TYPE_THREAD);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in->type, (void*)M_TYPE_THREAD);
 		return;
 	}
 

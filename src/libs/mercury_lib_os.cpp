@@ -34,7 +34,7 @@ void mercury_lib_os_time(mercury_state* M, mercury_int args_in, mercury_int args
 
 void mercury_lib_os_execute(mercury_state* M, mercury_int args_in, mercury_int args_out) { //dangerous!
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	for (mercury_int i = 1; i < args_in; i++) {
@@ -43,14 +43,14 @@ void mercury_lib_os_execute(mercury_state* M, mercury_int args_in, mercury_int a
 
 	mercury_variable* cvar=mercury_popstack(M);
 	if (cvar->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)cvar->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)cvar->type, (void*)M_TYPE_STRING);
 		return;
 	}
 	mercury_stringliteral* code=(mercury_stringliteral*)cvar->data.p;
 	
 	char* c_code = (char*)malloc(sizeof(char) * (code->size + 1));
 	if (!c_code) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	for (mercury_int i = 0; i < code->size; i++) {
@@ -91,7 +91,7 @@ void mercury_lib_os_execute(mercury_state* M, mercury_int args_in, mercury_int a
 			if (size_c == allocated_c) {
 				void* o = realloc(out_c, allocated_c + 128);
 				if (!o) {
-					mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
 				}
 				out_c = (char*)o;
@@ -142,33 +142,3 @@ void mercury_lib_os_clock(mercury_state* M, mercury_int args_in, mercury_int arg
 		mercury_pushstack(M, mv);
 	}
 }
-
-/*
-void mercury_lib_os_isposix(mercury_state* M, mercury_int args_in, mercury_int args_out) { //bool
-	for (mercury_int i = 0; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
-	}
-	if (!args_out) {
-		return;
-	}
-
-	mercury_variable* out = mercury_assign_var(M);
-	out->type = M_TYPE_BOOL;
-
-
-#if defined(_WIN32) || defined(_WIN64) 
-	out->data.i = 0;
-#else
-	out->data.i = 1;
-#endif
-
-	mercury_pushstack(M, out);
-
-	for (mercury_int a = 1; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
-}
-*/

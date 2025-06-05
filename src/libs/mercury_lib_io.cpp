@@ -23,7 +23,7 @@
 
 void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args_out) { //opens a file. nuff said.
 	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)2);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
 	};
 	if (!args_out)return;
@@ -33,13 +33,13 @@ void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args
 
 	mercury_variable* mode_var = mercury_popstack(M);
 	if (mode_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)mode_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)mode_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 
 	mercury_variable* file_var = mercury_popstack(M);
 	if (file_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)file_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)file_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 
@@ -57,7 +57,7 @@ void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args
 
 		mercury_filewrapper* fw = (mercury_filewrapper*)malloc(sizeof(mercury_filewrapper));
 		if (!fw) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			fclose(F);
 			return;
 		}
@@ -89,7 +89,7 @@ void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args
 
 void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (!args_out)return;
@@ -99,7 +99,7 @@ void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args
 
 	mercury_variable* file_var = mercury_popstack(M);
 	if (file_var->type != M_TYPE_FILE) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)file_var->type, (void*)M_TYPE_FILE);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)file_var->type, (void*)M_TYPE_FILE);
 		return;
 	}
 
@@ -123,14 +123,14 @@ void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args
 			else {
 				char* s = (char*)malloc(sizeof(char) * len);
 				if (!s) {
-					mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
 				}
 				rewind(F);
 				fread(s, 1, len, F);
 				mercury_stringliteral* str = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 				if (!str) {
-					mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
 				}
 				str->ptr = s;
@@ -160,7 +160,7 @@ void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args
 
 void mercury_lib_io_close(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	for (mercury_int i = 1; i < args_in; i++) {
@@ -169,7 +169,7 @@ void mercury_lib_io_close(mercury_state* M, mercury_int args_in, mercury_int arg
 
 	mercury_variable* file_var = mercury_popstack(M);
 	if (file_var->type != M_TYPE_FILE) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)file_var->type, (void*)M_TYPE_FILE);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)file_var->type, (void*)M_TYPE_FILE);
 		return;
 	}
 
@@ -191,7 +191,7 @@ void mercury_lib_io_close(mercury_state* M, mercury_int args_in, mercury_int arg
 
 void mercury_lib_io_write(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)2);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
 	};
 	for (mercury_int i = 2; i < args_in; i++) {
@@ -200,13 +200,13 @@ void mercury_lib_io_write(mercury_state* M, mercury_int args_in, mercury_int arg
 
 	mercury_variable* data_var = mercury_popstack(M);
 	if (data_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)data_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)data_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 
 	mercury_variable* file_var = mercury_popstack(M);
 	if (file_var->type != M_TYPE_FILE) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)file_var->type, (void*)M_TYPE_FILE);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)file_var->type, (void*)M_TYPE_FILE);
 		return;
 	}
 	mercury_stringliteral* str = (mercury_stringliteral*)data_var->data.p;
@@ -231,7 +231,7 @@ void mercury_lib_io_write(mercury_state* M, mercury_int args_in, mercury_int arg
 
 void mercury_lib_io_getfiles(mercury_state* M, mercury_int args_in, mercury_int args_out) { //an array of strings
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (!args_out)return;
@@ -241,7 +241,7 @@ void mercury_lib_io_getfiles(mercury_state* M, mercury_int args_in, mercury_int 
 
 	mercury_variable* dir_var = mercury_popstack(M);
 	if (dir_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)dir_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)dir_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 
@@ -273,7 +273,7 @@ void mercury_lib_io_getfiles(mercury_state* M, mercury_int args_in, mercury_int 
 				mercury_stringliteral* s = mercury_cstring_to_mstring(fn, strlen(fn));
 				mercury_variable* v = (mercury_variable*)malloc(sizeof(mercury_variable));
 				if (!v) {
-					mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					FindClose(hFind);
 					return;
 				}
@@ -298,7 +298,7 @@ void mercury_lib_io_getfiles(mercury_state* M, mercury_int args_in, mercury_int 
 				mercury_stringliteral* s = mercury_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
 				mercury_variable* v = (mercury_variable*)malloc(sizeof(mercury_variable));
 				if (!v) {
-					mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					closedir(d);
 					return;
 				}
@@ -326,7 +326,7 @@ void mercury_lib_io_getfiles(mercury_state* M, mercury_int args_in, mercury_int 
 
 void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int args_out) { //an array of strings
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (!args_out)return;
@@ -336,7 +336,7 @@ void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int a
 
 	mercury_variable* dir_var = mercury_popstack(M);
 	if (dir_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)dir_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)dir_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 
@@ -369,7 +369,7 @@ void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int a
 				mercury_stringliteral* s = mercury_cstring_to_mstring(fn, strlen(fn));
 				mercury_variable* v = (mercury_variable*)malloc(sizeof(mercury_variable));
 				if (!v) {
-					mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					FindClose(hFind);
 					return;
 				}
@@ -394,7 +394,7 @@ void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int a
 				mercury_stringliteral* s = mercury_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
 				mercury_variable* v = (mercury_variable*)malloc(sizeof(mercury_variable));
 				if (!v) {
-					mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					closedir(d);
 					return;
 				}
@@ -425,7 +425,7 @@ void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int a
 
 void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int args_out) { //returns an array of the lines, sans newline characters.
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	if (!args_out)return;
@@ -435,7 +435,7 @@ void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int arg
 
 	mercury_variable* fil_var = mercury_popstack(M);
 	if (fil_var->type != M_TYPE_FILE) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)fil_var->type, (void*)M_TYPE_FILE);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)fil_var->type, (void*)M_TYPE_FILE);
 		return;
 	}
 
@@ -446,7 +446,7 @@ void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int arg
 	mercury_int cbuf = 0;
 	char* buf = (char*)malloc(bsize);
 	if (!buf) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 	mercury_int count = 0;
@@ -462,7 +462,7 @@ void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int arg
 					mercury_stringliteral* s= mercury_cstring_to_mstring(buf,cbuf);
 					mercury_variable* v=(mercury_variable*)malloc(sizeof(mercury_variable));
 					if (!v) {
-						mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+						mercury_raise_error(M, M_ERROR_ALLOCATION);
 						rewind(f);
 						return;
 					}
@@ -480,7 +480,7 @@ void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int arg
 				if (cbuf >= bsize) {
 					void* n=realloc(buf, bsize * 2);
 					if (!n) {
-						mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+						mercury_raise_error(M, M_ERROR_ALLOCATION);
 						rewind(f);
 						return;
 					}
@@ -510,7 +510,7 @@ void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int arg
 
 void mercury_lib_io_post(mercury_state* M, mercury_int args_in, mercury_int args_out) { //send characters to stdout directly
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)M->programcounter, (void*)args_in, (void*)1);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
 	};
 	for (mercury_int i = 1; i < args_in; i++) {
@@ -519,7 +519,7 @@ void mercury_lib_io_post(mercury_state* M, mercury_int args_in, mercury_int args
 
 	mercury_variable* str_var = mercury_popstack(M);
 	if (str_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)str_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)str_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 
@@ -546,7 +546,7 @@ void mercury_lib_io_prompt(mercury_state* M, mercury_int args_in, mercury_int ar
 	mercury_int len = 0;
 	char* c = (char*)malloc(sizec);
 	if (!c) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -559,7 +559,7 @@ void mercury_lib_io_prompt(mercury_state* M, mercury_int args_in, mercury_int ar
 			sizec += 200;
 			void* n=realloc(c, sizec);
 			if (!n) {
-				mercury_raise_error(M, M_ERROR_ALLOCATION, (void*)M->programcounter);
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
 				return;
 			}
 			c = (char*)n;
@@ -593,7 +593,7 @@ void mercury_lib_io_remove(mercury_state* M, mercury_int args_in, mercury_int ar
 
 	mercury_variable* dir_var = mercury_popstack(M);
 	if (dir_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)dir_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)dir_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 	mercury_stringliteral* fst = (mercury_stringliteral*)dir_var->data.p;
@@ -628,7 +628,7 @@ void mercury_lib_io_removedir(mercury_state* M, mercury_int args_in, mercury_int
 
 	mercury_variable* dir_var = mercury_popstack(M);
 	if (dir_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)dir_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)dir_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 	mercury_stringliteral* fst = (mercury_stringliteral*)dir_var->data.p;
@@ -669,7 +669,7 @@ void mercury_lib_io_createdir(mercury_state* M, mercury_int args_in, mercury_int
 
 	mercury_variable* dir_var = mercury_popstack(M);
 	if (dir_var->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M->programcounter, (void*)dir_var->type, (void*)M_TYPE_STRING);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)dir_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
 	mercury_stringliteral* fst = (mercury_stringliteral*)dir_var->data.p;
