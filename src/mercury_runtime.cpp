@@ -40,6 +40,8 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("IDIV\n"); break;
 		case M_OPCODE_POW:
 			printf(" POW\n"); break;
+		case M_OPCODE_MOD:
+			printf(" MOD\n"); break;
 		case M_OPCODE_LOR:
 			printf("L OR\n"); break;
 		case M_OPCODE_LXOR:
@@ -165,6 +167,20 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			break;
 		case M_OPCODE_CPYT:
 			printf("CPYT\n");
+			break;
+		case M_OPCODE_CPYX:
+			printf("CPYX ");
+			{
+				mercury_int sz = 0;
+#ifdef MERCURY_64BIT
+				sz = *((mercury_int*)(instructions + offset + 1));
+				offset += 2;
+#else
+				sz = *((mercury_int*)(instructions + offset + 1));
+				offset++;
+#endif
+				printf("%lli\n", sz);
+			}
 			break;
 		case M_OPCODE_CNCT:
 			printf("CNCT\n");

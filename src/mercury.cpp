@@ -846,9 +846,9 @@ mercury_variable* mercury_tostring(mercury_variable* var) {
 		break;
 	case M_TYPE_FLOAT:
 		#ifdef MERCURY_64BIT
-		tint = snprintf(tout, sizeof(tout), "%.60lg", var->data.f);
+		tint = snprintf(tout, sizeof(tout), "%#.30lg", var->data.f);
 		#else
-		tint = snprintf(tout, sizeof(tout), "%.30lg", var->data.f);
+		tint = snprintf(tout, sizeof(tout), "%#.15g", var->data.f);
 		#endif
 		
 		if (tint==-1) {

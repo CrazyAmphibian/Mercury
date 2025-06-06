@@ -142,6 +142,7 @@ enum token_flags {
 	TOKEN_LOOP_MODIFIER = 1<<13,
 	TOKEN_JUMP = 1<<14,
 	TOKEN_EXIT = 1<<15,
+	TOKEN_SELFMODIFY = 1<<16,
 };
 
 
@@ -374,16 +375,23 @@ int read_char_from_dec_chars(char* chars,int* offset_out) {
 
 bool symbols_can_join(char c1, char c2) {
 	switch (c1) {
-		case '=':
-		case '|':
-		case '&':
-		case '~':
-		case '.':
-			return c2 == c1; //		|| && ~~ .. ==
-		case '!':
-		case '>':
-		case '<':
-			return c2 == c1 || c2 == '='; // !! != >= <= >> <<
+		case '=':	// ==
+		case '|':	// || |= ||=
+		case '&':	// && &= &&=
+		case '~':	// ~~ ~= ~~=
+		case '.':	// .. ..=
+		case '!':	// !! !=
+		case '>':	// >= >> >>=
+		case '<':	// <= << <<=
+			return c2 == c1 || c2 == '=';
+		case '+':	// +=
+		case '-':	// -=
+		case '*':	// *=
+		case '/':	// /=
+		case '\\':	// \=
+		case '^':	// ^=
+		case '%':	// %=
+			return c2 == '=';
 		default:
 			return false;
 	}	
@@ -547,7 +555,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 					add_char_to_token(temp_token, c_char);
 					bool allow_nonnumber = !(temp_token->token_flags & TOKEN_ENVVARNAME);
 					if(!temp_token->token_flags)temp_token->token_flags = TOKEN_STATICNUMBER | TOKEN_VARIABLE;
-					if (!char_is_number(n_char) && (!allow_nonnumber && !char_is_character(n_char)) ) {
+					if (!char_is_number(n_char) && (!allow_nonnumber || !char_is_character(n_char)) ) {
 						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
 						out[num_tokens] = temp_token;
 						num_tokens++;
@@ -765,6 +773,55 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 				else if (tc[0] == '!' && tc[1] == '=') {
 					token->token_flags |= TOKEN_BINARY;
 				}
+				else if (tc[0] == '+' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '-' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '*' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '/' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '\\' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '^' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '%' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '&' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '|' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '~' && tc[1] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+			}
+			else if (token->num_chars == 3) {
+				if (tc[0] == '.' && tc[1] == '.' && tc[2] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
+				} else if (tc[0] == '<' && tc[1] == '<' && tc[2] == '=') {
+						token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}else if (tc[0] == '>' && tc[1] == '>' && tc[2] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '|' && tc[1] == '|' && tc[2] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '&' && tc[1] == '&' && tc[2] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '~' && tc[1] == '~' && tc[2] == '=') {
+					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
+				}
+				//TOKEN_SELFMODIFY
 			}
 
 		}
@@ -849,6 +906,59 @@ uint16_t m_compile_get_operator_bytecode(compiler_token* token,int forcetype) {
 			return M_OPCODE_LXOR;
 		}
 		else if (c1 == '.' && c2 == '.') {
+			return M_OPCODE_CNCT;
+		}
+		else if (c1 == '|' && c2 == '=') {
+			return M_OPCODE_BOR;
+		}
+		else if (c1 == '&' && c2 == '=') {
+			return M_OPCODE_BAND;
+		}
+		else if (c1 == '~' && c2 == '=') {
+			return M_OPCODE_BXOR;
+		}
+		else if (c1 == '+' && c2 == '=') {
+			return M_OPCODE_ADD;
+		}
+		else if (c1 == '-' && c2 == '=') {
+			return M_OPCODE_SUB;
+		}
+		else if (c1 == '*' && c2 == '=') {
+			return M_OPCODE_MUL;
+		}
+		else if (c1 == '/' && c2 == '=') {
+			return M_OPCODE_DIV;
+		}
+		else if (c1 == '\\' && c2 == '=') {
+			return M_OPCODE_IDIV;
+		}
+		else if (c1 == '^' && c2 == '=') {
+			return M_OPCODE_POW;
+		}
+		else if (c1 == '%' && c2 == '=') {
+			return M_OPCODE_MOD;
+		}
+	}
+	else if (token->num_chars == 3) {
+		char c1 = token->chars[0];
+		char c2 = token->chars[1];
+		char c3 = token->chars[2];
+		if (c1 == '&' && c2 == '&' && c2 == '=') {
+			return M_OPCODE_LAND;
+		}
+		else if (c1 == '|' && c2 == '|' && c2 == '=') {
+			return M_OPCODE_LOR;
+		}
+		else if (c1 == '~' && c2 == '~' && c2 == '=') {
+			return M_OPCODE_LXOR;
+		}
+		else if (c1 == '<' && c2 == '<' && c2 == '=') {
+			return M_OPCODE_BSHL;
+		}
+		else if (c1 == '>' && c2 == '>' && c2 == '=') {
+			return M_OPCODE_BSHR;
+		}
+		else if (c1 == '.' && c2 == '.' && c2 == '=') {
 			return M_OPCODE_CNCT;
 		}
 	}
@@ -1649,8 +1759,6 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 	//compiler_function* func= init_comp_func();
 	if (!func)return 0;
 
-
-
 	if (token_max < offset + 2) {
 		func->errorcode = M_COMPERR_ENDS_TOO_SOON;
 		func->token_error_num = offset;
@@ -1765,13 +1873,23 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 
 	//scan for variables
 	compiler_function* var_code = init_comp_func();
+	compiler_function* var_code_final = init_comp_func();
 	if (!var_code) {
+		return 0;
+	}
+	if (!var_code_final) {
 		return 0;
 	}
 	bool tokenpass = false;
 	while (true) {
+		concat_comp_func_appends(var_code, var_code_final);
+		delete_comp_func(var_code_final);
+		var_code_final=init_comp_func();
+		if (!var_code_final)return 0;
+
 		if (offset + addoff > token_max) {
 			delete_comp_func(var_code);
+			delete_comp_func(var_code_final);
 			return 0;
 		}
 		cur_tok = tokens[offset + addoff];
@@ -1788,7 +1906,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 				break;
 			}
 
-			m_compile_cstring_load(var_code, cur_tok->chars, cur_tok->num_chars, offset+addoff);
+			m_compile_cstring_load(var_code_final, cur_tok->chars, cur_tok->num_chars, offset+addoff);
 			//m_compile_add_instruction(var_code, get_opcode);
 			addoff++;
 			cur_tok = tokens[offset + addoff];
@@ -1799,18 +1917,18 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 
 		if (cur_tok->token_flags & TOKEN_OPERATOR) {
 			if (cur_tok->chars[0] == '.' && cur_tok->num_chars == 1) { //period indexing will skip to the next itteration so that cstring_load will capture what you're trying to get.
-				m_compile_add_instruction(var_code, get_opcode, 0, offset+addoff);
+				m_compile_add_instruction(var_code_final, get_opcode, 0, offset+addoff);
 				addoff++;
 				get_opcode = M_OPCODE_GET;
 				set_opcode = M_OPCODE_SET;
 			}
 			else if (cur_tok->chars[0] == '[' && cur_tok->num_chars == 1) { // bracket indexing must first read a statment, and will additonally not call cstring_load.
-				m_compile_add_instruction(var_code, get_opcode, 0, offset + addoff);
+				m_compile_add_instruction(var_code_final, get_opcode, 0, offset + addoff);
 				addoff++;
 				tokenpass = true;
 				get_opcode = M_OPCODE_GET;
 				set_opcode = M_OPCODE_SET;
-				m_compile_read_var_statment_recur(var_code,tokens,offset+addoff,token_max);
+				addoff+=m_compile_read_var_statment_recur(var_code_final,tokens,offset+addoff,token_max);
 				addoff++;
 			}
 			else {
@@ -1833,9 +1951,11 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 		if (cur_tok->chars[0] == '(' && cur_tok->num_chars == 1) {
 			mercury_int PREV_COMP_NUM_ARG_OUT = COMPILER_NUMBER_ARGS_OUT;
 			COMPILER_NUMBER_ARGS_OUT = 0;
+			concat_comp_func_appends(var_code, var_code_final);
 			m_compile_add_instruction(var_code, get_opcode, 0, offset + addoff);
 			int ad = m_compile_read_fcall(func, tokens, offset + addoff, token_max, var_code);
 			delete_comp_func(var_code);
+			delete_comp_func(var_code_final);
 
 			PREV_COMP_NUM_ARG_OUT = COMPILER_NUMBER_ARGS_OUT;
 
@@ -1845,7 +1965,9 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 		else if (cur_tok->chars[0] == '=' && cur_tok->num_chars == 1) {
 			addoff++;
 			concat_comp_func_appends(func,var_code);
+			concat_comp_func_appends(func, var_code_final);
 			delete_comp_func(var_code);
+			delete_comp_func(var_code_final);
 
 			int ad = 0;
 			if (next_tok->token_flags & TOKEN_KEYWORD && next_tok->num_chars == 8 && next_tok->chars[0] == 'f' && next_tok->chars[7] == 'n') {
@@ -1854,6 +1976,40 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 			else {
 				ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
 			}
+			addoff += ad;
+			m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
+			return addoff;
+		}
+		else if (cur_tok->token_flags & TOKEN_SELFMODIFY) { // TODO: we need to bifrucate var_code into 2 sections, the first being the bulk and the seconds being the final variable. eg a is a, a[0] is 0, a[0][n] is n.
+			addoff++; // THEN, we need to replace the following code with a CPYX 2, so that way doing += and whatnot is actually faster (hopefully)
+			concat_comp_func_appends(func, var_code);
+			concat_comp_func_appends(func, var_code_final);
+			if (var_code->number_instructions) //we only copy top 2 if we need to index
+			{
+				m_compile_add_instruction(func, M_OPCODE_CPYX, 0, offset + addoff);
+#ifdef MERCURY_64BIT
+				m_compile_add_rawdatadouble(func, 2, offset + addoff);
+#else
+				m_compile_add_rawdata(func, 2, offset + addoff);
+#endif
+			}
+			else { //otherwise we can just copy top.
+				m_compile_add_instruction(func, M_OPCODE_CPYT, 0, offset + addoff);
+			}
+			m_compile_add_instruction(func, get_opcode, 0, offset + addoff);
+			delete_comp_func(var_code);
+			delete_comp_func(var_code_final);
+			//m_compile_add_instruction(func, M_OPCODE_CPYT, 0, offset + addoff);
+			int ad = 0;
+			if (next_tok->token_flags & TOKEN_KEYWORD && next_tok->num_chars == 8 && next_tok->chars[0] == 'f' && next_tok->chars[7] == 'n') {
+				func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
+				func->token_error_num = offset + addoff + 1;
+				return 0;
+			}
+			else {
+				ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
+			}
+			m_compile_add_instruction(func, m_compile_get_operator_bytecode(cur_tok,0), 0, offset + addoff);
 			addoff += ad;
 			m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
 			return addoff;
@@ -2400,8 +2556,8 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 		if (flags & TOKEN_TAKESTATICNUM) {
 			printf("TAKESSTATICNUM ");
 		}
-		if (flags & TOKEN_TAKESTATICNUM) {
-			printf("TAKESSTATICNUM ");
+		if (flags & TOKEN_SELFMODIFY) {
+			printf("SELFMODIFY ");
 		}
 		if (flags & TOKEN_STATICSTRING) {
 			printf("STATICSTRING ");

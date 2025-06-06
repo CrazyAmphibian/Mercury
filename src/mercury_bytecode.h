@@ -100,6 +100,7 @@ void M_BYTECODE_SETG(mercury_state* M, uint16_t flags);
 
 void M_BYTECODE_CPYT(mercury_state* M, uint16_t flags);
 void M_BYTECODE_SWPT(mercury_state* M, uint16_t flags);
+void M_BYTECODE_CPYX(mercury_state* M, uint16_t flags);
 
 extern mercury_instruction mercury_bytecode_list[];
 
@@ -170,4 +171,5 @@ enum mercury_opcodes:uint16_t {
 
 	M_OPCODE_CPYT = 54,
 	M_OPCODE_SWPT = 55,
+	M_OPCODE_CPYX = 56,
 };

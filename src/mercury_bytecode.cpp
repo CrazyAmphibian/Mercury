@@ -376,7 +376,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 			break;
 		case M_TYPE_FLOAT:
 			f1 = var->data.f;
-			floatcount++;
+			floatcount+=2;
 			break;
 		default:
 			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
@@ -391,7 +391,7 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount++;
+			floatcount+=2;
 		}
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
@@ -427,13 +427,21 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 		mercury_unassign_var(M, var);
 	}
 
-	if (floatcount) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.f = (floatcount == 2 ? f2 : (mercury_float)i1) / f1;
-	}
-	else {
-		outv->type = M_TYPE_FLOAT;
+
+	outv->type = M_TYPE_FLOAT;
+	switch (floatcount) {
+	case 0:
 		outv->data.f = (mercury_float)i2 / (mercury_float)i1;
+		break;
+	case 1:
+		outv->data.f = (mercury_float)f1 / i1;
+		break;
+	case 2:
+		outv->data.f = (mercury_float)i1 / f1;
+		break;
+	case 3:
+		outv->data.f = f2 / f1;
+		break;
 	}
 	mercury_pushstack(M, outv);
 
@@ -498,7 +506,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount++;
+			floatcount+=2;
 		}
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
@@ -523,7 +531,7 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 			break;
 		case M_TYPE_FLOAT:
 			(floatcount ? f2 : f1) = var->data.f;
-			floatcount++;
+			floatcount+=2;
 			break;
 		default:
 			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
@@ -534,13 +542,20 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 		mercury_unassign_var(M, var);
 	}
 
-	if (floatcount) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.f = pow( (floatcount == 2 ? f2 : (mercury_float)i1) , f1 );
-	}
-	else {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.f = pow(i2,i1);
+	outv->type = M_TYPE_FLOAT;
+	switch (floatcount) {
+	case 0:
+		outv->data.f = pow(i2, i1);
+		break;
+	case 1:
+		outv->data.f = pow(i1, f1);
+		break;
+	case 2:
+		outv->data.f = pow(f1, i1);
+		break;
+	case 3:
+		outv->data.f = pow(f2, f1);
+		break;
 	}
 	mercury_pushstack(M, outv);
 
@@ -606,7 +621,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount++;
+			floatcount+=2;
 		}
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
@@ -631,7 +646,7 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 			break;
 		case M_TYPE_FLOAT:
 			(floatcount ? f2 : f1) = var->data.f;
-			floatcount++;
+			floatcount+=2;
 			break;
 		default:
 			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
@@ -642,26 +657,40 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 		mercury_unassign_var(M, var);
 	}
 
-	if (floatcount) {
-
+	outv->type = M_TYPE_INT;
+	switch (floatcount) {
+	case 0:
+		if (i1 == 0) {
+			mercury_raise_error(M, M_ERROR_DIV_ZERO);
+			mercury_unassign_var(M, outv);
+			return;
+		}
+		outv->data.i = i2 / i1;
+		break;
+	case 1:
 		if ((mercury_int)f1 == 0) {
 			mercury_raise_error(M, M_ERROR_DIV_ZERO);
 			mercury_unassign_var(M, outv);
 			return;
 		}
-
-		outv->type = M_TYPE_INT;
-		outv->data.i = (floatcount == 2 ? (mercury_int)f2 : i1) / (mercury_int)f1;
-	}
-	else {
-		if ((mercury_int)i1 == 0) {
+		outv->data.i = i1 / (mercury_int)f1;
+		break;
+	case 2:
+		if (i1 == 0) {
 			mercury_raise_error(M, M_ERROR_DIV_ZERO);
 			mercury_unassign_var(M, outv);
 			return;
 		}
-
-		outv->type = M_TYPE_INT;
-		outv->data.i = i2 / i1;
+		outv->data.i = (mercury_int)f1 / i1;
+		break;
+	case 3:
+		if ((mercury_int)f1 == 0) {
+			mercury_raise_error(M, M_ERROR_DIV_ZERO);
+			mercury_unassign_var(M, outv);
+			return;
+		}
+		outv->data.i = (mercury_int)f2 / (mercury_int)f1;
+		break;
 	}
 	mercury_pushstack(M, outv);
 
@@ -726,7 +755,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 		void* offset = M->bytecode.instructions + M->programcounter;
 		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
 			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount++;
+			floatcount+=2;
 		}
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
@@ -751,7 +780,7 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 			break;
 		case M_TYPE_FLOAT:
 			(floatcount ? f2 : f1) = var->data.f;
-			floatcount++;
+			floatcount+=2;
 			break;
 		default:
 			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
@@ -762,13 +791,21 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 		mercury_unassign_var(M, var);
 	}
 
-	if (floatcount) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.f = fmod(floatcount == 2 ? f2 : (mercury_float)i1 , f1);
-	}
-	else {
+	outv->type = M_TYPE_FLOAT;
+	switch (floatcount) {
+	case 0:
 		outv->type = M_TYPE_INT;
 		outv->data.i = i2 % i1;
+		break;
+	case 1:
+		outv->data.f = fmod(i1, f1);
+		break;
+	case 2:
+		outv->data.f = fmod(f1, i1);
+		break;
+	case 3:
+		outv->data.f = fmod(f2 , f1);
+		break;
 	}
 	mercury_pushstack(M, outv);
 
@@ -2614,7 +2651,54 @@ void M_BYTECODE_SWPT(mercury_state* M, uint16_t flags) { //SWaP Top. swaps the t
 	mercury_pushstack(M, v2);
 }
 
+void M_BYTECODE_CPYX(mercury_state* M, uint16_t flags) { // CoPY X elements (from top of stack)
+	if (!M->sizeofstack)return; //nothing on stack, nothing to copy.
 
+
+	mercury_int num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+#ifdef MERCURY_64BIT
+	M->programcounter += 2;
+#else
+	M->programcounter += 1;
+#endif
+	mercury_int start_stack_size = M->sizeofstack;
+	for (mercury_int i = 0; i < num; i++) {
+
+		mercury_int index = start_stack_size - num + i;
+		if (index < 0) { //do not break, we need to gaurentee the stack size.
+			M_BYTECODE_NNIL(M,0);
+			continue;
+		}
+
+		mercury_variable* val = M->stack[index];
+
+		mercury_variable* out = mercury_assign_var(M);
+		if (!out) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+
+		out->type = val->type;
+		switch (val->type) {
+		case M_TYPE_STRING:
+		{
+			mercury_stringliteral* str = (mercury_stringliteral*)val->data.p;
+			out->data.p = mercury_copystring(str);// mercury_cstring_to_mstring(str->ptr, str->size); // cheap way to just copy a string. easy enough, even if it's probably not the best practice.
+		}
+		break;
+		case M_TYPE_ARRAY:
+		{
+			mercury_array* arr = (mercury_array*)val->data.p;
+			arr->refrences++;
+		}
+		default:
+			out->data.i = val->data.i;
+		}
+
+		mercury_pushstack(M, out);
+	}
+
+}
 
 
 mercury_instruction mercury_bytecode_list[] = {
@@ -2684,5 +2768,6 @@ mercury_instruction mercury_bytecode_list[] = {
 
 	M_BYTECODE_CPYT, //54
 	M_BYTECODE_SWPT, //55
+	M_BYTECODE_CPYX, //56
 };
 
