@@ -431,6 +431,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 					temp_token->num_chars = 0;
 					temp_token->line_col = col;
 					temp_token->line_num = line;
+					temp_token->token_flags = 0;
 				}
 				else {
 
@@ -540,11 +541,13 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 					temp_token->num_chars = 0;
 					temp_token->line_col = col;
 					temp_token->line_num = line;
+					temp_token->token_flags = 0;
 				}
 				else if ((char_is_number(c_char))) {
 					add_char_to_token(temp_token, c_char);
-					temp_token->token_flags = TOKEN_STATICNUMBER | TOKEN_VARIABLE;
-					if (!char_is_number(n_char)) {
+					bool allow_nonnumber = !(temp_token->token_flags & TOKEN_ENVVARNAME);
+					if(!temp_token->token_flags)temp_token->token_flags = TOKEN_STATICNUMBER | TOKEN_VARIABLE;
+					if (!char_is_number(n_char) && (!allow_nonnumber && !char_is_character(n_char)) ) {
 						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
 						out[num_tokens] = temp_token;
 						num_tokens++;
@@ -553,12 +556,13 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 						temp_token->num_chars = 0;
 						temp_token->line_col = col;
 						temp_token->line_num = line;
+						temp_token->token_flags = 0;
 					}
 				}
 				else if (char_is_character(c_char)) {
 					add_char_to_token(temp_token, c_char);
 					temp_token->token_flags = TOKEN_ENVVARNAME | TOKEN_VARIABLE;
-					if (!char_is_character(n_char)) {
+					if (!(char_is_character(n_char) ||char_is_number(n_char) )) {
 						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
 						out[num_tokens] = temp_token;
 						num_tokens++;
@@ -567,6 +571,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 						temp_token->num_chars = 0;
 						temp_token->line_col = col;
 						temp_token->line_num = line;
+						temp_token->token_flags = 0;
 					}
 				}
 				else if (char_is_symbol(c_char)) {
@@ -581,6 +586,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 						temp_token->num_chars = 0;
 						temp_token->line_col = col;
 						temp_token->line_num = line;
+						temp_token->token_flags = 0;
 					}
 					else if (!symbols_can_join(c_char, n_char)) {
 						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
@@ -591,6 +597,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 						temp_token->num_chars = 0;
 						temp_token->line_col = col;
 						temp_token->line_num = line;
+						temp_token->token_flags = 0;
 					}
 				}
 

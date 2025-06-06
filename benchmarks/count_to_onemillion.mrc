@@ -1,15 +1,13 @@
-start=os.clock()
-a=0
+local start=global os.clock()
+local a=0
 while a<1000000 do
 	a=a+1
 end
-time=os.clock()-start
-print("standard iteration took "..time.." seconds")
+print(global string.format("standard iteration took %.5f seconds",global os.clock()-local start))
 
-start=os.clock()
+local start=global os.clock()
 local a=0
 while local a<1000000 do
 	local a=local a+1
 end
-time=os.clock()-start
-print("iteration using locals took "..time.." seconds")
+print(global string.format("locals iteration took %.5f seconds",global os.clock()-local start))
