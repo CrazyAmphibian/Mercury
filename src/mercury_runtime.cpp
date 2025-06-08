@@ -395,6 +395,9 @@ int main(int argc, char** argv) {
 			}
 			putchar('\n');
 		}
+		else {
+			printf("failed to compile, unknown error\n");
+		}
 		if (!interactivemode)return 1;
 	}
 	else {

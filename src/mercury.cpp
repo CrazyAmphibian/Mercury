@@ -732,7 +732,7 @@ bool mercury_setarray(mercury_array* array, mercury_variable* var, mercury_int p
 		if (!nptr)return false;
 		subblock = (mercury_variable**)nptr;
 		array->values[subnumber] = subblock;
-		for (mercury_int i = 0; i < 1 << MERCURY_ARRAY_BLOCKSIZE; i++) {
+		for (mercury_int i = 0; i < (1 << MERCURY_ARRAY_BLOCKSIZE); i++) {
 			subblock[i] = nullptr;
 		}
 	}
@@ -779,8 +779,18 @@ mercury_variable* mercury_getarray(mercury_array* array, mercury_int pos, mercur
 		return out;
 	}
 
-	out = subblock[mantisa];
-	if (out) {
+	if (subblock[mantisa]) {
+		out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
+		if (!out)return nullptr;
+
+		mercury_variable* v = subblock[mantisa];
+		out->type = v->type;
+		if (out->type == M_TYPE_STRING) {
+			out->data.p = mercury_copystring((mercury_stringliteral*)v->data.p);
+		}
+		else {
+			out->data.i = v->data.i;
+		}
 		return out;
 	}
 	else {
@@ -1578,6 +1588,7 @@ __attribute__((constructor)) dynamic_lib_load() {
 #ifdef MERCURY_LIB_OS
 	mercury_register_library(mercury_lib_os_time, "time", "os");
 	mercury_register_library(mercury_lib_os_execute, "execute", "os");
+	mercury_register_library(mercury_lib_os_call, "call", "os");
 	mercury_register_library(mercury_lib_os_clock, "clock", "os");
 	mercury_register_library((void*)&m_os_isposix, "IS_POSIX", "os", M_TYPE_BOOL);
 	mercury_register_library((void*)&m_os_isposix, "IS_UNIX", "os", M_TYPE_BOOL);
@@ -1755,7 +1766,7 @@ int main(int argc, char** argv) {
 	}
 	
 
-	const char* code = "w=io.input()  print(w)";
+	const char* code = "while n do while i do end end";
 
 
 

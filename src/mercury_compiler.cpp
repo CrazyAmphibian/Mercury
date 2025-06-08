@@ -1976,8 +1976,8 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 			else {
 				ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
 			}
-			addoff += ad;
 			m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
+			addoff += ad;
 			return addoff;
 		}
 		else if (cur_tok->token_flags & TOKEN_SELFMODIFY) { // TODO: we need to bifrucate var_code into 2 sections, the first being the bulk and the seconds being the final variable. eg a is a, a[0] is 0, a[0][n] is n.
@@ -2010,8 +2010,8 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 				ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
 			}
 			m_compile_add_instruction(func, m_compile_get_operator_bytecode(cur_tok,0), 0, offset + addoff);
-			addoff += ad;
 			m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
+			addoff += ad;
 			return addoff;
 		}
 		else {
@@ -2349,7 +2349,6 @@ int mercury_compile_read_while_statment(compiler_function* func, compiler_token*
 		if (ct->token_flags & TOKEN_KEYWORD) {
 			if (ct->num_chars == 3 && ct->chars[0]=='e' && ct->chars[1] == 'n' && ct->chars[2] == 'd') {
 
-
 				m_compile_add_instruction(func, M_OPCODE_JMPR, 0, cur_off);
 #ifdef MERCURY_64BIT
 				m_compile_add_rawdatadouble(func, addrstart - func->number_instructions-2, cur_off);
@@ -2390,6 +2389,7 @@ int mercury_compile_read_while_statment(compiler_function* func, compiler_token*
 				if (!a) {
 					return adv;
 				}
+				adv += a;
 			}
 			else if (ct->num_chars == 2 && ct->chars[0] == 'i' && ct->chars[1] == 'f') {
 				a = mercury_compile_read_if_statment(func, tokens, cur_off, token_max);

@@ -711,7 +711,16 @@ returns a float of how long the program has been running
 <div class='fdec'>execute (<span class='type'>string</span> command)</div>
 <div class='desc'>
 <p>
-executes a string as if it were a shell command. input is platform-dependent. returns any text the command writes.
+executes a string as if it were a shell command. input is platform-dependent. returns any text the command writes. This function uses C's popen function.
+</p>
+<p class='example'>
+<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>execute</span><span class='m_symbol'>(<span class='m_string'>"curl www.test-site.com"</span>)</span> <span class='m_comment'> //returns a web request result </span> <br>
+</div>
+
+<div class='fdec'>call (<span class='type'>string</span> command)</div>
+<div class='desc'>
+<p>
+executes a string as if it were a shell command. input is platform-dependent. returns a code from the command. This function uses C's system function. Some commands may work better with this function compared to execute.
 </p>
 <p class='example'>
 <span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>execute</span><span class='m_symbol'>(<span class='m_string'>"curl www.test-site.com"</span>)</span> <span class='m_comment'> //returns a web request result </span> <br>

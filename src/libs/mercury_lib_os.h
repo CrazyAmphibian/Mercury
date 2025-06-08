@@ -5,6 +5,7 @@
 
 void mercury_lib_os_time(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_os_execute(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_os_call(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_os_clock(mercury_state* M, mercury_int args_in, mercury_int args_out);
 
 #if defined(_WIN32) || defined(_WIN64)
