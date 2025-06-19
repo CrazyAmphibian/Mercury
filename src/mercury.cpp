@@ -537,6 +537,24 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 	switch (var->type)
 	{
 	case M_TYPE_TABLE:
+	{
+		mercury_table* ftab = (mercury_table*)var->data.p;
+		ftab->refrences--;
+		if (!ftab->refrences) {
+			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+				mercury_subtable* st = ftab->data[t];
+				for (mercury_int i = 0; i < st->size; i++) {
+					mercury_variable* v = st->values[i];
+					mercury_free_var(v,true);
+					v->type = t;	//because keys are stored as raw data, we have to do a bit of hax. still, this is a neat way to save some processing and memory.
+					v->data = st->keys[i];
+					mercury_free_var(v);
+				}
+				free(st);
+			}
+			free(ftab);
+		}
+	}
 		break;
 	case M_TYPE_STRING:
 	{
@@ -583,6 +601,7 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 			free(fw);
 		}
 	}
+		break;
 	case M_TYPE_THREAD:
 	{
 		mercury_threadholder* t = (mercury_threadholder*)var->data.p;
@@ -608,6 +627,7 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 
 		
 	}
+		break;
 	default:
 		break;
 	}
@@ -699,6 +719,26 @@ bool mercury_pushstack(mercury_state* M, mercury_variable* var) {
 	return true;
 }
 
+mercury_variable* mercury_clonevariable(mercury_variable* var,mercury_state* M) {
+	mercury_variable* out=nullptr;
+	if (M) {
+		out=mercury_assign_var(M);
+	}
+	else {
+		out = (mercury_variable*)malloc(sizeof(mercury_variable));
+	}
+	if (!out)return nullptr;
+
+	out->type = var->type;
+	if (out->type == M_TYPE_STRING) {
+		out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
+	}
+	else {
+		out->data = var->data;
+	}
+	
+	return out;
+}
 
 
 mercury_array* mercury_newarray() {
@@ -1766,7 +1806,7 @@ int main(int argc, char** argv) {
 	}
 	
 
-	const char* code = "while n do while i do end end";
+	const char* code = "iterate(io, function(k,v) print(k,v) end ) a=202";
 
 
 

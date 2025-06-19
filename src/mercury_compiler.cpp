@@ -968,6 +968,7 @@ uint16_t m_compile_get_operator_bytecode(compiler_token* token,int forcetype) {
 
 
 void m_compile_add_instruction(compiler_function* func , uint16_t opcode ,uint16_t flags=0,mercury_int tokennum=0) {
+	//printf("adding instruction %i [%i] to function %p as number %i from token %i\n",opcode,flags,func,func->number_instructions+1,tokennum);
 	uint32_t* naddr= (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions+1) );
 	if (!naddr) {
 		return;
@@ -1465,6 +1466,11 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 		}
 	}
 	return 0;
+	}
+	else if (t->token_flags & TOKEN_KEYWORD) {
+		if (t->num_chars == 8 && t->chars[0] == 'f' && t->chars[7] == 'n') { //read an anonymous function
+			return mercury_compile_read_function_define(func,tokens,offset,token_max,false);
+		}
 	}
 	return 0;
 }

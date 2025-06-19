@@ -218,6 +218,7 @@ MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_pullstack(mercury_state* M);
 MERCURY_DYNAMIC_LIBRARY bool mercury_unassign_var(mercury_state* M, mercury_variable* var);
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_assign_var(mercury_state* M);
 MERCURY_DYNAMIC_LIBRARY void mercury_free_var(mercury_variable* var, bool keep_struct = false);
+MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_clonevariable(mercury_variable* var, mercury_state* M=nullptr);
 
 //misc
 MERCURY_DYNAMIC_LIBRARY bool mercury_checkbool(mercury_variable* var);

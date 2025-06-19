@@ -165,6 +165,9 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 		case M_OPCODE_GETG:
 			printf("GETG\n");
 			break;
+		case M_OPCODE_LEN:
+			printf("LEN \n");
+			break;
 		case M_OPCODE_CPYT:
 			printf("CPYT\n");
 			break;
@@ -295,7 +298,7 @@ int main(int argc, char** argv) {
 		//printf("\t%i %s\n",i, argv[i]);
 	}
 	
-	char* code;// = (char*)"";
+	char* code=nullptr;// = (char*)"";
 
 
 	if (argc>=2) {
@@ -336,10 +339,13 @@ int main(int argc, char** argv) {
 	else {
 		//printf("no file supplied.\n");
 		//return -1;
-		code = (char*)"print(\"hello, world!\")";
+		//code = (char*)"print(\"hello, world!\")";
 		interactivemode = true;
 	}
 
+	if (interactivemode) {
+		printf("Mercury Alpha 3 (c)2025 interactive mode\n");
+	}
 
 	
 
@@ -358,6 +364,7 @@ int main(int argc, char** argv) {
 
 	start:
 	if (interactivemode) {
+		putchar('>');
 		mercury_int sizec = 200;
 		mercury_int len = 0;
 		char* c = (char*)malloc(sizec);

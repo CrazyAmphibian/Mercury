@@ -130,8 +130,13 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 			for (mercury_int i = 0; i < subt->size; i++) {
 				mercury_variable* k=mercury_assign_var(M);
 				k->type = t;
-				k->data.i = subt->keys[i].i;
-				mercury_variable* v = subt->values[i];
+				if (t == M_TYPE_STRING) {
+					k->data.p = mercury_copystring((mercury_stringliteral*)subt->keys[i].p);
+				}
+				else {
+					k->data.i = subt->keys[i].i;
+				}
+				mercury_variable* v = mercury_clonevariable(subt->values[i]);
 
 				mercury_pushstack(SubM, k);
 				mercury_pushstack(SubM, v);
@@ -142,8 +147,8 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 				else {
 					while (mercury_stepstate(SubM));
 					SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
-					M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
 				}
+				M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
 
 			}
 		}
@@ -157,6 +162,8 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	}
 
 	mercury_destroystate(SubM);
+	mercury_free_var(function);
+	mercury_free_var(listlike);
 
 	for (mercury_int a = 0; a < args_out; a++) {
 		mercury_variable* mv = mercury_assign_var(M);
