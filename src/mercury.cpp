@@ -1552,6 +1552,8 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_std_type, "type", nullptr);
 	mercury_register_library(mercury_lib_std_tostring, "tostring", nullptr);
 	mercury_register_library(mercury_lib_std_tonumber, "tonumber", nullptr);
+	mercury_register_library(mercury_lib_std_toint, "toint", nullptr);
+	mercury_register_library(mercury_lib_std_tofloat, "tofloat", nullptr);
 	mercury_register_library(mercury_lib_std_dynamic_library_load, "loadlibrary", nullptr);
 
 

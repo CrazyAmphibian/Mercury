@@ -559,7 +559,7 @@ void mercury_lib_std_tostring(mercury_state* M, mercury_int args_in, mercury_int
 
 void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int args_out) { //bit more complicated.
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)1, (void*)args_in);
 		return;
 	}
 	if (!args_out) {
@@ -680,3 +680,82 @@ void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in,
 		mercury_pushstack(M, mv);
 	}
 }
+
+
+void mercury_lib_std_toint(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)1, (void*)args_in);
+		return;
+	}
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int a = 1; a < args_in; a++) { //remove extra input args
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+
+	mercury_lib_std_tonumber(M, 1, 1); //we already have to number code. might as well use it.
+
+	mercury_variable* i = mercury_popstack(M);
+	mercury_variable* o; //= mercury_assign_var(M);
+
+	switch (i->type) { //because we know it'll only be a float, int, or nil, we can only check for float for extra easy code.
+	case M_TYPE_FLOAT:
+		o = mercury_assign_var(M);
+		o->type = M_TYPE_INT;
+		o->data.i = (mercury_int)i->data.f;
+		mercury_pushstack(M, o);
+		break;
+	default:
+		o = i;
+		mercury_pushstack(M, o);
+		break;
+	}
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+
+
+void mercury_lib_std_tofloat(mercury_state* M, mercury_int args_in, mercury_int args_out) { //basically the same thing as the above.
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)1, (void*)args_in);
+		return;
+	}
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int a = 1; a < args_in; a++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+
+	mercury_lib_std_tonumber(M, 1, 1);
+
+	mercury_variable* i = mercury_popstack(M);
+	mercury_variable* o;
+
+	switch (i->type) {
+	case M_TYPE_INT:
+		o = mercury_assign_var(M);
+		o->type = M_TYPE_FLOAT;
+		o->data.f = (mercury_float)i->data.i;
+		mercury_pushstack(M, o);
+		break;
+	default:
+		o = i;
+		mercury_pushstack(M, o);
+		break;
+	}
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+

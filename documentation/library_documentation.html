@@ -185,6 +185,30 @@ s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span cla
 </p>
 </div>
 
+<div class='fdec'>toint (<span class='type'>variable</span> variable)</div>
+<div class='desc'>
+<p>
+returns an integer which represents another variable. Operates in the same manner as tonumber, but will type convert a float result into an int. may return nil.
+</p>
+<p class='example'>
+s<span class='m_symbol'>=</span><span class='m_builtin'>toint</span><span class='m_symbol'>(</span><span class='m_string'>"12.47"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12</span> <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>toint</span><span class='m_symbol'>(</span><span class='m_static'>true</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1</span> <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>toint</span><span class='m_symbol'>({</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>})</span> <span class='m_comment'>//returns nil</span> <br>
+</p>
+</div>
+
+<div class='fdec'>tofloat (<span class='type'>variable</span> variable)</div>
+<div class='desc'>
+<p>
+returns a float which represents another variable. Operates in the same manner as tonumber, but will type convert an int result into a float. may return nil.
+</p>
+<p class='example'>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tofloat</span><span class='m_symbol'>(</span><span class='m_string'>"12.47"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12.47</span> <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tofloat</span><span class='m_symbol'>(</span><span class='m_static'>true</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.0</span> <br>
+s<span class='m_symbol'>=</span><span class='m_builtin'>tofloat</span><span class='m_symbol'>({</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>})</span> <span class='m_comment'>//returns nil</span> <br>
+</p>
+</div>
+
 <div class='fdec'>loadlibrary (<span class='type'>string</span> path)</div>
 <div class='desc'>
 <p>
