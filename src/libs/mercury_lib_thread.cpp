@@ -158,7 +158,7 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 		}
 		else {
 			if (table_var)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
-			t->state->instructions = nullptr; //don't mess with the host function's data
+			t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
 			mercury_destroystate(t->state);
 			free(t);
 		}

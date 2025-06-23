@@ -2532,7 +2532,7 @@ compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercu
 
 mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 
-	static const char const* empty_token_string = "";
+	static const char* empty_token_string = "";
 
 	mercury_variable* out = (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (!out)return nullptr;

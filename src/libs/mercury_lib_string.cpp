@@ -3,6 +3,9 @@
 #include "../mercury_error.h"
 
 #include "malloc.h"
+#ifndef _WIN32
+#include <cstring.h>
+#endif
 
 void mercury_lib_string_sub(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 3) {
