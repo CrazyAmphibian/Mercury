@@ -133,7 +133,7 @@ struct mercury_threadholder {
 	mercury_uint refrences = 0;
 	volatile bool finished = false; //it could change, you know.
 	bool customenv = false;
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 	HANDLE threadobject = NULL;
 #else
 	pthread_t threadobject = NULL;

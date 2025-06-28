@@ -237,8 +237,6 @@ void mercury_lib_string_replace(mercury_state* M, mercury_int args_in, mercury_i
 		return;
 	}
 
-	mercury_stringliteral* intermediate=nullptr;
-
 	mercury_stringliteral* outstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!outstr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -263,18 +261,18 @@ void mercury_lib_string_replace(mercury_state* M, mercury_int args_in, mercury_i
 		}
 		//string found
 		replacments++;
-		intermediate=mercury_mstrings_concat(outstr,replace);
-		mercury_mstring_delete(outstr);
-		outstr = intermediate;
+		mercury_mstrings_append(outstr, replace);
 		c += search->size;
 		continue;
 		next:
 		//string not found.
-		intermediate=mercury_mstrings_concat(outstr, mercury_cstring_to_mstring(str->ptr+c, 1));
-		mercury_mstring_delete(outstr);
-		outstr = intermediate;
+		mercury_mstring_addchars(outstr, str->ptr+c,1);
 		c++;
 	}
+
+	mercury_unassign_var(M, str_var);
+	mercury_unassign_var(M, search_var);
+	mercury_unassign_var(M, replace_var);
 
 	mercury_variable* out = mercury_assign_var(M);
 	out->type = M_TYPE_STRING;
