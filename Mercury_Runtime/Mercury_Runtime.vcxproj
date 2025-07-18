@@ -149,9 +149,16 @@
   <ItemGroup>
     <ClInclude Include="..\src\mercury.h" />
     <ClInclude Include="..\src\mercury_compiler.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\mercury_runtime.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\shittyicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Mercury_Runtime.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
