@@ -243,6 +243,15 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("CALL in:%lli out:%lli\n", i, o);
 		}
 		break;
+		case M_OPCODE_UNM:
+			printf("UNM \n");
+			break;
+		case M_OPCODE_INC:
+			printf("INC \n");
+			break;
+		case M_OPCODE_DEC:
+			printf("DEC \n");
+			break;
 		default:
 			printf("???? (%i)\n", instructions[offset]);
 		}

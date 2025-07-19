@@ -2701,6 +2701,84 @@ void M_BYTECODE_CPYX(mercury_state* M, uint16_t flags) { // CoPY X elements (fro
 }
 
 
+
+
+void M_BYTECODE_UNM(mercury_state* M, uint16_t flags) { //UNary Minus
+	mercury_variable* var = mercury_popstack(M);
+	if (!var) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		var->data.i *= -1;
+		break;
+	case M_TYPE_FLOAT:
+		var->data.f *= -1.0;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, var);
+		return;
+	}
+
+	mercury_pushstack(M, var);
+	return;
+}
+
+void M_BYTECODE_INC(mercury_state* M, uint16_t flags) { //INCrement
+	mercury_variable* var = mercury_popstack(M);
+	if (!var) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		var->data.i++;
+		break;
+	case M_TYPE_FLOAT:
+		var->data.f += 1.0;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, var);
+		return;
+	}
+
+	mercury_pushstack(M, var);
+	return;
+}
+
+void M_BYTECODE_DEC(mercury_state* M, uint16_t flags) { //DECrement
+	mercury_variable* var = mercury_popstack(M);
+	if (!var) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		var->data.i--;
+		break;
+	case M_TYPE_FLOAT:
+		var->data.f -= 1.0;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, var);
+		return;
+	}
+
+	mercury_pushstack(M, var);
+	return;
+}
+
+
 mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_NOP, //0
 	//arithmetic
@@ -2769,5 +2847,9 @@ mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_CPYT, //54
 	M_BYTECODE_SWPT, //55
 	M_BYTECODE_CPYX, //56
+
+	M_BYTECODE_UNM, //57
+	M_BYTECODE_INC,
+	M_BYTECODE_DEC, //59
 };
 

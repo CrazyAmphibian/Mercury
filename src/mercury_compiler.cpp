@@ -383,9 +383,9 @@ bool symbols_can_join(char c1, char c2) {
 		case '!':	// !! !=
 		case '>':	// >= >> >>=
 		case '<':	// <= << <<=
+		case '+':	// += ++
+		case '-':	// -= --
 			return c2 == c1 || c2 == '=';
-		case '+':	// +=
-		case '-':	// -=
 		case '*':	// *=
 		case '/':	// /=
 		case '\\':	// \=
@@ -803,6 +803,12 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 				else if (tc[0] == '~' && tc[1] == '=') {
 					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
 				}
+				else if (tc[0] == '+' && tc[1] == '+') {
+					token->token_flags |= TOKEN_UANRY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
+				else if (tc[0] == '-' && tc[1] == '-') {
+					token->token_flags |= TOKEN_UANRY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
+				}
 			}
 			else if (token->num_chars == 3) {
 				if (tc[0] == '.' && tc[1] == '.' && tc[2] == '=') {
@@ -851,7 +857,7 @@ uint16_t m_compile_get_operator_bytecode(compiler_token* token,int forcetype) {
 		case '+':
 			return M_OPCODE_ADD;
 		case '-':
-			return M_OPCODE_SUB;
+			return forcetype ? M_OPCODE_UNM : M_OPCODE_SUB;
 		case '*':
 			return M_OPCODE_MUL;
 		case '/':
@@ -937,6 +943,12 @@ uint16_t m_compile_get_operator_bytecode(compiler_token* token,int forcetype) {
 		}
 		else if (c1 == '%' && c2 == '=') {
 			return M_OPCODE_MOD;
+		}
+		else if (c1 == '+' && c2 == '+') {
+			return M_OPCODE_INC;
+		}
+		else if (c1 == '-' && c2 == '-') {
+			return M_OPCODE_DEC;
 		}
 	}
 	else if (token->num_chars == 3) {
@@ -1480,7 +1492,7 @@ int m_compile_read_unary_op(compiler_function* func, compiler_token** tokens, me
 	if (offset >= token_max)return 0;
 	compiler_token* t = tokens[offset];
 	if ( (t->token_flags & TOKEN_OPERATOR) && (t->token_flags & TOKEN_UANRY) ) {
-		uint16_t op = m_compile_get_operator_bytecode(t, 0);
+		uint16_t op = m_compile_get_operator_bytecode(t, 1);
 		m_compile_add_instruction(func, op, 0, offset);
 		return 1;
 	}
@@ -1765,7 +1777,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 	//compiler_function* func= init_comp_func();
 	if (!func)return 0;
 
-	if (token_max < offset + 2) {
+	if (token_max < offset + 1) {
 		func->errorcode = M_COMPERR_ENDS_TOO_SOON;
 		func->token_error_num = offset;
 		return 0;
@@ -1987,7 +1999,7 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 			return addoff;
 		}
 		else if (cur_tok->token_flags & TOKEN_SELFMODIFY) { // TODO: we need to bifrucate var_code into 2 sections, the first being the bulk and the seconds being the final variable. eg a is a, a[0] is 0, a[0][n] is n.
-			addoff++; // THEN, we need to replace the following code with a CPYX 2, so that way doing += and whatnot is actually faster (hopefully)
+			 // THEN, we need to replace the following code with a CPYX 2, so that way doing += and whatnot is actually faster (hopefully)
 			concat_comp_func_appends(func, var_code);
 			concat_comp_func_appends(func, var_code_final);
 			if (var_code->number_instructions) //we only copy top 2 if we need to index
@@ -2006,17 +2018,27 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 			delete_comp_func(var_code);
 			delete_comp_func(var_code_final);
 			//m_compile_add_instruction(func, M_OPCODE_CPYT, 0, offset + addoff);
+			
 			int ad = 0;
-			if (next_tok->token_flags & TOKEN_KEYWORD && next_tok->num_chars == 8 && next_tok->chars[0] == 'f' && next_tok->chars[7] == 'n') {
-				func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-				func->token_error_num = offset + addoff + 1;
-				return 0;
+			if (cur_tok->token_flags & TOKEN_BINARY) {
+				addoff++;
+				if (next_tok->token_flags & TOKEN_KEYWORD && next_tok->num_chars == 8 && next_tok->chars[0] == 'f' && next_tok->chars[7] == 'n') {
+					func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
+					func->token_error_num = offset + addoff + 1;
+					return 0;
+				}
+				else {
+					ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
+				}
+				m_compile_add_instruction(func, m_compile_get_operator_bytecode(cur_tok, 0), 0, offset + addoff);
+				m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
 			}
 			else {
-				ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
+				m_compile_add_instruction(func, m_compile_get_operator_bytecode(cur_tok, 0), 0, offset + addoff);
+				m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
+				addoff++;
 			}
-			m_compile_add_instruction(func, m_compile_get_operator_bytecode(cur_tok,0), 0, offset + addoff);
-			m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
+			
 			addoff += ad;
 			return addoff;
 		}
@@ -2518,9 +2540,6 @@ compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercu
 
 	COMPILER_JUMP_DATABASE=OLD_JUMPDATABASE;
 	COMPILER_JUMP_NUMBERS=OLD_JUMPAMTS;
-
-	
-
 
 	return out;
 }
