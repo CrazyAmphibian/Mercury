@@ -53,12 +53,13 @@ mercury_stringliteral* mercury_cstring_const_to_mstring(char* str, long size) {
 
 char* mercury_mstring_to_cstring(mercury_stringliteral* str) {
 	mercury_int sz = strlen(str->ptr); //use this mecause null terminator
-	if(sz > str->size)sz = str->size+1;
-	char* out = (char*)malloc(sizeof(char) * sz); 
+	//printf("%i/%i %s",str->size,sz,str->ptr);
+	if(sz > str->size)sz = str->size;
+	char* out = (char*)malloc(sizeof(char) * (sz+1)); 
 	if (!out)return nullptr;
 
-	memcpy(out, str->ptr, (sz-1)*sizeof(char));
-	out[sz-1] = '\0';
+	memcpy(out, str->ptr, sz*sizeof(char));
+	out[sz] = '\0';
 	return out;
 }
 
