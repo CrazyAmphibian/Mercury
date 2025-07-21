@@ -586,6 +586,11 @@ void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int
 	case M_TYPE_STRING:
 		{
 		mercury_stringliteral* s = (mercury_stringliteral*)i->data.p;
+		if (!s->size) {
+			o->type = M_TYPE_NIL;
+			o->data.i = 0;
+			break;
+		}
 		char* c = mercury_mstring_to_cstring(s);
 		char* e;
 		mercury_int n = strtoll(c, &e, 0);

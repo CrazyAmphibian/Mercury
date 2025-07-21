@@ -349,7 +349,7 @@ int read_char_from_dec_chars(char* chars,int* offset_out) {
 	char c2 = chars[2];
 	char c3 = chars[3];
 
-	printf("%c %c %c\n", c1, c2, c3);
+	//printf("%c %c %c\n", c1, c2, c3);
 
 	if (c1 < '0' || c1>'9') {
 		*offset_out = 0;
@@ -444,6 +444,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 				else {
 
 					if (c_char == '\\') {
+						//printf("backslash escape! %c%c\n",c_char,n_char);
 						switch (n_char)
 						{
 						case 'n': //newline
@@ -464,22 +465,23 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 						case '\?': //question
 							add_char_to_token(temp_token, '?');
 							break;
-						case '\a': //bell
+						case 'a': //bell
 							add_char_to_token(temp_token, '\a');
 							break;
-						case '\b': //backspace
+						case 'b': //backspace
 							add_char_to_token(temp_token, '\b');
 							break;
 						case '\e': //escape
 							add_char_to_token(temp_token, '\e');
 							break;
-						case '\f': //formfeed
+						case 'f': //formfeed
 							add_char_to_token(temp_token, '\f');
 							break;
-						case '\t': //tab
+						case 't': //tab
+							//printf("we added a tab.\n");
 							add_char_to_token(temp_token, '\t');
 							break;
-						case '\v': //vertical tab
+						case 'v': //vertical tab
 							add_char_to_token(temp_token, '\v');
 							break;
 						case 'x': //hex input

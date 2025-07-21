@@ -1034,3 +1034,387 @@ void mercury_lib_string_format(mercury_state* M, mercury_int args_in, mercury_in
 }
 
 
+
+/*
+	patterns!
+
+	selectors:
+	%n - number
+	%l - letter
+	%w - lowercase letters
+	%u - uppercase letters
+	%a - alphanumberic
+	%s - symbols
+	%  - whitespace
+	%. - wildcard
+	%% - % literal
+
+	specifiers:
+	%* - 0 to infinity matches, greedy
+	%~ - 0 to infinity matches
+	%- - 1 to infinity matches
+	%+ - 1 to infinity matches, greedy
+	%? - 0 or 1 matches
+	%! - 1 match (implicit behavior made explicit)
+
+*/
+
+
+enum M_PAT_MATCH {
+	//count flags
+	MATCH_SINGLE = (1<<0), //we only want a single char, and stop as soon as we find what we want.
+	MATCH_AT_LEAST_ONE = (1<<1), //we can match many chars, and keep going until the rule stops being true.
+	//behavior flags
+	MATCH_OPTIONAL = (1<<2), //if we aren't required, just set passed to true. still iterates through chars to advance filters
+	MATCH_GREEDY = (1<<3), //if flag, do not allow traversal through first_good_char
+};
+
+struct M_PATTERN{
+	bool allowed_chars[256] = { false };
+	int match_type = MATCH_SINGLE;
+	mercury_int first_good_char = 0; //succesive checks will start at this +1 if not MATCH_GREEDY
+	mercury_int last_good_char = 0; //and end at this.
+	bool passed = false;
+};
+
+void m_initialize_pattern(M_PATTERN* P) {
+	if (!P)return;
+	P->first_good_char = 0;
+	P->last_good_char = 0;
+	P->match_type = MATCH_SINGLE;
+	P->passed = false;
+	int i = 0xFF;
+	while (i>=0) {
+		P->allowed_chars[i] = false;
+		i--;
+	}
+}
+
+
+inline void m_init_pattern_filter_numbers(M_PATTERN* P){
+	if (!P)return;
+	int i = '0';
+	while (i <= '9') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+}
+inline void m_init_pattern_filter_letter_upper(M_PATTERN* P) {
+	if (!P)return;
+	int i = 'A';
+	while (i <= 'Z') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+}
+
+inline void m_init_pattern_filter_letter_lower(M_PATTERN* P) {
+	if (!P)return;
+	int i = 'a';
+	while (i <= 'z') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+}
+
+inline void m_init_pattern_filter_wildcard(M_PATTERN* P) {
+	if (!P)return;
+	int i = '\x00';
+	while (i <= '\xFF') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+}
+
+inline void m_init_pattern_filter_symbols(M_PATTERN* P) {
+	if (!P)return;
+	int i = '\x21';
+	while (i <= '\x2F') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+	i = '\x3A';
+	while (i <= '\x40') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+	i = '\x5B';
+	while (i <= '\x60') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+	i = '\x7B';
+	while (i <= '\x7E') {
+		P->allowed_chars[i] = true;
+		i++;
+	}
+}
+
+inline void m_init_pattern_filter_whitespace(M_PATTERN* P) {
+	if (!P)return;
+	P->allowed_chars[' '] = true;
+	P->allowed_chars['\t'] = true;
+	P->allowed_chars['\n'] = true;
+	P->allowed_chars['\r'] = true;
+}
+
+M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) {
+	mercury_int n = 0;
+	M_PATTERN* out = nullptr;
+
+
+	for (mercury_int c = 0; c < str->size; c++) {
+		char cc = str->ptr[c];
+		printf("%i %c\n",c,cc);
+		M_PATTERN* nptr = (M_PATTERN*)realloc(out, sizeof(M_PATTERN) * (n + 1));
+		if (!nptr)return nullptr;
+		out = nptr;
+		M_PATTERN* p = out+n;
+		n++;
+		m_initialize_pattern(p);
+		
+		//look for the first part of the pattern, the character set.
+		if (cc == '%' && (c + 1) < str->size) {
+			char nc = str->ptr[c + 1];
+			c++;
+			switch (nc) {
+			case 'n':
+				m_init_pattern_filter_numbers(p);
+				break;
+			case 'l':
+				m_init_pattern_filter_letter_upper(p);
+				m_init_pattern_filter_letter_lower(p);
+				break;
+			case 'u':
+				m_init_pattern_filter_letter_upper(p);
+				break;
+			case 'w':
+				m_init_pattern_filter_letter_lower(p);
+				break;
+			case 'a':
+				m_init_pattern_filter_numbers(p);
+				m_init_pattern_filter_letter_upper(p);
+				m_init_pattern_filter_letter_lower(p);
+				break;
+			case 's':
+				m_init_pattern_filter_symbols(p);
+				break;
+			case ' ':
+				m_init_pattern_filter_whitespace(p);
+				break;
+			case '.':
+				m_init_pattern_filter_wildcard(p);
+				break;
+			case '%': //explicitly define this as intented behavior. if you're not escaping %, then you're just asking for trouble later down the line.
+			default:
+				p->allowed_chars[nc] = true;
+			}
+		}
+		else {
+			p->allowed_chars[cc] = true;
+		}
+
+		p->match_type = MATCH_SINGLE;
+
+		//next, look for the second half, the selector.
+		if (c + 1 >= str->size)continue;
+		
+		cc = str->ptr[c+1];
+		if (cc == '%' && (c + 2) < str->size) {
+			char nc = str->ptr[c + 2];
+			c+=2;
+			switch (nc) {
+			case '+':
+				p->match_type = MATCH_AT_LEAST_ONE | MATCH_GREEDY;
+				break;
+			case '-':
+				p->match_type = MATCH_AT_LEAST_ONE;
+				break;
+			case '*':
+				p->match_type = MATCH_AT_LEAST_ONE | MATCH_OPTIONAL | MATCH_GREEDY;
+				break;
+			case '~':
+				p->match_type = MATCH_AT_LEAST_ONE | MATCH_OPTIONAL;
+				break;
+			case '?':
+				p->match_type = MATCH_SINGLE | MATCH_OPTIONAL;
+				break;
+			case '!':
+				p->match_type = MATCH_SINGLE;
+			case '%': //see above.
+			default:
+				c -= 2; //invalid selector? we drop the character advance, so we can treat it like a normal character sequence.
+			}
+		}
+
+
+	}
+
+	if (num_out)*num_out = n;
+	return out;
+}
+
+
+bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercury_int num_patterns, mercury_int str_start, mercury_int* pattern_str_start, mercury_int* pattern_str_end) {
+
+	*pattern_str_start = 0;
+	*pattern_str_end = 0;
+	if (str_start >= str->size)return false;
+	str_start--;
+	if (!num_patterns)return true;
+
+	mercury_int advanced_from = 0;
+	mercury_int current_pattern = 0;
+	advance:
+	str_start++;
+	if (str_start >= str->size)return false;
+	*pattern_str_start = str_start;
+	advanced_from = 0;
+	current_pattern = 0;
+	for (mercury_int n = 0; n < num_patterns; n++) {
+		patterns[n].passed = false;
+	}
+	for (mercury_int c = str_start; c < str->size; c++) {
+		char cc = str->ptr[c];
+		
+		*pattern_str_end = c;
+		M_PATTERN* p = patterns+current_pattern;
+		if (!current_pattern && !p->passed)*pattern_str_start = c;
+		if (p->allowed_chars[cc]) {
+			if (p->match_type & MATCH_SINGLE) {
+				current_pattern++;
+			}
+			else {
+				if (!p->passed) {
+					p->first_good_char = c;
+				}
+				p->last_good_char = c;
+			}
+			p->passed = true;
+		}
+		else {
+			if (p->passed) {
+				if (!(p->match_type & MATCH_GREEDY)) {
+					advanced_from = c;
+					c = p->first_good_char + 1;
+				}
+				current_pattern++;
+			}
+			if (p->match_type & MATCH_OPTIONAL) {
+				p->passed = true;
+				current_pattern++;
+				c--;
+			}
+
+			if(c>=advanced_from && !p->passed) {
+				goto advance;
+			}
+		}	
+
+
+		if (current_pattern == num_patterns) {
+			for (mercury_int n = 0; n < num_patterns; n++) {
+				if (!(patterns[n].passed))goto advance;
+			}
+			break;
+		}
+		if (c+1 == str->size && p->match_type&MATCH_AT_LEAST_ONE) {
+			current_pattern++;
+			c = p->first_good_char;
+		}
+
+	}
+
+	for (mercury_int n = 0; n < num_patterns; n++) {
+		if (!(patterns[n].passed))goto advance;
+	}
+
+	return true;
+}
+
+
+
+void mercury_lib_string_p_find(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 2) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
+		return;
+	};
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int i = 3; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	mercury_variable* startat = nullptr;
+	if (args_in > 2) {
+		startat = mercury_popstack(M);
+		if (startat->type != M_TYPE_INT) {
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)startat->type, (void*)M_TYPE_INT);
+			return;
+		}
+	}
+
+	mercury_variable* searchforvar = mercury_popstack(M);
+	if (searchforvar->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)searchforvar->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_variable* strvar = mercury_popstack(M);
+	if (strvar->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+
+	mercury_stringliteral* str = (mercury_stringliteral*)strvar->data.p;
+	mercury_stringliteral* pat_str = (mercury_stringliteral*)searchforvar->data.p;
+
+	mercury_int num_pats = 0;
+	M_PATTERN* P = m_patternize_string(pat_str,&num_pats);
+
+
+	mercury_int start = 0;
+	mercury_int end = 0;
+	bool found=m_evaluate_patterns(str,P,num_pats, startat ? startat->data.i : 0,&start,&end);
+
+	free(P);
+	if(startat)mercury_unassign_var(M,startat);
+
+	if (args_out < 2) {
+		mercury_unassign_var(M, strvar);
+	}
+	else {
+		mercury_free_var(strvar, true);
+	}
+
+	mercury_free_var(searchforvar, true);
+
+	if (found) {
+		searchforvar->type = M_TYPE_INT;
+		searchforvar->data.i = start;
+		strvar->type = M_TYPE_INT;
+		strvar->data.i = end;
+	}
+	else {
+		searchforvar->type = M_TYPE_NIL;
+		searchforvar->data.i = 0;
+		strvar->type = M_TYPE_NIL;
+		strvar->data.i = 0;
+	}
+
+	mercury_pushstack(M, searchforvar);
+	if (args_out > 1) {
+		mercury_pushstack(M, strvar);
+	}
+
+	for (mercury_int a = 2; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+
+

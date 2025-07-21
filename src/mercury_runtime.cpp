@@ -64,6 +64,14 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("BSHR\n"); break;
 		case M_OPCODE_EQL:
 			printf(" EQL\n"); break;
+		case M_OPCODE_LET:
+			printf(" LET\n"); break;
+		case M_OPCODE_GRT:
+			printf(" GRT\n"); break;
+		case M_OPCODE_LTE:
+			printf(" LTE\n"); break;
+		case M_OPCODE_GTE:
+			printf(" GTE\n"); break;
 		case M_OPCODE_NSTR:
 			printf("NSTR ");
 			{

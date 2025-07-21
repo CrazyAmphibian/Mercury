@@ -497,6 +497,49 @@ formats start with a %, followed by a character depending on the value. this fun
 </div>
 
 
+<br>
+<br>
+<br>
+<br>
+
+<h3>Mercury String Patterns</h3>
+string patterns follow the behavior of character specifier. for example, %l matches any letter. to make it match more than one, add %+ or %- to the end of it (%l%+ or %l%-). pattern sequences are always 2 characters wide, and start with a % to make them stand out and for clarity.<br>
+<b>Character Matches</b>
+<table>
+<tr><th>sequence</th><th>type</th></tr>
+<tr><td>%n</td><td>any number</td></tr>
+<tr><td>%l</td><td>any letter</td></tr>
+<tr><td>%w</td><td>any lowercase letter</td></tr>
+<tr><td>%u</td><td>any uppercase letter</td></tr>
+<tr><td>%a</td><td>any alphanumeric character</td></tr>
+<tr><td>%s</td><td>any symbol</td></tr>
+<tr><td>% </td><td>any whitespace character</td></tr>
+<tr><td>%.</td><td>wildcard - any character.</td></tr>
+<tr><td>%%</td><td>the character %</td></tr>
+</table>
+<br>
+<b>Count Specifier</b>
+<table>
+<tr><th>sequence</th><th>type</th></tr>
+<tr><td>%*</td><td>0 to infinity matches, greedy</td></tr>
+<tr><td>%~</td><td>0 to infinity matches</td></tr>
+<tr><td>%+</td><td>1 to infinity matches, greedy</td></tr>
+<tr><td>%-</td><td>1 to infinity matches</td></tr>
+<tr><td>%?</td><td>0 or 1 matches</td></tr>
+<tr><td>%!</td><td>1 match (default behavior)</td></tr>
+</table>
+
+<div class='fdec'>pfind (<span class='type'>string</span> string,<span class='type'>pattern match</span> string,[<span class='type'>int</span> start=0])</div>
+<div class='desc'>
+<p>
+The same principal as string.find, put uses pattern matching on the match string.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pfind</span><span class='m_symbol'>(</span><span class='m_string'>"result: 12.7"</span><span class='m_symbol'>,</span><span class='m_string'>"-%?%n%+.%?%n%*"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 8 </span> <br>
+</div>
+
+
+
 <h2>Array library</h2>
 <h3>constants</h3>
 <p>
@@ -747,7 +790,7 @@ executes a string as if it were a shell command. input is platform-dependent. re
 executes a string as if it were a shell command. input is platform-dependent. returns a code from the command. This function uses C's system function. Some commands may work better with this function compared to execute.
 </p>
 <p class='example'>
-<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>execute</span><span class='m_symbol'>(<span class='m_string'>"curl www.test-site.com"</span>)</span> <span class='m_comment'> //returns a web request result </span> <br>
+<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>call</span><span class='m_symbol'>(<span class='m_string'>"curl www.test-site.com"</span>)</span> <span class='m_comment'> //returns 0 </span> <br>
 </div>
 
 <h2>Thread library</h2>
