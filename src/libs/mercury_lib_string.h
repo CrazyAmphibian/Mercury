@@ -20,3 +20,4 @@ void mercury_lib_string_upper(mercury_state* M, mercury_int args_in, mercury_int
 void mercury_lib_string_lower(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_string_format(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_string_p_find(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_string_p_extract(mercury_state* M, mercury_int args_in, mercury_int args_out);

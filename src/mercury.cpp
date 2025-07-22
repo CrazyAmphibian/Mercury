@@ -1627,6 +1627,7 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_string_lower, "lower", "string");
 	mercury_register_library(mercury_lib_string_format, "format", "string");
 	mercury_register_library(mercury_lib_string_p_find, "pfind", "string");
+	mercury_register_library(mercury_lib_string_p_extract, "pextract", "string");
 
 #endif
 #ifdef MERCURY_LIB_OS

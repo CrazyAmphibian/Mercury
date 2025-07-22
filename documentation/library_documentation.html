@@ -496,10 +496,6 @@ formats start with a %, followed by a character depending on the value. this fun
 <span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>format</span><span class='m_symbol'>(</span><span class='m_string'>"the time is %2i:%02i"</span><span class='m_symbol'>,</span>hours<span class='m_symbol'>,</span>minutes<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
 </div>
 
-
-<br>
-<br>
-<br>
 <br>
 
 <h3>Mercury String Patterns</h3>
@@ -528,6 +524,7 @@ string patterns follow the behavior of character specifier. for example, %l matc
 <tr><td>%?</td><td>0 or 1 matches</td></tr>
 <tr><td>%!</td><td>1 match (default behavior)</td></tr>
 </table>
+<br><br>
 
 <div class='fdec'>pfind (<span class='type'>string</span> string,<span class='type'>pattern match</span> string,[<span class='type'>int</span> start=0])</div>
 <div class='desc'>
@@ -538,6 +535,14 @@ The same principal as string.find, put uses pattern matching on the match string
 <span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pfind</span><span class='m_symbol'>(</span><span class='m_string'>"result: 12.7"</span><span class='m_symbol'>,</span><span class='m_string'>"-%?%n%+.%?%n%*"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 8 </span> <br>
 </div>
 
+<div class='fdec'>pextract (<span class='type'>string</span> string,<span class='type'>pattern match</span></div>
+<div class='desc'>
+<p>
+Takes a string and a pattern match, and returns all matches as an array. if none were found, an empty array will be returned.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pextract</span><span class='m_symbol'>(</span><span class='m_string'>"result: 12.7"</span><span class='m_symbol'>,</span><span class='m_string'>"-%?%n%+.%?%n%*"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns ["12.7"] </span> <br>
+</div>
 
 
 <h2>Array library</h2>

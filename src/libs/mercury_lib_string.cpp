@@ -1165,7 +1165,7 @@ M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) 
 
 	for (mercury_int c = 0; c < str->size; c++) {
 		char cc = str->ptr[c];
-		printf("%i %c\n",c,cc);
+		//printf("%i %c\n",c,cc);
 		M_PATTERN* nptr = (M_PATTERN*)realloc(out, sizeof(M_PATTERN) * (n + 1));
 		if (!nptr)return nullptr;
 		out = nptr;
@@ -1257,6 +1257,36 @@ M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) 
 
 bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercury_int num_patterns, mercury_int str_start, mercury_int* pattern_str_start, mercury_int* pattern_str_end) {
 
+#if defined(DEBUG) || defined(_DEBUG)
+
+	for (mercury_int i = 0; i < num_patterns; i++) {
+
+		M_PATTERN P = patterns[i];
+		printf("pattern %i: ",i);
+
+		if (P.match_type & MATCH_SINGLE) {
+			printf("MATCH_SINGLE ");
+		}
+		if (P.match_type & MATCH_AT_LEAST_ONE) {
+			printf("MATCH_AT_LEAST_ONE ");
+		}
+		if (P.match_type & MATCH_GREEDY) {
+			printf("MATCH_GREEDY ");
+		}
+		if (P.match_type & MATCH_OPTIONAL) {
+			printf("MATCH_OPTIONAL ");
+		}
+
+		for (int n = 0; n <= 0xFF; n++) {
+			if (P.allowed_chars[n])putchar(n);
+		}
+		putchar('\n');
+	}
+
+#endif
+
+
+
 	*pattern_str_start = 0;
 	*pattern_str_end = 0;
 	if (str_start >= str->size)return false;
@@ -1273,11 +1303,13 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 	current_pattern = 0;
 	for (mercury_int n = 0; n < num_patterns; n++) {
 		patterns[n].passed = false;
+		patterns[n].first_good_char = 0;
+		patterns[n].last_good_char = 0;
 	}
 	for (mercury_int c = str_start; c < str->size; c++) {
 		char cc = str->ptr[c];
 		
-		*pattern_str_end = c;
+		
 		M_PATTERN* p = patterns+current_pattern;
 		if (!current_pattern && !p->passed)*pattern_str_start = c;
 		if (p->allowed_chars[cc]) {
@@ -1301,20 +1333,22 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 				current_pattern++;
 			}
 			if (p->match_type & MATCH_OPTIONAL) {
-				p->passed = true;
 				current_pattern++;
 				c--;
 			}
 
-			if(c>=advanced_from && !p->passed) {
+			if(c>=advanced_from && !(p->match_type & MATCH_OPTIONAL) && !p->passed ) {
 				goto advance;
 			}
 		}	
 
+		*pattern_str_end = c;
 
 		if (current_pattern == num_patterns) {
 			for (mercury_int n = 0; n < num_patterns; n++) {
-				if (!(patterns[n].passed))goto advance;
+				if (!(patterns[n].match_type & MATCH_OPTIONAL)) {
+					if (!(patterns[n].passed))goto advance;
+				}
 			}
 			break;
 		}
@@ -1326,7 +1360,9 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 	}
 
 	for (mercury_int n = 0; n < num_patterns; n++) {
-		if (!(patterns[n].passed))goto advance;
+		if (!(patterns[n].match_type & MATCH_OPTIONAL)) {
+			if (!(patterns[n].passed))goto advance;
+		}
 	}
 
 	return true;
@@ -1417,4 +1453,75 @@ void mercury_lib_string_p_find(mercury_state* M, mercury_int args_in, mercury_in
 	}
 }
 
+void mercury_lib_string_p_extract(mercury_state* M, mercury_int args_in, mercury_int args_out) { //returns all instances of a match in an array.
+	if (args_in < 2) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
+		return;
+	};
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int i = 2; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	mercury_variable* matchvar = mercury_popstack(M);
+	if (matchvar->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)matchvar->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_variable* strvar = mercury_popstack(M);
+	if (strvar->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_stringliteral* str = (mercury_stringliteral*)strvar->data.p;
+	mercury_stringliteral* match = (mercury_stringliteral*)matchvar->data.p;
+
+	mercury_int num_pats = 0;
+	M_PATTERN* P = m_patternize_string(match, &num_pats);
+	mercury_free_var(matchvar,true);
+	mercury_variable* out = matchvar;
+
+	mercury_array* arr=mercury_newarray();
+	out->type = M_TYPE_ARRAY;
+	out->data.p = arr;
+
+	mercury_int count = 0;
+	mercury_int start = 0;
+	mercury_int end = 0;
+	while (m_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
+		mercury_stringliteral* ss=mercury_mstring_substring(str,start,end);
+		if (!ss) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			mercury_unassign_var(M,strvar);
+			mercury_unassign_var(M,out);
+			return;
+		}
+		//printf("%s | %i %i\n",ss->ptr,start,end);
+		mercury_variable* inter = mercury_assign_var(M);
+		if (!inter) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			mercury_unassign_var(M, strvar);
+			mercury_unassign_var(M, out);
+			return;
+		}
+		inter->type = M_TYPE_STRING;
+		inter->data.p = ss;
+		mercury_setarray(arr, inter, count, M);
+		count++;
+		end++;
+	}
+
+	mercury_pushstack(M,out);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
 
