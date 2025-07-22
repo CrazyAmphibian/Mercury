@@ -1129,6 +1129,19 @@ int m_compile_read_stored_variable(compiler_function* func, compiler_token** tok
 	if (t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0] == '[') { //either create a new array, or index. we need to find out which.
 		mercury_int o = 1;
 		m_compile_add_instruction(func, M_OPCODE_CPYT, 0,offset+o);
+		compiler_token* tn = tokens[offset+o];
+		if (tn->chars[0] == ']' && tn->token_flags & TOKEN_SPECIALVARIABLECREATE) { //implied index empty array.
+			m_compile_add_instruction(func, M_OPCODE_NINT, 0, offset + o);
+#ifdef MERCURY_64BIT
+			m_compile_add_rawdatadouble(func, POSITION_IN_DATASTRUCTURE, offset + o);
+#else
+			m_compile_add_rawdata(func, POSITION_IN_DATASTRUCTURE, offset + o);
+#endif
+			POSITION_IN_DATASTRUCTURE++;
+			m_compile_add_instruction(func, M_OPCODE_NARR, 0, offset + o);
+			m_compile_add_instruction(func, M_OPCODE_SET, 0, offset + o);
+			return 2;
+		}
 		mercury_int a = m_compile_read_var_statment_recur(func, tokens, offset + o, token_max);
 		if (!a)return 0;
 		o += a;
@@ -1416,6 +1429,11 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 			while (true) {
 
 				o += m_compile_read_stored_variable(func, tokens, offset + o, token_max);
+				if (offset + o > token_max) {
+					func->errorcode = M_COMPERR_ENDS_TOO_SOON;
+					func->token_error_num = offset + o;
+					return 0;
+				};
 
 				t = tokens[offset + o];
 				if (t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0]==']') {
@@ -1443,6 +1461,11 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 			while (true) {
 
 				o += m_compile_read_stored_variable(func, tokens, offset + o, token_max);
+				if (offset + o > token_max) {
+					func->errorcode = M_COMPERR_ENDS_TOO_SOON;
+					func->token_error_num = offset + o;
+					return 0;
+				};
 
 				t = tokens[offset + o];
 				if (t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0] == '}') {
