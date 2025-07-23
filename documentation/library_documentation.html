@@ -425,6 +425,15 @@ searches a string for all occurrences of a match, and replaces them with another
 <span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>replace</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l"</span><span class='m_symbol'></span><span class='m_symbol'><span class='m_symbol'>,</span><span class='m_string'>"t"</span><span class='m_symbol'>,</span><span class='m_number'>2</span>)</span> <span class='m_comment'>//returns "hetto, world!"</span> <br>
 </div>
 
+<div class='fdec'>count (<span class='type'>string</span> string, <span class='type'>string</span> match)</div>
+<div class='desc'>
+<p>
+returns the number of times the match is found in the string.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>count</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 3</span> <br>
+</div>
+
 <div class='fdec'>toarray (<span class='type'>string</span> string)</div>
 <div class='desc'>
 <p>
@@ -542,6 +551,24 @@ Takes a string and a pattern match, and returns all matches as an array. if none
 </p>
 <p class='example'>
 <span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pextract</span><span class='m_symbol'>(</span><span class='m_string'>"result: 12.7"</span><span class='m_symbol'>,</span><span class='m_string'>"-%?%n%+.%?%n%*"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns ["12.7"] </span> <br>
+</div>
+
+<div class='fdec'>preplace (<span class='type'>string</span> string, <span class='type'>string</span> match, <span class='type'>string</span> replacement, [<span class='type'>int</span> max replacments=infinity])</div>
+<div class='desc'>
+<p>
+same function as string.replace, but works with pattern matching for finding occurances.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>preplace</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l%+"</span><span class='m_symbol'></span><span class='m_symbol'><span class='m_symbol'>,</span><span class='m_string'>"t"</span><span class='m_symbol'>,</span><span class='m_number'>1</span>)</span> <span class='m_comment'>//returns "heto, world!"</span> <br>
+</div>
+
+<div class='fdec'>pcount (<span class='type'>string</span> string, <span class='type'>string</span> match)</div>
+<div class='desc'>
+<p>
+same as string.count, but uses pattern matches.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pcount</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l%+"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2</span> <br>
 </div>
 
 

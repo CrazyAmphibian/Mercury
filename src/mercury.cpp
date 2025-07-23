@@ -125,9 +125,9 @@ bool mercury_mstrings_append(mercury_stringliteral* basestr, mercury_stringliter
 	if (basestr->constant) {
 		char* nptr = (char*)malloc( sizeof(char) * (basestr->size + appstr->size));
 		if (!nptr)return false;
-		memcpy(nptr,basestr->ptr, basestr->size);
+		if(basestr->size)memcpy(nptr,basestr->ptr, basestr->size);
 		basestr->ptr = nptr;
-		memcpy(basestr->ptr + basestr->size, appstr->ptr, appstr->size);
+		if(appstr->size)memcpy(basestr->ptr + basestr->size, appstr->ptr, appstr->size);
 		basestr->size += appstr->size;
 		basestr->constant = false;
 	}
@@ -173,7 +173,8 @@ mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mer
 	if (nstr == nullptr) return nullptr;
 
 	if (start > str->size || end < 0) { //no characters? just return an empty string.
-		nstr->ptr = nullptr;
+		nstr->ptr = (char*)"";
+		nstr->constant = true;
 		nstr->size = 0;
 
 		return nstr;
@@ -1620,6 +1621,7 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_string_reverse, "reverse", "string");
 	mercury_register_library(mercury_lib_string_find, "find", "string");
 	mercury_register_library(mercury_lib_string_replace, "replace", "string");
+	mercury_register_library(mercury_lib_string_count, "count", "string");
 	mercury_register_library(mercury_lib_string_toarray, "toarray", "string");
 	mercury_register_library(mercury_lib_string_fromarray, "fromarray", "string");
 	mercury_register_library(mercury_lib_string_separate, "separate", "string");
@@ -1628,6 +1630,8 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_string_format, "format", "string");
 	mercury_register_library(mercury_lib_string_p_find, "pfind", "string");
 	mercury_register_library(mercury_lib_string_p_extract, "pextract", "string");
+	mercury_register_library(mercury_lib_string_p_replace, "preplace", "string");
+	mercury_register_library(mercury_lib_string_p_count, "pcount", "string");
 
 #endif
 #ifdef MERCURY_LIB_OS
