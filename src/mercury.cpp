@@ -424,7 +424,8 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 		newstate->parentstate = parent;
 	}
 
-
+	newstate->constants = nullptr;
+	newstate->num_constants = 0;
 
 	mercury_variable* globvarkey = (mercury_variable*)malloc(sizeof(mercury_variable));
 	globvarkey->type = M_TYPE_STRING;
@@ -497,12 +498,19 @@ void mercury_destroystate(mercury_state* M) {
 		free(M->registers);
 	}
 
+	for (mercury_int i = 0; i < M->num_constants; i++) {
+		mercury_variable* v = M->constants[i];
+		v->constant = 0;
+		mercury_free_var(v);
+	}
+
 	if(M->enviroment)mercury_destroytable(M->enviroment);
 	if(M->bytecode.instructions)free(M->bytecode.instructions);
 	free(M);
 }
 
 bool mercury_unassign_var(mercury_state* M,mercury_variable* var) {
+	if (var->constant)return false;
 	if (!(M->sizeunassignedstack > M->numunassignedstack)) {
 		void* nptr=realloc(M->unassignedstack, sizeof(mercury_variable*) * (M->numunassignedstack + 1) );
 		if (nptr == nullptr) return false;
@@ -516,11 +524,13 @@ bool mercury_unassign_var(mercury_state* M,mercury_variable* var) {
 	return true;
 }
 
+
 mercury_variable* mercury_assign_var(mercury_state* M) {
 	if (M->numunassignedstack) {
 		M->numunassignedstack--;
 		mercury_variable* nvar = M->unassignedstack[M->numunassignedstack];
 		nvar->data.i = 0;
+		nvar->constant = 0;
 		nvar->type = M_TYPE_NIL;
 		return nvar;
 	}
@@ -528,6 +538,7 @@ mercury_variable* mercury_assign_var(mercury_state* M) {
 	mercury_variable* nvar=(mercury_variable*)malloc(sizeof(mercury_variable));
 	if (nvar == nullptr)return nullptr;
 	nvar->data.i = 0;
+	nvar->constant = 0;
 	nvar->type = M_TYPE_NIL;
 
 	return nvar;
@@ -535,6 +546,7 @@ mercury_variable* mercury_assign_var(mercury_state* M) {
 
 void mercury_free_var(mercury_variable* var,bool keep_struct) {
 	if (var == nullptr)return;
+	if (var->constant)return;
 
 	switch (var->type)
 	{

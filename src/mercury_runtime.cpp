@@ -260,6 +260,34 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 		case M_OPCODE_DEC:
 			printf("DEC \n");
 			break;
+		case M_OPCODE_SCON:
+			printf("SCON ");
+			{
+				mercury_int sz = 0;
+#ifdef MERCURY_64BIT
+				sz = *((mercury_int*)(instructions + offset + 1));
+				offset += 2;
+#else
+				sz = *((mercury_int*)(instructions + offset + 1));
+				offset++;
+#endif
+				printf("%i\n", sz);
+			}
+			break;
+		case M_OPCODE_GCON:
+			printf("GCON ");
+			{
+				mercury_int sz = 0;
+#ifdef MERCURY_64BIT
+				sz = *((mercury_int*)(instructions + offset + 1));
+				offset += 2;
+#else
+				sz = *((mercury_int*)(instructions + offset + 1));
+				offset++;
+#endif
+				printf("%i\n", sz);
+			}
+			break;
 		default:
 			printf("???? (%i)\n", instructions[offset]);
 		}

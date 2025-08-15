@@ -20,7 +20,40 @@ bool COMPILER_INSIDE_LOOP = false;
 mercury_int COMPILER_BREAK_AMOUNTS = 0;
 mercury_int* COMPILER_BREAK_ADDRS = nullptr; //array of positions where we need them to jump to the end.
 
+mercury_stringliteral* CONSTANT_STRINGS = nullptr; //stores the strings themselves
+mercury_int NUM_CONSTANT_STRINGS = 0; //stores the number of them
+/*
+"hello" "world"
+2
+*/
 
+mercury_int add_str_as_const(char* str,mercury_int len) {
+	for (mercury_int i = 0; i < NUM_CONSTANT_STRINGS;i++) {
+		mercury_stringliteral s = CONSTANT_STRINGS[i];
+		if (len == s.size) {
+			for (mercury_int c = 0; c < len; c++) {
+				if(s.ptr[c] != str[c]) goto next_str;
+			}
+			return i;
+		}
+		next_str:
+		{}
+	}
+
+	mercury_stringliteral* nptr=(mercury_stringliteral*)realloc(CONSTANT_STRINGS,sizeof(mercury_stringliteral)* (NUM_CONSTANT_STRINGS+1) );
+	if (!nptr)return -1;
+	CONSTANT_STRINGS = nptr;
+	char* c = (char*)malloc(sizeof(char) * len);
+	if (!c)return -1;
+	memcpy(c, str, len * sizeof(char));
+	CONSTANT_STRINGS[NUM_CONSTANT_STRINGS].constant = true;
+	CONSTANT_STRINGS[NUM_CONSTANT_STRINGS].ptr = c;
+	CONSTANT_STRINGS[NUM_CONSTANT_STRINGS].size = len;
+
+	NUM_CONSTANT_STRINGS++;
+
+	return NUM_CONSTANT_STRINGS - 1;
+}
 
 struct JUMP_POINT {
 	char* label;
@@ -1356,7 +1389,21 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 	if (t->token_flags & TOKEN_SCOPESPECIFIER) {
 		compiler_token* t2 = tokens[offset + 1];
 		if (t2->token_flags & TOKEN_ENVVARNAME) {
-			m_compile_cstring_load(func, t2->chars, t2->num_chars, offset);
+
+			mercury_int i = add_str_as_const(t2->chars, t2->num_chars);
+			if (i == -1) {
+				func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+				func->token_error_num = offset;
+				return 0;
+			}
+			m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);
+#ifdef MERCURY_64BIT
+			m_compile_add_rawdatadouble(func, i, offset);
+#else
+			m_compile_add_rawdata(func, i, offset);
+#endif
+
+			//m_compile_cstring_load(func, t2->chars, t2->num_chars, offset);
 			if (t->chars[0] == 'l') { //local
 				m_compile_add_instruction(func, M_OPCODE_GETL, 0,offset);
 			}
@@ -1370,12 +1417,38 @@ int m_compile_read_variable(compiler_function* func, compiler_token** tokens, me
 		}
 	}
 	else if (t->token_flags & TOKEN_ENVVARNAME) {
-		m_compile_cstring_load(func,t->chars, t->num_chars, offset);
+		mercury_int i = add_str_as_const(t->chars, t->num_chars);
+		if (i == -1) {
+			func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			func->token_error_num = offset;
+			return 0;
+		}
+		m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);
+#ifdef MERCURY_64BIT
+		m_compile_add_rawdatadouble(func, i, offset);
+#else
+		m_compile_add_rawdata(func, i, offset);
+#endif
+
+		//m_compile_cstring_load(func,t->chars, t->num_chars, offset);
 		m_compile_add_instruction(func, M_OPCODE_GENV, 0, offset);
 		return 1;
 	}
 	else if (t->token_flags & TOKEN_STATICSTRING) {
-		m_compile_cstring_load(func, t->chars, t->num_chars, offset);
+		mercury_int i=add_str_as_const(t->chars,t->num_chars);
+		if (i == -1) {
+			func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			func->token_error_num = offset;
+			return 0;
+		}
+		m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);	
+#ifdef MERCURY_64BIT
+		m_compile_add_rawdatadouble(func, i, offset);
+#else
+		m_compile_add_rawdata(func, i, offset);
+#endif
+
+		//m_compile_cstring_load(func, t->chars, t->num_chars, offset);
 		return 1;
 	}
 	else if (t->token_flags & TOKEN_STATICNIL) {
@@ -1564,7 +1637,20 @@ int m_compile_read_indexing(compiler_function* func, compiler_token** tokens, me
 	if (periodmode) {
 		compiler_token* t = tokens[offset];
 		if (t->token_flags & TOKEN_ENVVARNAME) {
-			m_compile_cstring_load(func, t->chars, t->num_chars, offset);
+
+			mercury_int i = add_str_as_const(t->chars, t->num_chars);
+			if (i == -1) {
+				func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+				func->token_error_num = offset;
+				return 0;
+			}
+			m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);
+#ifdef MERCURY_64BIT
+			m_compile_add_rawdatadouble(func, i, offset);
+#else
+			m_compile_add_rawdata(func, i, offset);
+#endif
+			//m_compile_cstring_load(func, t->chars, t->num_chars, offset);
 			a = 1;
 		}
 		else {
@@ -1949,7 +2035,20 @@ int mercury_compile_compile_block(compiler_function* func, compiler_token** toke
 				break;
 			}
 
-			m_compile_cstring_load(var_code_final, cur_tok->chars, cur_tok->num_chars, offset+addoff);
+			mercury_int i = add_str_as_const(cur_tok->chars, cur_tok->num_chars);
+			if (i == -1) {
+				func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+				func->token_error_num = offset;
+				return 0;
+			}
+			m_compile_add_instruction(var_code_final, M_OPCODE_GCON, 0, offset);
+#ifdef MERCURY_64BIT
+			m_compile_add_rawdatadouble(var_code_final, i, offset);
+#else
+			m_compile_add_rawdata(var_code_final, i, offset);
+#endif
+
+			//m_compile_cstring_load(var_code_final, cur_tok->chars, cur_tok->num_chars, offset+addoff);
 			//m_compile_add_instruction(var_code, get_opcode);
 			addoff++;
 			cur_tok = tokens[offset + addoff];
@@ -2484,11 +2583,17 @@ compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercu
 	if (!out) { return nullptr; }
 
 
+	
+
 	JUMP_POINT** OLD_JUMPDATABASE = COMPILER_JUMP_DATABASE;
 	mercury_int OLD_JUMPAMTS = COMPILER_JUMP_NUMBERS;
-
 	COMPILER_JUMP_DATABASE = nullptr;
 	COMPILER_JUMP_NUMBERS = 0;
+
+	mercury_stringliteral* OLD_CONSTANT_STRINGS = CONSTANT_STRINGS;
+	mercury_int OLD_NUM_CONSTANT_STRINGS = NUM_CONSTANT_STRINGS;
+	CONSTANT_STRINGS = nullptr;
+	NUM_CONSTANT_STRINGS=0;
 
 	while (true) {
 		if (cur_token >= num_tokens || out->errorcode) {
@@ -2560,11 +2665,33 @@ compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercu
 			free(J);
 		}
 	}
+	
 	free(COMPILER_JUMP_DATABASE);
-
-
 	COMPILER_JUMP_DATABASE=OLD_JUMPDATABASE;
 	COMPILER_JUMP_NUMBERS=OLD_JUMPAMTS;
+
+	compiler_function* append_string_constants = init_comp_func();
+	if (!append_string_constants) { return nullptr; }
+
+	for (mercury_int i = 0; i < NUM_CONSTANT_STRINGS; i++) {
+		mercury_stringliteral s = CONSTANT_STRINGS[i];
+		m_compile_cstring_load(append_string_constants,s.ptr,s.size,0);
+		m_compile_add_instruction(append_string_constants, M_OPCODE_SCON, 0, 0);
+#ifdef MERCURY_64BIT
+		m_compile_add_rawdatadouble(append_string_constants,i,0);
+#else
+		m_compile_add_rawdata(append_string_constants,i,0);
+#endif
+
+		free(s.ptr);
+	}
+	concat_comp_func_appends(append_string_constants,out);
+	delete_comp_func(out);
+	out = append_string_constants;
+	
+	free(CONSTANT_STRINGS);
+	CONSTANT_STRINGS = OLD_CONSTANT_STRINGS;
+	NUM_CONSTANT_STRINGS = OLD_NUM_CONSTANT_STRINGS;
 
 	return out;
 }

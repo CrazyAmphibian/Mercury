@@ -2106,8 +2106,10 @@ void M_BYTECODE_GET(mercury_state* M, uint16_t flags) {
 		return;
 	}
 
-	key->type = M_TYPE_NIL; //do not destroy the key type if it is a string, since this will delete existing data.
-	//mercury_unassign_var(M, key);
+	if (key->type == M_TYPE_STRING && !key->constant) {
+		key->type = M_TYPE_NIL; //do not destroy the key type if it is a string, since this will delete existing data.
+		//mercury_unassign_var(M, key);
+	}
 	mercury_unassign_var(M, table);
 	mercury_pushstack(M, out);
 }
@@ -2778,6 +2780,37 @@ void M_BYTECODE_DEC(mercury_state* M, uint16_t flags) { //DECrement
 	return;
 }
 
+void M_BYTECODE_SCON(mercury_state* M, uint16_t flags) { //Set CONstant
+	mercury_int con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+	if (con_num >= M->num_constants) {
+		void* nptr=realloc(M->constants, sizeof(mercury_variable*) * (con_num+1) );
+		if (!nptr) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		M->num_constants = con_num+1;
+		M->constants = (mercury_variable**)nptr;
+	}
+	
+	mercury_variable* v=mercury_pullstack(M);
+	//printf("added a new constant (num %i) at %p. type: %i data:%i\n",con_num ,v,v->type,v->data.i );
+	v->constant = 1;
+	M->constants[con_num] = v;
+}
+
+void M_BYTECODE_GCON(mercury_state* M, uint16_t flags) { //Get CONstant
+	mercury_int con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	if (con_num >= M->num_constants) {
+		M_BYTECODE_NNIL(M,0);
+		return;
+	}
+	//printf("got a new constant (num %i) at %p. type:%i data:%i\n", con_num, M->constants[con_num], M->constants[con_num]->type, M->constants[con_num]->data.i);
+	mercury_pushstack(M, M->constants[con_num]);
+}
+
 
 mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_NOP, //0
@@ -2851,5 +2884,8 @@ mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_UNM, //57
 	M_BYTECODE_INC,
 	M_BYTECODE_DEC, //59
+
+	M_BYTECODE_SCON, //60
+	M_BYTECODE_GCON, //61
 };
 

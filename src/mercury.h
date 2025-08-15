@@ -25,14 +25,14 @@
 typedef int64_t mercury_int; //typedefs to ensure that our variables occupy the same space in memory.
 typedef uint64_t mercury_uint;
 typedef double mercury_float;
-//typedef void* mercury_rawvar; //to represent stored binary data of almost any type. using a void* because there's no implicit typecasted behavior when using it.
 #define MERCURY_64BIT
+#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE 2; //how many instructions fit into one variable. instructions are 32 bits, so on a 64 bit system this is 2. on a 32 bit system, this is 1. if you're using a 16 bit system, god help you.
 #else
 typedef __int32 mercury_int;
 typedef unsigned __int32 mercury_uint;
 typedef float mercury_float;
-//typedef void* mercury_rawvar;
 #define MERCURY_32BIT
+#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE 1;
 #endif
 
 union mercury_rawdata { //to represent stored binary data of almost any type.
@@ -44,6 +44,7 @@ union mercury_rawdata { //to represent stored binary data of almost any type.
 
 struct mercury_variable {
 	uint8_t type = 0;
+	uint8_t constant = 0;
 	mercury_rawdata data;
 };
 
@@ -119,6 +120,8 @@ struct mercury_state {
 	mercury_int sizeunassignedstack = 0; // size of the unused element array.
 
 	mercury_variable** registers = nullptr;
+	mercury_variable** constants = nullptr;
+	mercury_int num_constants = 0;
 
 	mercury_int programcounter = 0;
 	mercury_function bytecode;

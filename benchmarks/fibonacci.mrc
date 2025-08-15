@@ -1,6 +1,4 @@
-/*
-purpose: gauge speed of function calls
-*/
+//the purpose of this test is to gauge the speed of function calls.
 global ITTERATION_COUNT=250000
 
 global FIB_CUR=1
