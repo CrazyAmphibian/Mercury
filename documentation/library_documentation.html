@@ -381,9 +381,19 @@ returns a random number as a float. if no arguments are provided, the number wil
 returns a random number as an int. the random number will be between minimum and maximum inclusive.
 </p>
 <p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>random</span><span class='m_symbol'>(</span><span class='m_number'>1</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>5</span><span class='m_symbol'>)</span> <span class='m_comment'>//may return 4</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>randomint</span><span class='m_symbol'>(</span><span class='m_number'>1</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>5</span><span class='m_symbol'>)</span> <span class='m_comment'>//may return 4</span> <br>
 </div>
 
+<div class='fdec'>isnan (<span class='type'>float</span> number)</div>
+<div class='desc'>
+<p>
+returns a bool if the supplied float is a non-number value. this includes all types of NaN, as well as infinity. If a non-float value is supplied, it will always return false.
+</p>
+<p class='example'>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>isnan</span><span class='m_symbol'>(</span><span class='m_number'>0</span><span class='m_symbol'></span><span class='m_symbol'>/</span><span class='m_symbol'></span><span class='m_number'>0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns true</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>isnan</span><span class='m_symbol'>(</span><span class='m_number'>10</span><span class='m_symbol'></span><span class='m_symbol'>/</span><span class='m_symbol'></span><span class='m_number'>0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns true</span> <br>
+<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>isnan</span><span class='m_symbol'>(</span><span class='m_number'>0</span><span class='m_symbol'></span><span class='m_symbol'>/</span><span class='m_symbol'></span><span class='m_number'>10</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns false</span> <br>
+</div>
 
 <h2>String library</h2>
 <h3>functions</h3>

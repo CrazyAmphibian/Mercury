@@ -749,3 +749,35 @@ void mercury_lib_math_randomseed(mercury_state* M, mercury_int args_in, mercury_
 		M_BYTECODE_NNIL(M, 0);
 	}
 }
+
+
+void mercury_lib_math_isnan(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+		return;
+	};
+	if (args_out < 1)return;
+
+	mercury_variable* out = mercury_assign_var(M);
+	out->data.i = 0;
+	out->type = M_TYPE_BOOL;
+
+	for (mercury_int i = 1; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+	mercury_variable* val = mercury_popstack(M);
+
+	if (val->type == M_TYPE_FLOAT) {
+#ifdef MERCURY_64BIT
+		out->data.i = (val->data.i & 0x7ff0000000000000)== 0x7ff0000000000000; //NaN will always have all exponent bits checked. this also will catch infinity, which i suppose technically isn't a number.
+#else
+		out->data.i = (val->data.i & 0x7f800000)== 0x7f800000;
+#endif
+	}
+	mercury_unassign_var(M, val);
+
+	mercury_pushstack(M, out);
+	for (mercury_int a = 1; a < args_out; a++) {
+		M_BYTECODE_NNIL(M, 0);
+	}
+}

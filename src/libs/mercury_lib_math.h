@@ -24,6 +24,8 @@ void mercury_lib_math_to_asin(mercury_state* M, mercury_int args_in, mercury_int
 void mercury_lib_math_to_acos(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_math_to_atan(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_math_isnan(mercury_state* M, mercury_int args_in, mercury_int args_out);
+
 
 void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_int args_out);

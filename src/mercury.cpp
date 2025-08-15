@@ -1603,6 +1603,7 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_math_random, "random", "math");
 	mercury_register_library(mercury_lib_math_randomint, "randomint", "math");
 	mercury_register_library(mercury_lib_math_randomseed, "randomseed", "math");
+	mercury_register_library(mercury_lib_math_isnan, "isnan", "math");
 
 	mercury_register_library((void*)&m_math_pi, "pi", "math", M_TYPE_FLOAT);
 	mercury_register_library((void*)&m_math_root2, "root2", "math", M_TYPE_FLOAT);
