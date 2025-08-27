@@ -93,7 +93,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
-		listlike->constant = true;
+		listlike->constant = true; //prevents the array being garbage collected when we mess with the substate.
 		mercury_array* arr = (mercury_array*)listlike->data.p;
 		mercury_int srefs = arr->refrences;
 
@@ -112,7 +112,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 						mercury_pushstack(SubM, listlike);
 						((mercury_cfunc)function->data.p)(SubM,3,0);
 					}
-					else {
+					else { //M functions get args in the reverse order. confusing, but it works.
 						mercury_pushstack(SubM, listlike);
 						mercury_pushstack(SubM, var);
 						mercury_pushstack(SubM, idxvar);
