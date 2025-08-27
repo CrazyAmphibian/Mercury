@@ -178,8 +178,8 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	mercury_destroystate(SubM);
 
 	listlike->constant = false;
-	mercury_free_var(function);
-	mercury_free_var(listlike);
+	mercury_unassign_var(M, function);
+	mercury_unassign_var(M, listlike);
 
 	for (mercury_int a = 0; a < args_out; a++) {
 		mercury_variable* mv = mercury_assign_var(M);
