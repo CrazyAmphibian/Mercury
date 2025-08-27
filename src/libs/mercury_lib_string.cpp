@@ -1771,3 +1771,305 @@ void mercury_lib_string_p_count(mercury_state* M, mercury_int args_in, mercury_i
 		mercury_pushstack(M, mv);
 	}
 }
+
+
+void mercury_lib_string_escape_mercury(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+		return;
+	};
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int i = 1; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	mercury_variable* instr = mercury_popstack(M);
+	if (instr->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_variable* outvar=mercury_assign_var(M);
+	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	if (!outvar || !os) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	outvar->type = M_TYPE_STRING;
+	outvar->data.p = os;
+
+	os->size = 0;
+	os->ptr = nullptr;
+	os->constant = false;
+
+	mercury_stringliteral* is = (mercury_stringliteral*)instr->data.p;
+	mercury_int pos = 0;
+	while (pos < is->size) {
+		char c = is->ptr[pos];
+		switch (c) {
+		case '\"':
+			mercury_mstring_addchars(os, (char*)"\\\"", 2);
+			break;
+		case '\\':
+			mercury_mstring_addchars(os, (char*)"\\\\", 2);
+			break;
+		default:
+			mercury_mstring_addchars(os, is->ptr + pos, 1);
+		}
+		
+		pos++;
+	}
+
+	mercury_unassign_var(M, instr);
+	mercury_pushstack(M, outvar);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+
+
+void mercury_lib_string_escape_url(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+		return;
+	};
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int i = 1; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	mercury_variable* instr = mercury_popstack(M);
+	if (instr->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_variable* outvar = mercury_assign_var(M);
+	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	if (!outvar || !os) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	outvar->type = M_TYPE_STRING;
+	outvar->data.p = os;
+
+	os->size = 0;
+	os->ptr = nullptr;
+	os->constant = false;
+
+	mercury_stringliteral* is = (mercury_stringliteral*)instr->data.p;
+	mercury_int pos = 0;
+	while (pos < is->size) {
+		char c = is->ptr[pos];
+
+
+		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c=='-' || c == '_' || c == '~' || c == '.') {
+			mercury_mstring_addchars(os, is->ptr + pos, 1);
+		}
+		else { //need to percent encode these.
+			mercury_mstring_addchars(os, (char*)"%" , 1);
+			char sc = (c & 0xF0)>>4;
+			if (sc<0xA) {
+				char n = sc+0x30;
+				mercury_mstring_addchars(os, &n, 1);
+			}
+			else {
+				char n = sc + 0x41-0x0A;
+				mercury_mstring_addchars(os, &n, 1);
+			}
+			c &= 0xF;
+			if (c < 0xA) {
+				char n = c + 0x30;
+				mercury_mstring_addchars(os, &n, 1);
+			}
+			else {
+				char n = c + 0x41 - 0x0A;
+				mercury_mstring_addchars(os, &n, 1);
+			}
+
+		}
+
+		pos++;
+	}
+
+	mercury_unassign_var(M, instr);
+	mercury_pushstack(M, outvar);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+
+
+void mercury_lib_string_escape_c(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+		return;
+	};
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int i = 1; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	mercury_variable* instr = mercury_popstack(M);
+	if (instr->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_variable* outvar = mercury_assign_var(M);
+	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	if (!outvar || !os) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	outvar->type = M_TYPE_STRING;
+	outvar->data.p = os;
+
+	os->size = 0;
+	os->ptr = nullptr;
+	os->constant = false;
+
+	mercury_stringliteral* is = (mercury_stringliteral*)instr->data.p;
+	mercury_int pos = 0;
+	while (pos < is->size) {
+		char c = is->ptr[pos];
+		switch (c) {
+		case '\a':
+			mercury_mstring_addchars(os, (char*)"\\a", 2);
+			break;
+		case '\b':
+			mercury_mstring_addchars(os, (char*)"\\b", 2);
+			break;
+		case '\e':
+			mercury_mstring_addchars(os, (char*)"\\e", 2);
+			break;
+		case '\f':
+			mercury_mstring_addchars(os, (char*)"\\f", 2);
+			break;
+		case '\n':
+			mercury_mstring_addchars(os, (char*)"\\n", 2);
+			break;
+		case '\r':
+			mercury_mstring_addchars(os, (char*)"\\r", 2);
+			break;
+		case '\t':
+			mercury_mstring_addchars(os, (char*)"\\t", 2);
+			break;
+		case '\v':
+			mercury_mstring_addchars(os, (char*)"\\v", 2);
+			break;
+		case '\\':
+			mercury_mstring_addchars(os, (char*)"\\\\", 2);
+			break;
+		case '\'':
+			mercury_mstring_addchars(os, (char*)"\\'", 2);
+			break;
+		case '\"':
+			mercury_mstring_addchars(os, (char*)"\\\"", 2);
+			break;
+		case '\?':
+			mercury_mstring_addchars(os, (char*)"\\?", 2);
+			break;
+		case '\0':
+			mercury_mstring_addchars(os, (char*)"\\0", 2);
+			break;
+		default:
+			mercury_mstring_addchars(os, is->ptr + pos, 1);
+		}
+
+		pos++;
+	}
+
+	mercury_unassign_var(M, instr);
+	mercury_pushstack(M, outvar);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}
+
+void mercury_lib_string_escape_html(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 1) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+		return;
+	};
+	if (!args_out) {
+		return;
+	}
+	for (mercury_int i = 1; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+
+	mercury_variable* instr = mercury_popstack(M);
+	if (instr->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_variable* outvar = mercury_assign_var(M);
+	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	if (!outvar || !os) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	outvar->type = M_TYPE_STRING;
+	outvar->data.p = os;
+
+	os->size = 0;
+	os->ptr = nullptr;
+	os->constant = false;
+
+	mercury_stringliteral* is = (mercury_stringliteral*)instr->data.p;
+	mercury_int pos = 0;
+	while (pos < is->size) {
+		char c = is->ptr[pos];
+		switch (c) {
+		case '<':
+			mercury_mstring_addchars(os, (char*)"&lt;", 4);
+			break;
+		case '>':
+			mercury_mstring_addchars(os, (char*)"&gt;", 4);
+			break;
+		case '&':
+			mercury_mstring_addchars(os, (char*)"&amp;", 5);
+			break;
+		case '\"':
+			mercury_mstring_addchars(os, (char*)"&quot;", 6);
+			break;
+		case '\'':
+			mercury_mstring_addchars(os, (char*)"&#39;", 6);
+			break;
+		default:
+			mercury_mstring_addchars(os, is->ptr + pos, 1);
+		}
+
+		pos++;
+	}
+
+	mercury_unassign_var(M, instr);
+	mercury_pushstack(M, outvar);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}

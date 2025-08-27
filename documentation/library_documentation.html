@@ -545,7 +545,7 @@ string patterns follow the behavior of character specifier. for example, %l matc
 </table>
 <br><br>
 
-<div class='fdec'>pfind (<span class='type'>string</span> string,<span class='type'>pattern match</span> string,[<span class='type'>int</span> start=0])</div>
+<div class='fdec'>pfind (<span class='type'>string</span> string,<span class='type'>string</span> pattern match,[<span class='type'>int</span> start=0])</div>
 <div class='desc'>
 <p>
 The same principal as string.find, put uses pattern matching on the match string.
@@ -554,7 +554,7 @@ The same principal as string.find, put uses pattern matching on the match string
 <span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pfind</span><span class='m_symbol'>(</span><span class='m_string'>"result: 12.7"</span><span class='m_symbol'>,</span><span class='m_string'>"-%?%n%+.%?%n%*"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 8 </span> <br>
 </div>
 
-<div class='fdec'>pextract (<span class='type'>string</span> string,<span class='type'>pattern match</span></div>
+<div class='fdec'>pextract (<span class='type'>string</span> string,<span class='type'>string</span> pattern match)</div>
 <div class='desc'>
 <p>
 Takes a string and a pattern match, and returns all matches as an array. if none were found, an empty array will be returned.
@@ -581,6 +581,44 @@ same as string.count, but uses pattern matches.
 <span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pcount</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l%+"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2</span> <br>
 </div>
 
+
+
+<div class='fdec'>escape (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+takes a string, and substitutes characters so that it could be interpreted properly as a string in mercury. replaces quote mark (") and backslash (\)
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape</span><span class='m_symbol'>(</span><span class='m_string'>"this is a \"cool\" test!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "this is a \"cool\" test!"</span> <br>
+</div>
+
+<div class='fdec'>escape_url (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+takes a string, and substitutes characters so that it could be interpreted properly as a URL location. this does not create a URL adress, as many control characters will be escaped, such as ( / + or &
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape_url</span><span class='m_symbol'>(</span><span class='m_string'>"awesome cool file/thing.odt"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "awesome%20cool%20file%2Fthing.odt"</span> <br>
+</div>
+
+<div class='fdec'>escape_c (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+takes a string, and substitutes characters that conform to the C escape sequence standards. does not escape hex characters, but will escape null.
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape_c</span><span class='m_symbol'>(</span><span class='m_string'>"how\tinteresting!\0\\\nquite!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "how\tinteresting!\0\\\nquite!"</span> <br>
+</div>
+
+<div class='fdec'>escape_html (<span class='type'>string</span> string)</div>
+<div class='desc'>
+<p>
+takes a string, and substitutes characters so that the text may be used in HTML or XML without causing any special formatting changes.<br>
+escapes the following characters: &lt; &gt; &amp; " '
+</p>
+<p class='example'>
+<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape_html</span><span class='m_symbol'>(</span><span class='m_string'>"&lt;span class='thing'&gt;woah!&lt;/span&gt;"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "&amp;lt;span class=&amp;#39;thing&amp;#39;&amp;gt;woah!&amp;lt;/span&amp;gt;"</span> <br>
+</div>
 
 <h2>Array library</h2>
 <h3>constants</h3>

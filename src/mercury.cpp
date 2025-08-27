@@ -1645,6 +1645,10 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_string_p_extract, "pextract", "string");
 	mercury_register_library(mercury_lib_string_p_replace, "preplace", "string");
 	mercury_register_library(mercury_lib_string_p_count, "pcount", "string");
+	mercury_register_library(mercury_lib_string_escape_mercury, "escape", "string");
+	mercury_register_library(mercury_lib_string_escape_url, "escape_url", "string");
+	mercury_register_library(mercury_lib_string_escape_c, "escape_c", "string");
+	mercury_register_library(mercury_lib_string_escape_html, "escape_html", "string");
 
 #endif
 #ifdef MERCURY_LIB_OS

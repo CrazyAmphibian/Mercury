@@ -24,3 +24,7 @@ void mercury_lib_string_p_find(mercury_state* M, mercury_int args_in, mercury_in
 void mercury_lib_string_p_extract(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_string_p_replace(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_string_p_count(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_string_escape_mercury(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_string_escape_url(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_string_escape_c(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_string_escape_html(mercury_state* M, mercury_int args_in, mercury_int args_out);
