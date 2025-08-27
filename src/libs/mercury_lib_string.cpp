@@ -1178,7 +1178,7 @@ inline void m_init_pattern_filter_letter_lower(M_PATTERN* P) {
 inline void m_init_pattern_filter_wildcard(M_PATTERN* P) {
 	if (!P)return;
 	int i = '\x00';
-	while (i <= '\xFF') {
+	while (i <= (unsigned char)'\xFF') {
 		P->allowed_chars[i] = true;
 		i++;
 	}
