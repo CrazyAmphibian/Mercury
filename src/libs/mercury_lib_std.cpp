@@ -93,7 +93,9 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
+		listlike->constant = true;
 		mercury_array* arr = (mercury_array*)listlike->data.p;
+		mercury_int srefs = arr->refrences;
 
 		for (mercury_int b = 0; b < arr->size; b++) {
 			if (!arr->values[b])continue;
@@ -104,26 +106,31 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 					idxvar->data.i = (b << MERCURY_ARRAY_BLOCKSIZE) | i;
 					idxvar->type = M_TYPE_INT;
 
-					mercury_pushstack(SubM, idxvar);
-					mercury_pushstack(SubM, var);
-
 					if (function->type == M_TYPE_CFUNC) {
-						((mercury_cfunc)function->data.p)(SubM,2,0);
+						mercury_pushstack(SubM, idxvar);
+						mercury_pushstack(SubM, var);
+						mercury_pushstack(SubM, listlike);
+						((mercury_cfunc)function->data.p)(SubM,3,0);
 					}
 					else {
+						mercury_pushstack(SubM, listlike);
+						mercury_pushstack(SubM, var);
+						mercury_pushstack(SubM, idxvar);
 						while (mercury_stepstate(SubM));
 						SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
 						M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
 					}
-
 				}
 			}
 		}
+		arr->refrences = srefs;
 
 
 	}
 	else if (listlike->type == M_TYPE_TABLE) {
+		listlike->constant = true;
 		mercury_table* tab = (mercury_table*)listlike->data.p;
+		mercury_int srefs = tab->refrences;
 
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* subt = tab->data[t];
@@ -138,20 +145,27 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 				}
 				mercury_variable* v = mercury_clonevariable(subt->values[i]);
 
-				mercury_pushstack(SubM, k);
-				mercury_pushstack(SubM, v);
-
+				
 				if (function->type == M_TYPE_CFUNC) {
-					((mercury_cfunc)function->data.p)(SubM, 2, 0);
+					mercury_pushstack(SubM, k);
+					mercury_pushstack(SubM, v);
+					mercury_pushstack(SubM, listlike);
+					((mercury_cfunc)function->data.p)(SubM, 3, 0);
+					
 				}
 				else {
+					mercury_pushstack(SubM, listlike);
+					mercury_pushstack(SubM, v);
+					mercury_pushstack(SubM, k);
+					
 					while (mercury_stepstate(SubM));
 					SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
 				}
 				M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
-
+				
 			}
 		}
+		tab->refrences = srefs;
 
 
 	}
@@ -162,6 +176,8 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	}
 
 	mercury_destroystate(SubM);
+
+	listlike->constant = false;
 	mercury_free_var(function);
 	mercury_free_var(listlike);
 

@@ -92,17 +92,17 @@ b<span class='m_symbol'>=</span><span class='m_number'>12</span><br>
 <div class='fdec'>iterate (<span class='type'>structure</span> data, <span class='type'>callable</span> executor)</div>
 <div class='desc'>
 <p>
-takes a traversable and a callable. for each element, both the index and associated data will be sent to the callable. The key will be the first argument, and the value will be the second<br>
+takes a structure and a callable. for each element, the index, associated data, and structure will be sent to the callable. The key will be the first argument, the value will be the second, and the structure will be the third<br>
 </p>
 <p class='example'>
 a<span class='m_symbol'>=[</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>,</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span>  <br>
 <span class='m_builtin'>iterate</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,</span><span class='m_builtin'>print</span><span class='m_symbol'>)</span> <br>
 <span class='m_comment'>/*  <br>
 output: <br>
-0&emsp;1 <br>
-1&emsp;2 <br>
-2&emsp;hello <br>
-3&emsp;4 <br>
+0&emsp;1&emsp;array 0x01234567 <br>
+1&emsp;2&emsp;array 0x01234567 <br>
+2&emsp;hello&emsp;array 0x01234567 <br>
+3&emsp;4&emsp;array 0x01234567 <br>
 */ <br>
 </span>
 </p>
