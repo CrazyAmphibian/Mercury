@@ -614,6 +614,43 @@ void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_in
 
 
 
+/* why implement our own randomness function?
+well... because C's stdlib random kinda blows. only 15 bits of space (on windows, at least)? oh please.
+This probably isn't as performant, but you're going to lose speed with mercury being interpreted so...
+but hey, with this we can really customize it, you can save the random state! also 64 bits of width! */
+#ifdef MERCURY_64BIT
+const uint64_t M_RANDOM_MAX = 0xFFFFFFFFFFFFFFFF; //for the sake of porting C code over.
+uint64_t M_RANDOM_STATE = 0x0000DEADBEEF0000Ui64;
+/*
+basic xorshift
+numbers from the paper: George Marsaglia Xorshift RNGs
+*/
+uint64_t m_random() { //basic Xorshift
+	uint64_t n = M_RANDOM_STATE;
+	n ^= n << 3;
+	n ^= n >> 27;
+	n ^= n << 11;
+	M_RANDOM_STATE = n;
+	return n;
+}
+#else
+const uint32_t M_RANDOM_MAX = 0xFFFFFFFF;
+uint32_t M_RANDOM_STATE = 0xDEADBEEF;
+uint32_t m_random() {
+	uint32_t n = M_RANDOM_STATE;
+	n ^= n << 4;
+	n ^= n >> 9;
+	n ^= n << 13;
+	M_RANDOM_STATE = n;
+	return n;
+}
+#endif
+
+
+
+
+
+
 
 void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in ==1) {
@@ -637,8 +674,8 @@ void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int 
 		return;
 	}
 
-	int r = rand();
-	mercury_float f = (mercury_float)r / (mercury_float)RAND_MAX;
+	mercury_uint r = m_random();
+	mercury_float f = (mercury_float)r / (mercury_float)M_RANDOM_MAX;
 
 	if (!args_out)return;
 
@@ -700,7 +737,7 @@ void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_i
 		return;
 	}
 
-	int r = rand();
+	mercury_uint r = m_random();
 
 	if (!args_out)return;
 
@@ -726,28 +763,38 @@ void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_i
 
 
 void mercury_lib_math_randomseed(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
-		return;
-	};
-
 	for (mercury_int i = 1; i < args_in; i++) {
 		mercury_unassign_var(M, mercury_popstack(M));
 	}
 
-	mercury_variable* v1 = mercury_popstack(M);
+	if (!args_in) {
+		if (args_out) {
+			mercury_variable* o = mercury_assign_var(M);
+			o->type = M_TYPE_INT;
+			o->data.i = M_RANDOM_STATE;
+			mercury_pushstack(M,o);
+		}
+		for (mercury_int a = 1; a < args_out; a++) {
+			M_BYTECODE_NNIL(M, 0);
+		}
+	}
+	else {
+		mercury_variable* v1 = mercury_popstack(M);
 
-	if ((v1->type != M_TYPE_INT)) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)v1->type, (void*)M_TYPE_INT);
-		return;
+		if ((v1->type != M_TYPE_INT)) {
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)v1->type, (void*)M_TYPE_INT);
+			return;
+		}
+
+		M_RANDOM_STATE = v1->data.i;
+		mercury_unassign_var(M, v1);
+
+		for (mercury_int a = 0; a < args_out; a++) {
+			M_BYTECODE_NNIL(M, 0);
+		}
 	}
 
-	srand(v1->data.i);
-	mercury_unassign_var(M, v1);
 
-	for (mercury_int a = 0; a < args_out; a++) {
-		M_BYTECODE_NNIL(M, 0);
-	}
 }
 
 

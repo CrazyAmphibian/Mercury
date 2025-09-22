@@ -12,7 +12,7 @@
 
 
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 
 //what the fuck is an LPVOID?
 DWORD WINAPI threadfunction(LPVOID param) {
@@ -24,7 +24,6 @@ DWORD WINAPI threadfunction(LPVOID param) {
 	threadvar->finished = true;
 	return 0;
 }
-
 #else
 void* threadfunction(void* param) {
 	if (!param)return nullptr;

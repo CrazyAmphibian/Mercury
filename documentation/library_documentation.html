@@ -357,10 +357,10 @@ returns an angle as a float in radians to reach another point at the relative co
 <span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>atan2</span><span class='m_symbol'>(</span><span class='m_number'>10</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>10</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 0.78...</span> <br>
 </div>
 
-<div class='fdec'>randomseed (<span class='type'>int</span> seed)</div>
+<div class='fdec'>randomseed ([<span class='type'>int</span> seed])</div>
 <div class='desc'>
 <p>
-sets the random seed to a desired number. resets the random state.
+If no parameter is given, returns the current random seed state as an int. otherwise, if an integer is provided, it sets the random seed state.
 </p>
 <p class='example'>
 <span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>randomseed</span><span class='m_symbol'>(</span><span class='m_builtin'>os</span><span class='m_symbol'></span><span class='m_symbol'>.</span><span class='m_symbol'></span><span class='m_builtin'>time</span><span class='m_symbol'>())</span> <span class='m_comment'></span> <br>
@@ -378,7 +378,7 @@ returns a random number as a float. if no arguments are provided, the number wil
 <div class='fdec'>randomint (<span class='type'>int</span> minimum, <span class='type'>int</span> maximum)</div>
 <div class='desc'>
 <p>
-returns a random number as an int. the random number will be between minimum and maximum inclusive.
+returns a random number as an int. the random number will be between minimum and maximum, inclusive.
 </p>
 <p class='example'>
 <span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>randomint</span><span class='m_symbol'>(</span><span class='m_number'>1</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>5</span><span class='m_symbol'>)</span> <span class='m_comment'>//may return 4</span> <br>
