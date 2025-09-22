@@ -686,9 +686,9 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
 				else if (tc[0] == 'e' && tc[1] == 'n' && tc[2] == 'd') {
 					token->token_flags = TOKEN_KEYWORD;
 				}
-				else if (tc[0] == 'n' && tc[1] == 'a' && tc[2] == 'n') { //nan
-					token->token_flags = TOKEN_VARIABLE | TOKEN_STATICNUMBER;
-				}
+				//else if (tc[0] == 'n' && tc[1] == 'a' && tc[2] == 'n') { //nan
+				//	token->token_flags = TOKEN_VARIABLE | TOKEN_STATICNUMBER;  //removed because nan like this is not actually nan. that is to say nan!=(0/0)
+				//}
 				else if (tc[0] == 'i' && tc[1] == 'n' && tc[2] == 'f') { //inf
 					token->token_flags = TOKEN_VARIABLE | TOKEN_STATICNUMBER;
 				}
