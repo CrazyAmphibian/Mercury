@@ -153,6 +153,7 @@
     <ClCompile Include="..\src\libs\mercury_lib_os.cpp" />
     <ClCompile Include="..\src\libs\mercury_lib_std.cpp" />
     <ClCompile Include="..\src\libs\mercury_lib_string.cpp" />
+    <ClCompile Include="..\src\libs\mercury_lib_table.cpp" />
     <ClCompile Include="..\src\libs\mercury_lib_thread.cpp" />
     <ClCompile Include="..\src\mercury.cpp" />
     <ClCompile Include="..\src\mercury_bytecode.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="..\src\libs\mercury_lib_os.h" />
     <ClInclude Include="..\src\libs\mercury_lib_std.h" />
     <ClInclude Include="..\src\libs\mercury_lib_string.h" />
+    <ClInclude Include="..\src\libs\mercury_lib_table.h" />
     <ClInclude Include="..\src\libs\mercury_lib_thread.h" />
     <ClInclude Include="..\src\mercury.h" />
     <ClInclude Include="..\src\mercury_bytecode.h" />

@@ -654,6 +654,7 @@ returns a new array containing the same values as the old one, but as a seperate
 a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
 b<span class='m_symbol'>=</span><span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>copy</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
 <span class='m_builtin'>print</span><span class='m_symbol'>(</span>a<span class='m_symbol'>==</span>b<span class='m_symbol'>)</span> <span class='m_comment'>//false </span> <br>
+</p>
 </div>
 
 <div class='fdec'>insert (<span class='type'>array</span> array, <span class='type'>variable</span> element, [<span class='type'>int</span> index=end])</div>
@@ -950,6 +951,24 @@ halts the main thread until the supplied thread is finished.
 </p>
 <span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>await</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'>  </span> <br>
 </div>
+
+
+<h2>Table library</h2>
+<h3>functions</h3>
+
+<div class='fdec'>copy (<span class='type'>table</span> table)</div>
+<div class='desc'>
+<p>
+creates a new table which contains the same values as the supplied table.
+</p>
+<p class='example'>
+a<span class='m_symbol'>={</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>}</span> <br>
+b<span class='m_symbol'>=</span><span class='m_builtin'>table</span><span class='m_symbol'>.</span><span class='m_builtin'>copy</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
+<span class='m_builtin'>print</span><span class='m_symbol'>(</span>a<span class='m_symbol'>==</span>b<span class='m_symbol'>)</span> <span class='m_comment'>//false </span> <br>
+</p>
+</div>
+
+
 
 </body>
 </html>
