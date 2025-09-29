@@ -620,7 +620,7 @@ This probably isn't as performant, but you're going to lose speed with mercury b
 but hey, with this we can really customize it, you can save the random state! also 64 bits of width! */
 #ifdef MERCURY_64BIT
 const uint64_t M_RANDOM_MAX = 0xFFFFFFFFFFFFFFFF; //for the sake of porting C code over.
-uint64_t M_RANDOM_STATE = 0x0000DEADBEEF0000Ui64;
+uint64_t M_RANDOM_STATE = 0x0000DEADBEEF0000;
 /*
 basic xorshift
 numbers from the paper: George Marsaglia Xorshift RNGs
