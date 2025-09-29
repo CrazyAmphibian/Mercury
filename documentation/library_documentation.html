@@ -698,6 +698,16 @@ a<span class='m_symbol'>=[</span><span class='m_number'>7</span><span class='m_s
 <span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>sort</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_builtin'>array</span>.<span class='m_builtin'>SORTING_GREATER_TO_LESSER</span>)</span> <span class='m_comment'>//array is now [7,3,1] </span> <br>
 </div>
 
+<div class='fdec'>concat (<span class='type'>array</span> array, <span class='type'>string</span> separator)</div>
+<div class='desc'>
+<p>
+returns a string formed from each element in an array, from 0 to the end, and adds the separator string between each element. automatically runs tostring on each element.
+</p>
+<p class='example'>
+a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
+<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>concat</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_string'>","</span>)</span> <span class='m_comment'>//returns "hello,1,true" </span> <br>
+</div>
+
 
 <h2>IO library</h2>
 <h3>functions</h3>

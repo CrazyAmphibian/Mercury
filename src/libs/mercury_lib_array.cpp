@@ -573,3 +573,57 @@ int mercury_sort_alphabet_za(const void* a, const void* b) {
 
 
 
+void mercury_lib_array_concat(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	if (args_in < 2) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
+		return;
+	};
+	for (mercury_int i = 2; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+	mercury_variable* var_str = mercury_popstack(M);
+	if (var_str->type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_str->type, (void*)M_TYPE_STRING);
+		return;
+	}
+
+	mercury_variable* var_array = mercury_popstack(M);
+	if (var_array->type != M_TYPE_ARRAY) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_array->type, (void*)M_TYPE_ARRAY);
+		return;
+	}
+	if (!args_out)return;
+
+	mercury_stringliteral* out_str=mercury_cstring_to_mstring((char*)"",0);
+
+	mercury_int limit=mercury_array_len((mercury_array*)var_array->data.p);
+	for (mercury_int i = 0; i < limit; i++) {
+		mercury_variable* var=mercury_getarray((mercury_array*)var_array->data.p, i, M);
+		if (var) {
+			mercury_mstrings_append(out_str, (mercury_stringliteral*)mercury_tostring(var)->data.p);
+		}
+		else {
+			mercury_mstring_addchars(out_str,(char*)"nil",3);
+		}
+		
+
+		if(i!=limit-1)mercury_mstrings_append(out_str, (mercury_stringliteral*)var_str->data.p);
+	}
+
+	mercury_variable* out = mercury_assign_var(M);
+	out->type = M_TYPE_STRING;
+	out->data.p = out_str;
+	out->constant = false;
+
+	mercury_pushstack(M, out);
+
+	mercury_unassign_var(M, var_array);
+	mercury_unassign_var(M, var_str);
+
+	for (mercury_int a = 1; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		mv->type = M_TYPE_NIL;
+		mv->data.i = 0;
+		mercury_pushstack(M, mv);
+	}
+}

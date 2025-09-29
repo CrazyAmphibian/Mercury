@@ -1621,6 +1621,7 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_array_remove, "remove", "array");
 	mercury_register_library(mercury_lib_array_swap, "swap", "array");
 	mercury_register_library(mercury_lib_array_sort, "sort", "array");
+	mercury_register_library(mercury_lib_array_concat, "concat", "array");
 
 	mercury_register_library(mercury_sort_greater_to_lesser, "SORTING_GREATER_TO_LESSER", "array");
 	mercury_register_library(mercury_sort_lesser_to_greater, "SORTING_LESSER_TO_GREATER", "array");
