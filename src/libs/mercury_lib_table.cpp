@@ -3,6 +3,7 @@
 #include"../mercury_error.h"
 
 #include <malloc.h>
+#include <cstring>
 
 void mercury_lib_table_copy(mercury_state* M, mercury_int args_in, mercury_int args_out) { //basically the same as array.copy
 	if (args_in < 1) {
