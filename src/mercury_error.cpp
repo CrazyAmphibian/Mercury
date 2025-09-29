@@ -62,6 +62,9 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 	case M_ERROR_INDEX_INVALID_TYPE:
 		result = snprintf(buffer, 255, "%s: attempt to index invalid variable type %s \n", header, typetostring[(int)data1]);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
+	case M_ERROR_NOT_ENOUGH_ARGS:
+		result = snprintf(buffer, 255, "%s: incorrect number of args. expected %i, got %i \n", header, (int)data2, (int)data1);
+		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_CUSTOM_STRING:
 		result = snprintf(buffer, 255, "%s: %s \n", header, (char*)data1);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
