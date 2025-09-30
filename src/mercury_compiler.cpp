@@ -1810,13 +1810,6 @@ int m_compile_read_var_statment_recur(compiler_function* func, compiler_token** 
 		f1 = ff;
 	}
 
-	/*
-	if (parentheses && tokens[offset]->token_flags & TOKEN_OPERATOR && tokens[offset]->chars[0] == ')') {
-		offset++;
-		parentheses = false;
-		addo++;
-	}
-	*/
 
 	int binop_off = m_compile_read_binary_op(f4, tokens, offset, token_max);
 	if (binop_off) {
@@ -1835,23 +1828,14 @@ int m_compile_read_var_statment_recur(compiler_function* func, compiler_token** 
 		binop_off += next_off;
 	}
 
-	/*
-	if (parentheses && tokens[offset]->token_flags & TOKEN_OPERATOR && tokens[offset]->chars[0] == ')') {
-		offset++;
-		addo++;
-	}
-	else if (parentheses) {
-		func->errorcode= M_COMPERR_PAREN_NOT_CLOSED;
-		func->token_error_num = offset;
-		return 0;
-	}
-	*/
 
 	/*
-		f1 - base
-		f2 - unary op
-		f3 - bin op statment
-		f4 - binary op
+		f1 - base == a
+		f2 - unary op == #
+		f3 - bin op statment == 1
+		f4 - binary op == +
+
+		#a + 1
 	*/
 	
 	concat_comp_func_appends(f1, f2);

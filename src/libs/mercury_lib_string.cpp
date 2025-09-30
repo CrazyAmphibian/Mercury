@@ -1114,6 +1114,8 @@ void mercury_lib_string_format(mercury_state* M, mercury_int args_in, mercury_in
 	%+ - 1 to infinity matches, greedy
 	%? - 0 or 1 matches
 	%! - 1 match (implicit behavior made explicit)
+	%/ - 0 matches, next char
+	%\ - 0 matches, greedy
 
 */
 
@@ -1125,6 +1127,7 @@ enum M_PAT_MATCH {
 	//behavior flags
 	MATCH_OPTIONAL = (1<<2), //if we aren't required, just set passed to true. still iterates through chars to advance filters
 	MATCH_GREEDY = (1<<3), //if flag, do not allow traversal through first_good_char
+	MATCH_INVERTED = (1<<4), //we do NOT want this char.
 };
 
 struct M_PATTERN{
@@ -1216,6 +1219,15 @@ inline void m_init_pattern_filter_whitespace(M_PATTERN* P) {
 	P->allowed_chars['\r'] = true;
 }
 
+inline void m_init_mattern_invert_filter_chars(M_PATTERN* P) {
+	if (!P)return;
+	int i = '\x00';
+	while (i <= (unsigned char)'\xFF') {
+		P->allowed_chars[i] = !P->allowed_chars[i];
+		i++;
+	}
+}
+
 M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) {
 	mercury_int n = 0;
 	M_PATTERN* out = nullptr;
@@ -1299,6 +1311,31 @@ M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) 
 				break;
 			case '!':
 				p->match_type = MATCH_SINGLE;
+				break;
+			case '/':
+				m_init_mattern_invert_filter_chars(p);
+				p->match_type = MATCH_AT_LEAST_ONE | MATCH_OPTIONAL | MATCH_GREEDY;
+				break;
+			case '\\':
+				m_init_mattern_invert_filter_chars(p);
+				p->match_type = MATCH_AT_LEAST_ONE | MATCH_OPTIONAL;
+				break;
+			case '#':
+				m_init_mattern_invert_filter_chars(p);
+				p->match_type = MATCH_AT_LEAST_ONE | MATCH_GREEDY;
+				break;
+			case '@':
+				m_init_mattern_invert_filter_chars(p);
+				p->match_type = MATCH_AT_LEAST_ONE;
+				break;
+			case '|':
+				m_init_mattern_invert_filter_chars(p);
+				p->match_type = MATCH_SINGLE | MATCH_OPTIONAL;
+				break;
+			case '=':
+				m_init_mattern_invert_filter_chars(p);
+				p->match_type = MATCH_SINGLE;
+				break;
 			case '%': //see above.
 			default:
 				c -= 2; //invalid selector? we drop the character advance, so we can treat it like a normal character sequence.
@@ -1333,6 +1370,9 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 		}
 		if (P.match_type & MATCH_OPTIONAL) {
 			printf("MATCH_OPTIONAL ");
+		}
+		if (P.match_type & MATCH_INVERTED) {
+			printf("MATCH_INVERTED ");
 		}
 
 		for (int n = 0; n <= 0xFF; n++) {
@@ -1409,7 +1449,7 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 			mercury_int passed = 0;
 			mercury_int req_pas = 0;
 			for (mercury_int n = 0; n < num_patterns; n++) {
-				if (patterns[n].passed) {
+				if ((patterns[n].match_type & MATCH_INVERTED) ? (!patterns[n].passed) : patterns[n].passed) {
 					if (!(patterns[n].match_type & MATCH_OPTIONAL)) {
 						passed++;
 					}
@@ -1435,14 +1475,11 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 	}
 
 
-
-
-
 	bool anypass = false;
 	mercury_int passed = 0;
 	mercury_int req_pas = 0;
 	for (mercury_int n = 0; n < num_patterns; n++) {
-		if (patterns[n].passed) {
+		if ((patterns[n].match_type & MATCH_INVERTED) ? (!patterns[n].passed) : patterns[n].passed) {
 			if (!(patterns[n].match_type & MATCH_OPTIONAL)) {
 				passed++;
 			}
