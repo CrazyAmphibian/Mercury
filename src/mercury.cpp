@@ -1557,6 +1557,10 @@ BOOL WINAPI DllMain(HMODULE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 __attribute__((constructor)) dynamic_lib_load() {
 #endif
 
+	static const mercury_int v = MERCURY_VERSION;
+	mercury_register_library((void*)&v, "_VERSION", nullptr,M_TYPE_INT);
+	static const mercury_int v_p = MERCURY_VERSION_PATCH;
+	mercury_register_library((void*)&v_p, "_VERSION_PATCH", nullptr, M_TYPE_INT);
 
 #ifdef MERCURY_LIB_STD
 	mercury_register_library(mercury_lib_std_print, "print", nullptr);

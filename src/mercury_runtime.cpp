@@ -390,6 +390,7 @@ int main(int argc, char** argv) {
 
 	if (interactivemode) {
 		printf("Mercury Alpha 5 (c)2025 interactive mode\n");
+		//printf("Mercury %i.%i (c)2025 interactive mode\n",MERCURY_VERSION,MERCURY_VERSION_PATCH); uncomment for later when this gets out of alpha (yeah right)
 	}
 
 	

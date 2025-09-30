@@ -26,7 +26,7 @@ typedef int64_t mercury_int; //typedefs to ensure that our variables occupy the 
 typedef uint64_t mercury_uint;
 typedef double mercury_float;
 #define MERCURY_64BIT
-#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE 2; //how many instructions fit into one variable. instructions are 32 bits, so on a 64 bit system this is 2. on a 32 bit system, this is 1. if you're using a 16 bit system, god help you.
+#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE 2 //how many instructions fit into one variable. instructions are 32 bits, so on a 64 bit system this is 2. on a 32 bit system, this is 1. if you're using a 16 bit system, god help you.
 #else
 typedef __int32 mercury_int;
 typedef unsigned __int32 mercury_uint;
@@ -34,6 +34,9 @@ typedef float mercury_float;
 #define MERCURY_32BIT
 #define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE 1;
 #endif
+
+#define MERCURY_VERSION 0
+#define MERCURY_VERSION_PATCH 5
 
 union mercury_rawdata { //to represent stored binary data of almost any type.
 	mercury_int i;
