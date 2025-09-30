@@ -389,7 +389,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (interactivemode) {
-		printf("Mercury Alpha 4 (c)2025 interactive mode\n");
+		printf("Mercury Alpha 5 (c)2025 interactive mode\n");
 	}
 
 	
