@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 7.6.2.1 (Windows)"/>
+	<meta name="created" content="2025-09-30T14:45:59.071000000"/>
+	<meta name="changed" content="2025-09-30T17:30:02.600000000"/>
+	<style type="text/css">
+		h2.cjk { font-family: "NSimSun" }
+		h2.ctl { font-family: "Arial" }
+		h3.cjk { font-family: "NSimSun" }
+		h3.ctl { font-family: "Arial" }
+		p.codeblock-western { font-family: "Liberation Mono", monospace; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
+		p.codeblock-cjk { background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
+		p.codeblock-ctl { background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
+		h4.cjk { font-family: "NSimSun" }
+		h4.ctl { font-family: "Arial" }
+	</style>
+</head>
+<body lang="en-US" dir="ltr"><h1 align="center">Mercury</h1>
+<p>Mercury is an interpreted dynamically-typed language with a simple
+but robust syntax.</p>
+<p><br/>
+<br/>
+
+</p>
+<h2 class="western">Design philosophy</h2>
+<p>Mercury is designed around a core set of ideas, listed in order of
+priority.</p>
+<p>Mercury should be:</p>
+<ul>
+	<li><p>Fast</p>
+	<ul>
+		<li><p>Mercury should be as fast as it can be, without sacrificing
+		other capabilities</p></li>
+	</ul>
+	<li><p>Simple</p>
+	<ul>
+		<li><p>Mercury's syntax should be easy to read, and not tie
+		multiple behaviors to a single syntax that would cause ambiguity
+		for the user or compiler.</p></li>
+	</ul>
+	<li><p>Flexible</p>
+	<ul>
+		<li><p>Mercury should be ambivalent to any specific style of
+		programming</p></li>
+		<li><p>Mercury should have a diverse set of standard library
+		functions</p></li>
+	</ul>
+	<li><p>Compatible</p>
+	<ul>
+		<li><p>Mercury should be able to run on any system with the same
+		(or similar) results</p></li>
+		<li><p>Mercury should not needlessly remove, deprecate, or change
+		old behavior</p></li>
+	</ul>
+</ul>
+<p><br/>
+<br/>
+
+</p>
+<h2 class="western">Basic Syntax</h2>
+<h3 class="western">Hello world</h3>
+<p>Hello world in Mercury is quite straightforward</p>
+<p class="codeblock-western">print(&quot;Hello, world!&quot;)</p>
+<h3 class="western">Comments</h3>
+<p>Comments follow the same syntax as C.</p>
+<p>A single line comment is done with two forward slashes</p>
+<p class="codeblock-western">print(&quot;Hello, world&quot;) //Quite
+important, do not remove!</p>
+<p>A multi-line comment is done as such</p>
+<p class="codeblock-western">/*</p>
+<p class="codeblock-western">this does some stuff.</p>
+<p class="codeblock-western">Pretty cool stuff.</p>
+<p class="codeblock-western">*/</p>
+<p class="codeblock-western">print(&quot;Hello, world&quot;)</p>
+<p>if two comment styles overlap, the multi-line takes priority.</p>
+<p class="codeblock-western">// This does stuff /*</p>
+<p class="codeblock-western">now it doesn't</p>
+<p class="codeblock-western">*/</p>
+<h3 class="western">Order of operations</h3>
+<p><br/>
+<br/>
+
+</p>
+<p>The program executes in the following order during runtime:</p>
+<ol>
+	<li><p>Variable is retrieved</p></li>
+	<li><p>Variable is indexed</p></li>
+	<li><p>Function is called</p></li>
+	<li><p>Unary operations are applied</p></li>
+	<li><p>Binary operations are applied</p></li>
+	<li><p>Variable is set</p></li>
+</ol>
+<p>All operations of the same type are done in left-to-right order,
+and do not follow standard order of operations.</p>
+<p>For example:</p>
+<p class="codeblock-western">b=#a+1/3</p>
+<p>first, the variable 'a' is retrieved. Next, the length operator is
+applied to it. Then, it is added with 1, and divided by 3. Finally,
+the variable 'b' is set to the result</p>
+<p>this example showcases how operations are applied in order</p>
+<p class="codeblock-western">a=5+3/4 //returns 2.0</p>
+<p class="codeblock-western">a=3/4+5 //returns 5.75</p>
+<p class="codeblock-western">a=5+(3/4)//returns 5.75</p>
+<h3 class="western">Strings</h3>
+<p>Strings are constructed with two quote marks and work like typical
+strings. Strings will run until they find another quote mark, even if
+that means spanning multiple lines. Strings accept escapes using
+backslash, and follow similar rules to C string escapes.</p>
+<table width="100%" cellpadding="4" cellspacing="1" style="page-break-inside: avoid">
+	<col width="128*"/>
+	<col width="128*"/>
+	<tr valign="top">
+		<td width="50%" style="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			Sequence</p>
+		</td>
+		<td width="50%" style="border: 1px double #808080; padding: 0.04in"><p>
+			Outcome</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\\</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The character \</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\&quot;</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			Quote mark &quot;</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\'</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			Single quote '</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\t</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			tab</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\n</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			newline</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\r</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			Carriage return</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\?</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			Question mark ?</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\a</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			bell</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\b</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			backspace</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\e</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			escape</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\f</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			formfeed</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\v</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			Vertical tab</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\x00</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			Hexadecimal char input.</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			\123</p>
+		</td>
+		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			Decimal character input.</p>
+		</td>
+	</tr>
+</table>
+<p><br/>
+<br/>
+
+</p>
+<h3 class="western">Keywords</h3>
+<p>Mercury has 17 reserved keywords. These cannot be used for
+variable names, as they either are part of the language syntax, are
+represent another variable.</p>
+<p>Keywords are case sensitive, so you can use capitalization to
+share a name with a keyword without any issues.</p>
+<ul>
+	<li><p style="margin-bottom: 0in">if 
+	</p></li>
+	<li><p style="margin-bottom: 0in">do</p></li>
+	<li><p style="margin-bottom: 0in">nil</p></li>
+	<li><p style="margin-bottom: 0in">inf</p></li>
+	<li><p style="margin-bottom: 0in">end</p></li>
+	<li><p style="margin-bottom: 0in">true</p></li>
+	<li><p style="margin-bottom: 0in">then</p></li>
+	<li><p style="margin-bottom: 0in">else</p></li>
+	<li><p style="margin-bottom: 0in">goto</p></li>
+	<li><p style="margin-bottom: 0in">while</p></li>
+	<li><p style="margin-bottom: 0in">false</p></li>
+	<li><p style="margin-bottom: 0in">local</p></li>
+	<li><p style="margin-bottom: 0in">global</p></li>
+	<li><p style="margin-bottom: 0in">elseif</p></li>
+	<li><p style="margin-bottom: 0in">return</p></li>
+	<li><p style="margin-bottom: 0in">continue</p></li>
+	<li><p style="margin-bottom: 0in">function</p></li>
+</ul>
+<p style="margin-bottom: 0in"><br/>
+
+</p>
+<h4 class="western">keywords: Static variables</h4>
+<p>Static variable keywords represent a constant value, and can be
+used for assignment or comparison</p>
+<ul>
+	<li><p>nil</p>
+	<ul>
+		<li><p>represents the nil datatype, nothing.</p></li>
+	</ul>
+	<li><p>Inf</p>
+	<ul>
+		<li><p>represents infinity in as a float.</p></li>
+	</ul>
+	<li><p>true</p>
+	<ul>
+		<li><p>represents the boolean value of true</p></li>
+	</ul>
+	<li><p>false</p>
+	<ul>
+		<li><p>represents the boolean value of false</p></li>
+	</ul>
+</ul>
+<h4 class="western">keywords: flow control</h4>
+<p>These keywords form the structure of a program and are vital for
+complex behavior</p>
+<ul>
+	<li><p>end</p>
+	<ul>
+		<li><p>the universal delimiter for statement bodies.</p></li>
+	</ul>
+	<li><p>if, then, else, elseif</p>
+	<ul>
+		<li><p>forms the basis for if statements</p></li>
+	</ul>
+	<li><p>while, do</p>
+	<ul>
+		<li><p>forms the basis for while loops</p></li>
+	</ul>
+	<li><p>continue, break</p>
+	<ul>
+		<li><p>modifies behavior of loops</p></li>
+	</ul>
+	<li><p>goto</p>
+	<ul>
+		<li><p>unconditional jump to another section of code, use with
+		caution</p></li>
+	</ul>
+	<li><p>function</p>
+	<ul>
+		<li><p>self-explanitory</p></li>
+	</ul>
+	<li><p>return</p>
+	<ul>
+		<li><p>can be used in function to abort execution and return values</p></li>
+	</ul>
+</ul>
+<h4 class="western">keywords: scope specifiers</h4>
+<p>These keywords are used for variable retrieval and assignment to
+fine tune scope.</p>
+<ul>
+	<li><p>global</p>
+	<ul>
+		<li><p>specifies that a variable should belong to the top-level
+		state</p></li>
+	</ul>
+	<li><p>local</p>
+	<ul>
+		<li><p>specifies that a variable should belong to the bottom-most
+		state</p></li>
+	</ul>
+</ul>
+<h3 class="western">Variable types</h3>
+<p>Mercury has 11 unique datatypes</p>
+<ul>
+	<li><p style="margin-bottom: 0in">nil</p></li>
+	<li><p style="margin-bottom: 0in">int</p></li>
+	<li><p style="margin-bottom: 0in">float</p></li>
+	<li><p style="margin-bottom: 0in">bool</p></li>
+	<li><p style="margin-bottom: 0in">table</p></li>
+	<li><p style="margin-bottom: 0in">string</p></li>
+	<li><p style="margin-bottom: 0in">c function</p></li>
+	<li><p style="margin-bottom: 0in">array</p></li>
+	<li><p style="margin-bottom: 0in">function</p></li>
+	<li><p style="margin-bottom: 0in">file</p></li>
+	<li><p style="margin-bottom: 0in">thread</p></li>
+</ul>
+<p><br/>
+<br/>
+
+</p>
+<h3 class="western">Operators</h3>
+<h4 class="western">Operators: Arithmetic</h4>
+<ul>
+	<li><p style="margin-bottom: 0in">Addition +</p></li>
+	<li><p style="margin-bottom: 0in">Subtraction -</p></li>
+	<li><p style="margin-bottom: 0in">Multiplication *</p></li>
+	<li><p style="margin-bottom: 0in">Division /</p></li>
+	<li><p style="margin-bottom: 0in">Exponentiation ^</p></li>
+	<li><p style="margin-bottom: 0in">Modulo %</p></li>
+	<li><p style="margin-bottom: 0in">Integer Division \</p></li>
+	<li><p style="margin-bottom: 0in">increment ++ (only on variables)</p></li>
+	<li><p style="margin-bottom: 0in">decrement -- (only on variables)</p></li>
+</ul>
+<h4 class="western">Operators: Bitwise</h4>
+<ul>
+	<li><p style="margin-bottom: 0in">Bitwise not !</p></li>
+	<li><p style="margin-bottom: 0in">Bitwise and &amp;</p></li>
+	<li><p style="margin-bottom: 0in">Bitwise or |</p></li>
+	<li><p style="margin-bottom: 0in">bitwise xor ~</p></li>
+	<li><p style="margin-bottom: 0in">bitshift left &lt;&lt;</p></li>
+	<li><p style="margin-bottom: 0in">bitshift right &gt;&gt;</p></li>
+</ul>
+<h4 class="western">Operators: Logical</h4>
+<ul>
+	<li><p style="margin-bottom: 0in">Logical not !!</p></li>
+	<li><p style="margin-bottom: 0in">Logical and &amp;&amp;</p></li>
+	<li><p style="margin-bottom: 0in">Logical or ||</p></li>
+	<li><p style="margin-bottom: 0in">Logical xor ~~</p></li>
+</ul>
+<h4 class="western">Operators: Comparison</h4>
+<ul>
+	<li><p style="margin-bottom: 0in">Greater than &gt;</p></li>
+	<li><p style="margin-bottom: 0in">Less than &lt;</p></li>
+	<li><p style="margin-bottom: 0in">Greater than or equal to &gt;=</p></li>
+	<li><p style="margin-bottom: 0in">Less than or equal to &lt;=</p></li>
+	<li><p style="margin-bottom: 0in">Equal ==</p></li>
+	<li><p style="margin-bottom: 0in">Not equal !=</p></li>
+</ul>
+<h4 class="western">Operators: listlike</h4>
+<ul>
+	<li><p style="margin-bottom: 0in">Length #</p></li>
+	<li><p style="margin-bottom: 0in">Index [ ]</p></li>
+</ul>
+<h4 class="western">Operators: Other</h4>
+<ul>
+	<li><p style="margin-bottom: 0in">Concatenate ..</p></li>
+	<li><p style="margin-bottom: 0in">Call function ( )</p></li>
+</ul>
+<p><br/>
+<br/>
+
+</p>
+<h3 class="western">Control Flow</h3>
+<h4 class="western">If statements</h4>
+<p>If statements in Mercury operate in a very similar way to those in
+other high level languages. They are split into 2 parts, the
+condition and the body. If the condition is true, then the contents
+of the body are executed. If statements start with if, followed by
+the condition. Next, the then keyword is used before the body, and is
+finished with end.</p>
+<p class="codeblock-western">if a&gt;20 then</p>
+<p class="codeblock-western">  print(&quot;a is kinda big&quot;)</p>
+<p class="codeblock-western">end</p>
+<p>the else keyword can be used to add more complexity to an if
+check, and is quite simple to use</p>
+<p class="codeblock-western">if a&gt;20 then</p>
+<p class="codeblock-western">  print(&quot;a is kinda big&quot;)</p>
+<p class="codeblock-western">else</p>
+<p class="codeblock-western">  print(&quot;a is not that big&quot;)</p>
+<p class="codeblock-western">end</p>
+<p>the final layer is elseif, which combines else and another if
+statement together. Elseif can be used as many times as desired, but
+should go before else.</p>
+<p class="codeblock-western">if a&gt;20 then</p>
+<p class="codeblock-western">  print(&quot;a is kinda big&quot;)</p>
+<p class="codeblock-western">elseif a&lt;0 then</p>
+<p class="codeblock-western">  print(&quot;a is negative!&quot;)</p>
+<p class="codeblock-western">else</p>
+<p class="codeblock-western">  print(&quot;a is not that big&quot;)</p>
+<p class="codeblock-western">end</p>
+<h4 class="western">while loops</h4>
+<p>As with if statements, while loops are simple in operation</p>
+<p class="codeblock-western">n=0</p>
+<p class="codeblock-western">while n&lt;10 do</p>
+<p class="codeblock-western">  do_stuff(n)</p>
+<p class="codeblock-western">  n++</p>
+<p class="codeblock-western">end</p>
+<p>the continue and break keyword can add further complexity.</p>
+<p class="codeblock-western">n=0</p>
+<p class="codeblock-western">while n&lt;10 do</p>
+<p class="codeblock-western">  if should_abort(n) then</p>
+<p class="codeblock-western">    break</p>
+<p class="codeblock-western">  end</p>
+<p class="codeblock-western">  n++</p>
+<p class="codeblock-western">  if n%2==0 then</p>
+<p class="codeblock-western">    continue</p>
+<p class="codeblock-western">  end</p>
+<p class="codeblock-western">  stuff(n)</p>
+<p class="codeblock-western">end</p>
+<h4 class="western">functions and returns</h4>
+<p>Functions are designated with a name and parameters. Do note that
+a function may receive less parameters than specified.</p>
+<p>The return keyword will cause the immediate closure and escape
+from the current state. Values may be supplied to pass values to the
+calling state. Returning in the main body of the program will halt
+all execution.</p>
+<p>Functions can be given a name first</p>
+<p class="codeblock-western">function add(num1,num2)</p>
+<p class="codeblock-western">  return num1+num2</p>
+<p class="codeblock-western">end</p>
+<p>or be assigned to a name</p>
+<p class="codeblock-western">add=function(num1,num2)</p>
+<p class="codeblock-western">  return num1+num2</p>
+<p class="codeblock-western">end</p>
+<p>using this method allows scope specifiers to be applied to the
+function for more control.</p>
+<h4 class="western">Goto</h4>
+<p>Goto can jump code execution to any location within the current
+state. Caution is advised when using goto, as it can potentially jump
+over variable declarations and cause bugs with scoping. It's
+recommended to explicitly state global or local keywords to be safe.</p>
+<p class="codeblock-western">a=0</p>
+<p class="codeblock-western">b=0</p>
+<p class="codeblock-western">while a&lt;100 do</p>
+<p class="codeblock-western">  while b&lt;100 do</p>
+<p class="codeblock-western">    if something_wrong(a,b) then goto
+exit end</p>
+<p class="codeblock-western">    other_stuff()</p>
+<p class="codeblock-western">  end</p>
+<p class="codeblock-western">  stuff()</p>
+<p class="codeblock-western">end</p>
+<p class="codeblock-western">exit:</p>
+<p>for an example of incorrect usage of goto, this results in an
+error, since the label thing is not visible within the function state</p>
+<p class="codeblock-western">function stuff()</p>
+<p class="codeblock-western">  goto thing</p>
+<p class="codeblock-western">end</p>
+<p class="codeblock-western">thing:</p>
+<p class="codeblock-western">stuff()</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+</body>
+</html>
