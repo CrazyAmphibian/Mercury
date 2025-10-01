@@ -51,6 +51,9 @@
     <ClCompile Include="..\src\libs\mercury_lib_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\libs\mercury_lib_debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\mercury.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\libs\mercury_lib_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\libs\mercury_lib_debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

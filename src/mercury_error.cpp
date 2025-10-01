@@ -48,7 +48,7 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 		result=snprintf(buffer, 255, "%s: memory allocation error\n",header);
 		return mercury_cstring_const_to_mstring(buffer,strlen(buffer));
 	case M_ERROR_WRONG_TYPE:
-		result = snprintf(buffer, 255, "%s: wrong type. expected %s, got %s\n", header , typetostring[(int)data1] , typetostring[(int)data2]);
+		result = snprintf(buffer, 255, "%s: arg %i wrong type. expected %s, got %s\n", header ,(int)data3 , typetostring[(int)data2] , typetostring[(int)data1]);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_DIV_ZERO:
 		result = snprintf(buffer, 255, "%s: integer division by 0\n", header);

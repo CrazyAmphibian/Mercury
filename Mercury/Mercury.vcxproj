@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\libs\mercury_lib_array.cpp" />
+    <ClCompile Include="..\src\libs\mercury_lib_debug.cpp" />
     <ClCompile Include="..\src\libs\mercury_lib_io.cpp" />
     <ClCompile Include="..\src\libs\mercury_lib_math.cpp" />
     <ClCompile Include="..\src\libs\mercury_lib_os.cpp" />
@@ -162,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\libs\mercury_lib_array.h" />
+    <ClInclude Include="..\src\libs\mercury_lib_debug.h" />
     <ClInclude Include="..\src\libs\mercury_lib_io.h" />
     <ClInclude Include="..\src\libs\mercury_lib_math.h" />
     <ClInclude Include="..\src\libs\mercury_lib_os.h" />

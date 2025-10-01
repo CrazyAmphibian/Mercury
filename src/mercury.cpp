@@ -21,6 +21,7 @@
 #include "libs/mercury_lib_io.h"
 #include "libs/mercury_lib_thread.h"
 #include "libs/mercury_lib_table.h"
+#include "libs/mercury_lib_debug.h"
 
 uint8_t M_NUMBER_OF_TYPES = 11; //VERY IMPORTANT that this is kept at the proper number.
 uint16_t register_max = 0xf;
@@ -1694,7 +1695,12 @@ __attribute__((constructor)) dynamic_lib_load() {
 #ifdef MERCURY_LIB_TABLE
 	mercury_register_library(mercury_lib_table_copy, "copy", "table");
 #endif
-
+#ifdef MERCURY_LIB_DEBUG
+	mercury_register_library(mercury_lib_debug_stack_dbg, "dumpstack", "debug");
+	mercury_register_library(mercury_lib_debug_state_dbg, "dumpstate", "debug");
+	mercury_register_library(mercury_lib_debug_enviroment_dbg, "dumpenv", "debug");
+	
+#endif
 
 #ifdef _WIN32
 	}
