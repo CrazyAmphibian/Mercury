@@ -5,7 +5,7 @@
 	<title></title>
 	<meta name="generator" content="LibreOffice 7.6.2.1 (Windows)"/>
 	<meta name="created" content="2025-09-30T14:45:59.071000000"/>
-	<meta name="changed" content="2025-09-30T17:30:02.600000000"/>
+	<meta name="changed" content="2025-10-01T16:58:42.918000000"/>
 	<style type="text/css">
 		h2.cjk { font-family: "NSimSun" }
 		h2.ctl { font-family: "Arial" }
@@ -21,10 +21,18 @@
 <body lang="en-US" dir="ltr"><h1 align="center">Mercury</h1>
 <p>Mercury is an interpreted dynamically-typed language with a simple
 but robust syntax.</p>
-<p><br/>
-<br/>
-
-</p>
+<h2 class="western">Why Mercury?</h2>
+<p>Mercury is here to show that a high-level language doesn't have to
+compromise on programmer freedom for the sake of simplicity. Drawing
+from the simplicity of C and ease of use from Lua, Mercury gives the
+user a lot of control and flexibility, while at the same time,
+keeping functions atomic and varied.</p>
+<p>Mercury is also easy to embed into another program, and has been
+written in a way that makes it very accessible from the C++
+foundation of the language.</p>
+<p>Featuring things such as multithreadding, automatic garbage
+collection, and first class functions, Mercury is more than capable
+of standing up as a standalone language.</p>
 <h2 class="western">Design philosophy</h2>
 <p>Mercury is designed around a core set of ideas, listed in order of
 priority.</p>
@@ -274,7 +282,7 @@ used for assignment or comparison</p>
 	<ul>
 		<li><p>represents the nil datatype, nothing.</p></li>
 	</ul>
-	<li><p>Inf</p>
+	<li><p>inf</p>
 	<ul>
 		<li><p>represents infinity in as a float.</p></li>
 	</ul>
@@ -416,43 +424,43 @@ of the body are executed. If statements start with if, followed by
 the condition. Next, the then keyword is used before the body, and is
 finished with end.</p>
 <p class="codeblock-western">if a&gt;20 then</p>
-<p class="codeblock-western">  print(&quot;a is kinda big&quot;)</p>
+<p class="codeblock-western">print(&quot;a is kinda big&quot;)</p>
 <p class="codeblock-western">end</p>
 <p>the else keyword can be used to add more complexity to an if
 check, and is quite simple to use</p>
 <p class="codeblock-western">if a&gt;20 then</p>
-<p class="codeblock-western">  print(&quot;a is kinda big&quot;)</p>
+<p class="codeblock-western">print(&quot;a is kinda big&quot;)</p>
 <p class="codeblock-western">else</p>
-<p class="codeblock-western">  print(&quot;a is not that big&quot;)</p>
+<p class="codeblock-western">print(&quot;a is not that big&quot;)</p>
 <p class="codeblock-western">end</p>
 <p>the final layer is elseif, which combines else and another if
 statement together. Elseif can be used as many times as desired, but
 should go before else.</p>
 <p class="codeblock-western">if a&gt;20 then</p>
-<p class="codeblock-western">  print(&quot;a is kinda big&quot;)</p>
+<p class="codeblock-western">print(&quot;a is kinda big&quot;)</p>
 <p class="codeblock-western">elseif a&lt;0 then</p>
-<p class="codeblock-western">  print(&quot;a is negative!&quot;)</p>
+<p class="codeblock-western">print(&quot;a is negative!&quot;)</p>
 <p class="codeblock-western">else</p>
-<p class="codeblock-western">  print(&quot;a is not that big&quot;)</p>
+<p class="codeblock-western">print(&quot;a is not that big&quot;)</p>
 <p class="codeblock-western">end</p>
 <h4 class="western">while loops</h4>
 <p>As with if statements, while loops are simple in operation</p>
 <p class="codeblock-western">n=0</p>
 <p class="codeblock-western">while n&lt;10 do</p>
-<p class="codeblock-western">  do_stuff(n)</p>
-<p class="codeblock-western">  n++</p>
+<p class="codeblock-western">do_stuff(n)</p>
+<p class="codeblock-western">n++</p>
 <p class="codeblock-western">end</p>
 <p>the continue and break keyword can add further complexity.</p>
 <p class="codeblock-western">n=0</p>
 <p class="codeblock-western">while n&lt;10 do</p>
-<p class="codeblock-western">  if should_abort(n) then</p>
-<p class="codeblock-western">    break</p>
-<p class="codeblock-western">  end</p>
-<p class="codeblock-western">  n++</p>
-<p class="codeblock-western">  if n%2==0 then</p>
-<p class="codeblock-western">    continue</p>
-<p class="codeblock-western">  end</p>
-<p class="codeblock-western">  stuff(n)</p>
+<p class="codeblock-western">if should_abort(n) then</p>
+<p class="codeblock-western">break</p>
+<p class="codeblock-western">end</p>
+<p class="codeblock-western">n++</p>
+<p class="codeblock-western">if n%2==0 then</p>
+<p class="codeblock-western">continue</p>
+<p class="codeblock-western">end</p>
+<p class="codeblock-western">stuff(n)</p>
 <p class="codeblock-western">end</p>
 <h4 class="western">functions and returns</h4>
 <p>Functions are designated with a name and parameters. Do note that
@@ -463,11 +471,11 @@ calling state. Returning in the main body of the program will halt
 all execution.</p>
 <p>Functions can be given a name first</p>
 <p class="codeblock-western">function add(num1,num2)</p>
-<p class="codeblock-western">  return num1+num2</p>
+<p class="codeblock-western">return num1+num2</p>
 <p class="codeblock-western">end</p>
 <p>or be assigned to a name</p>
 <p class="codeblock-western">add=function(num1,num2)</p>
-<p class="codeblock-western">  return num1+num2</p>
+<p class="codeblock-western">return num1+num2</p>
 <p class="codeblock-western">end</p>
 <p>using this method allows scope specifiers to be applied to the
 function for more control.</p>
@@ -479,18 +487,18 @@ recommended to explicitly state global or local keywords to be safe.</p>
 <p class="codeblock-western">a=0</p>
 <p class="codeblock-western">b=0</p>
 <p class="codeblock-western">while a&lt;100 do</p>
-<p class="codeblock-western">  while b&lt;100 do</p>
-<p class="codeblock-western">    if something_wrong(a,b) then goto
-exit end</p>
-<p class="codeblock-western">    other_stuff()</p>
-<p class="codeblock-western">  end</p>
-<p class="codeblock-western">  stuff()</p>
+<p class="codeblock-western">while b&lt;100 do</p>
+<p class="codeblock-western">if something_wrong(a,b) then goto exit
+end</p>
+<p class="codeblock-western">other_stuff()</p>
+<p class="codeblock-western">end</p>
+<p class="codeblock-western">stuff()</p>
 <p class="codeblock-western">end</p>
 <p class="codeblock-western">exit:</p>
 <p>for an example of incorrect usage of goto, this results in an
 error, since the label thing is not visible within the function state</p>
 <p class="codeblock-western">function stuff()</p>
-<p class="codeblock-western">  goto thing</p>
+<p class="codeblock-western">goto thing</p>
 <p class="codeblock-western">end</p>
 <p class="codeblock-western">thing:</p>
 <p class="codeblock-western">stuff()</p>
