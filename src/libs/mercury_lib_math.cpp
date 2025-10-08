@@ -26,17 +26,17 @@ void mercury_lib_math_min(mercury_state* M, mercury_int args_in, mercury_int arg
 				}
 			}
 			else {
-				if ((mercury_float)var->data.i < out->data.f) {
-					out->type = M_TYPE_INT;
-					out->data.i = var->data.i;
+				if (var->data.f< (mercury_float)out->data.i) {
+					out->type = M_TYPE_FLOAT;
+					out->data.f = var->data.f;
 				}
 			}
 		}
 		else if (var->type == M_TYPE_INT) {
 			if (out->type == M_TYPE_FLOAT) {
-				if ((mercury_int)var->data.f < out->data.i) {
-					out->type = M_TYPE_FLOAT;
-					out->data.f = var->data.f;
+				if ((mercury_float)var->data.i < out->data.f) {
+					out->type = M_TYPE_INT;
+					out->data.i = var->data.i;
 				}
 			}
 			else {
@@ -76,17 +76,17 @@ void mercury_lib_math_max(mercury_state* M, mercury_int args_in, mercury_int arg
 				}
 			}
 			else {
-				if ((mercury_float)var->data.i > out->data.f) {
-					out->type = M_TYPE_INT;
-					out->data.i = var->data.i;
+				if (var->data.f > (mercury_float)out->data.i) {
+					out->type = M_TYPE_FLOAT;
+					out->data.f = var->data.f;
 				}
 			}
 		}
 		else if (var->type == M_TYPE_INT) {
 			if (out->type == M_TYPE_FLOAT) {
-				if ((mercury_int)var->data.f > out->data.i) {
-					out->type = M_TYPE_FLOAT;
-					out->data.f = var->data.f;
+				if ((mercury_float)var->data.i > out->data.f) {
+					out->type = M_TYPE_INT;
+					out->data.i = var->data.i;
 				}
 			}
 			else {
