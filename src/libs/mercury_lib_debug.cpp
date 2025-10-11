@@ -140,17 +140,43 @@ char* m_var_to_string(uint8_t type,mercury_rawdata data) {
 }
 
 void mercury_lib_debug_enviroment_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	for (mercury_int a = 0; a < args_in; a++) {
+		mercury_unassign_var(M, mercury_pullstack(M));
+	}
+
 	while (M) {
 		mercury_table* e = M->enviroment;
 		printf("state 0x%p, evniroment 0x%p\n", M, e);
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* st = e->data[t];
 			for (mercury_int i = 0; i < st->size; i++) {
-
 				printf("\t%s = %s\n", m_var_to_string(t, st->keys[i]), m_var_to_string(st->values[i]->type, st->values[i]->data));
 			}
 
 		}
 		M = M->parentstate;
 	}
+
+	for (mercury_int a = 0; a < args_out; a++) {
+		M_BYTECODE_NNIL(M, 0);
+	}
 }
+
+
+void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	for (mercury_int a = 0; a < args_in; a++) {
+		mercury_unassign_var(M, mercury_pullstack(M));
+	}
+
+	printf("state 0x%p has %i constants\n", M,M->num_constants);
+
+	for (mercury_int i = 0; i < M->num_constants; i++) {
+		mercury_variable* c=M->constants[i];
+		printf("\t%i : %s\n", i, m_var_to_string(c->type, c->data));
+	}
+
+	for (mercury_int a = 0; a < args_out; a++) {
+		M_BYTECODE_NNIL(M, 0);
+	}
+}
+
