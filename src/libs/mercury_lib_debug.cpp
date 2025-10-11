@@ -3,6 +3,8 @@
 #include"../mercury_error.h"
 #include"../mercury_bytecode.h"
 
+#include <malloc.h>
+
 //dumps length and contents of stack
 void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	for (mercury_int a = 0; a < args_in; a++) {
@@ -106,11 +108,12 @@ char* m_var_to_string(uint8_t type,mercury_rawdata data) {
 	{
 		mercury_stringliteral* s = (mercury_stringliteral*)data.p;
 		out[0] = '\"';
-		for (mercury_int i = 0; i < min(2040,s->size); i++) {
+		mercury_int m_size = s->size>2040 ? 2040 : s->size;
+		for (mercury_int i = 0; i < m_size; i++) {
 			out[i+1] = s->ptr[i];
 		}
-		out[min(2040, s->size)+1] = '\"';
-		out[min(2040, s->size)+2] = '\0';
+		out[m_size+1] = '\"';
+		out[m_size+2] = '\0';
 
 	}
 		break;

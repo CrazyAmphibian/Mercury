@@ -73,25 +73,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>Mercury</TargetName>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\out\windows_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)_intermediate\runtime\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Mercury</TargetName>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\out\windows_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)_intermediate\runtime\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>Mercury</TargetName>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\out\windows_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)_intermediate\runtime\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Mercury</TargetName>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\out\windows_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)_intermediate\runtime\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -106,7 +106,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ImportLibrary>
       </ImportLibrary>
-      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\out\windows_$(Platform)_$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,7 +125,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ImportLibrary>
       </ImportLibrary>
-      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\out\windows_$(Platform)_$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,7 +140,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ImportLibrary>
       </ImportLibrary>
-      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\out\windows_$(Platform)_$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -159,7 +159,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ImportLibrary>
       </ImportLibrary>
-      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\out\windows_$(Platform)_$(Configuration)\Mercury.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

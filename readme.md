@@ -10,19 +10,21 @@ Some features include:
 * logical XOR
 * strong dynamic typing
 * fine variable scope control
+* lambdas / anonymous functions
 
 
 
 ## how to build
+
 ### windows
 1. Use visual studio to open /Mercury/Mercury.sln
 2. run batch build. select the proper configuration for your platform, and ensure that 1 build of Mercury and 1 build of Mercury_Runtime is selected.
-3. Build. Move Mercury.exe and Mercury.dll to a desired location, if wanted.
+3. Build. The output will be in ./out/windows[configuration]
 
 ### unix-like systems
 1. ensure your system has the g++ package installed
-2. run compile.sh
-3. move mercury and mercury.so to a desired location, if wanted.
+2. run compile.sh (or compile_debug.sh)
+3. The output will be in ./out/linux[_debug/_release]
 
 
 ### not compiling with libraries
