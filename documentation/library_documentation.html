@@ -1007,10 +1007,10 @@ logs information about the state's constants to stdout, including how many const
 </p>
 </div>
 
-<div class='fdec'>dumpbytecode ()</div>
+<div class='fdec'>dumpbytecode ([<span class='type'>function</span> function=_ENV])</div>
 <div class='desc'>
 <p>
-logs information about the state's function to stdout, including the number of instructions, and each opcode and additional information. Returns no value.
+logs information about the provided function to stdout, including the number of instructions, and each opcode and additional information. Returns no value. if no arg is given, instead uses the current state's bytecode. 
 </p>
 </div>
 

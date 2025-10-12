@@ -183,16 +183,35 @@ void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, merc
 
 
 void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	for (mercury_int a = 0; a < args_in; a++) {
+	for (mercury_int a = 1; a < args_in; a++) {
 		mercury_unassign_var(M, mercury_pullstack(M));
 	}
 
-	printf("state 0x%p bytecode (%i/%i)\n", M,M->programcounter, M->bytecode.numberofinstructions);
-	mercury_stringliteral* l=mercury_get_bytecode_debug(&M->bytecode);
-	for (mercury_int i = 0; i < l->size; i++) {
-		putchar(l->ptr[i]);
+
+	if (args_in == 1) { //read bytecode from function
+		mercury_variable* in = mercury_pullstack(M);
+		if (in->type == M_TYPE_FUNCTION) {
+			printf("variable %p function %p bytecode (%u)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions );
+			mercury_stringliteral* l = mercury_get_bytecode_debug( ((mercury_function*)in->data.p) );
+			for (mercury_int i = 0; i < l->size; i++) {
+				putchar(l->ptr[i]);
+			}
+			putchar('\n');
+		}
+		else {
+			printf("variable %p (type %hhu) is not a function (type %hhu). failed to dump bytecode.",in,in->type,M_TYPE_FUNCTION);
+		}
+		mercury_unassign_var(M, in);
 	}
-	putchar('\n');
+	else {
+
+		printf("state %p bytecode (%i/%u)\n", M, M->programcounter, M->bytecode.numberofinstructions);
+		mercury_stringliteral* l = mercury_get_bytecode_debug(&M->bytecode);
+		for (mercury_int i = 0; i < l->size; i++) {
+			putchar(l->ptr[i]);
+		}
+		putchar('\n');
+	}
 
 	for (mercury_int a = 0; a < args_out; a++) {
 		M_BYTECODE_NNIL(M, 0);

@@ -1652,7 +1652,7 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 			case M_OPCODE_CPYX:
 			case M_OPCODE_SCON:
 			case M_OPCODE_GCON:
-				snprintf(buffer, 0x2FFF, "  %i ", *(mercury_int*)(F->instructions + offset));
+				snprintf(buffer, 0x2FFF, " %i ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
