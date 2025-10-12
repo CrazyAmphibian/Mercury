@@ -180,3 +180,21 @@ void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, merc
 	}
 }
 
+
+
+void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+	for (mercury_int a = 0; a < args_in; a++) {
+		mercury_unassign_var(M, mercury_pullstack(M));
+	}
+
+	printf("state 0x%p bytecode (%i/%i)\n", M,M->programcounter, M->bytecode.numberofinstructions);
+	mercury_stringliteral* l=mercury_get_bytecode_debug(&M->bytecode);
+	for (mercury_int i = 0; i < l->size; i++) {
+		putchar(l->ptr[i]);
+	}
+	putchar('\n');
+
+	for (mercury_int a = 0; a < args_out; a++) {
+		M_BYTECODE_NNIL(M, 0);
+	}
+}

@@ -975,7 +975,44 @@ b<span class='m_symbol'>=</span><span class='m_builtin'>table</span><span class=
 </p>
 </div>
 
+<h2>Debug library</h2>
+<h3>functions</h3>
 
+
+<div class='fdec'>dumpstack ()</div>
+<div class='desc'>
+<p>
+logs information about the current state's stack to stdout, including how many variables are on the stack, what the variables's values are, and unallocated variables, as well as the allocated size of the stack array. Returns no value.
+</p>
+</div>
+
+<div class='fdec'>dumpstate ()</div>
+<div class='desc'>
+<p>
+logs information about the current state structure to stdout, including how far the each state is into execution, the instruction address, and which state is the parent state recursively, until the master state is reached. Returns no value.
+</p>
+</div>
+
+<div class='fdec'>dumpenv ()</div>
+<div class='desc'>
+<p>
+logs information about the environment to stdout, including associated state, and all values stored inside the environment table, and does so for each parent state until the master state. Returns no value.
+</p>
+</div>
+
+<div class='fdec'>dumpconstants ()</div>
+<div class='desc'>
+<p>
+logs information about the state's constants to stdout, including how many constants the state has, and what the values of the constants are. Returns no value.
+</p>
+</div>
+
+<div class='fdec'>dumpbytecode ()</div>
+<div class='desc'>
+<p>
+logs information about the state's function to stdout, including the number of instructions, and each opcode and additional information. Returns no value.
+</p>
+</div>
 
 </body>
 </html>

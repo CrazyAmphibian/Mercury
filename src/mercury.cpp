@@ -1444,6 +1444,225 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 
 }
 
+inline const char* m_get_opcode_str(uint16_t instruction) {
+
+	if (instruction > M_OPCODE_GCON) {
+		return "????";
+	}
+	static const char* lookup[0xFFFF] = {
+		" NOP", //0
+
+		" ADD", //1
+		" SUB", //2
+		" MUL", //3
+		" DIV", //4
+		" POW", //5
+		"IDIV", //6
+		" MOD", //7
+
+		"BAND", //8
+		"BOR ", //9
+		"BXOR", //10
+		"BNOT", //11
+		"BSHL", //12
+		"BSHR", //13
+
+		"LAND", //14
+		"LOR ", //15
+		"LXOR", //16
+		"LNOT", //17
+
+		"EQL ", //18
+		"NEQ ", //19
+		"GRT ", //20
+		"LET ", //21
+		"GTE ", //22
+		"LTE ", //23
+
+		"SENV", //24
+		"GENV", //25
+		"SET ", //26
+		"GET ", //27
+		"SREG", //28
+		"GREG", //29
+
+		"NINT", //30
+		"NFLO", //31
+		"NTRU", //32
+		"NFAL", //33
+		"NNIL", //34
+		"NSTR", //35
+		"NFUN", //36
+		"NTAB", //37
+		"NARR", //38
+
+		"JMP ", //39
+		"JMPR", //40
+		"JIF ", //41
+		"JNIF", //42
+		"JRIF", //43
+		"JRNI", //44
+
+		"CALL", //45
+		"EXIT", //46
+		"LEN ", //47
+		"CNCT", //48
+		"CLS ", //49
+		"GETL", //50
+		"SETL", //51
+		"GETG", //52
+		"SETG", //53
+
+		"CPYT", //54
+		"SWPT", //55
+		"CPYX", //56
+
+		"UNM ", //57
+		"INC ", //58
+		"DEC ", //59
+
+		"SCON", //60
+		"GCON", //61
+	};
+	return lookup[instruction];
+}
+
+mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
+	mercury_stringliteral* out= (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	if (!out)return nullptr;
+	out->constant = false;
+	out->ptr = nullptr;
+	out->size = 0;
+
+	mercury_int offset = 0;
+	while (offset < F->numberofinstructions) {
+		uint32_t i=F->instructions[offset];
+		offset++;
+		uint16_t flags = (i >>16);
+		uint16_t instruction = (i & 0xFFFF);
+		char buffer[0x2FFF];
+
+
+#ifdef MERCURY_64BIT
+	snprintf(buffer, 0x2FFF, "[%015lX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+#else
+	snprintf(buffer, 0x2FFF, "[%07X - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+#endif
+		
+		mercury_mstring_addchars(out, buffer, strlen(buffer) );
+
+		switch (instruction) {
+			case M_OPCODE_ADD: //can take 2 static number args.
+			case M_OPCODE_SUB:
+			case M_OPCODE_MUL:
+			case M_OPCODE_DIV:
+			case M_OPCODE_POW:
+			case M_OPCODE_IDIV:
+			case M_OPCODE_MOD:
+			case M_OPCODE_BAND:
+			case M_OPCODE_BOR:
+			case M_OPCODE_BXOR:
+			case M_OPCODE_GRT:
+			case M_OPCODE_LET:
+			case M_OPCODE_GTE:
+			case M_OPCODE_LTE:
+				if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
+					if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
+						snprintf(buffer, 0x2FFF, " arg 1: %f", *(mercury_float*)(F->instructions+offset) );
+					}
+					else {
+						snprintf(buffer, 0x2FFF, " arg 1: %i", *(mercury_int*)(F->instructions + offset) );
+					}
+					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+					mercury_mstring_addchars(out,buffer, strlen(buffer) );
+				}
+				if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
+					if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
+						snprintf(buffer, 0x2FFF, " arg 2: %f", *(mercury_float*)(F->instructions + offset));
+					}
+					else {
+						snprintf(buffer, 0x2FFF, " arg 2: %i", *(mercury_int*)(F->instructions + offset));
+					}
+					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+					mercury_mstring_addchars(out, buffer, strlen(buffer));
+				} 
+				break;
+			case M_OPCODE_BNOT: //1 possible static number arg
+				if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
+					if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
+						snprintf(buffer, 0x2FFF, " arg: %f", *(mercury_float*)(F->instructions + offset));
+					}
+					else {
+						snprintf(buffer, 0x2FFF, " arg: %i", *(mercury_int*)(F->instructions + offset));
+					}
+					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+					mercury_mstring_addchars(out, buffer, strlen(buffer));
+				}
+				break;
+			case M_OPCODE_NINT: //static var inputs
+				snprintf(buffer, 0x2FFF, " %i", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+			case M_OPCODE_NFLO:
+				snprintf(buffer, 0x2FFF, " %f", *(mercury_float*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+			case M_OPCODE_NSTR:
+				{
+				mercury_int size = *(mercury_int*)(F->instructions + offset);
+				snprintf(buffer, 0x2FFF, " size:%i ", size );
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				size = size >= 0x2FFF ? 0x2FFF : size;
+				for (mercury_int i = 0; i < size; i++) {
+					char c = *(((char*)(F->instructions + offset)) + i);
+					buffer[i] = c;
+				}
+				offset += (size + 3) / 4;
+				mercury_mstring_addchars(out, (char*)"\"", 1);
+				mercury_mstring_addchars(out, buffer, size);
+				mercury_mstring_addchars(out, (char*)"\"", 1);
+				}
+				break;
+			case M_OPCODE_NFUN:
+				snprintf(buffer, 0x2FFF, " instructions:%i ", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+			case M_OPCODE_CALL:
+				snprintf(buffer, 0x2FFF, " in:%i ", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;	
+				snprintf(buffer, 0x2FFF, " out:%i ", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+			case M_OPCODE_JMP: //gaurentee takes 1, int
+			case M_OPCODE_JMPR:
+			case M_OPCODE_JIF:
+			case M_OPCODE_JNIF:
+			case M_OPCODE_JRIF:
+			case M_OPCODE_JRNI:
+				snprintf(buffer, 0x2FFF, " offset:%i ", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+			case M_OPCODE_CPYX:
+			case M_OPCODE_SCON:
+			case M_OPCODE_GCON:
+				snprintf(buffer, 0x2FFF, "  %i ", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+		}
+
+		mercury_mstring_addchars(out,(char*)"\n",1);
+	}
+	return out;
+}
+
 
 
 bool mercury_register_library(void* data, const char* key, const char* table,uint8_t type=M_TYPE_CFUNC) {
@@ -1700,6 +1919,8 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_debug_state_dbg, "dumpstate", "debug");
 	mercury_register_library(mercury_lib_debug_enviroment_dbg, "dumpenv", "debug");
 	mercury_register_library(mercury_lib_debug_constants_dbg, "dumpconstants", "debug");
+	mercury_register_library(mercury_lib_debug_bytecode_dbg, "dumpbytecode", "debug");
+
 #endif
 
 #ifdef _WIN32

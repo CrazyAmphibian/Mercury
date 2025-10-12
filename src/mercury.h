@@ -236,3 +236,5 @@ MERCURY_DYNAMIC_LIBRARY bool mercury_vars_equal(mercury_variable* var1, mercury_
 
 MERCURY_DYNAMIC_LIBRARY bool mercury_register_library(void* data, char* key, char* table, uint8_t type=M_TYPE_CFUNC);
 MERCURY_DYNAMIC_LIBRARY void mercury_populate_enviroment_with_libs(mercury_state* M);
+
+MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F);
