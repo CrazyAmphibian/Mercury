@@ -7,7 +7,7 @@
 enum M_ERROR_TYPES:uint32_t {
 	M_ERROR_NONE = 0,			// args: 
 	M_ERROR_ALLOCATION = 1,		//args:
-	M_ERROR_WRONG_TYPE = 2,		//args: expected, provided
+	M_ERROR_WRONG_TYPE = 2,		//args: expected, provided, arg
 	M_ERROR_DIV_ZERO = 3,		//args:
 	M_ERROR_INVALID_INDEX = 4, // args: expected, provided
 	M_ERROR_INSTRUCTION_FAILIURE = 5, //args:

@@ -1352,6 +1352,17 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 	// compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercury_int num_tokens , mercury_int* endatend=nullptr )
 	mercury_int functokensused = 0;
 	compiler_function* fnfunc = mercury_compile_compile_tokens(tokens+offset+adv, token_max-adv-offset, &functokensused); //shift the tokens to match it.
+	if (!fnfunc) {
+		func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+		func->token_error_num = adv + offset;
+		return 0;
+	}
+	if (fnfunc->errorcode) {
+		func->errorcode = fnfunc->errorcode;
+		func->token_error_num = fnfunc->token_error_num;
+		delete_comp_func(fnfunc);
+		return 0;
+	}
 
 	adv += functokensused;
 
@@ -1377,7 +1388,6 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 	concat_comp_func_appends(func, fvarget);
 	delete_comp_func(fvarget);
 	delete_comp_func(ffunc);
-
 	return adv;
 }
 
