@@ -486,7 +486,7 @@ void mercury_lib_std_dump(mercury_state* M, mercury_int args_in, mercury_int arg
 
 void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)1, (void*)args_in);
 		return;
 	}
 	if (!args_out) {

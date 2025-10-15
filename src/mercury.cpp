@@ -746,11 +746,32 @@ mercury_variable* mercury_clonevariable(mercury_variable* var,mercury_state* M) 
 	if (!out)return nullptr;
 
 	out->type = var->type;
-	if (out->type == M_TYPE_STRING) {
-		out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
-	}
-	else {
-		out->data = var->data;
+	switch (out->type) {
+		case M_TYPE_STRING:
+			out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
+			break;
+		case M_TYPE_TABLE:
+			((mercury_table*)var->data.p)->refrences++;
+			out->data = var->data;
+			break;
+		case M_TYPE_ARRAY:
+			((mercury_array*)var->data.p)->refrences++;
+			out->data = var->data;
+			break;
+		case M_TYPE_FILE:
+			((mercury_filewrapper*)var->data.p)->refrences++;
+			out->data = var->data;
+			break;
+		case M_TYPE_THREAD:
+			((mercury_threadholder*)var->data.p)->refrences++;
+			out->data = var->data;
+			break;
+		case M_TYPE_FUNCTION:
+			((mercury_function*)var->data.p)->refrences++;
+			out->data = var->data;
+			break;
+		default:
+			out->data = var->data;
 	}
 	
 	return out;

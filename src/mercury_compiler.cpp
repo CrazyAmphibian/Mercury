@@ -1388,6 +1388,7 @@ int mercury_compile_read_function_define(compiler_function* func, compiler_token
 	concat_comp_func_appends(func, fvarget);
 	delete_comp_func(fvarget);
 	delete_comp_func(ffunc);
+	//printf("func escaped OK\n");
 	return adv;
 }
 
@@ -2840,6 +2841,7 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
 
 	mf->refrences = 1;
 	mf->numberofinstructions = f->number_instructions;
+	mf->enviromental = false;
 	mf->instructions = (uint32_t*)malloc(f->number_instructions * sizeof(uint32_t));
 	if (!mf->instructions)return nullptr;
 	memcpy(mf->instructions,f->instructions, f->number_instructions * sizeof(uint32_t));
