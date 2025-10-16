@@ -90,7 +90,10 @@ void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1, void
 	free(str->ptr);
 	free(str);
 
-	M->programcounter = M->bytecode.numberofinstructions; //push to end to stop execution
+	while (M) {
+		M->programcounter = M->bytecode.numberofinstructions; //push to end to stop execution
+		M = M->parentstate;
+	}
 }
 
 

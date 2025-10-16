@@ -2450,19 +2450,11 @@ void M_BYTECODE_JRNI(mercury_state* M, uint16_t flags) { //Jump Relative Not If
 
 void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	mercury_int args_in = *(mercury_int*)offset;
 
 	offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	mercury_int args_out = *(mercury_int*)offset;
 
 
@@ -2473,8 +2465,9 @@ void M_BYTECODE_CALL(mercury_state* M, uint16_t flags) { //CALL function
 		{
 		mercury_state* FM=mercury_newstate(M);
 		mercury_function* func = (mercury_function*)ck->data.p;
-		FM->bytecode.instructions = func->instructions;
-		FM->bytecode.numberofinstructions = func->numberofinstructions;
+		//FM->bytecode.instructions = func->instructions;
+		//FM->bytecode.numberofinstructions = func->numberofinstructions;
+		memcpy(&FM->bytecode, ck->data.p, sizeof(mercury_function));
 		for (mercury_int i = 0; i < args_in;i++) {
 			mercury_pushstack(FM, mercury_popstack(M));
 		}

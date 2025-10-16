@@ -485,17 +485,17 @@ bool mercury_stepstate(mercury_state* M) {
 
 void mercury_destroystate(mercury_state* M) {
 	for (mercury_int i = 0; i < M->sizeofstack; i++) {
-		mercury_unassign_var(M,M->stack[i]);
+		mercury_free_var(M->stack[i]);
 	}
 	free(M->stack);
 	for (mercury_int i = 0; i < M->numunassignedstack; i++) {
-		free(M->unassignedstack[i]);
+		mercury_free_var(M->unassignedstack[i]);
 	}
 	free(M->unassignedstack);
 
 	if (M->masterstate == M && M->registers) {
 		for (mercury_int i = 0; i < register_max; i++) {
-			if(M->registers[i])free(M->registers[i]);
+			if(M->registers[i])mercury_free_var(M->registers[i]);
 		}
 		free(M->registers);
 	}
@@ -566,6 +566,8 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 					v->data = st->keys[i];
 					mercury_free_var(v);
 				}
+				free(st->keys);
+				free(st->values);
 				free(st);
 			}
 			free(ftab);
@@ -593,8 +595,10 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 					if (!v)continue;
 					mercury_free_var(v);
 				}
+				free(vt);
 			}
-	
+			free(farray->values);
+			free(farray);
 		}
 		}
 		break;
