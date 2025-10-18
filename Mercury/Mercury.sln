@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mercury", "Mercury.vcxproj", "{5EF44CFF-F215-47C5-8214-5C518F0052EF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mercury_Runtime", "..\Mercury_Runtime\Mercury_Runtime.vcxproj", "{79D48C76-9653-4BB3-BA12-1EA3AC1068DA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5EF44CFF-F215-47C5-8214-5C518F0052EF} = {5EF44CFF-F215-47C5-8214-5C518F0052EF}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
