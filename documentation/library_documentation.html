@@ -92,7 +92,7 @@ b<span class='m_symbol'>=</span><span class='m_number'>12</span><br>
 <div class='fdec'>iterate (<span class='type'>structure</span> data, <span class='type'>callable</span> executor)</div>
 <div class='desc'>
 <p>
-takes a structure and a callable. for each element, the index, associated data, and structure will be sent to the callable. The key will be the first argument, the value will be the second, and the structure will be the third<br>
+takes a structure and a callable. for each element, the index, associated data, and structure will be sent to the callable. The key will be the first argument, the value will be the second, and the structure will be the third. if the callable returns a value considered true by mercury boolean logic, it will stop traversing the structure similar to how the break keyword works in a loop. returning a non-true value will simply halt iteration of the current element, like the continue keyword in a loop.<br>
 </p>
 <p class='example'>
 a<span class='m_symbol'>=[</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>,</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span>  <br>

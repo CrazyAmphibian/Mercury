@@ -110,7 +110,14 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 						mercury_pushstack(SubM, idxvar);
 						mercury_pushstack(SubM, var);
 						mercury_pushstack(SubM, listlike);
-						((mercury_cfunc)function->data.p)(SubM,3,0);
+						((mercury_cfunc)function->data.p)(SubM,3,1);
+
+						mercury_variable* o = mercury_pullstack(SubM);
+						if (mercury_checkbool(o)) {
+							b = arr->size; //soft break from both loops.
+							i = (1 << MERCURY_ARRAY_BLOCKSIZE) - 1;
+						}
+						mercury_free_var(o);
 					}
 					else { //M functions get args in the reverse order. confusing, but it works.
 						mercury_pushstack(SubM, listlike);
@@ -118,6 +125,14 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 						mercury_pushstack(SubM, idxvar);
 						while (mercury_stepstate(SubM));
 						SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
+
+						mercury_variable* o = mercury_pullstack(SubM);
+						if (mercury_checkbool(o)) {
+							b = arr->size; //soft break from both loops.
+							i = (1 << MERCURY_ARRAY_BLOCKSIZE) - 1;
+						}
+						mercury_free_var(o);
+
 						M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
 					}
 				}
@@ -140,16 +155,6 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 				ik.type = t;
 				ik.data = subt->keys[i];
 				mercury_variable* k = mercury_clonevariable(&ik);
-				/*
-				mercury_variable* k=mercury_assign_var(M);
-				k->type = t;
-				if (t == M_TYPE_STRING) {
-					k->data.p = mercury_copystring((mercury_stringliteral*)subt->keys[i].p);
-				}
-				else {
-					k->data.i = subt->keys[i].i;
-				}
-				*/
 				mercury_variable* v = mercury_clonevariable(subt->values[i]);
 
 				
@@ -157,7 +162,13 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 					mercury_pushstack(SubM, k);
 					mercury_pushstack(SubM, v);
 					mercury_pushstack(SubM, listlike);
-					((mercury_cfunc)function->data.p)(SubM, 3, 0);
+					((mercury_cfunc)function->data.p)(SubM, 3, 1);
+					mercury_variable* o=mercury_pullstack(SubM);
+					if (mercury_checkbool(o)) {
+						t = M_NUMBER_OF_TYPES; //soft break from both loops.
+						i = subt->size;
+					}
+					mercury_free_var(o);
 					
 				}
 				else {
@@ -167,6 +178,13 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 					
 					while (mercury_stepstate(SubM));
 					SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
+
+					mercury_variable* o = mercury_pullstack(SubM);
+					if (mercury_checkbool(o)) {
+						t = M_NUMBER_OF_TYPES;
+						i = subt->size;
+					}
+					mercury_free_var(o);
 				}
 				M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
 				

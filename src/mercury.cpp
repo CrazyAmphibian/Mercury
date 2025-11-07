@@ -489,7 +489,7 @@ void mercury_destroystate(mercury_state* M) {
 	}
 	free(M->stack);
 	for (mercury_int i = 0; i < M->numunassignedstack; i++) {
-		free(M->unassignedstack[i]);
+		free(M->unassignedstack[i]); //do not use mercury_free_var or i will beat the shit out of you (and the memory will corrupt)
 	}
 	free(M->unassignedstack);
 
