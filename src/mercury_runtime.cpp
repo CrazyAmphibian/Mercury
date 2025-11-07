@@ -347,10 +347,10 @@ int main(int argc, char** argv) {
 
 
 	if (argc>=2) {
-		const char* fpath= argv[1];
+		const char* fpath = argv[1];
 		FILE* f=fopen(fpath,"rb");
 		if (!f) {
-			printf("error opening file.\n");
+			printf("error opening file %s\n",fpath);
 			return 1;
 		}
 		if (fseek(f, 0, SEEK_END)) {
@@ -367,7 +367,7 @@ int main(int argc, char** argv) {
 			else {
 				char* s = (char*)malloc(sizeof(char) * (len+1) );
 				if (!s) {
-					printf("error reading file (3).\n");
+					printf("error reading file %s: unable to allocate memory.\n",fpath);
 					return 1;
 				}
 				rewind(f);
