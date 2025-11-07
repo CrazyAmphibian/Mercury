@@ -489,7 +489,7 @@ void mercury_destroystate(mercury_state* M) {
 	}
 	free(M->stack);
 	for (mercury_int i = 0; i < M->numunassignedstack; i++) {
-		mercury_free_var(M->unassignedstack[i]);
+		free(M->unassignedstack[i]);
 	}
 	free(M->unassignedstack);
 
@@ -904,6 +904,7 @@ mercury_variable* mercury_tostring(mercury_variable* var) {
 	if (newvar == nullptr) return nullptr;
 	newvar->type = M_TYPE_STRING;
 	newvar->data.p = nullptr;
+	newvar->constant = false;
 
 	mercury_stringliteral* tstr;
 

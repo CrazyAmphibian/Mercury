@@ -135,6 +135,12 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* subt = tab->data[t];
 			for (mercury_int i = 0; i < subt->size; i++) {
+				mercury_variable ik;
+				ik.constant = false;
+				ik.type = t;
+				ik.data = subt->keys[i];
+				mercury_variable* k = mercury_clonevariable(&ik);
+				/*
 				mercury_variable* k=mercury_assign_var(M);
 				k->type = t;
 				if (t == M_TYPE_STRING) {
@@ -143,6 +149,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 				else {
 					k->data.i = subt->keys[i].i;
 				}
+				*/
 				mercury_variable* v = mercury_clonevariable(subt->values[i]);
 
 				
