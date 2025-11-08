@@ -425,7 +425,8 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 		newstate->masterstate = parent->masterstate;
 		newstate->parentstate = parent;
 
-		parent->enviroment->refrences++;
+		parent->enviroment->refrences+=1;
+		parent->masterstate->enviroment->refrences += 1;
 	}
 
 	newstate->constants = nullptr;
