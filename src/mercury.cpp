@@ -424,6 +424,8 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 		newstate->registers = parent->registers;
 		newstate->masterstate = parent->masterstate;
 		newstate->parentstate = parent;
+
+		parent->enviroment->refrences++;
 	}
 
 	newstate->constants = nullptr;
@@ -506,6 +508,8 @@ void mercury_destroystate(mercury_state* M) {
 		mercury_free_var(v);
 	}
 
+	//if (M->parentstate)M->parentstate->enviroment->refrences--;
+
 	if(M->enviroment)mercury_destroytable(M->enviroment);
 	if(M->bytecode.instructions)free(M->bytecode.instructions);
 	free(M);
@@ -556,7 +560,13 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 	{
 		mercury_table* ftab = (mercury_table*)var->data.p;
 		ftab->refrences--;
-		if (!ftab->refrences) {
+		if (!ftab->refrences && !ftab->enviromental) {
+
+#if defined(_DEBUG) || defined(DEBUG)
+			if (ftab->enviromental) {
+				printf("enviromental table %p marked for freeing. something has gone terribly worng. probably.\n");
+			}
+#endif
 			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 				mercury_subtable* st = ftab->data[t];
 				for (mercury_int i = 0; i < st->size; i++) {

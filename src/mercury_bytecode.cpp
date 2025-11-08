@@ -2611,12 +2611,16 @@ void M_BYTECODE_CPYT(mercury_state* M, uint16_t flags) { // CoPY Top (of stack)
 	if (!M->sizeofstack)return; //nothing on stack, nothing to copy.
 
 	mercury_variable* val= M->stack[M->sizeofstack - 1];
-	mercury_variable* out = mercury_assign_var(M);
+	//mercury_variable* out = mercury_assign_var(M);
+	
+
+	mercury_variable* out = mercury_clonevariable(val,M);
 	if (!out) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
 
+	/*
 	out->type = val->type;
 	switch (val->type) {
 	case M_TYPE_STRING:
@@ -2633,6 +2637,8 @@ void M_BYTECODE_CPYT(mercury_state* M, uint16_t flags) { // CoPY Top (of stack)
 	default:
 		out->data.i = val->data.i;
 	}
+	*/
+
 	mercury_pushstack(M, out);
 }
 
@@ -2667,12 +2673,14 @@ void M_BYTECODE_CPYX(mercury_state* M, uint16_t flags) { // CoPY X elements (fro
 
 		mercury_variable* val = M->stack[index];
 
-		mercury_variable* out = mercury_assign_var(M);
+		//mercury_variable* out = mercury_assign_var(M);
+		mercury_variable* out = mercury_clonevariable(val, M);
 		if (!out) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
 
+		/*
 		out->type = val->type;
 		switch (val->type) {
 		case M_TYPE_STRING:
@@ -2689,6 +2697,7 @@ void M_BYTECODE_CPYX(mercury_state* M, uint16_t flags) { // CoPY X elements (fro
 		default:
 			out->data.i = val->data.i;
 		}
+		*/
 
 		mercury_pushstack(M, out);
 	}
