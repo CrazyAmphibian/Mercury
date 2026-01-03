@@ -38,3 +38,37 @@ void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1 = nul
 mercury_stringliteral* mercury_generate_compiler_error_string(compiler_token** tokens, uint32_t errorcode, mercury_int token_err, mercury_int token_max);
 
 
+//helper functions for making c functions. returns true if there's a problem, false if nothing went wrong. if()return;
+
+//variadic functions need not apply. also if you want to take optional args, you should specify max_args as the largest number you want to take. this function ensures that additional args will be discarded, and if args are missing, an error will be thrown.
+inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(mercury_state* M, mercury_int args_in, mercury_int min_args, mercury_int max_args=0) {
+	if (!max_args) {
+		max_args = min_args; //by default, args are specific
+	}
+	if (args_in < min_args) {
+		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)min_args);
+		return true;
+	}
+	for (mercury_int i = max_args; i < args_in; i++) {
+		mercury_unassign_var(M, mercury_popstack(M));
+	}
+	return false;
+}
+
+//pretty simple will output any args that haven't been outputted. is nil.
+inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(mercury_state* M, mercury_int args_out, mercury_int sent_args=0) {
+	for (mercury_int a = sent_args; a < args_out; a++) {
+		mercury_variable* mv = mercury_assign_var(M);
+		if (mv) {
+			mv->type = M_TYPE_NIL;
+			mv->data.i = 0;
+			mv->constant = false;
+			mercury_pushstack(M, mv);
+		}
+		else {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return true;
+		}
+	}
+	return false;
+}
