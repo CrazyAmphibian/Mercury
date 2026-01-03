@@ -7,10 +7,7 @@
 
 //dumps length and contents of stack
 void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	for (mercury_int a = 0; a < args_in; a++) {
-		mercury_unassign_var(M,mercury_pullstack(M));
-	}
-
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	printf("current state: 0x%p size of stack: %li (allocated: %li) [unassigned: %li allocated: %li]\n",M,M->sizeofstack,M->actualstacksize,M->numunassignedstack,M->sizeunassignedstack);
 	for (mercury_int i = 0; i < M->sizeofstack; i++) {
@@ -54,10 +51,7 @@ void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_
 		printf("\t[%i] 0x%p = (%s%s %i) = i:%i f:%f p:%p \n",i,v,v->constant ? "<CONSTANT> " : " ", typestr, v->type, v->data.i,v->data.f,v->data.p);
 	}
 
-
-	for (mercury_int a = 0; a < args_out; a++) {
-		M_BYTECODE_NNIL(M, 0);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 void m_output_state(mercury_state* M, mercury_int* l,bool is_cur) {
@@ -72,16 +66,12 @@ void m_output_state(mercury_state* M, mercury_int* l,bool is_cur) {
 }
 
 void mercury_lib_debug_state_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	for (mercury_int a = 0; a < args_in; a++) {
-		mercury_unassign_var(M, mercury_pullstack(M));
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	mercury_int c = 0;
 	m_output_state(M, &c,true);
 
-	for (mercury_int a = 0; a < args_out; a++) {
-		M_BYTECODE_NNIL(M, 0);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
@@ -140,9 +130,7 @@ char* m_var_to_string(uint8_t type,mercury_rawdata data) {
 }
 
 void mercury_lib_debug_enviroment_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	for (mercury_int a = 0; a < args_in; a++) {
-		mercury_unassign_var(M, mercury_pullstack(M));
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	while (M) {
 		mercury_table* e = M->enviroment;
@@ -157,16 +145,12 @@ void mercury_lib_debug_enviroment_dbg(mercury_state* M, mercury_int args_in, mer
 		M = M->parentstate;
 	}
 
-	for (mercury_int a = 0; a < args_out; a++) {
-		M_BYTECODE_NNIL(M, 0);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
 void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	for (mercury_int a = 0; a < args_in; a++) {
-		mercury_unassign_var(M, mercury_pullstack(M));
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	printf("state 0x%p has %i constants\n", M,M->num_constants);
 
@@ -175,18 +159,13 @@ void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, merc
 		printf("\t%i : %s\n", i, m_var_to_string(c->type, c->data));
 	}
 
-	for (mercury_int a = 0; a < args_out; a++) {
-		M_BYTECODE_NNIL(M, 0);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
 
 void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	for (mercury_int a = 1; a < args_in; a++) {
-		mercury_unassign_var(M, mercury_pullstack(M));
-	}
-
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	if (args_in == 1) { //read bytecode from function
 		mercury_variable* in = mercury_pullstack(M);
@@ -213,7 +192,5 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercu
 		putchar('\n');
 	}
 
-	for (mercury_int a = 0; a < args_out; a++) {
-		M_BYTECODE_NNIL(M, 0);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }

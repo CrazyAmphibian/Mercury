@@ -8,12 +8,9 @@
 #include <stdio.h>
 
 void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int args_out) { //discards nil values.
-	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in,1)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
-	};
-	for (mercury_int i = 1; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
 	}
 
 	mercury_variable* arr_var = mercury_popstack(M);
@@ -52,25 +49,17 @@ void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int 
 	arr->size = newarr->size;
 	free(newarr);
 
-	for (mercury_int a = 0; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
 void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int args_out) { //creates a copy of all values. not recursive. arrays are refrences so this will make a new one.
-	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
-		return;
-	};
-	if (args_out < 1) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	for (mercury_int i = 1; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
+	if (args_out < 1) {
+		return;
 	}
 
 	mercury_variable* arr_var = mercury_popstack(M);
@@ -138,27 +127,18 @@ void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int a
 	new_arr_var->type = M_TYPE_ARRAY;
 	new_arr_var->data.p = arr2;
 	mercury_pushstack(M, new_arr_var);
-	
 
-	for (mercury_int a = 1; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
 
 
 void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int args_out) { //add at index, shifts values forward.
-	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2,3)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
-	};
-
-	for (mercury_int i = 3; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
 	}
+
 	mercury_variable* len_var = nullptr;
 	if (args_in > 2) {
 		len_var = mercury_popstack(M);
@@ -189,23 +169,13 @@ void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int
 		mercury_setarray(arr, var_to_ins, cur_len);
 	}
 
-
-	for (mercury_int a = 0; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 void mercury_lib_array_remove(mercury_state* M, mercury_int args_in, mercury_int args_out) { //gets rid of a value and shifts ones after down.
-	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
-	};
-
-	for (mercury_int i = 2; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
 	}
 
 	mercury_variable* len_var = mercury_popstack(M);
@@ -231,32 +201,14 @@ void mercury_lib_array_remove(mercury_state* M, mercury_int args_in, mercury_int
 		mercury_setarray(arr, mercury_getarray(arr, i+1), i);
 	}
 
-	/*
-	if (!(cur_len & ((1 << MERCURY_ARRAY_BLOCKSIZE) - 1))) { //if we remove the first element in the block, remove it.
-		free(arr->values[cur_len >> MERCURY_ARRAY_BLOCKSIZE]);
-		arr->values[cur_len >> MERCURY_ARRAY_BLOCKSIZE] = nullptr;
-	}
-	arr->size--;
-	*/
-
-
-	for (mercury_int a = 0; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
 void mercury_lib_array_swap(mercury_state* M, mercury_int args_in, mercury_int args_out) { //duh.
-	if (args_in < 3) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
-	};
-
-	for (mercury_int i = 3; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
 	}
 
 	mercury_variable* pos_var1 = mercury_popstack(M);
@@ -285,12 +237,7 @@ void mercury_lib_array_swap(mercury_state* M, mercury_int args_in, mercury_int a
 	mercury_setarray(ar, mercury_getarray(ar, p2), p1);
 	mercury_setarray(ar, tv,p2);
 
-	for (mercury_int a = 0; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
@@ -574,12 +521,9 @@ int mercury_sort_alphabet_za(const void* a, const void* b) {
 
 
 void mercury_lib_array_concat(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	if (args_in < 2) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
-	};
-	for (mercury_int i = 2; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
 	}
 	mercury_variable* var_str = mercury_popstack(M);
 	if (var_str->type != M_TYPE_STRING) {
@@ -620,10 +564,5 @@ void mercury_lib_array_concat(mercury_state* M, mercury_int args_in, mercury_int
 	mercury_unassign_var(M, var_array);
 	mercury_unassign_var(M, var_str);
 
-	for (mercury_int a = 1; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
