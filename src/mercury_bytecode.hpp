@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mercury.h"
+#include "mercury.hpp"
 #include <stdint.h>
 
 

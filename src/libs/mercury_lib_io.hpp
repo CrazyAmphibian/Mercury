@@ -3,7 +3,7 @@
  io library.
  contains functions for file reading or modification
 */
-#include "../mercury.h"
+#include "../mercury.hpp"
 
 #define MERCURY_LIB_IO
 

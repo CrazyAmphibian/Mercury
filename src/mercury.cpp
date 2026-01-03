@@ -1,7 +1,7 @@
-#include "mercury.h"
+#include "mercury.hpp"
 
-#include "mercury_bytecode.h"
-#include "mercury_compiler.h"
+#include "mercury_bytecode.hpp"
+#include "mercury_compiler.hpp"
 #include "stdio.h"
 #include "malloc.h"
 #include "string.h"
@@ -13,15 +13,15 @@
 #endif
 
 //mercury libs
-#include "libs/mercury_lib_std.h"
-#include "libs/mercury_lib_math.h"
-#include "libs/mercury_lib_array.h"
-#include "libs/mercury_lib_string.h"
-#include "libs/mercury_lib_os.h"
-#include "libs/mercury_lib_io.h"
-#include "libs/mercury_lib_thread.h"
-#include "libs/mercury_lib_table.h"
-#include "libs/mercury_lib_debug.h"
+#include "libs/mercury_lib_std.hpp"
+#include "libs/mercury_lib_math.hpp"
+#include "libs/mercury_lib_array.hpp"
+#include "libs/mercury_lib_string.hpp"
+#include "libs/mercury_lib_os.hpp"
+#include "libs/mercury_lib_io.hpp"
+#include "libs/mercury_lib_thread.hpp"
+#include "libs/mercury_lib_table.hpp"
+#include "libs/mercury_lib_debug.hpp"
 
 uint8_t M_NUMBER_OF_TYPES = 11; //VERY IMPORTANT that this is kept at the proper number.
 uint16_t register_max = 0xf;

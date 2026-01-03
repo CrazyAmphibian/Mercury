@@ -3,7 +3,7 @@
  thread library.
 functions to multithread, safety not gaurenteed.
 */
-#include "../mercury.h"
+#include "../mercury.hpp"
 
 #define MERCURY_LIB_THREAD
 

@@ -1,6 +1,6 @@
-#include "mercury_lib_string.h"
-#include "../mercury.h"
-#include "../mercury_error.h"
+#include "mercury_lib_string.hpp"
+#include "../mercury.hpp"
+#include "../mercury_error.hpp"
 
 #include "malloc.h"
 #ifndef _WIN32

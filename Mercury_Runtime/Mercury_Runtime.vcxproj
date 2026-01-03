@@ -163,8 +163,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\mercury.h" />
-    <ClInclude Include="..\src\mercury_compiler.h" />
+    <ClInclude Include="..\src\mercury.hpp" />
+    <ClInclude Include="..\src\mercury_compiler.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

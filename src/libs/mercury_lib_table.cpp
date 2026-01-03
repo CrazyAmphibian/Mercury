@@ -1,6 +1,6 @@
-#include "mercury_lib_table.h"
-#include"../mercury.h"
-#include"../mercury_error.h"
+#include "mercury_lib_table.hpp"
+#include"../mercury.hpp"
+#include"../mercury_error.hpp"
 
 #include <malloc.h>
 #include <cstring>

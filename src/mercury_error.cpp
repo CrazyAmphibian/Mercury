@@ -1,6 +1,6 @@
-#include "mercury_error.h"
-#include "mercury_compiler.h"
-#include "mercury.h"
+#include "mercury_error.hpp"
+#include "mercury_compiler.hpp"
+#include "mercury.hpp"
 
 #include "stdio.h"
 #include "malloc.h"

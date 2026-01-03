@@ -1,7 +1,7 @@
 #pragma once
 
 #define MERCURY_LIB_OS
-#include "../mercury.h"
+#include "../mercury.hpp"
 
 void mercury_lib_os_time(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_os_execute(mercury_state* M, mercury_int args_in, mercury_int args_out);

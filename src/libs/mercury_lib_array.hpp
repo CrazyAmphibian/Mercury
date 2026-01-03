@@ -1,5 +1,5 @@
 #pragma once
-#include"../mercury.h"
+#include"../mercury.hpp"
 
 #define MERCURY_LIB_ARRAY
 

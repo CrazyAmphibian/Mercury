@@ -1,7 +1,7 @@
-#include "mercury_bytecode.h"
-#include "mercury.h"
+#include "mercury_bytecode.hpp"
+#include "mercury.hpp"
 #include "malloc.h"
-#include "mercury_error.h"
+#include "mercury_error.hpp"
 #include "math.h"
 #include "string.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "stdint.h"
-#include "mercury.h"
-#include "mercury_compiler.h"
+#include "mercury.hpp"
+#include "mercury_compiler.hpp"
 
 
 enum M_ERROR_TYPES:uint32_t {

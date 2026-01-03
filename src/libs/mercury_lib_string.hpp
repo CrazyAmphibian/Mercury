@@ -3,7 +3,7 @@
  string library.
  contains functions for string manipulation.
 */
-#include "../mercury.h"
+#include "../mercury.hpp"
 
 #define MERCURY_LIB_STRING
 

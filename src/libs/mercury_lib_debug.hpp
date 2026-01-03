@@ -1,7 +1,7 @@
 /*
 debug library. it helps debug things. not that useful for a normal user.
 */
-#include "../mercury.h"
+#include "../mercury.hpp"
 
 
 #define MERCURY_LIB_DEBUG

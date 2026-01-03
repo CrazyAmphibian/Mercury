@@ -56,43 +56,43 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\mercury.h">
+    <ClInclude Include="..\src\mercury.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\mercury_bytecode.h">
+    <ClInclude Include="..\src\mercury_bytecode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\mercury_error.h">
+    <ClInclude Include="..\src\mercury_error.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\mercury_compiler.h">
+    <ClInclude Include="..\src\mercury_compiler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_std.h">
+    <ClInclude Include="..\src\libs\mercury_lib_std.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_math.h">
+    <ClInclude Include="..\src\libs\mercury_lib_math.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_array.h">
+    <ClInclude Include="..\src\libs\mercury_lib_array.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_string.h">
+    <ClInclude Include="..\src\libs\mercury_lib_string.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_os.h">
+    <ClInclude Include="..\src\libs\mercury_lib_os.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_io.h">
+    <ClInclude Include="..\src\libs\mercury_lib_io.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_thread.h">
+    <ClInclude Include="..\src\libs\mercury_lib_thread.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_table.h">
+    <ClInclude Include="..\src\libs\mercury_lib_table.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\libs\mercury_lib_debug.h">
+    <ClInclude Include="..\src\libs\mercury_lib_debug.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

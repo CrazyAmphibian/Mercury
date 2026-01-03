@@ -3,7 +3,7 @@ the standard library.
 contains things for basic debugging and some misc. utility functions.
 
 */
-#include "../mercury.h"
+#include "../mercury.hpp"
 
 
 #define MERCURY_LIB_MATH

@@ -162,19 +162,19 @@
     <ClCompile Include="..\src\mercury_error.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\libs\mercury_lib_array.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_debug.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_io.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_math.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_os.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_std.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_string.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_table.h" />
-    <ClInclude Include="..\src\libs\mercury_lib_thread.h" />
-    <ClInclude Include="..\src\mercury.h" />
-    <ClInclude Include="..\src\mercury_bytecode.h" />
-    <ClInclude Include="..\src\mercury_compiler.h" />
-    <ClInclude Include="..\src\mercury_error.h" />
+    <ClInclude Include="..\src\libs\mercury_lib_array.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_debug.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_io.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_math.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_os.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_std.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_string.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_table.hpp" />
+    <ClInclude Include="..\src\libs\mercury_lib_thread.hpp" />
+    <ClInclude Include="..\src\mercury.hpp" />
+    <ClInclude Include="..\src\mercury_bytecode.hpp" />
+    <ClInclude Include="..\src\mercury_compiler.hpp" />
+    <ClInclude Include="..\src\mercury_error.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

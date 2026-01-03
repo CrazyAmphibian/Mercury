@@ -1,7 +1,7 @@
-#include"../mercury.h"
-#include"../mercury_error.h"
+#include"../mercury.hpp"
+#include"../mercury_error.hpp"
 
-#include "mercury_lib_math.h"
+#include "mercury_lib_math.hpp"
 
 #include "math.h"
 #include <stdlib.h>
