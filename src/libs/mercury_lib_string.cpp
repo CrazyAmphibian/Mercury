@@ -145,7 +145,7 @@ void mercury_lib_string_find(mercury_state* M, mercury_int args_in, mercury_int 
 
 	mercury_int located_at = -1;
 
-	for (mercury_int c = (startat ? startat->data.i : 0); c < str->size-search->size; c++) {
+	for (mercury_int c = (startat ? startat->data.i : 0); c < str->size-search->size+1; c++) {
 		for (mercury_int i = 0; i < search->size; i++) {
 			if (str->ptr[c + i] != search->ptr[i]) {
 				goto next;

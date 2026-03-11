@@ -1,5 +1,6 @@
 iterate(io.getfiles(""),function(i,v,a)
 	if v=="run_all_tests.mrc" then return end
+	if !!string.find(v,".mrc") then return end
 	io.post(string.format("==========%s==========\n",v))
 	local f=io.open(v,"r")
 	local c=io.read(f)

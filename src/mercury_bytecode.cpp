@@ -2233,11 +2233,7 @@ void M_BYTECODE_NNIL(mercury_state* M, uint16_t flags) { //New NIL
 
 void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	mercury_int string_size = *(mercury_int*)offset;
 
@@ -2356,12 +2352,6 @@ void M_BYTECODE_NARR(mercury_state* M, uint16_t flags) { //New ARRay
 
 void M_BYTECODE_JMP(mercury_state* M, uint16_t flags) { //JuMP
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
-
 
 	mercury_int instruction = *(mercury_int*)offset;
 
@@ -2370,11 +2360,7 @@ void M_BYTECODE_JMP(mercury_state* M, uint16_t flags) { //JuMP
 
 void M_BYTECODE_JMPR(mercury_state* M, uint16_t flags) { //JuMP Relative
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+
 	mercury_int instruction = *(mercury_int*)offset;
 
 	M->programcounter += instruction;
@@ -2382,11 +2368,7 @@ void M_BYTECODE_JMPR(mercury_state* M, uint16_t flags) { //JuMP Relative
 
 void M_BYTECODE_JIF(mercury_state* M, uint16_t flags) { //Jump IF
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+
 	mercury_int instruction = *(mercury_int*)offset;
 
 
@@ -2394,16 +2376,15 @@ void M_BYTECODE_JIF(mercury_state* M, uint16_t flags) { //Jump IF
 	if(mercury_checkbool(ck)){
 		M->programcounter = instruction;
 	}
+	else {
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	}
 	mercury_unassign_var(M, ck);
 }
 
 void M_BYTECODE_JNIF(mercury_state* M, uint16_t flags) { //Jump Not IF
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+
 	mercury_int instruction = *(mercury_int*)offset;
 
 
@@ -2411,16 +2392,15 @@ void M_BYTECODE_JNIF(mercury_state* M, uint16_t flags) { //Jump Not IF
 	if (!mercury_checkbool(ck)) {
 		M->programcounter = instruction;
 	}
+	else {
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	}
 	mercury_unassign_var(M, ck);
 }
 
 void M_BYTECODE_JRIF(mercury_state* M, uint16_t flags) { //Jump Relative IF
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+
 	mercury_int instruction = *(mercury_int*)offset;
 
 
@@ -2428,22 +2408,24 @@ void M_BYTECODE_JRIF(mercury_state* M, uint16_t flags) { //Jump Relative IF
 	if (mercury_checkbool(ck)) {
 		M->programcounter += instruction;
 	}
+	else {
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	}
 	mercury_unassign_var(M, ck);
 }
 
 void M_BYTECODE_JRNI(mercury_state* M, uint16_t flags) { //Jump Relative Not If
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+
 	mercury_int instruction = *(mercury_int*)offset;
 
 
 	mercury_variable* ck = mercury_popstack(M);
 	if (!mercury_checkbool(ck)) {
 		M->programcounter += instruction;
+	}
+	else {
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	}
 	mercury_unassign_var(M, ck);
 }

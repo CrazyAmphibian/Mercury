@@ -1,4 +1,4 @@
-function factorial(n)
+factorial=function(n)
 local sum=0
 	while n do
 		sum=sum+n

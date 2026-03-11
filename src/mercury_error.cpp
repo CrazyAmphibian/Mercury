@@ -33,12 +33,22 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 	char header[255] = {0};
 	if (M->bytecode.debug_info) {
 
+		const char* fallback = "";
 
 		mercury_debug_token T = M->bytecode.debug_info[M->programcounter-1];
-		snprintf(header,255,"line %lli col %lli at \"%s%s%s%s%s\"",T.line+1,T.col+1 ,T.token_prev_prev, T.token_prev , T.token, T.token_next, T.token_next_next);
+		char* tchars=(char*)malloc(T.num_chars+1);
+		if (tchars) {
+			memcpy(tchars, T.chars, T.num_chars);
+			tchars[T.num_chars] = '\0';
+		}
+#if defined(DEBUG) || defined(_DEBUG)
+		snprintf(header, 255, "line %lli col %lli instruction #%lli (%04X) at \"%s\"", T.line + 1, T.col + 1, M->programcounter-1, 0xFFFF & M->bytecode.instructions[M->programcounter-1], tchars ? tchars : fallback);
+#else
+		snprintf(header, 255, "line %lli col %lli at \"%s\"", T.line + 1, T.col + 1, tchars ? tchars : fallback);
+#endif
 	}
 	else {
-		snprintf(header, 255, "line ? col ? at ????? - instruction #%lli (%04X)",M->programcounter,0xFFFF&M->bytecode.instructions[M->programcounter]);
+		snprintf(header, 255, "line ? col ? at ? - instruction #%lli (%04X)",M->programcounter-1,0xFFFF&M->bytecode.instructions[M->programcounter-1]);
 	}
 
 	switch (errorcode) {
@@ -94,54 +104,4 @@ void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1, void
 		M->programcounter = M->bytecode.numberofinstructions; //push to end to stop execution
 		M = M->parentstate;
 	}
-}
-
-
-
-mercury_stringliteral* mercury_generate_compiler_error_string(compiler_token** tokens, uint32_t errorcode, mercury_int token_err, mercury_int token_max) {
-	char buffer[255] = { 0 };
-	int result = 0;
-
-	compiler_token* ct = tokens[token_err];
-
-	if (ct == nullptr) {
-		errorcode = M_COMPERR_UNKNOWN;
-	}
-
-
-	switch (errorcode) {
-	case M_COMPERR_DID_NOT_CALL_OR_SET:
-		result = snprintf(buffer, 255, "line %lli col %lli:expected expression, got %s\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	case M_COMPERR_INVALID_SYMBOL:
-		result = snprintf(buffer, 255, "line %lli col %lli:unknown symbol %s\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	case M_COMPERR_ENDS_TOO_SOON:
-		result = snprintf(buffer, 255, "line %lli col %lli:file ends too soon at %s\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	case M_COMPERR_EXPECTED_VARIABLE:
-		result = snprintf(buffer, 255, "line %lli col %lli:expected variable, got %s\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	case M_COMPERR_IF_NEEDS_THEN:
-		result = snprintf(buffer, 255, "line %lli col %lli:expected 'then' to match 'if', got %s\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	case M_COMPERR_ELSEIF_NEEDS_THEN:
-		result = snprintf(buffer, 255, "line %lli col %lli:expected 'then' to match 'elseif', got %s\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	case M_COMPERR_MEMORY_ALLOCATION:
-		result = snprintf(buffer, 255, "line %lli col %lli:failed to allocate memory while at token %s\n", ct->line_num + 1, ct->line_col, ct->chars);
-		break;
-	case M_COMPERR_WHILE_NEEDS_DO:
-		result = snprintf(buffer, 255, "line %lli col %lli:expected 'do' to match 'while', got %s\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	case M_COMPERR_UNKNOWN:
-		result = snprintf(buffer, 255, "invalid token data\n");
-		break;
-	case M_COMPERR_KEYWORD_REQUIRES_LOOP:
-		result = snprintf(buffer, 255, "line %lli col %lli: %s requires loop\n", ct->line_num + 1, ct->line_col + 1, ct->chars);
-		break;
-	default:
-		result = snprintf(buffer, 255, "line %lli col %lli:unspecified error at %s\n", ct->line_num+1, ct->line_col + 1, ct->chars );
-	}
-	return mercury_cstring_to_mstring(buffer, strlen(buffer));
 }

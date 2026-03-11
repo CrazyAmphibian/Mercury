@@ -7,8 +7,6 @@
 
 #define MERCURY_LIB_IO
 
-
-
 void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args_out);
 void mercury_lib_io_close(mercury_state* M, mercury_int args_in, mercury_int args_out);

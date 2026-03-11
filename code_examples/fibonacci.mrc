@@ -1,4 +1,4 @@
-function fibonacci(n)
+fibonacci=function(n)
 	local total=0
 	local num1=1
 	local num2=0

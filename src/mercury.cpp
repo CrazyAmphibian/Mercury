@@ -476,12 +476,13 @@ bool mercury_stepstate(mercury_state* M) {
 	M->programcounter++;
 	mercury_bytecode_list[opcode](M, iflags);
 
-	/*printf("post stack: %i\n", M->sizeofstack);
+	/*
+	printf("post stack: %i\n", M->sizeofstack);
 	for (mercury_int i = 0; i < M->sizeofstack; i++) {
 		mercury_variable* v = M->stack[i];
 		printf("\t%i [%i]: %i %f %p\n",i,v->type,v->data.i, v->data.f, v->data.p);
 	}
-	*/
+	//*/
 
 	return true;
 }
@@ -761,6 +762,7 @@ mercury_variable* mercury_clonevariable(mercury_variable* var,mercury_state* M) 
 	if (!out)return nullptr;
 
 	out->type = var->type;
+	out->constant = false;
 	switch (out->type) {
 		case M_TYPE_STRING:
 			out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
@@ -1937,6 +1939,7 @@ __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_io_remove, "remove", "io");
 	mercury_register_library(mercury_lib_io_removedir, "removedir", "io");
 	mercury_register_library(mercury_lib_io_createdir, "createdir", "io");
+
 
 #endif
 #ifdef MERCURY_LIB_THREAD

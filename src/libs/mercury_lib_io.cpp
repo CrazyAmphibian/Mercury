@@ -1,6 +1,6 @@
 #include "../mercury.hpp"
 #include "../mercury_error.hpp"
-
+#include "mercury_lib_io.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
@@ -25,13 +25,18 @@ void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_unassign_var(M, mercury_popstack(M));
+		mercury_unassign_var(M, mercury_popstack(M));
+		return;
+	};
 
 	mercury_variable* mode_var = mercury_popstack(M);
 	if (mode_var->type != M_TYPE_STRING) {
 		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)mode_var->type, (void*)M_TYPE_STRING);
 		return;
 	}
+
 
 	mercury_variable* file_var = mercury_popstack(M);
 	if (file_var->type != M_TYPE_STRING) {
@@ -41,10 +46,55 @@ void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args
 
 	mercury_variable* out=mercury_assign_var(M);
 
-	char* mode = mercury_mstring_to_cstring((mercury_stringliteral*)mode_var->data.p);
 	char* file = mercury_mstring_to_cstring((mercury_stringliteral*)file_var->data.p);
+	const char* mode = mercury_mstring_to_cstring((mercury_stringliteral*)mode_var->data.p);
+	int mode_l = strlen(mode);
 
+	if (mode_l == 1) {
+		char c = mode[0];
+		free((char*)mode);
+		mode = nullptr;
+		if (c == 'r')mode = "rb";
+		else if(c == 'w')mode = "wb";
+		else if(c == 'a')mode = "ab";
+	}
+	else if (mode_l == 2) {
+		char c = mode[0];
+		char c2 = mode[1];
+		free((char*)mode);
+		mode = nullptr;
+		if (c == 'r') {
+			if (c2 == 'b')mode = "rb";
+			else if (c2 == '+')mode = "rb+";
+		}
+		else if (c == 'w') {
+			if (c2 == 'b')mode = "wb";
+			else if (c2 == '+')mode = "wb+";
+		}
+		else if (c == 'a') {
+			if (c2 == 'b')mode = "ab";
+			else if (c2 == '+')mode = "ab+";
+		}
+	}
+	else if (mode_l == 3) {
+		char c = mode[0];
+		char c2 = mode[1];
+		char c3 = mode[2];
+		free((char*)mode);
+		mode = nullptr;
+		if (c2 == 'b' && c3=='+') {
+			if (c == 'r')mode="rb+";
+			else if (c == 'w')mode="wb+";
+			else if (c == 'a')mode="ab+";
+		}
+	}
 
+	if (!mode) {
+		mercury_unassign_var(M, file_var);
+		mercury_unassign_var(M, mode_var);
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+		return;
+	}
 
 	FILE* F=fopen(file,mode);
 	if (F) {
@@ -122,7 +172,7 @@ void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args
 				}
 				str->ptr = s;
 				str->size = len;
-
+				str->constant = false;
 				out->type = M_TYPE_STRING;
 				out->data.p = str;
 			}
@@ -610,7 +660,7 @@ void mercury_lib_io_createdir(mercury_state* M, mercury_int args_in, mercury_int
 
 
 void mercury_lib_io_input(mercury_state* M, mercury_int args_in, mercury_int args_out) { //read a single char stdin. no newline required! (platform dependant, though. :/)
-	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0)) {
 		return;
 	}
 

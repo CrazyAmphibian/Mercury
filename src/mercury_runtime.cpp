@@ -64,6 +64,8 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("BSHR\n"); break;
 		case M_OPCODE_EQL:
 			printf(" EQL\n"); break;
+		case M_OPCODE_NEQ:
+			printf(" NEQ\n"); break;
 		case M_OPCODE_LET:
 			printf(" LET\n"); break;
 		case M_OPCODE_GRT:
@@ -439,6 +441,10 @@ int main(int argc, char** argv) {
 
 	mercury_stringliteral* tstr = mercury_cstring_const_to_mstring((char*)code, strlen(code));
 	mercury_variable* funcy = mercury_compile_mstring(tstr);
+	if (!funcy) {
+		printf("allocator error when compiling\n");
+		return -1;
+	}
 
 	if (funcy->type != M_TYPE_FUNCTION) {
 		if (funcy->type == M_TYPE_STRING) {
@@ -457,7 +463,7 @@ int main(int argc, char** argv) {
 
 		mercury_function* compiled = (mercury_function*)funcy->data.p;
 
-#if defined(DEBUG) || defined(_DEBUG)
+#ifdef MERCURY_DEBUG
 		mercury_debugdumpbytecode(compiled->instructions, compiled->numberofinstructions);
 #endif
 
@@ -473,11 +479,17 @@ int main(int argc, char** argv) {
 	}
 
 	if (interactivemode) {
+		if (funcy->type == M_TYPE_FUNCTION) {
+			M->programcounter = 0;
+			free(code);
+			free(M->bytecode.instructions);
+			M->bytecode.numberofinstructions = 0;
+			free(M->bytecode.debug_info);
 
-		free(code);
-		free(M->bytecode.instructions);
-		M->bytecode.numberofinstructions = 0;
-		free(M->bytecode.debug_info);
+			for (mercury_int i = 0; i < M->sizeofstack;i++) {
+				mercury_unassign_var(M,mercury_popstack(M)); //clean up the stack
+			}
+		}
 		goto start;
 	}
 

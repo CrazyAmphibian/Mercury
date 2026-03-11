@@ -9,13 +9,15 @@ a*=7
 a-=3
 a^=2
 a/=3
+a=!a
 a\=2
 a|=2
+a=-a
 a~=181983
 a&=255
 
-if a!=201 then
-	print("operations test failed!")
+if a!=137 then
+	print("operations test failed! we got "..a .." but expected 137.")
 else
 	print("operations test passed!")
 end

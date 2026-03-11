@@ -3,9 +3,9 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 	<title></title>
-	<meta name="generator" content="LibreOffice 7.6.2.1 (Windows)"/>
+	<meta name="generator" content="LibreOffice 7.5.1.2 (Windows)"/>
 	<meta name="created" content="2025-09-30T14:45:59.071000000"/>
-	<meta name="changed" content="2025-10-01T16:58:42.918000000"/>
+	<meta name="changed" content="2026-03-11T14:06:47.955000000"/>
 	<style type="text/css">
 		h2.cjk { font-family: "NSimSun" }
 		h2.ctl { font-family: "Arial" }
@@ -41,27 +41,27 @@ priority.</p>
 	<li><p>Fast</p>
 	<ul>
 		<li><p>Mercury should be as fast as it can be, without sacrificing
-		other capabilities</p></li>
+		other capabilities</p>
 	</ul>
 	<li><p>Simple</p>
 	<ul>
 		<li><p>Mercury's syntax should be easy to read, and not tie
 		multiple behaviors to a single syntax that would cause ambiguity
-		for the user or compiler.</p></li>
+		for the user or compiler.</p>
 	</ul>
 	<li><p>Flexible</p>
 	<ul>
 		<li><p>Mercury should be ambivalent to any specific style of
-		programming</p></li>
+		programming</p>
 		<li><p>Mercury should have a diverse set of standard library
-		functions</p></li>
+		functions</p>
 	</ul>
 	<li><p>Compatible</p>
 	<ul>
 		<li><p>Mercury should be able to run on any system with the same
-		(or similar) results</p></li>
+		(or similar) results</p>
 		<li><p>Mercury should not needlessly remove, deprecate, or change
-		old behavior</p></li>
+		old behavior</p>
 	</ul>
 </ul>
 <p><br/>
@@ -94,15 +94,16 @@ important, do not remove!</p>
 </p>
 <p>The program executes in the following order during runtime:</p>
 <ol>
-	<li><p>Variable is retrieved</p></li>
-	<li><p>Variable is indexed</p></li>
-	<li><p>Function is called</p></li>
-	<li><p>Unary operations are applied</p></li>
-	<li><p>Binary operations are applied</p></li>
-	<li><p>Variable is set</p></li>
+	<li><p>Variable is retrieved</p>
+	<li><p>Variable is indexed</p>
+	<li><p>Function is called</p>
+	<li><p>Unary operations are applied</p>
+	<li><p>Binary operations are applied</p>
+	<li><p>Variable is set</p>
 </ol>
 <p>All operations of the same type are done in left-to-right order,
-and do not follow standard order of operations.</p>
+and do not follow standard order of operations. The exception to this
+is unary operations, which are read from right to left.</p>
 <p>For example:</p>
 <p class="codeblock-western">b=#a+1/3</p>
 <p>first, the variable 'a' is retrieved. Next, the length operator is
@@ -119,7 +120,9 @@ that means spanning multiple lines. Strings accept escapes using
 backslash, and follow similar rules to C string escapes.</p>
 <table width="100%" cellpadding="4" cellspacing="1" style="page-break-inside: avoid">
 	<col width="128*"/>
+
 	<col width="128*"/>
+
 	<tr valign="top">
 		<td width="50%" style="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			Sequence</p>
@@ -253,23 +256,23 @@ represent another variable.</p>
 share a name with a keyword without any issues.</p>
 <ul>
 	<li><p style="margin-bottom: 0in">if 
-	</p></li>
-	<li><p style="margin-bottom: 0in">do</p></li>
-	<li><p style="margin-bottom: 0in">nil</p></li>
-	<li><p style="margin-bottom: 0in">inf</p></li>
-	<li><p style="margin-bottom: 0in">end</p></li>
-	<li><p style="margin-bottom: 0in">true</p></li>
-	<li><p style="margin-bottom: 0in">then</p></li>
-	<li><p style="margin-bottom: 0in">else</p></li>
-	<li><p style="margin-bottom: 0in">goto</p></li>
-	<li><p style="margin-bottom: 0in">while</p></li>
-	<li><p style="margin-bottom: 0in">false</p></li>
-	<li><p style="margin-bottom: 0in">local</p></li>
-	<li><p style="margin-bottom: 0in">global</p></li>
-	<li><p style="margin-bottom: 0in">elseif</p></li>
-	<li><p style="margin-bottom: 0in">return</p></li>
-	<li><p style="margin-bottom: 0in">continue</p></li>
-	<li><p style="margin-bottom: 0in">function</p></li>
+	</p>
+	<li><p style="margin-bottom: 0in">do</p>
+	<li><p style="margin-bottom: 0in">nil</p>
+	<li><p style="margin-bottom: 0in">inf</p>
+	<li><p style="margin-bottom: 0in">end</p>
+	<li><p style="margin-bottom: 0in">true</p>
+	<li><p style="margin-bottom: 0in">then</p>
+	<li><p style="margin-bottom: 0in">else</p>
+	<li><p style="margin-bottom: 0in">goto</p>
+	<li><p style="margin-bottom: 0in">while</p>
+	<li><p style="margin-bottom: 0in">false</p>
+	<li><p style="margin-bottom: 0in">local</p>
+	<li><p style="margin-bottom: 0in">global</p>
+	<li><p style="margin-bottom: 0in">elseif</p>
+	<li><p style="margin-bottom: 0in">return</p>
+	<li><p style="margin-bottom: 0in">continue</p>
+	<li><p style="margin-bottom: 0in">function</p>
 </ul>
 <p style="margin-bottom: 0in"><br/>
 
@@ -280,19 +283,19 @@ used for assignment or comparison</p>
 <ul>
 	<li><p>nil</p>
 	<ul>
-		<li><p>represents the nil datatype, nothing.</p></li>
+		<li><p>represents the nil datatype, nothing.</p>
 	</ul>
 	<li><p>inf</p>
 	<ul>
-		<li><p>represents infinity in as a float.</p></li>
+		<li><p>represents infinity in as a float.</p>
 	</ul>
 	<li><p>true</p>
 	<ul>
-		<li><p>represents the boolean value of true</p></li>
+		<li><p>represents the boolean value of true</p>
 	</ul>
 	<li><p>false</p>
 	<ul>
-		<li><p>represents the boolean value of false</p></li>
+		<li><p>represents the boolean value of false</p>
 	</ul>
 </ul>
 <h4 class="western">keywords: flow control</h4>
@@ -301,32 +304,32 @@ complex behavior</p>
 <ul>
 	<li><p>end</p>
 	<ul>
-		<li><p>the universal delimiter for statement bodies.</p></li>
+		<li><p>the universal delimiter for statement bodies.</p>
 	</ul>
 	<li><p>if, then, else, elseif</p>
 	<ul>
-		<li><p>forms the basis for if statements</p></li>
+		<li><p>forms the basis for if statements</p>
 	</ul>
 	<li><p>while, do</p>
 	<ul>
-		<li><p>forms the basis for while loops</p></li>
+		<li><p>forms the basis for while loops</p>
 	</ul>
 	<li><p>continue, break</p>
 	<ul>
-		<li><p>modifies behavior of loops</p></li>
+		<li><p>modifies behavior of loops</p>
 	</ul>
 	<li><p>goto</p>
 	<ul>
 		<li><p>unconditional jump to another section of code, use with
-		caution</p></li>
+		caution</p>
 	</ul>
 	<li><p>function</p>
 	<ul>
-		<li><p>self-explanitory</p></li>
+		<li><p>self-explanitory</p>
 	</ul>
 	<li><p>return</p>
 	<ul>
-		<li><p>can be used in function to abort execution and return values</p></li>
+		<li><p>can be used in function to abort execution and return values</p>
 	</ul>
 </ul>
 <h4 class="western">keywords: scope specifiers</h4>
@@ -336,28 +339,28 @@ fine tune scope.</p>
 	<li><p>global</p>
 	<ul>
 		<li><p>specifies that a variable should belong to the top-level
-		state</p></li>
+		state</p>
 	</ul>
 	<li><p>local</p>
 	<ul>
 		<li><p>specifies that a variable should belong to the bottom-most
-		state</p></li>
+		state</p>
 	</ul>
 </ul>
 <h3 class="western">Variable types</h3>
 <p>Mercury has 11 unique datatypes</p>
 <ul>
-	<li><p style="margin-bottom: 0in">nil</p></li>
-	<li><p style="margin-bottom: 0in">int</p></li>
-	<li><p style="margin-bottom: 0in">float</p></li>
-	<li><p style="margin-bottom: 0in">bool</p></li>
-	<li><p style="margin-bottom: 0in">table</p></li>
-	<li><p style="margin-bottom: 0in">string</p></li>
-	<li><p style="margin-bottom: 0in">c function</p></li>
-	<li><p style="margin-bottom: 0in">array</p></li>
-	<li><p style="margin-bottom: 0in">function</p></li>
-	<li><p style="margin-bottom: 0in">file</p></li>
-	<li><p style="margin-bottom: 0in">thread</p></li>
+	<li><p style="margin-bottom: 0in">nil</p>
+	<li><p style="margin-bottom: 0in">int</p>
+	<li><p style="margin-bottom: 0in">float</p>
+	<li><p style="margin-bottom: 0in">bool</p>
+	<li><p style="margin-bottom: 0in">table</p>
+	<li><p style="margin-bottom: 0in">string</p>
+	<li><p style="margin-bottom: 0in">c function</p>
+	<li><p style="margin-bottom: 0in">array</p>
+	<li><p style="margin-bottom: 0in">function</p>
+	<li><p style="margin-bottom: 0in">file</p>
+	<li><p style="margin-bottom: 0in">thread</p>
 </ul>
 <p><br/>
 <br/>
@@ -365,51 +368,119 @@ fine tune scope.</p>
 </p>
 <h3 class="western">Operators</h3>
 <h4 class="western">Operators: Arithmetic</h4>
+<p style="margin-bottom: 0in">Arithmetic operators work only on
+numbers (either floats or ints). In most cases, if an operator is
+provided with two ints, the result will always be an int, and if a
+float is provided, the result will be a float.</p>
 <ul>
-	<li><p style="margin-bottom: 0in">Addition +</p></li>
-	<li><p style="margin-bottom: 0in">Subtraction -</p></li>
-	<li><p style="margin-bottom: 0in">Multiplication *</p></li>
-	<li><p style="margin-bottom: 0in">Division /</p></li>
-	<li><p style="margin-bottom: 0in">Exponentiation ^</p></li>
-	<li><p style="margin-bottom: 0in">Modulo %</p></li>
-	<li><p style="margin-bottom: 0in">Integer Division \</p></li>
-	<li><p style="margin-bottom: 0in">increment ++ (only on variables)</p></li>
-	<li><p style="margin-bottom: 0in">decrement -- (only on variables)</p></li>
+	<li><p style="margin-bottom: 0in">Addition +</p>
+	<li><p style="margin-bottom: 0in">Subtraction (and unary negation) -</p>
+	<li><p style="margin-bottom: 0in">Multiplication *</p>
+	<li><p style="margin-bottom: 0in">Division /</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">always returns a float</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">Exponentiation ^</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">always returns a float</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">Modulo %</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">operates on C modulo rules
+		(truncation)</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">Integer Division \</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">always returns an int.</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">increment ++ 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">only on environmental variables
+		as a complete statement</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">decrement -- 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">only on environmental variables
+		as a complete statement</p>
+	</ul>
 </ul>
+<p style="margin-bottom: 0in"><br/>
+
+</p>
 <h4 class="western">Operators: Bitwise</h4>
+<p style="margin-bottom: 0in">Bitwise work much like arithmetic
+operators, in being able to take both ints and floats. The returned
+type is always equal to the type of the first (left) operand. This
+can be used for casting floats to ints, or other niche tricks.</p>
 <ul>
-	<li><p style="margin-bottom: 0in">Bitwise not !</p></li>
-	<li><p style="margin-bottom: 0in">Bitwise and &amp;</p></li>
-	<li><p style="margin-bottom: 0in">Bitwise or |</p></li>
-	<li><p style="margin-bottom: 0in">bitwise xor ~</p></li>
-	<li><p style="margin-bottom: 0in">bitshift left &lt;&lt;</p></li>
-	<li><p style="margin-bottom: 0in">bitshift right &gt;&gt;</p></li>
+	<li><p style="margin-bottom: 0in">Bitwise not !</p>
+	<li><p style="margin-bottom: 0in">Bitwise and &amp;</p>
+	<li><p style="margin-bottom: 0in">Bitwise or |</p>
+	<li><p style="margin-bottom: 0in">bitwise xor ~</p>
+	<li><p style="margin-bottom: 0in">bitshift left &lt;&lt;</p>
+	<li><p style="margin-bottom: 0in">bitshift right &gt;&gt;</p>
 </ul>
 <h4 class="western">Operators: Logical</h4>
+<p style="margin-bottom: 0in">Short-circuit evaluation is not
+provided. The returned value of logical operators is highly variable,
+dependent on each operator, but the boolean state will be maintained
+for the purpose of conditional checks.</p>
 <ul>
-	<li><p style="margin-bottom: 0in">Logical not !!</p></li>
-	<li><p style="margin-bottom: 0in">Logical and &amp;&amp;</p></li>
-	<li><p style="margin-bottom: 0in">Logical or ||</p></li>
-	<li><p style="margin-bottom: 0in">Logical xor ~~</p></li>
+	<li><p style="margin-bottom: 0in">Logical not !!</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">will always return true or false</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">Logical and &amp;&amp;</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">if true, returns the second
+		value, otherwise returns false.</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">Logical or ||</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">if true, returns the first true
+		value, otherwise returns false.</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">Logical xor ~~</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">if true, returns the value of the
+		single true operand. If false, returns the value false.</p>
+	</ul>
 </ul>
 <h4 class="western">Operators: Comparison</h4>
 <ul>
-	<li><p style="margin-bottom: 0in">Greater than &gt;</p></li>
-	<li><p style="margin-bottom: 0in">Less than &lt;</p></li>
-	<li><p style="margin-bottom: 0in">Greater than or equal to &gt;=</p></li>
-	<li><p style="margin-bottom: 0in">Less than or equal to &lt;=</p></li>
-	<li><p style="margin-bottom: 0in">Equal ==</p></li>
-	<li><p style="margin-bottom: 0in">Not equal !=</p></li>
+	<li><p style="margin-bottom: 0in">Greater than &gt;</p>
+	<li><p style="margin-bottom: 0in">Less than &lt;</p>
+	<li><p style="margin-bottom: 0in">Greater than or equal to &gt;=</p>
+	<li><p style="margin-bottom: 0in">Less than or equal to &lt;=</p>
+	<li><p style="margin-bottom: 0in">Equal ==</p>
+	<li><p style="margin-bottom: 0in">Not equal !=</p>
 </ul>
 <h4 class="western">Operators: listlike</h4>
 <ul>
-	<li><p style="margin-bottom: 0in">Length #</p></li>
-	<li><p style="margin-bottom: 0in">Index [ ]</p></li>
+	<li><p style="margin-bottom: 0in">Length #</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">strings and arrays will return
+		their length (highest index). Tables will return the number of
+		elements stored of all types.</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">Index [ ]</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">strings can be indexed as read
+		only, attempting to assign to an index will result in an error.</p>
+	</ul>
 </ul>
 <h4 class="western">Operators: Other</h4>
 <ul>
-	<li><p style="margin-bottom: 0in">Concatenate ..</p></li>
-	<li><p style="margin-bottom: 0in">Call function ( )</p></li>
+	<li><p style="margin-bottom: 0in">Concatenate ..</p>
+	<li><p style="margin-bottom: 0in">Call function ( )</p>
+</ul>
+<h4 class="western">Operators: Creation</h4>
+<ul>
+	<li><p style="margin-bottom: 0in">New array [ ]</p>
+	<li><p style="margin-bottom: 0in">New table { }</p>
+	<li><p style="margin-bottom: 0in">New string &quot; &quot;</p>
 </ul>
 <p><br/>
 <br/>
@@ -463,22 +534,17 @@ should go before else.</p>
 <p class="codeblock-western">stuff(n)</p>
 <p class="codeblock-western">end</p>
 <h4 class="western">functions and returns</h4>
-<p>Functions are designated with a name and parameters. Do note that
-a function may receive less parameters than specified.</p>
+<p>Functions are designated with the keyword and parameters. Do note
+that a function may receive less parameters than specified.</p>
 <p>The return keyword will cause the immediate closure and escape
 from the current state. Values may be supplied to pass values to the
 calling state. Returning in the main body of the program will halt
 all execution.</p>
-<p>Functions can be given a name first</p>
-<p class="codeblock-western">function add(num1,num2)</p>
-<p class="codeblock-western">return num1+num2</p>
-<p class="codeblock-western">end</p>
-<p>or be assigned to a name</p>
+<p>Functions can either be assigned directly to a variable, or passed
+as an arg to another function.</p>
 <p class="codeblock-western">add=function(num1,num2)</p>
 <p class="codeblock-western">return num1+num2</p>
 <p class="codeblock-western">end</p>
-<p>using this method allows scope specifiers to be applied to the
-function for more control.</p>
 <h4 class="western">Goto</h4>
 <p>Goto can jump code execution to any location within the current
 state. Caution is advised when using goto, as it can potentially jump
@@ -497,11 +563,57 @@ end</p>
 <p class="codeblock-western">exit:</p>
 <p>for an example of incorrect usage of goto, this results in an
 error, since the label thing is not visible within the function state</p>
-<p class="codeblock-western">function stuff()</p>
+<p class="codeblock-western">stuff=function()</p>
 <p class="codeblock-western">goto thing</p>
 <p class="codeblock-western">end</p>
 <p class="codeblock-western">thing:</p>
 <p class="codeblock-western">stuff()</p>
+<p><br/>
+<br/>
+
+</p>
+<h3 class="western">Structure semantics</h3>
+<p>Strings are created by enclosing characters in quote marks.
+Strings span across any amount of characters until another quote mark
+is hit, including newlines.</p>
+<p class="codeblock-western">msg=&quot;hello</p>
+<p class="codeblock-western">world!&quot;</p>
+<p>Strings are evaluated at tokenization, so longer strings do not
+add significantly more overhead, and escapes add no overhead.</p>
+<p><br/>
+<br/>
+
+</p>
+<p>Arrays and tables share the same creation syntax, albeit arrays
+use [ and ], while tables use { and }. The compiler will not check if
+the index is valid when evaluating creation. There are 2 syntax modes
+to arrays and tables. Implicit indexing, and explicit indexing.</p>
+<p class="codeblock-western">my_array=[1,2,3] //implicit indexing.
+0=1, 1=2, 2=3</p>
+<p class="codeblock-western">my_array=[0=1,1=2,2=3] //explicit
+indexing. Results in the same code and data as above.</p>
+<p>Explicit indexing can take named variables as well, which results
+in a get call.</p>
+<p class="codeblock-western">a=5</p>
+<p class="codeblock-western">my_array=[a=1] // 5=1</p>
+<p>This should not be confused with an explicit string index</p>
+<p class="codeblock-western">my_table={&quot;a&quot;=1} //doing this
+with an array would result in an error. 
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p>All structures can be indexed with brackets, with the variable you
+want in brackets</p>
+<p class="codeblock-western">my_array=[1,2,3]</p>
+<p class="codeblock-western">print(my_array[0]) // 1</p>
+<p>Tables can be indexed with period notation, allowing for a cleaner
+way to index with a string</p>
+<p class="codeblock-western">my_table={&quot;a&quot;=1}</p>
+<p class="codeblock-western">print(my_table[&quot;a&quot;]) // 1</p>
+<p class="codeblock-western">print(my_table.a) // 1. not to be
+confused with my_table[a]</p>
 <p><br/>
 <br/>
 

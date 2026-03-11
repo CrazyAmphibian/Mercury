@@ -38,6 +38,11 @@ typedef float mercury_float;
 #define MERCURY_VERSION 0
 #define MERCURY_VERSION_PATCH 5
 
+#define MERCURY
+#if defined(DEBUG) || defined(_DEBUG)
+#define MERCURY_DEBUG
+#endif
+
 union mercury_rawdata { //to represent stored binary data of almost any type.
 	mercury_int i;
 	mercury_uint u;
@@ -78,11 +83,8 @@ struct mercury_table {
 //typedef mercury_subtable** mercury_table;
 
 struct mercury_debug_token {
-	char* token_prev_prev=	nullptr;
-	char* token_prev=	nullptr;
-	char* token	  =	nullptr;	//you get 5 tokens.
-	char* token_next=	nullptr;
-	char* token_next_next=	nullptr;
+	char* chars=nullptr;
+	mercury_int num_chars=0;
 	mercury_int col=0;
 	mercury_int line=0;
 };

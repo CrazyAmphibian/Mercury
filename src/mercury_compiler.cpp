@@ -1,2853 +1,2409 @@
 #include "mercury_compiler.hpp"
 #include "mercury_bytecode.hpp"
-#include "mercury_error.hpp"
 #include "mercury.hpp"
-#include "malloc.h"
-#include "stdint.h"
-#include "string.h"
-#include "stdlib.h"
+#include <malloc.h>
+#include <stdint.h>
+#include <string.h>
 
-
-mercury_int COMPILER_NUMBER_ARGS_OUT = 0;
-mercury_int COMPILER_LOOP_START = 0;
-mercury_int* COMPILER_LOOP_ENDJMPS = nullptr;
-mercury_int COMPILER_LOOP_ENDCOUNT = 0;
-
-mercury_int POSITION_IN_DATASTRUCTURE = 0; //arrays and tables [1,2,3] 0,1,2
-
-mercury_int COMPILER_CONTINUE_JUMP_POSITION = 0; // continue jumps to the start. far easier to implement.
-bool COMPILER_INSIDE_LOOP = false;
-mercury_int COMPILER_BREAK_AMOUNTS = 0;
-mercury_int* COMPILER_BREAK_ADDRS = nullptr; //array of positions where we need them to jump to the end.
-
-mercury_stringliteral* CONSTANT_STRINGS = nullptr; //stores the strings themselves
-mercury_int NUM_CONSTANT_STRINGS = 0; //stores the number of them
-/*
-"hello" "world"
-2
-*/
-
-mercury_int add_str_as_const(char* str,mercury_int len) {
-	for (mercury_int i = 0; i < NUM_CONSTANT_STRINGS;i++) {
-		mercury_stringliteral s = CONSTANT_STRINGS[i];
-		if (len == s.size) {
-			for (mercury_int c = 0; c < len; c++) {
-				if(s.ptr[c] != str[c]) goto next_str;
-			}
-			return i;
-		}
-		next_str:
-		{}
-	}
-
-	mercury_stringliteral* nptr=(mercury_stringliteral*)realloc(CONSTANT_STRINGS,sizeof(mercury_stringliteral)* (NUM_CONSTANT_STRINGS+1) );
-	if (!nptr)return -1;
-	CONSTANT_STRINGS = nptr;
-	char* c = (char*)malloc(sizeof(char) * len);
-	if (!c)return -1;
-	memcpy(c, str, len * sizeof(char));
-	CONSTANT_STRINGS[NUM_CONSTANT_STRINGS].constant = true;
-	CONSTANT_STRINGS[NUM_CONSTANT_STRINGS].ptr = c;
-	CONSTANT_STRINGS[NUM_CONSTANT_STRINGS].size = len;
-
-	NUM_CONSTANT_STRINGS++;
-
-	return NUM_CONSTANT_STRINGS - 1;
-}
-
-struct JUMP_POINT {
-	char* label;
-	mercury_int label_size;
-	mercury_int* positions;
-	mercury_int num_positions;
-	mercury_int label_point;
-	bool defined = true; //if not defined, should act like a NOP
-};
-/* so basically
-"label:"
-goto label is at instruction #12, goto label is at instruction #91
-is at instruction number #123
-has been defined.
-*/
-
-JUMP_POINT** COMPILER_JUMP_DATABASE = nullptr;
-mercury_int COMPILER_JUMP_NUMBERS = 0;
-
-bool m_compile_register_jump_point_goto(char* label, mercury_int label_size, mercury_int position) {
-	for (mercury_int i = 0; i < COMPILER_JUMP_NUMBERS; i++) {
-		JUMP_POINT* JP = COMPILER_JUMP_DATABASE[i];
-		if (JP->label_size == label_size) {
-			for (mercury_int c = 0; c < label_size; c++){
-				if (label[c] != JP->label[c])goto next;
-			}
-			void* npt = realloc(JP->positions,sizeof(mercury_int)*(JP->num_positions+1));
-			if (!npt)return false;
-			JP->positions = (mercury_int*)npt;
-			JP->positions[JP->num_positions] = position;
-			JP->num_positions++;
-			return true;
-		}
-		next:
-		{}
-	}
-	void* npt=realloc(COMPILER_JUMP_DATABASE,sizeof(JUMP_POINT*)*(COMPILER_JUMP_NUMBERS+1));
-	if (!npt)return false;
-	COMPILER_JUMP_DATABASE = (JUMP_POINT**)npt;
-
-	JUMP_POINT* J=(JUMP_POINT*)malloc(sizeof(JUMP_POINT));
-	if (!J)return false;
-
-	J->defined = false;
-	J->label = (char*)malloc(sizeof(char)*label_size);
-	if (!J->label)return false;
-	memcpy(J->label, label, label_size * sizeof(char));
-	J->label_point = 0;
-	J->label_size = label_size;
-	J->num_positions = 1;
-	J->positions = (mercury_int*)malloc(sizeof(mercury_int));
-	if (!J->positions)return false;
-	J->positions[0] = position;
-
-	COMPILER_JUMP_DATABASE[COMPILER_JUMP_NUMBERS]=J;
-	COMPILER_JUMP_NUMBERS++;
-	return true;
-}
-
-bool m_compile_register_jump_point_label(char* label, mercury_int label_size, mercury_int position) {
-	for (mercury_int i = 0; i < COMPILER_JUMP_NUMBERS; i++) {
-		JUMP_POINT* JP = COMPILER_JUMP_DATABASE[i];
-		if (JP->label_size == label_size) {
-			for (mercury_int c = 0; c < label_size; c++) {
-				if (label[c] != JP->label[c])goto next;
-			}
-			JP->label_point = position;
-			JP->defined = true;
-			return true;
-		}
-	next:
-		{}
-	}
-	void* npt = realloc(COMPILER_JUMP_DATABASE, sizeof(JUMP_POINT*) * (COMPILER_JUMP_NUMBERS + 1));
-	if (!npt)return false;
-	COMPILER_JUMP_DATABASE = (JUMP_POINT**)npt;
-
-	JUMP_POINT* J = (JUMP_POINT*)malloc(sizeof(JUMP_POINT));
-	if (!J)return false;
-
-	J->defined = true;
-	J->label = (char*)malloc(sizeof(char) * label_size);
-	if (!J->label)return false;
-	memcpy(J->label, label, label_size * sizeof(char));
-	J->label_point = position;
-	J->label_size = label_size;
-	J->num_positions = 0;
-	J->positions = nullptr;
-
-	COMPILER_JUMP_DATABASE[COMPILER_JUMP_NUMBERS] = J;
-	COMPILER_JUMP_NUMBERS++;
-	return true;
-}
-
-
-
-
-
-enum comment_type:unsigned char {
+enum comment_type:uint8_t {
 	COMMENT_NONE=0,
 	COMMENT_LINE=1,
 	COMMENT_MULTI=2,
 };
 
 enum token_flags {
-	TOKEN_OPERATOR = 1 << 0,
-	TOKEN_UANRY = 1 << 1,
-	TOKEN_BINARY = 1 << 2,
-	TOKEN_TAKESTATICNUM = 1 << 3,
-	TOKEN_STATICSTRING = 1 << 4,
-	TOKEN_STATICNUMBER = 1 << 5,
+	TOKEN_OPERATOR = 1 << 1,
+	TOKEN_UNARY_OP = 1 << 2,
+	TOKEN_BINARY_OP = 1 << 3,
+	TOKEN_MISC_OP = 1 << 4,
+	TOKEN_SELFMODIFY_OP = 1 << 5,
 	TOKEN_VARIABLE = 1 << 6,
-	TOKEN_ENVVARNAME = 1 << 7,
-	TOKEN_KEYWORD = 1 << 8,
-	TOKEN_STATICBOOLEAN = 1 << 9,
-	TOKEN_STATICNIL = 1 << 10,
-	TOKEN_SCOPESPECIFIER = 1 << 11,
-	TOKEN_SPECIALVARIABLECREATE = 1<<12,
-	TOKEN_LOOP_MODIFIER = 1<<13,
-	TOKEN_JUMP = 1<<14,
-	TOKEN_EXIT = 1<<15,
-	TOKEN_SELFMODIFY = 1<<16,
+	TOKEN_TAKES_STATIC_NUM = 1 << 7,
+	TOKEN_TAKES_STATIC_STRING = 1 << 8,
+	TOKEN_STATIC_NUMBER = 1 << 9,
+	TOKEN_STATIC_STRING = 1 << 10,
+	TOKEN_STATIC_BOOLEAN = 1 << 11,
+	TOKEN_STATIC_NIL = 1 << 12,
+	TOKEN_ENV_VAR = 1 << 13,
+	TOKEN_KEYWORD = 1 << 14,
+	TOKEN_SCOPESPECIFIER = 1 << 15,
+	TOKEN_LOOP_MODIFIER = 1 << 16,
 };
 
 
-compiler_function* init_comp_func() {
-	compiler_function* out=(compiler_function*)malloc(sizeof(compiler_function));
-	if (!out)return nullptr;
-	out->errorcode = 0;
-	out->instructions = nullptr;
-	out->number_instructions = 0;
-	out->token_error_num = 0;
-	out->instruction_tokens = nullptr;
+enum compiler_error_codes {
+	M_COMPERR_MEMORY_ALLOCATION,
+	M_COMPERR_NO_MORE_TOKENS,
 
-	return out;
-}
+	M_COMPERR_MALFORMED_NUMBER,
+	M_COMPERR_WRONG_SYMBOL,
+	M_COMPERR_NO_OPERATION_FOUND, //if we don't do anything with a var, so instead of a=5, we just do a
 
-
-
-//forward refrence this so that indexing and calls can use it.
-int m_compile_read_var_statment_recur(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max, compiler_function* operation_append=nullptr);
-int m_compile_read_variable(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max);
-
-compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercury_int num_tokens, mercury_int* endatend = nullptr);
-
-
-void delete_comp_func(compiler_function* func) {
-	if (!func)return;
-	if (func->instructions)free(func->instructions);
-	if (func->instruction_tokens)free(func->instruction_tokens);
-	free(func);
-}
-
-void concat_comp_func_appends(compiler_function* fb , compiler_function* fa) { // appends fa to base function fb
-	compiler_function* out = init_comp_func();
-	if (!out)return;
-	uint32_t* np=(uint32_t*)realloc( fb->instructions ,sizeof(uint32_t) * (fb->number_instructions + fa->number_instructions));
-	if (!np)return;
-	fb->instructions = np;
-	memcpy(fb->instructions + fb->number_instructions, fa->instructions, fa->number_instructions * sizeof(uint32_t));
-
-	mercury_int* np2 = (mercury_int*)realloc(fb->instruction_tokens, sizeof(mercury_int) * (fb->number_instructions + fa->number_instructions));
-	if (!np2)return;
-	fb->instruction_tokens = np2;
-	memcpy(fb->instruction_tokens + fb->number_instructions, fa->instruction_tokens, fa->number_instructions * sizeof(mercury_int));
-	fb->number_instructions += fa->number_instructions;
-}
+	M_COMPERR_WHILE_NEEDS_DO,
+	M_COMPERR_IF_NEEDS_THEN,
+	M_COMPERR_LOOPKEYWORD_WRONG_SPOT,
+	M_COMPERR_ARRAY_NOT_CLOSED,
+	M_COMPERR_TABLE_NOT_CLOSED,
+	M_COMPERR_CALL_NOT_CLOSED,
+	M_COMPERR_NESTEDSTATMENT_NOT_CLOSED, // ()
+	M_COMPERR_NO_VARIABLE, //for any variable of any type with any syntax, including variable statments such as a>5
+	M_COMPERR_NO_NAMED_VARIABLE, //this is for implicit variable names, under TOKEN_ENV_VAR.
+};
 
 
+enum token_type {
+	TOKEN_TYPE_OPERATOR = 1,
+	TOKEN_TYPE_KEYWORD = 2,
+	TOKEN_TYPE_STRING = 3,
+	TOKEN_TYPE_NUMBER = 4,
+};
 
-inline bool char_is_character(char c) {
+
+struct compiler_token {
+	mercury_int line_num = 0;
+	mercury_int line_col = 0;
+	char* chars = nullptr;
+	int num_chars = 0;
+	int token_flags = 0;
+	int token_type = 0;
+};
+
+struct compiler_function {
+	uint32_t* instructions = nullptr;
+	mercury_int* instruction_tokens = nullptr; //which token each instruction points to
+	mercury_int number_instructions = 0;
+	mercury_int tokens_consumed = 0;
+	
+	
+	mercury_int token_error_num = 0;
+	int errorcode = 0;
+};
+
+
+
+inline bool char_is_character(unsigned char c){
 	return (c>=0x41 && c<=0x5A) || (c>=0x61 && c<=0x7A) || c=='_';
 }
-inline bool char_is_number(char c) {
+
+inline bool char_is_number(unsigned char c) {
 	return (c >= 0x30 && c <= 0x39);
 }
-inline bool char_is_symbol(char c) {
+//semicolon is considered whitespace, not a symbol. is is to appease c users who go;
+inline bool char_is_symbol(unsigned char c) {
 	return ((c>=0x21 && c<=0x2F) || (c>= 0x3C && c<= 0x40) || (c>= 0x5B && c<= 0x60) || (c>= 0x7B && c<= 0x7E) || c==0x3A);
 }
-inline bool char_is_whitespace(char c) {
+
+inline bool char_is_whitespace(unsigned char c) {
 	return (!(char_is_symbol(c) || char_is_number(c) || char_is_character(c)));
 }
 
-bool add_char_to_token(compiler_token* t, char c) {
-	t->num_chars++;
-	void* naddr=realloc(t->chars,sizeof(char)*t->num_chars);
-	if (!naddr) {
-		return false;
+
+inline compiler_token* new_compiler_token(mercury_int col_num, mercury_int line_num){
+	compiler_token* out=(compiler_token*)malloc(sizeof(compiler_token));
+	if(out){
+		out->line_num= line_num;
+		out->line_col= col_num;
+		out->chars = nullptr;
+		out->num_chars = 0;
+		out->token_flags = 0;
+		out->token_type=0;
 	}
-	t->chars = (char*)naddr;
-	t->chars[t->num_chars - 1] = c;
+	return out;
+}
+
+inline bool append_char_to_compiler_token(compiler_token* token, char c){
+	char* naddr=(char*)realloc(token->chars,sizeof(char)*(token->num_chars+1));
+	if (!naddr)return false;
+	token->chars=naddr;
+	token->chars[token->num_chars]=c;
+	token->num_chars++;
 	return true;
 }
 
-int read_char_from_hex_chars(char* chars,int* offset_out) { //this isn't pretty
-	int num = 0;
-	char c1 = chars[1];
-	char c2 = chars[2];
-	*offset_out = 0;
-	switch (c1) {
-	case '0':
-		num |= 0x0;
-		break;
-	case '1':
-		num |= 0x1;
-		break;
-	case '2':
-		num |= 0x2;
-		break;
-	case '3':
-		num |= 0x3;
-		break;
-	case '4':
-		num |= 0x4;
-		break;
-	case '5':
-		num |= 0x5;
-		break;
-	case '6':
-		num |= 0x6;
-		break;
-	case '7':
-		num |= 0x7;
-		break;
-	case '8':
-		num |= 0x8;
-		break;
-	case '9':
-		num |= 0x9;
-		break;
-	case 'A':
-	case 'a':
-		num |= 0xA;
-		break;
-	case 'B':
-	case 'b':
-		num |= 0xB;
-		break;
-	case 'C':
-	case 'c':
-		num |= 0xC;
-		break;
-	case 'D':
-	case 'd':
-		num |= 0xD;
-		break;
-	case 'E':
-	case 'e':
-		num |= 0xE;
-		break;
-	case 'F':
-	case 'f':
-		num |= 0xF;
-		break;
-	default:
-		return 0xBEEF;
+inline void advance_position_from_char(char c,char c_prev,mercury_int* col,mercury_int* line){
+	(*col)++;
+	if(c=='\n' || c=='\r' && !(c_prev=='\r' && c=='\n') ){
+		*col=1;
+		(*line)++;
 	}
-	num <<= 4;
-	*offset_out = 1;
-	switch (c2) {
-	case '0':
-		num |= 0x0;
-		break;
-	case '1':
-		num |= 0x1;
-		break;
-	case '2':
-		num |= 0x2;
-		break;
-	case '3':
-		num |= 0x3;
-		break;
-	case '4':
-		num |= 0x4;
-		break;
-	case '5':
-		num |= 0x5;
-		break;
-	case '6':
-		num |= 0x6;
-		break;
-	case '7':
-		num |= 0x7;
-		break;
-	case '8':
-		num |= 0x8;
-		break;
-	case '9':
-		num |= 0x9;
-		break;
-	case 'A':
-	case 'a':
-		num |= 0xA;
-		break;
-	case 'B':
-	case 'b':
-		num |= 0xB;
-		break;
-	case 'C':
-	case 'c':
-		num |= 0xC;
-		break;
-	case 'D':
-	case 'd':
-		num |= 0xD;
-		break;
-	case 'E':
-	case 'e':
-		num |= 0xE;
-		break;
-	case 'F':
-	case 'f':
-		num |= 0xF;
-		break;
-	default:
-		return num>>4;
+}
+
+inline bool add_token_or_destroy_array(compiler_token*** array,mercury_int* size,compiler_token* toadd){
+	if (!toadd->num_chars && toadd->token_type!=TOKEN_TYPE_STRING) {
+		free(toadd->chars);
+		free(toadd);
+		return false;
 	}
-	*offset_out = 2;
-	return num;
+	compiler_token** nptr=(compiler_token**)realloc(*array,sizeof(compiler_token*)*(*size+1) );
+	if(!nptr){
+		for(mercury_int i=0;i<(const mercury_int)*size;i++){
+			free((*array)[i]);
+		}
+		free(array);
+		*size=0;
+		return true;
+	}else{
+		*array=nptr;
+		(*array)[*size]=toadd;
+		(*size)++;
+		return false;
+	}
 }
 
 
-int read_char_from_dec_chars(char* chars,int* offset_out) {
-	int num = 0;
-	char c1 = chars[1];
-	char c2 = chars[2];
-	char c3 = chars[3];
-
-	//printf("%c %c %c\n", c1, c2, c3);
-
-	if (c1 < '0' || c1>'9') {
-		*offset_out = 0;
-		return 0xBEEF;
+inline bool token_matches_chars(compiler_token* t,const char* s){
+	if(strlen(s)!=t->num_chars)return false;
+	for (mercury_int c = 0; c < t->num_chars; c++) {
+		if (t->chars[c] != s[c])return false;
 	}
-	num += (c1 - '0');
-	if (c2 < '0' || c2>'9') {
-		*offset_out = 1;
-		return num;
-	}
-	num *= 10;
-	num += (c2 - '0');
-	if (c3 < '0' || c3>'9') {
-		*offset_out = 2;
-		return num;
-	}
-	num *= 10;
-	num += (c3 - '0');
-	*offset_out = 3;
-	return num;
+	return true;
 }
 
-
-bool symbols_can_join(char c1, char c2) {
-	switch (c1) {
-		case '=':	// ==
-		case '|':	// || |= ||=
-		case '&':	// && &= &&=
-		case '~':	// ~~ ~= ~~=
-		case '.':	// .. ..=
-		case '!':	// !! !=
-		case '>':	// >= >> >>=
-		case '<':	// <= << <<=
-		case '+':	// += ++
-		case '-':	// -= --
-			return c2 == c1 || c2 == '=';
-		case '*':	// *=
-		case '/':	// /=
-		case '\\':	// \=
-		case '^':	// ^=
-		case '%':	// %=
-			return c2 == '=';
-		default:
+bool symbol_can_merge_token(compiler_token* t,const char c){
+	if(!t->num_chars)return true;
+	const char last_char = t->chars[t->num_chars-1];
+	switch(last_char){
+		//symbols that can be repeated with themselves only. ==
+		case '=': // ==
+		// "where's (), {}, and []?" you may ask. well, it's more helpful for the compiler if we read each segment individually, so we don't merge those.
+			return last_char == c;
+		//symbols that can be repeated with themselves and equals. += ++ && &=
+		case '!': // !! !=
+		case '&': // && &=
+		case '|': // || |=
+		case '~': // ~~ ~=
+		case '+': // ++ +=
+		case '-': // -- -=
+		case '<': // << <=
+		case '>': // >> >=
+		case '.': // .. ..=
+			return last_char == c || c == '=';
+		//symbols that can only be repeated with equals
+		case '*': // *=
+		case '/': // /=
+		case '\\': // \=
+		case '%': // %=
+		case '^': // ^=
+			return c == '=';
+		default: //otherwise, the symbol is not repeatable
 			return false;
-	}	
+	}
 }
 
+inline bool char_is_hex(char c){
+	return (c>='0' && c<='9') || (c>='a' && c<='f') || (c>='A' && c<='F');
+}
 
-
-compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str) {
-	compiler_token** out = (compiler_token**)malloc(sizeof(compiler_token*) * 1);
-	mercury_int num_tokens = 0;
-	compiler_token* temp_token = (compiler_token*)malloc(sizeof(compiler_token));;
-	temp_token->chars = nullptr;
-	temp_token->num_chars = 0;
-	temp_token->line_col = 0;
-	temp_token->line_num = 0;
-	temp_token->token_flags = 0;
-
-
-	mercury_int strsize = str->size;
-	char* cstr = str->ptr;
-
-	mercury_int col = 0;
-	mercury_int line = 0;
-	bool readstring = false;
-	unsigned char commentmode = 0;
-
-
-
-	for (mercury_int c = 0; c < strsize; c++) {
-		char c_char = cstr[c];
-		char p_char = c==0 ? '\0' : cstr[c - 1];
-		char n_char = c >= strsize - 1 ? '\0' : cstr[c + 1];
-		col++;
-
-		if (!commentmode) {
-			if (readstring) {
-				if (c_char == '\"') {
-					readstring = false;
-					temp_token->token_flags = TOKEN_STATICSTRING | TOKEN_VARIABLE;
-					out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
-					out[num_tokens] = temp_token;
-					num_tokens++;
-					temp_token = (compiler_token*)malloc(sizeof(compiler_token));
-					temp_token->chars = nullptr;
-					temp_token->num_chars = 0;
-					temp_token->line_col = col;
-					temp_token->line_num = line;
-					temp_token->token_flags = 0;
-				}
-				else {
-
-					if (c_char == '\\') {
-						//printf("backslash escape! %c%c\n",c_char,n_char);
-						switch (n_char)
-						{
-						case 'n': //newline
-							add_char_to_token(temp_token, '\n');
-							break;
-						case 'r': //carriage return
-							add_char_to_token(temp_token, '\r');
-							break;
-						case '\\': // backslash
-							add_char_to_token(temp_token, '\\');
-							break;
-						case '\"': //quote
-							add_char_to_token(temp_token, '\"');
-							break;
-						case '\'': //single quote
-							add_char_to_token(temp_token, '\'');
-							break;
-						case '\?': //question
-							add_char_to_token(temp_token, '?');
-							break;
-						case 'a': //bell
-							add_char_to_token(temp_token, '\a');
-							break;
-						case 'b': //backspace
-							add_char_to_token(temp_token, '\b');
-							break;
-						case '\e': //escape
-							add_char_to_token(temp_token, '\e');
-							break;
-						case 'f': //formfeed
-							add_char_to_token(temp_token, '\f');
-							break;
-						case 't': //tab
-							//printf("we added a tab.\n");
-							add_char_to_token(temp_token, '\t');
-							break;
-						case 'v': //vertical tab
-							add_char_to_token(temp_token, '\v');
-							break;
-						case 'x': //hex input
-						{
-							int off = 0;
-							int  r = read_char_from_hex_chars(cstr + c + 1,&off);
-							if (r != 0xBEEF) { //magic numbers, yay
-								add_char_to_token(temp_token, (char)r);
-							}
-							c += off;
-							col += off;
-						}
-						break;
-						case '0':
-						case '1':
-						case '2':
-						case '3':
-						case '4':
-						case '5':
-						case '6':
-						case '7':
-						case '8':
-						case '9':
-						{
-							int adv = 0;
-							int  r = read_char_from_dec_chars(cstr + c ,&adv);
-							if (r != 0xBEEF) { //magic numbers, yay
-								add_char_to_token(temp_token, (char)r);
-							}
-							adv -= 1;
-							c += adv;
-							col += adv;
-						}
-							break;
-						default:
-							break;
-						}
-						c++;
-						col++;
-					}
-					else {
-						add_char_to_token(temp_token, c_char);
-					}
-
-
-				}
-			}
-			else {
-
-				if (c_char == '\"') {
-					readstring = true;
-				}
-				else if (c_char=='/' && (n_char == '/' || n_char == '*') ) {
-					if (n_char == '/') {
-						commentmode = COMMENT_LINE;
-					}
-					else if (n_char == '*') {
-						commentmode = COMMENT_MULTI;
-					}
-				}
-				else if (char_is_whitespace(c_char) && temp_token->num_chars) {
-					out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
-					out[num_tokens] = temp_token;
-					num_tokens++;
-					temp_token = (compiler_token*)malloc(sizeof(compiler_token));
-					temp_token->chars = nullptr;
-					temp_token->num_chars = 0;
-					temp_token->line_col = col;
-					temp_token->line_num = line;
-					temp_token->token_flags = 0;
-				}
-				else if ((char_is_number(c_char))) {
-					add_char_to_token(temp_token, c_char);
-					bool allow_nonnumber = !(temp_token->token_flags & TOKEN_ENVVARNAME);
-					if(!temp_token->token_flags)temp_token->token_flags = TOKEN_STATICNUMBER | TOKEN_VARIABLE;
-					if (!char_is_number(n_char) && (!allow_nonnumber || !char_is_character(n_char)) ) {
-						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
-						out[num_tokens] = temp_token;
-						num_tokens++;
-						temp_token = (compiler_token*)malloc(sizeof(compiler_token));
-						temp_token->chars = nullptr;
-						temp_token->num_chars = 0;
-						temp_token->line_col = col;
-						temp_token->line_num = line;
-						temp_token->token_flags = 0;
-					}
-				}
-				else if (char_is_character(c_char)) {
-					add_char_to_token(temp_token, c_char);
-					temp_token->token_flags = TOKEN_ENVVARNAME | TOKEN_VARIABLE;
-					if (!(char_is_character(n_char) ||char_is_number(n_char) )) {
-						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
-						out[num_tokens] = temp_token;
-						num_tokens++;
-						temp_token = (compiler_token*)malloc(sizeof(compiler_token));
-						temp_token->chars = nullptr;
-						temp_token->num_chars = 0;
-						temp_token->line_col = col;
-						temp_token->line_num = line;
-						temp_token->token_flags = 0;
-					}
-				}
-				else if (char_is_symbol(c_char)) {
-					add_char_to_token(temp_token, c_char);
-					temp_token->token_flags = TOKEN_OPERATOR;
-					if (!char_is_symbol(n_char)) {
-						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
-						out[num_tokens] = temp_token;
-						num_tokens++;
-						temp_token = (compiler_token*)malloc(sizeof(compiler_token));
-						temp_token->chars = nullptr;
-						temp_token->num_chars = 0;
-						temp_token->line_col = col;
-						temp_token->line_num = line;
-						temp_token->token_flags = 0;
-					}
-					else if (!symbols_can_join(c_char, n_char)) {
-						out = (compiler_token**)realloc(out, sizeof(compiler_token*) * (num_tokens + 1));
-						out[num_tokens] = temp_token;
-						num_tokens++;
-						temp_token = (compiler_token*)malloc(sizeof(compiler_token));
-						temp_token->chars = nullptr;
-						temp_token->num_chars = 0;
-						temp_token->line_col = col;
-						temp_token->line_num = line;
-						temp_token->token_flags = 0;
-					}
-				}
-
-
-
-			}
-		}
-		else {
-			if (commentmode == COMMENT_MULTI) {
-				if(c_char == '/' && p_char == '*')commentmode = COMMENT_NONE;
-			}
-			else if (commentmode == COMMENT_LINE) {
-				if (c_char == '*' && p_char == '/')commentmode = COMMENT_MULTI;
-			}
-		}
-
-		if ((c_char == '\n' && p_char != '\r') || c_char == '\r') {
-			col = 0;
-			line++;
-			commentmode = (commentmode == COMMENT_LINE ? COMMENT_NONE : commentmode);
-		}
+inline unsigned char read_hex_string_as_num(char c1,char c2){ //big endian
+	unsigned char out=0;
+	if(c1>='0' && c1<='9'){
+		out=c1-'0';
+	}else if(c1>='a' && c1<='f'){
+		out=10+c1-'a';
+	}else if(c1>='A' && c1<='F'){
+		out=10+c1-'A';
 	}
-
-
-
-	for (mercury_int i = 0; i < num_tokens; i++) {
-		compiler_token* token = out[i];
-
-		if (token->token_flags & TOKEN_ENVVARNAME) { //extracting keywords from vars
-			char* tc = token->chars;
-			if (token->num_chars == 2) {
-				if (tc[0] == 'i' && tc[1] == 'f') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-				else if (tc[0] == 'd' && tc[1] == 'o') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-			}
-			else if (token->num_chars == 3) {
-				if (tc[0] == 'n' && tc[1] == 'i' && tc[2] == 'l') {
-					token->token_flags = TOKEN_STATICNIL | TOKEN_VARIABLE;
-				}
-				else if (tc[0] == 'e' && tc[1] == 'n' && tc[2] == 'd') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-				//else if (tc[0] == 'n' && tc[1] == 'a' && tc[2] == 'n') { //nan
-				//	token->token_flags = TOKEN_VARIABLE | TOKEN_STATICNUMBER;  //removed because nan like this is not actually nan. that is to say nan!=(0/0)
-				//}
-				else if (tc[0] == 'i' && tc[1] == 'n' && tc[2] == 'f') { //inf
-					token->token_flags = TOKEN_VARIABLE | TOKEN_STATICNUMBER;
-				}
-			}
-			else if (token->num_chars == 4) {
-				if (tc[0] == 't' && tc[1] == 'r' && tc[2] == 'u' && tc[3] == 'e') {
-					token->token_flags = TOKEN_STATICBOOLEAN | TOKEN_VARIABLE;
-				}
-				else if (tc[0] == 't' && tc[1] == 'h' && tc[2] == 'e' && tc[3] == 'n') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-				else if (tc[0] == 'e' && tc[1] == 'l' && tc[2] == 's' && tc[3] == 'e') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-				else if (tc[0] == 'g' && tc[1] == 'o' && tc[2] == 't' && tc[3] == 'o') {
-					token->token_flags = TOKEN_JUMP;
-				}
-			}
-			else if (token->num_chars == 5) {
-				if (tc[0] == 'w' && tc[1] == 'h' && tc[2] == 'i' && tc[3] == 'l' && tc[4] == 'e') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-				if (tc[0] == 'f' && tc[1] == 'a' && tc[2] == 'l' && tc[3] == 's' && tc[4] == 'e') {
-					token->token_flags = TOKEN_STATICBOOLEAN | TOKEN_VARIABLE;
-				}
-				if (tc[0] == 'l' && tc[1] == 'o' && tc[2] == 'c' && tc[3] == 'a' && tc[4] == 'l') {
-					token->token_flags = TOKEN_SCOPESPECIFIER;
-				}
-				if (tc[0] == 'b' && tc[1] == 'r' && tc[2] == 'e' && tc[3] == 'a' && tc[4] == 'k') {
-					token->token_flags = TOKEN_LOOP_MODIFIER;
-				}
-			}
-			else if (token->num_chars == 6) {
-				if (tc[0] == 'e' && tc[1] == 'l' && tc[2] == 's' && tc[3] == 'e' && tc[4] == 'i' && tc[5] == 'f') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-				if (tc[0] == 'r' && tc[1] == 'e' && tc[2] == 't' && tc[3] == 'u' && tc[4] == 'r' && tc[5] == 'n') {
-					token->token_flags = TOKEN_EXIT;
-				}
-				if (tc[0] == 'g' && tc[1] == 'l' && tc[2] == 'o' && tc[3] == 'b' && tc[4] == 'a' && tc[5] == 'l') {
-					token->token_flags = TOKEN_SCOPESPECIFIER;
-				}
-			}
-			else if (token->num_chars == 8) {
-				if (tc[0] == 'c' && tc[1] == 'o' && tc[2] == 'n' && tc[3] == 't' && tc[4] == 'i' && tc[5] == 'n' && tc[6] == 'u' && tc[7] == 'e') {
-					token->token_flags = TOKEN_LOOP_MODIFIER;
-				} else if (tc[0] == 'f' && tc[1] == 'u' && tc[2] == 'n' && tc[3] == 'c' && tc[4] == 't' && tc[5] == 'i' && tc[6] == 'o' && tc[7] == 'n') {
-					token->token_flags = TOKEN_KEYWORD;
-				}
-			}
-
-
-		}
-		else if (token->token_flags & TOKEN_OPERATOR) {
-			char* tc = token->chars;
-			if (token->num_chars == 1) {
-				switch (tc[0]) {
-				case '>':
-				case '<':
-				case '+':
-				case '*':
-				case '/':
-				case '^':
-				case '%':
-				case '&':
-				case '|':
-				case '~':
-				case '\\':
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM;
-					break;
-				case '#':
-				case '!':
-					token->token_flags |= TOKEN_UANRY;
-					break;
-				case '-':
-					token->token_flags |= TOKEN_BINARY | TOKEN_UANRY | TOKEN_TAKESTATICNUM;
-					break;
-				case '[':
-				case ']':
-				case '{':
-				case '}':
-					token->token_flags |= TOKEN_SPECIALVARIABLECREATE;
-					break;
-				}
-			}
-			else if (token->num_chars == 2) {
-				if (tc[0] == '!' && tc[1] == '!') {
-					token->token_flags |= TOKEN_UANRY;
-				}
-				else if (tc[0] == '.' && tc[1] == '.') {
-					token->token_flags |= TOKEN_BINARY;
-				}
-				else if (tc[0] == '&' && tc[1] == '&') {
-					token->token_flags |= TOKEN_BINARY;
-				}
-				else if (tc[0] == '|' && tc[1] == '|') {
-					token->token_flags |= TOKEN_BINARY;
-				}
-				else if (tc[0] == '~' && tc[1] == '~') {
-					token->token_flags |= TOKEN_BINARY;
-				}
-				else if (tc[0] == '>' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM;
-				}
-				else if (tc[0] == '<' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM;
-				}
-				else if (tc[0] == '>' && tc[1] == '>') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM;
-				}
-				else if (tc[0] == '<' && tc[1] == '<') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM;
-				}
-				else if (tc[0] == '=' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY;
-				}
-				else if (tc[0] == '!' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY;
-				}
-				else if (tc[0] == '+' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '-' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '*' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '/' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '\\' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '^' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '%' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '&' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '|' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '~' && tc[1] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '+' && tc[1] == '+') {
-					token->token_flags |= TOKEN_UANRY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '-' && tc[1] == '-') {
-					token->token_flags |= TOKEN_UANRY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-			}
-			else if (token->num_chars == 3) {
-				if (tc[0] == '.' && tc[1] == '.' && tc[2] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
-				} else if (tc[0] == '<' && tc[1] == '<' && tc[2] == '=') {
-						token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}else if (tc[0] == '>' && tc[1] == '>' && tc[2] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_TAKESTATICNUM | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '|' && tc[1] == '|' && tc[2] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '&' && tc[1] == '&' && tc[2] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
-				}
-				else if (tc[0] == '~' && tc[1] == '~' && tc[2] == '=') {
-					token->token_flags |= TOKEN_BINARY | TOKEN_SELFMODIFY;
-				}
-				//TOKEN_SELFMODIFY
-			}
-
-		}
-
+	
+	out<<=4;
+	
+	if(c2>='0' && c2<='9'){
+		out|=c2-'0';
+	}else if(c2>='a' && c2<='f'){
+		out|=10+c2-'a';
+	}else if(c2>='A' && c2<='F'){
+		out|=10+c2-'A';
 	}
-
-	void* nptr = realloc(out, sizeof(compiler_token*)*(num_tokens + 1) );
-	if (!nptr){
-		free(out);
-		return nullptr;
-	}
-	out = (compiler_token**)nptr;
-	out[num_tokens] = nullptr;
+	
 	return out;
 }
 
+inline bool char_is_dec(char c){
+	return (c>='0' && c<='9');
+}
 
+inline unsigned char read_dec_string_as_num(char c1,char c2,char c3){
+	unsigned char out=0;
+	if(c1>='0' && c1<='9'){
+		out=c1-'0';
+	}
+	
+	out*=10;
+	
+	if(c2>='0' && c2<='9'){
+		out+=c2-'0';
+	}
+	
+	out*=10;
+	
+	if(c3>='0' && c3<='9'){
+		out+=c3-'0';
+	}
+	
+	return out;
+}
 
-uint16_t m_compile_get_operator_bytecode(compiler_token* token,int forcetype) {
-	if (token->num_chars == 1) {
-		char c1 = token->chars[0];
-		switch (c1) {
-		case '>':
-			return M_OPCODE_GRT;
-		case '<':
-			return M_OPCODE_LET;
-		case '+':
-			return M_OPCODE_ADD;
-		case '-':
-			return forcetype ? M_OPCODE_UNM : M_OPCODE_SUB;
-		case '*':
-			return M_OPCODE_MUL;
-		case '/':
-			return M_OPCODE_DIV;
-		case '\\':
-			return M_OPCODE_IDIV;
-		case '%':
-			return M_OPCODE_MOD;
-		case '^':
-			return M_OPCODE_POW;
-		case '|':
-			return M_OPCODE_BOR;
-		case '&':
-			return M_OPCODE_BAND;
-		case '~':
-			return M_OPCODE_BXOR;
-		case '!':
-			return M_OPCODE_BNOT;
-		case '#':
-			return M_OPCODE_LEN;
+compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str,mercury_int* num_out){
+	
+	*num_out = 0;
+
+	compiler_token* cur_tok=new_compiler_token(1,1);
+	compiler_token** out=nullptr;
+	
+	bool reading_string=false;
+	int8_t comment_mode=COMMENT_NONE;
+	
+	mercury_int line_num=1;
+	mercury_int col_num=1;
+	
+	mercury_int i=0;
+	const char* s=str->ptr;
+	const mercury_int size=str->size;
+	while(i<size){
+		char c=s[i];
+		char c_prev=i ? s[i-1] : '\0';
+
+		if(comment_mode){
+			advance_position_from_char(c,c_prev,&col_num,&line_num);
+			i++;
+			if(comment_mode==COMMENT_LINE && (c=='\n' || c=='\r') ){
+				comment_mode=COMMENT_NONE;
+			}else if(comment_mode==COMMENT_MULTI && c=='/' && c_prev=='*'){
+				comment_mode=COMMENT_NONE;
+			}
+		}
+		else{
+			if(!cur_tok){
+				for(mercury_int i=0;i<(const mercury_int)*num_out;i++){
+					free(out[i]);
+				}
+				free(out);
+				*num_out=0;
+				return nullptr;
+			}
+				
+			switch(cur_tok->token_type){
+				case TOKEN_TYPE_STRING:
+					if(c=='\"'){ //end string reading.
+						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
+						cur_tok=new_compiler_token(col_num, line_num);
+						advance_position_from_char(c, c_prev, &col_num, &line_num);
+						i++;
+					}else if(c=='\\'){ //escapes.
+						advance_position_from_char(c, c_prev, &col_num, &line_num);
+						i++;
+						char nc=i<size?s[i]:'\0';
+						advance_position_from_char(nc, c, &col_num, &line_num);
+						i++; //chars used: 2
+						switch(nc){
+							case 'a':
+								append_char_to_compiler_token(cur_tok,'\a');
+								break;
+							case 'b':
+								append_char_to_compiler_token(cur_tok,'\b');
+								break;
+							case 'c':
+								append_char_to_compiler_token(cur_tok,'\c');
+								break;
+							case 'e':
+								append_char_to_compiler_token(cur_tok,'\e');
+								break;
+							case 'f':
+								append_char_to_compiler_token(cur_tok,'\f');
+								break;
+							case 'n':
+								append_char_to_compiler_token(cur_tok,'\n');
+								break;
+							case 'r':
+								append_char_to_compiler_token(cur_tok,'\r');
+								break;
+							case 't':
+								append_char_to_compiler_token(cur_tok,'\t');
+								break;	
+							case 'v':
+								append_char_to_compiler_token(cur_tok,'\v');
+								break;
+							case '\\':
+								append_char_to_compiler_token(cur_tok,'\\');
+								break;
+							case '\"':
+								append_char_to_compiler_token(cur_tok,'\"');
+								break;
+							case 'x':
+							case 'X': //raw hex char reading
+								{
+									char hc1=i<size?s[i]:'\0';
+									i++;
+									char hc2=i<size?s[i]:'\0';
+									i++;
+									
+									if(char_is_hex(hc1) && char_is_hex(hc2)){
+										advance_position_from_char(hc1, nc, &col_num, &line_num);
+										advance_position_from_char(hc2, hc1, &col_num, &line_num);
+										append_char_to_compiler_token(cur_tok,read_hex_string_as_num(hc1,hc2));
+									}else if(char_is_hex(hc1)){
+										append_char_to_compiler_token(cur_tok,read_hex_string_as_num('0',hc1));
+										advance_position_from_char(hc1, nc, &col_num, &line_num);
+										i--;
+									}else{
+										append_char_to_compiler_token(cur_tok,'\0');
+										i-=2;
+									}
+								}
+								break;
+							case '0': //decimal char reading
+							case '1':
+							case '2':
+							case '3':
+							case '4':
+							case '5':
+							case '6':
+							case '7':
+							case '8':
+							case '9':
+								{
+									char dc2=i<size?s[i]:'\0';
+									i++;
+									char dc3=i<size?s[i]:'\0';
+									i++;
+									
+									if(char_is_dec(nc) && char_is_dec(dc2) && char_is_dec(dc3)){
+										advance_position_from_char(dc2, nc, &col_num, &line_num);
+										advance_position_from_char(dc3, dc2, &col_num, &line_num);
+										append_char_to_compiler_token(cur_tok,read_dec_string_as_num(nc,dc2,dc3));
+									}else if(char_is_hex(nc) && char_is_hex(dc2)){
+										advance_position_from_char(dc2, nc, &col_num, &line_num);
+										append_char_to_compiler_token(cur_tok,read_dec_string_as_num('0',nc,dc2));
+										i--;
+									}else{
+										append_char_to_compiler_token(cur_tok, read_dec_string_as_num('0','0',nc));
+										i-=2;
+									}
+									
+								}
+								break;
+							default: //UB: if we can't recognize the escape, just give the two chars themselves.
+								append_char_to_compiler_token(cur_tok,'\\');
+								append_char_to_compiler_token(cur_tok,nc);
+						}
+						
+					}else{ //add char to string.
+						append_char_to_compiler_token(cur_tok,c);
+						i++;
+					}
+					break;
+				case TOKEN_TYPE_NUMBER:
+					if(!char_is_number(c) && c!='.' && c!='x' && !char_is_hex(c) ){ //for decimal and hex
+						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
+						cur_tok=new_compiler_token(col_num, line_num);
+					}else{
+						append_char_to_compiler_token(cur_tok,c);
+						advance_position_from_char(c,c_prev,&col_num,&line_num);
+						i++;
+					}
+					break;
+				case TOKEN_TYPE_OPERATOR:
+					if(c=='/' && c_prev=='/'){
+						cur_tok->num_chars--; //remove the previous /
+						comment_mode=COMMENT_LINE;
+						advance_position_from_char(c,c_prev,&col_num,&line_num);
+						i++;
+					}else if(c=='*' && c_prev=='/'){
+						cur_tok->num_chars--; //remove the previous /
+						comment_mode=COMMENT_MULTI;
+						advance_position_from_char(c,c_prev,&col_num,&line_num);
+						i++;
+					}else if(char_is_symbol(c) && symbol_can_merge_token(cur_tok,c) ){
+						append_char_to_compiler_token(cur_tok,c);
+						advance_position_from_char(c,c_prev,&col_num,&line_num);
+						i++;
+					}else{
+						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
+						cur_tok=new_compiler_token(col_num, line_num);
+					}
+					break;
+				case TOKEN_TYPE_KEYWORD:
+					if(char_is_character(c) || char_is_number(c) ){
+						append_char_to_compiler_token(cur_tok,c);
+						advance_position_from_char(c,c_prev,&col_num,&line_num);
+						i++;
+					}else{
+						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
+						cur_tok=new_compiler_token(col_num, line_num);
+					}
+					break;
+				default:
+					if(char_is_character(c)){
+						cur_tok->token_type=TOKEN_TYPE_KEYWORD;
+					}else if(char_is_number(c)){
+						cur_tok->token_type=TOKEN_TYPE_NUMBER;
+					}else if(char_is_symbol(c)){
+						if(c=='\"'){
+							cur_tok->token_type=TOKEN_TYPE_STRING;
+							advance_position_from_char(c, c_prev, &col_num, &line_num);
+							i++;
+						}else{
+							cur_tok->token_type=TOKEN_TYPE_OPERATOR;
+						}
+					}else{
+						advance_position_from_char(c,c_prev,&col_num,&line_num);
+						i++;
+					}
+			}
+		}
+		
+	}
+	if (cur_tok->num_chars) {
+		if (add_token_or_destroy_array(&out, num_out, cur_tok))return nullptr;
+	}
+
+	//tokens extracted from string. now we need to run a processing step to get more useful data out of it.
+	for(mercury_int i=0;i<(const mercury_int)*num_out;i++){
+		compiler_token* t = out[i];
+		switch(t->token_type){
+			case TOKEN_TYPE_STRING:
+				t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_STRING;
+				break;
+			case TOKEN_TYPE_NUMBER:
+				t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NUMBER;
+				break;
+			case TOKEN_TYPE_KEYWORD:
+				if(t->num_chars==2){
+					if(token_matches_chars(t,"if")){
+						t->token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(t,"do")){
+						t->token_flags = TOKEN_KEYWORD;
+					}
+				}else if(t->num_chars==3){
+					if(token_matches_chars(t,"nil")){
+						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NIL;
+					}else if(token_matches_chars(t,"end")){
+						t->token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(t,"inf")){
+						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NUMBER;
+					}
+				}else if(t->num_chars==4){
+					if(token_matches_chars(t,"then")){
+						t->token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(t,"true")){
+						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_BOOLEAN;
+					}else if(token_matches_chars(t,"else")){
+						t->token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(t,"goto")){
+						t->token_flags = TOKEN_KEYWORD;
+					}
+				}else if(t->num_chars==5){
+					if(token_matches_chars(t,"false")){
+						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_BOOLEAN;
+					}else if(token_matches_chars(t,"while")){
+						t->token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(t,"local")){
+						t->token_flags = TOKEN_SCOPESPECIFIER;
+					}else if (token_matches_chars(t, "break")) {
+						t->token_flags = TOKEN_LOOP_MODIFIER;
+					}
+				}else if(t->num_chars==6){
+					if(token_matches_chars(t,"global")){
+						t->token_flags = TOKEN_SCOPESPECIFIER;
+					}else if(token_matches_chars(t,"elseif")){
+						t->token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(t,"return")){
+						t->token_flags = TOKEN_KEYWORD;
+					}
+				}else if(t->num_chars==8){
+					if(token_matches_chars(t,"function")){
+						t->token_flags = TOKEN_KEYWORD | TOKEN_VARIABLE;
+					}else if(token_matches_chars(t,"continue")){
+						t->token_flags = TOKEN_LOOP_MODIFIER;
+					}
+				}
+				if(!t->token_flags)t->token_flags = TOKEN_VARIABLE | TOKEN_ENV_VAR;
+				break;
+			case TOKEN_TYPE_OPERATOR:
+				if(t->num_chars==1){
+					switch(t->chars[0]){
+						case '=':
+							t->token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP;
+							break;
+						case '-':
+							t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_UNARY_OP; //unary minus, too
+							break;
+						case '+':
+						case '*':
+						case '/':
+						case '^':
+						case '%':
+						case '\\':
+						case '&':
+						case '|':
+						case '~':
+						case '>':
+						case '<':
+							t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_TAKES_STATIC_NUM;
+							break;
+						case '!':
+							t->token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP | TOKEN_TAKES_STATIC_NUM;
+							break;
+						case '#':
+							t->token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP;
+							break;
+						case '[':
+						case '{':
+							t->token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP | TOKEN_VARIABLE;
+							break;
+						case '(':
+						case ')':
+						case '}':
+						case ']':
+						case ':':
+						case '.':
+						case ',':
+							t->token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP;
+							break;
+					}
+				}else if(t->num_chars==2){
+					switch(t->chars[0]){
+						case '&':
+						case '~':
+						case '|':
+							if(t->chars[0]==t->chars[1]){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+								break;
+							}
+						case '+':
+						case '-':
+							if(t->chars[0]==t->chars[1]){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_TAKES_STATIC_NUM | TOKEN_UNARY_OP | TOKEN_SELFMODIFY_OP;
+								break;
+							}
+						case '%':
+						case '/':
+						case '*':
+						case '\\':
+						case '^':
+							if(t->chars[1]=='='){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_TAKES_STATIC_NUM | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+							}
+							break;
+						case '!':
+							if(t->chars[1]=='!'){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP;
+							}else if(t->chars[1]=='='){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+							}
+							break;
+						case '>':
+						case '<':
+							if(t->chars[0]==t->chars[1] || t->chars[1]=='='){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_TAKES_STATIC_NUM;
+							}
+							break;
+						case '.':
+							if(t->chars[1]=='.'){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+							}
+							break;
+						case '=':
+							if(t->chars[1]=='='){
+								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+							}
+							break;
+					}
+				}else if(t->num_chars==3){
+					if(token_matches_chars(t,"..=")){
+						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					} else if(token_matches_chars(t,"<<=")){
+						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if(token_matches_chars(t,">>=")){
+						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}
+				}
+				break;
 		}
 	}
-	else if (token->num_chars == 2) {
-		char c1 = token->chars[0];
-		char c2 = token->chars[1];
-		if (c1=='=' && c2=='=') {
-			return M_OPCODE_EQL;
-		}else if (c1 == '!' && c2 == '=') {
-			return M_OPCODE_NEQ;
-		}else if (c1 == '>' && c2 == '=') {
-			return M_OPCODE_GTE;
+	return out;
+}
+//end of tokenization code, probably.
+
+struct compiler_info {
+	mercury_int additional_instructions = 0;
+
+	//for while loops
+	bool in_loop = false;
+	mercury_int loop_jumppoint_start = 0; //used to track where continue and loop end will bring you to
+	mercury_int loop_endpoint_ref_count = 0; //tracks the number of below refs
+	mercury_int* loop_endpoint_ref_pos = nullptr; //where each break point is. filled in once a loop is compiled so that break will skip to after the loop ends.
+
+	//for if thens
+	bool in_conditional = false;
+	mercury_int conditional_jumppoint_init = 0; // for if statments, stores the position JRNI distance of the last conditional check, so that it skips to the start of the next elseif/else block.
+	mercury_int conditional_jumptoend_count = 0; //these are placed at the end of every elseif/if block to jump to the end so that other blocks are not called when we already executed one.
+	mercury_int* conditional_jumptoend_points = nullptr;
+	bool conditional_defaultcase = false;
+
+	//constant strings
+	mercury_int num_constants = 0;
+	mercury_stringliteral* constants = nullptr;
+
+	//goto compiling. this is made difficult because we can have situations where we write goto before the label is defined. because the compiler is single pass, this is made a bit tricky, but not impossible. eg, goto a a:
+	mercury_int num_gotos = 0; //how many different goto labels are being used. eg, 2
+	mercury_int** goto_positions = nullptr; //where the goto keywords are in instruction space. eg, [1], [55,43,32]
+	mercury_int* goto_pos_count = nullptr; // how many gotos are present. eg, 1,3
+	bool* goto_defined = nullptr; //if the label is defined yet. eg, 0,1 
+	mercury_stringliteral* goto_alias = nullptr; //the string of the goto label. eg, "stuff","cancel"
+	mercury_int* goto_labelpos = nullptr; //where the label is defined. eg, ?,50
+
+};
+
+inline compiler_info* new_compiler_info(){ //this exists to be used in m_compile_read_keyword_block and mercury_compile_tokens_to_bytecode, and whatnot to dictate keywords and control flow. doesn't need to be propagated to low-end functions like m_compile_read_variable or m_compile_read_statment.
+//haha just kidding. that was the plan, but, well... programming. turns out constant statements need that propagation so... oh well. turns out a compiler with any amount of good features needs to do that, i guess. at least goto should be less compilated... right?
+	compiler_info* out=(compiler_info*)malloc(sizeof(compiler_info));
+	if(!out)return out;
+
+	out->additional_instructions=0;
+	
+	out->in_loop=false;
+	out->loop_jumppoint_start=0;
+	out->loop_endpoint_ref_count=0;
+	out->loop_endpoint_ref_pos=nullptr;
+
+	out->in_conditional=false;
+	out->conditional_jumppoint_init=0;
+	out->conditional_jumptoend_count=0;
+	out->conditional_jumptoend_points=nullptr;
+	out->conditional_defaultcase=false;
+	
+	out->num_constants=0;
+	out->constants=nullptr;
+	
+	out->num_gotos=0;
+	
+	out->goto_positions=nullptr;
+	out->goto_pos_count=nullptr;
+	out->goto_defined=nullptr;
+	out->goto_alias=nullptr;
+	out->goto_labelpos=nullptr;
+	
+	return out;
+}
+
+inline void delete_compiler_info(compiler_info* i){
+	free(i->loop_endpoint_ref_pos);
+	free(i->conditional_jumptoend_points);
+	free(i->constants);
+	for(mercury_int n=0;n<i->num_gotos;n++){
+		free(i->goto_positions[n]);
+	}
+	free(i->goto_pos_count);
+	free(i->goto_positions);
+	free(i->goto_defined);
+	free(i->goto_alias);
+	free(i->goto_labelpos);	
+	free(i);
+}
+
+inline void propogate_compiler_info(compiler_info* i_upstream, compiler_info* i_downstream) {
+	i_upstream->constants = i_downstream->constants;
+	i_upstream->num_constants = i_downstream->num_constants;
+	i_upstream->num_gotos = i_downstream->num_gotos;
+	i_upstream->goto_positions = i_downstream->goto_positions;
+	i_upstream->goto_pos_count = i_downstream->goto_pos_count;
+	i_upstream->goto_defined = i_downstream->goto_defined;
+	i_upstream->goto_alias = i_downstream->goto_alias;
+	i_upstream->goto_labelpos = i_downstream->goto_labelpos;
+}
+
+inline bool compiler_info_add_loop_endjump(compiler_info* i,mercury_int instruction_point){
+	mercury_int* n=(mercury_int*)realloc(i->loop_endpoint_ref_pos,sizeof(mercury_int)*(i->loop_endpoint_ref_count+1) );
+	if(!n)return false;
+	n[i->loop_endpoint_ref_count] = instruction_point;
+	i->loop_endpoint_ref_pos=n;
+	i->loop_endpoint_ref_count++;
+	return true;
+}
+
+inline bool compiler_info_add_conditional_endjump(compiler_info* i,mercury_int instruction_point){
+	mercury_int* n=(mercury_int*)realloc(i->conditional_jumptoend_points,sizeof(mercury_int)*(i->conditional_jumptoend_count+1) );
+	if(!n)return false;
+	n[i->conditional_jumptoend_count] = instruction_point;
+	i->conditional_jumptoend_points=n;
+	i->conditional_jumptoend_count++;
+	return true;
+}
+
+inline mercury_int compiler_info_add_constant_string_from_token(compiler_info* i,compiler_token* t){
+	for(mercury_int n=0;n<i->num_constants;n++){
+		mercury_stringliteral s=i->constants[n];
+		if (s.size!=t->num_chars)continue;
+		for(mercury_int c=0;c<s.size;c++){
+			if(s.ptr[c]!=t->chars[c])goto exit;
 		}
-		else if (c1 == '<' && c2 == '=') {
-			return M_OPCODE_LTE;
+		return n;
+		exit:;
+	}
+	
+	mercury_stringliteral* nptr= (mercury_stringliteral*)realloc(i->constants,sizeof(mercury_stringliteral)*(i->num_constants+1) );
+	if(!nptr)return -1; //surely nobody will use 4294967295 / 18446744073709551615 constants in their code, right?
+	i->constants=nptr;
+	mercury_stringliteral* nstr=i->constants+i->num_constants;
+	nstr->size = t->num_chars;
+	nstr->ptr = t->chars;
+	i->num_constants++;
+	return i->num_constants-1;
+}
+
+inline bool compiler_info_add_goto_jump(compiler_info* i,compiler_token* t,mercury_int instruction_point){
+	void* nptr;
+	
+	for(mercury_int n=0;n<i->num_gotos;n++){
+		mercury_stringliteral s=i->goto_alias[n];
+		if(s.size!=t->num_chars)continue;
+		for(mercury_int c=0;c<t->num_chars;c++){
+			if(t->chars[c]!=s.ptr[c])goto next;
 		}
-		else if (c1 == '<' && c2 == '<') {
+		
+		nptr=realloc(i->goto_positions[n],sizeof(mercury_int)*(i->goto_pos_count[n]+1) );
+		if(!nptr)return false;
+		i->goto_positions[n] = (mercury_int*)nptr;
+		i->goto_positions[n][i->goto_pos_count[n]]=instruction_point;
+		i->goto_pos_count[n]++;
+		return true;
+		
+		next:;
+	}
+	
+	nptr=realloc(i->goto_positions, sizeof(mercury_int*)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_positions=(mercury_int**)nptr;
+
+	nptr=realloc(i->goto_pos_count, sizeof(mercury_int)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_pos_count=(mercury_int*)nptr;	
+	
+	nptr=realloc(i->goto_defined, sizeof(bool)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_defined=(bool*)nptr;	
+	
+	nptr=realloc(i->goto_alias, sizeof(mercury_stringliteral)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_alias=(mercury_stringliteral*)nptr;
+	
+	nptr=realloc(i->goto_labelpos, sizeof(mercury_int)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_labelpos=(mercury_int*)nptr;	
+	
+	nptr=malloc(sizeof(mercury_int));
+	if(!nptr)return false;
+	i->goto_positions[i->num_gotos]=(mercury_int*)nptr;
+	i->goto_positions[i->num_gotos][0] = instruction_point;
+	i->goto_pos_count[i->num_gotos]=1;
+	i->goto_defined[i->num_gotos]=false;
+	mercury_stringliteral s;
+	s.ptr=t->chars;
+	s.size=t->num_chars;
+	i->goto_alias[i->num_gotos]=s;
+	i->goto_labelpos[i->num_gotos]=0;
+	
+	i->num_gotos++;
+	return true;
+}
+
+
+inline bool compiler_info_add_goto_label(compiler_info* i,compiler_token* t,mercury_int instruction_point){
+	void* nptr;
+
+	for(mercury_int n=0;n<i->num_gotos;n++){
+		mercury_stringliteral s=i->goto_alias[n];
+		if(s.size!=t->num_chars)continue;
+		for(mercury_int c=0;c<t->num_chars;c++){
+			if(t->chars[c]!=s.ptr[c])goto next;
+		}
+
+		i->goto_defined[n]=true;
+		i->goto_labelpos[n]=instruction_point;
+		return true;
+		
+		next:;
+	}
+	
+	nptr=realloc(i->goto_positions, sizeof(mercury_int*)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_positions=(mercury_int**)nptr;
+
+	nptr=realloc(i->goto_pos_count, sizeof(mercury_int)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_pos_count=(mercury_int*)nptr;	
+	
+	nptr=realloc(i->goto_defined, sizeof(bool)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_defined=(bool*)nptr;	
+	
+	nptr=realloc(i->goto_alias, sizeof(mercury_stringliteral)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_alias=(mercury_stringliteral*)nptr;
+	
+	nptr=realloc(i->goto_labelpos, sizeof(mercury_int)*(i->num_gotos+1));
+	if(!nptr)return false;
+	i->goto_labelpos=(mercury_int*)nptr;
+	
+	i->goto_positions[i->num_gotos]=nullptr;
+	i->goto_pos_count[i->num_gotos]=0;
+	i->goto_defined[i->num_gotos]=true;
+	mercury_stringliteral s;
+	s.ptr=t->chars;
+	s.size=t->num_chars;
+	i->goto_alias[i->num_gotos]=s;
+	i->goto_labelpos[i->num_gotos]=instruction_point;
+	
+	i->num_gotos++;
+	return true;
+}
+
+
+inline compiler_function* new_compiler_function(){
+	compiler_function* out = (compiler_function*)malloc(sizeof(compiler_function));
+	if(out){
+		out->instructions=nullptr;
+		out->number_instructions=0;
+		out->instruction_tokens=nullptr;
+		out->tokens_consumed = 0;
+		out->token_error_num = 0;
+		out->errorcode = 0;
+	}
+	return out;
+}
+
+inline void delete_compiler_function(compiler_function* f){
+	if(f->instructions)free(f->instructions);
+	if(f->instruction_tokens)free(f->instruction_tokens);
+	free(f);
+}
+
+
+
+
+//appends the bytecode of fadd to fbase, and frees fadd.
+inline bool merge_compiler_functions(compiler_function* fbase, compiler_function* fadd){
+	mercury_int nsiz=fbase->number_instructions + fadd->number_instructions;
+	
+	void* p=realloc(fbase->instructions,sizeof(uint32_t)*(nsiz) );
+	if(!p)return false;
+	fbase->instructions = (uint32_t*)p;
+	p=realloc(fbase->instruction_tokens,sizeof(mercury_int)*(nsiz) );
+	if(!p)return false;
+	fbase->instruction_tokens = (mercury_int*)p;
+	
+	memcpy(fbase->instructions+fbase->number_instructions,fadd->instructions,sizeof(uint32_t)*fadd->number_instructions );
+	memcpy(fbase->instruction_tokens+fbase->number_instructions,fadd->instruction_tokens,sizeof(mercury_int)*fadd->number_instructions );
+	
+	fbase->number_instructions = nsiz;
+	if (fadd->errorcode && !fbase->errorcode) {
+		fbase->errorcode = fadd->errorcode;
+		fbase->token_error_num = fadd->token_error_num;
+	}
+	delete_compiler_function(fadd);
+	return true;
+}
+
+inline bool add_instruction(compiler_function* f, uint16_t opcode,uint16_t flags,mercury_int token_num){
+	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+1) );
+	if(!p)return false;
+	f->instructions = (uint32_t*)p;
+	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+1) );
+	if(!p)return false;
+	f->instruction_tokens = (mercury_int*)p;
+	
+	uint32_t d=flags;
+	f->instructions[f->number_instructions] = (d<<16) | opcode;
+	f->instruction_tokens[f->number_instructions] = token_num;
+	
+	f->number_instructions++;
+	return true;
+}
+
+inline bool add_instruction_at_begining(compiler_function* f, uint16_t opcode,uint16_t flags,mercury_int token_num){
+	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+1) );
+	if(!p)return false;
+	f->instructions = (uint32_t*)p;
+	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+1) );
+	if(!p)return false;
+	f->instruction_tokens = (mercury_int*)p;
+	
+	memmove(f->instructions+1,f->instructions, sizeof(uint32_t)*f->number_instructions );
+	memmove(f->instruction_tokens+1,f->instruction_tokens, sizeof(mercury_int)*f->number_instructions );
+	
+	uint32_t d=flags;
+	f->instructions[0] = (d<<16) | opcode;
+	f->instruction_tokens[0] = token_num;
+	
+	f->number_instructions++;
+	return true;
+}
+
+inline bool add_rawdata(compiler_function* f, uint32_t data,mercury_int token_num){
+	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+1) );
+	if(!p)return false;
+	f->instructions = (uint32_t*)p;
+	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+1) );
+	if(!p)return false;
+	f->instruction_tokens = (mercury_int*)p;
+	
+	f->instructions[f->number_instructions] = data;
+	f->instruction_tokens[f->number_instructions] = token_num;
+	
+	f->number_instructions++;
+	return true;
+}
+
+#ifdef MERCURY_64BIT
+inline bool add_rawdata_double(compiler_function* f, uint64_t data,mercury_int token_num){
+	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+2) );
+	if(!p)return false;
+	f->instructions = (uint32_t*)p;
+	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+2) );
+	if(!p)return false;
+	f->instruction_tokens = (mercury_int*)p;
+	
+	*(uint64_t*)(f->instructions+f->number_instructions) = data;
+	f->instruction_tokens[f->number_instructions] = token_num;
+	f->instruction_tokens[f->number_instructions+1] = token_num;
+	
+	f->number_instructions+=2;
+	return true;
+}
+#endif
+
+
+#ifdef MERCURY_64BIT
+typedef uint64_t binarydata;
+inline bool add_rawdata_bitwidth_size(compiler_function* f, uint64_t data,mercury_int token_num){
+	return add_rawdata_double(f, data, token_num);
+}
+#else
+typedef uint32_t binarydata;
+inline bool add_rawdata_bitwidth_size(compiler_function* f, uint32_t data,mercury_int token_num){
+	return add_rawdata(f, data, token_num);
+}
+#endif
+
+inline compiler_token* m_compile_get_next_token(compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset){
+	compiler_token* out=nullptr;
+	if( token_offset < num_tokens && token_offset>=0 ){ //OOB
+		out=tokens[token_offset];
+	}
+	return out;
+}
+
+uint16_t m_compile_get_operator_opcode_from_token(compiler_token* t,int ttype=0){
+	mercury_int nc = t->num_chars;
+	if(nc==1){
+		char c=t->chars[0];
+		switch (c){
+			case '+':
+				return M_OPCODE_ADD;
+			case '-':
+				return ttype==1 ? M_OPCODE_UNM : M_OPCODE_SUB;
+			case '*':
+				return M_OPCODE_MUL;
+			case '^':
+				return M_OPCODE_POW;
+			case '/':
+				return M_OPCODE_DIV;
+			case '\\':
+				return M_OPCODE_IDIV;
+			case '%':
+				return M_OPCODE_MOD;
+			case '!':
+				return M_OPCODE_BNOT;
+			case '&':
+				return M_OPCODE_BAND;
+			case '|':
+				return M_OPCODE_BOR;
+			case '~':
+				return M_OPCODE_BXOR;
+			case '#':
+				return M_OPCODE_LEN;
+			case '<':
+				return M_OPCODE_LET;
+			case '>':
+				return M_OPCODE_GRT;
+		}
+	}else if(nc==2){
+		if(t->chars[0]==t->chars[1]){
+			switch(t->chars[0]){
+				case '=':
+					return M_OPCODE_EQL;
+				case '.':
+					return M_OPCODE_CNCT;	
+				case '<':
+					return M_OPCODE_BSHL;
+				case '>':
+					return M_OPCODE_BSHR;
+				case '!':
+					return M_OPCODE_LNOT;
+				case '&':
+					return M_OPCODE_LAND;
+				case '|':
+					return M_OPCODE_LOR;
+				case '~':
+					return M_OPCODE_LXOR;
+				case '+':
+					return M_OPCODE_INC;
+				case '-':
+					return M_OPCODE_DEC;
+			}
+		}else if(t->chars[1]=='='){
+			switch(t->chars[0]){
+				case '!':
+					return M_OPCODE_NEQ;
+				case '<':
+					return M_OPCODE_LTE;
+				case '>':
+					return M_OPCODE_GTE;
+				case '&':
+					return M_OPCODE_BAND;
+				case '|':
+					return M_OPCODE_BOR;
+				case '~':
+					return M_OPCODE_BXOR;
+				case '+':
+					return M_OPCODE_ADD;
+				case '-':
+					return M_OPCODE_SUB;
+				case '*':
+					return M_OPCODE_MUL;
+				case '^':
+					return M_OPCODE_POW;
+				case '\\':
+					return M_OPCODE_IDIV;
+				case '/':
+					return M_OPCODE_DIV;
+				case '%':
+					return M_OPCODE_MOD;
+			}
+		}
+	}else if(nc==3){
+		if(token_matches_chars(t,"..=")){
+			return M_OPCODE_CNCT;
+		}else if(token_matches_chars(t,"<<=")){
 			return M_OPCODE_BSHL;
-		}
-		else if (c1 == '>' && c2 == '>') {
+		}else if(token_matches_chars(t,">>=")){
 			return M_OPCODE_BSHR;
 		}
-		else if (c1 == '!' && c2 == '!') {
-			return M_OPCODE_LNOT;
-		}
-		else if (c1 == '|' && c2 == '|') {
-			return M_OPCODE_LOR;
-		}
-		else if (c1 == '&' && c2 == '&') {
-			return M_OPCODE_LAND;
-		}
-		else if (c1 == '~' && c2 == '~') {
-			return M_OPCODE_LXOR;
-		}
-		else if (c1 == '.' && c2 == '.') {
-			return M_OPCODE_CNCT;
-		}
-		else if (c1 == '|' && c2 == '=') {
-			return M_OPCODE_BOR;
-		}
-		else if (c1 == '&' && c2 == '=') {
-			return M_OPCODE_BAND;
-		}
-		else if (c1 == '~' && c2 == '=') {
-			return M_OPCODE_BXOR;
-		}
-		else if (c1 == '+' && c2 == '=') {
-			return M_OPCODE_ADD;
-		}
-		else if (c1 == '-' && c2 == '=') {
-			return M_OPCODE_SUB;
-		}
-		else if (c1 == '*' && c2 == '=') {
-			return M_OPCODE_MUL;
-		}
-		else if (c1 == '/' && c2 == '=') {
-			return M_OPCODE_DIV;
-		}
-		else if (c1 == '\\' && c2 == '=') {
-			return M_OPCODE_IDIV;
-		}
-		else if (c1 == '^' && c2 == '=') {
-			return M_OPCODE_POW;
-		}
-		else if (c1 == '%' && c2 == '=') {
-			return M_OPCODE_MOD;
-		}
-		else if (c1 == '+' && c2 == '+') {
-			return M_OPCODE_INC;
-		}
-		else if (c1 == '-' && c2 == '-') {
-			return M_OPCODE_DEC;
-		}
 	}
-	else if (token->num_chars == 3) {
-		char c1 = token->chars[0];
-		char c2 = token->chars[1];
-		char c3 = token->chars[2];
-		if (c1 == '&' && c2 == '&' && c2 == '=') {
-			return M_OPCODE_LAND;
-		}
-		else if (c1 == '|' && c2 == '|' && c2 == '=') {
-			return M_OPCODE_LOR;
-		}
-		else if (c1 == '~' && c2 == '~' && c2 == '=') {
-			return M_OPCODE_LXOR;
-		}
-		else if (c1 == '<' && c2 == '<' && c2 == '=') {
-			return M_OPCODE_BSHL;
-		}
-		else if (c1 == '>' && c2 == '>' && c2 == '=') {
-			return M_OPCODE_BSHR;
-		}
-		else if (c1 == '.' && c2 == '.' && c2 == '=') {
-			return M_OPCODE_CNCT;
-		}
-	}
-
 	return M_OPCODE_NOP;
 }
 
-
-void m_compile_add_instruction(compiler_function* func , uint16_t opcode ,uint16_t flags=0,mercury_int tokennum=0) {
-	//printf("adding instruction %i [%i] to function %p as number %i from token %i\n",opcode,flags,func,func->number_instructions+1,tokennum);
-	uint32_t* naddr= (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions+1) );
-	if (!naddr) {
+inline void add_string_onto_stack(compiler_function* f,char* s,mercury_int len,mercury_int dbg_toknum){
+	mercury_int required_space = (len + 3) / 4;
+	add_instruction(f, M_OPCODE_NSTR,0,dbg_toknum);
+	add_rawdata_bitwidth_size(f, len,dbg_toknum);
+	void* nptr=realloc(f->instructions, sizeof(uint32_t)*(f->number_instructions+required_space) );
+	if(!nptr){
+		f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+		f->token_error_num=dbg_toknum;
 		return;
 	}
-	func->instructions = naddr;
-	uint32_t inst = 0;
-	inst |= flags;
-	inst <<= 16;
-	inst |= opcode;
-	func->instructions[func->number_instructions] = inst;
-
-	mercury_int* naddr2 =(mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + 1));
-	if (!naddr2) {
+	f->instructions=(uint32_t*)nptr;
+	nptr=realloc(f->instruction_tokens, sizeof(mercury_int)*(f->number_instructions+required_space) );
+	if(!nptr){
+		f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+		f->token_error_num=dbg_toknum;
 		return;
 	}
-	func->instruction_tokens = naddr2;
-	func->instruction_tokens[func->number_instructions]= tokennum;
-
-	func->number_instructions++;
-
+	f->instruction_tokens=(mercury_int*)nptr;
 	
-	return;
-}
-void m_compile_add_rawdata(compiler_function* func, uint32_t dat, mercury_int tokennum = 0) {
-	uint32_t* naddr = (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions + 1));
-	if (!naddr) {
-		return;
+	memcpy( f->instructions+f->number_instructions, s ,sizeof(char)*len );
+	for(mercury_int i=0;i<required_space;i++){
+		f->instruction_tokens[f->number_instructions+i]=dbg_toknum;
 	}
-	func->instructions = naddr;
-	func->instructions[func->number_instructions] = dat;
-
-	mercury_int* naddr2 = (mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + 1));
-	if (!naddr2) {
-		return;
-	}
-	func->instruction_tokens = naddr2;
-	func->instruction_tokens[func->number_instructions] = tokennum;
-
-	func->number_instructions++;
-	return;
-}
-void m_compile_add_rawdatadouble(compiler_function* func, uint64_t dat, mercury_int tokennum = 0) {
-	uint32_t* naddr = (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions + 2));
-	if (!naddr) {
-		return;
-	}
-	func->instructions = naddr;
-	uint64_t* ad = (uint64_t*)(func->instructions + func->number_instructions);
-	*ad = dat;
-
-	mercury_int* naddr2 = (mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + 2));
-	if (!naddr2) {
-		return;
-	}
-	func->instruction_tokens = naddr2;
-	func->instruction_tokens[func->number_instructions] = tokennum;
-	func->instruction_tokens[func->number_instructions+1] = tokennum;
-
-	func->number_instructions +=2;
-	return;
+	f->number_instructions+=required_space;
 }
 
 
 
-void m_compile_cstring_load(compiler_function* func, char* str, mercury_int len=-1, mercury_int position=0) {
-	len = len < 0 ? strlen(str) : len;
 
-	m_compile_add_instruction(func,M_OPCODE_NSTR,0);
-	#ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(func,len);
-	#else
-	m_compile_add_rawdata(func,len);
-	#endif
+//forward refrences for other complex functions
+mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** tokens, mercury_int num_tokens, mercury_int token_offset, compiler_info* i, compiler_function* postfix_function = nullptr);
+compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens, mercury_int num_tokens, mercury_int token_offset = 0, mercury_int* tokens_used = nullptr, compiler_info* ci = nullptr);
 
 
-	mercury_int sizetoallocate = (len + 3) / 4; // 4 chars in 32 bits.
-	uint32_t* naddr = (uint32_t*)realloc(func->instructions, sizeof(uint32_t) * (func->number_instructions + sizetoallocate ));
-	if (!naddr) {
-		return;
+mercury_int m_compile_read_variable(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
+	mercury_int initial_offset=token_offset;
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	//if(!(cur_tok &&(cur_tok->token_flags & (TOKEN_VARIABLE | TOKEN_SCOPESPECIFIER) ))) {
+	if (!cur_tok){
+		return 0;
 	}
-	func->instructions = naddr;
-	char* ad = (char*)(func->instructions + func->number_instructions);
-	memcpy(ad,str,len);
-
-	mercury_int* naddr2 = (mercury_int*)realloc(func->instruction_tokens, sizeof(mercury_int) * (func->number_instructions + sizetoallocate));
-	if (!naddr2) {
-		return;
-	}
-	func->instruction_tokens = naddr2;
-	for (mercury_int i = 0; i < sizetoallocate; i++) {
-		func->instruction_tokens[func->number_instructions + i] = position; //PLACEHOLDER
-	}
-
-	func->number_instructions += sizetoallocate;
-}
-
-void m_compile_number_string_load(compiler_function* func, char* str, mercury_int len = -1, mercury_int position = 0) {
-	len = len < 0 ? strlen(str) : len;
-	char* cstr = (char*)malloc(len + 1);
-	memcpy(cstr, str,len);
-	cstr[len] = '\0';
-	char* end;
-
-
-
+	if(cur_tok->token_flags & TOKEN_STATIC_NIL){
+		add_instruction(f, M_OPCODE_NNIL,0,token_offset);
+		token_offset++;
+	}else if(cur_tok->token_flags & TOKEN_STATIC_BOOLEAN){
+		if(cur_tok->chars[0]=='t'){
+			add_instruction(f, M_OPCODE_NTRU,0,token_offset);
+		}else{
+			add_instruction(f, M_OPCODE_NFAL,0,token_offset);
+		}
+		token_offset++;
+	}else if(cur_tok->token_flags & TOKEN_STATIC_STRING){
+		mercury_int ci=compiler_info_add_constant_string_from_token(i,cur_tok);
+		if (ci==-1){
+			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		add_instruction(f,M_OPCODE_GCON,0, token_offset);
+		add_rawdata_bitwidth_size(f,ci, token_offset);
+		//add_string_onto_stack(f,cur_tok->chars,cur_tok->num_chars,token_offset);
+		token_offset++;
+	}else if(cur_tok->token_flags & TOKEN_STATIC_NUMBER){
+		char* cstr=(char*)malloc(cur_tok->num_chars+1);
+		if (!cstr) {
+			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num = token_offset;
+			return 0;
+		}
+		memcpy(cstr,cur_tok->chars,cur_tok->num_chars);
+		cstr[cur_tok->num_chars]='\0';
+		char* end;
+		
 		mercury_int i = strtoll(cstr, &end, 0);
 		if (*end=='\0') {
-		m_compile_add_instruction(func, M_OPCODE_NINT,0, position);
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, i, position);
-#else
-		m_compile_add_rawdata(func, i, position);
-#endif
-			return;
-	}
-
-
-
-
-	mercury_float f = strtod(cstr, &end);
-		m_compile_add_instruction(func, M_OPCODE_NFLO,0, position);
-		mercury_int d = *((mercury_int*)&f);
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, d, position);
-#else
-		m_compile_add_rawdata(func, d, position);
-#endif
-			return;
-
-
-
-}
-
-//for tables an arrays. supports commas, as well as bracket notation. eg, [1,2,3] [1,2,[5]=1]
-int m_compile_read_stored_variable(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max) {
-	if (offset > token_max) {
-		return 0;
-	}
-	compiler_token* t = tokens[offset];
-
-	//m_compile_add_instruction(func, M_OPCODE_CPYT); //copy the structure so that it remains on the stack still.
-	//remember that the stack order is table -> key -> value.
-
-	if (t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0] == '[') { //either create a new array, or index. we need to find out which.
-		mercury_int o = 1;
-		m_compile_add_instruction(func, M_OPCODE_CPYT, 0,offset+o);
-		compiler_token* tn = tokens[offset+o];
-		if (tn->chars[0] == ']' && tn->token_flags & TOKEN_SPECIALVARIABLECREATE) { //implied index empty array.
-			m_compile_add_instruction(func, M_OPCODE_NINT, 0, offset + o);
-#ifdef MERCURY_64BIT
-			m_compile_add_rawdatadouble(func, POSITION_IN_DATASTRUCTURE, offset + o);
-#else
-			m_compile_add_rawdata(func, POSITION_IN_DATASTRUCTURE, offset + o);
-#endif
-			POSITION_IN_DATASTRUCTURE++;
-			m_compile_add_instruction(func, M_OPCODE_NARR, 0, offset + o);
-			m_compile_add_instruction(func, M_OPCODE_SET, 0, offset + o);
-			return 2;
-		}
-		mercury_int a = m_compile_read_var_statment_recur(func, tokens, offset + o, token_max);
-		if (!a)return 0;
-		o += a;
-		t = tokens[offset + o];
-		if ( t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0] == ']' ) {
-			o++;
-			t = tokens[offset + o];
-			if (t->token_flags & TOKEN_OPERATOR && t->num_chars==1 && t->chars[0] == '=') { // it is an indexed setting
-				o++;
-				a= m_compile_read_var_statment_recur(func, tokens, offset + o, token_max);
-				if (a)m_compile_add_instruction(func, M_OPCODE_SET, 0, offset + o);
-				return o + a;
-			}
-			else {
-				func->errorcode = M_COMPERR_INVALID_SYMBOL;
-				func->token_error_num = offset + o;
+			add_instruction(f, M_OPCODE_NINT,0,token_offset);
+			add_rawdata_bitwidth_size(f, *((binarydata*)&i),token_offset);
+		}else{
+			mercury_float fa = strtod(cstr, &end);
+			if (*end=='\0') {
+				add_instruction(f, M_OPCODE_NFLO,0,token_offset);
+				add_rawdata_bitwidth_size(f, *((binarydata*)&fa),token_offset);
+			}else{
+				f->errorcode=M_COMPERR_MALFORMED_NUMBER;
+				f->token_error_num=token_offset;
 				return 0;
 			}
 		}
-		else {
-			func->errorcode = M_COMPERR_INVALID_SYMBOL;
-			func->token_error_num = offset + o;
-			return 0;
-		} //nevermind, it's actually just a new array.
+		free(cstr);
+		token_offset++;
+	}else if( (cur_tok->token_flags & (TOKEN_OPERATOR | TOKEN_MISC_OP)) && cur_tok->num_chars==1 && (cur_tok->chars[0] == '[' || cur_tok->chars[0] == '{') ){
+		
+		bool is_array = cur_tok->chars[0]=='[';
+		mercury_int implicit_position=0;
+			
+		add_instruction(f,is_array? M_OPCODE_NARR : M_OPCODE_NTAB,0,token_offset);
+		token_offset++;
 
-		m_compile_add_instruction(func, M_OPCODE_NINT,0, offset + o);
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, POSITION_IN_DATASTRUCTURE, offset + o);
-#else
-		m_compile_add_rawdata(func, POSITION_IN_DATASTRUCTURE, offset + o);
-#endif
-		POSITION_IN_DATASTRUCTURE++;
-		a=m_compile_read_variable(func, tokens, offset, token_max);
-		if (a)m_compile_add_instruction(func, M_OPCODE_SET, 0, offset + a);
-		if(a)return a;
-	}
-	else {
-		compiler_function* f2=init_comp_func();
-		if (!f2)return 0;
-
-		m_compile_add_instruction(f2, M_OPCODE_CPYT, 0, offset);
-		m_compile_add_instruction(f2, M_OPCODE_NINT, 0, offset);
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(f2, POSITION_IN_DATASTRUCTURE);
-#else
-		m_compile_add_rawdata(func, POSITION_IN_DATASTRUCTURE);
-#endif
-		POSITION_IN_DATASTRUCTURE++;
-		mercury_int a=m_compile_read_var_statment_recur(f2, tokens, offset, token_max);
-		if (a) { 
-			m_compile_add_instruction(f2, M_OPCODE_SET, 0, offset+a);
-			concat_comp_func_appends(func,f2);
-			delete_comp_func(f2);
-		}
-		return a;
-	}
-
-
-	return 0;
-}
-
-int mercury_compile_read_function_define(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max, bool requiresname) {
-	mercury_int adv = 0;
-	compiler_token* token = tokens[offset + adv];
-
-	if (!(token->token_flags & TOKEN_KEYWORD && token->num_chars == 8 && token->chars[0] == 'f' && token->chars[7] == 'n')) { //function keyword
-		return 0;
-	}
-	adv++;
-	token = tokens[offset + adv];
-
-	compiler_function* ffunc = init_comp_func();
-
-	if (!ffunc) {
-		func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-		func->token_error_num = offset + adv;
-		return 0;
-	}
-
-	compiler_function* fvarget = init_comp_func();
-	if (!fvarget) {
-		func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-		func->token_error_num = offset + adv;
-		return 0;
-	}
-
-
-	/*
-	steps to do this in bytecode:
-		define function
-		commit to variable
-	of course, we actually do the reverse in code writting...
-
-
-	now, a function can be broken down into pieces
-
-	function stuff(var1,var2) return var1+var2 end
-	declaration, name, variables, body
-
-	*/
-
-
-
-	if (requiresname) {
-		if (token->token_flags & TOKEN_ENVVARNAME) {
-			m_compile_cstring_load(ffunc,token->chars,token->num_chars,offset+adv);
-			adv++;
-			token = tokens[offset + adv];
-		}
-		else {
-			func->errorcode = M_COMPERR_EXPECTED_VARIABLE;
-			func->token_error_num = offset + adv;
-			return 0;
-		}
-	}
-
-
-	if (!(token->token_flags & TOKEN_OPERATOR && token->num_chars == 1 && token->chars[0] == '(')) {
-		func->errorcode = M_COMPERR_INVALID_SYMBOL;
-		func->token_error_num = offset+ adv;
-		return 0;
-	}
-	adv++;
-
-	while (true) { //gotta search for vars.
-		token = tokens[offset + adv];
-		if (token->token_flags & TOKEN_OPERATOR) { //check for )
-			if (token->chars[0] == ')' && token->num_chars == 1) {
-				adv++;
-				break;
-			}
-			else {
-				func->errorcode = M_COMPERR_INVALID_SYMBOL;
-				func->token_error_num = offset + adv;
-				return 0;
-			}
-		}
-		else if (token->token_flags & TOKEN_ENVVARNAME) { //set var from stack
-			// fvarget
-
-			m_compile_cstring_load(fvarget, token->chars, token->num_chars, offset + adv); //first we need to get the string
-			m_compile_add_instruction(fvarget, M_OPCODE_SWPT, 0,offset+adv); // but, the key must be second on the stack
-			m_compile_add_instruction(fvarget, M_OPCODE_SETL, 0, offset + adv); //now set it as a local.
-			adv++;
-			token = tokens[offset + adv];
-			if (token->token_flags & TOKEN_OPERATOR) {
-				if (token->chars[0] == ')' && token->num_chars == 1) {
-					adv++;
-					break;
-				}
-				else if (token->chars[0] == ',' && token->num_chars == 1) {
-					adv++;
-				}
-				else {
-					func->errorcode = M_COMPERR_INVALID_SYMBOL;
-					func->token_error_num = offset + adv;
-					return 0;
-				}
-			}
-			else {
-				func->errorcode = M_COMPERR_INVALID_SYMBOL;
-				func->token_error_num = offset + adv;
-				return 0;
-			}
-		}
-		else { //error!
-			func->errorcode = M_COMPERR_INVALID_SYMBOL;
-			func->token_error_num = offset + adv;
-			return 0;
-		}
-	}
-	m_compile_add_instruction(fvarget, M_OPCODE_CLS, 0, offset + adv); // clear the stack after assigning variables so that if more variables are given than we need, it won't result in bad return values
-
-
-	// compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercury_int num_tokens , mercury_int* endatend=nullptr )
-	mercury_int functokensused = 0;
-	compiler_function* fnfunc = mercury_compile_compile_tokens(tokens+offset+adv, token_max-adv-offset, &functokensused); //shift the tokens to match it.
-	if (!fnfunc) {
-		func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-		func->token_error_num = adv + offset;
-		return 0;
-	}
-	if (fnfunc->errorcode) {
-		func->errorcode = fnfunc->errorcode;
-		func->token_error_num = fnfunc->token_error_num;
-		delete_comp_func(fnfunc);
-		return 0;
-	}
-
-	adv += functokensused;
-
-	adv++;
-
-	concat_comp_func_appends(fvarget, fnfunc);
-	delete_comp_func(fnfunc);
-
-
-	m_compile_add_instruction(ffunc, M_OPCODE_NFUN, 0, offset + adv);
-#ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(ffunc, fvarget->number_instructions);
-#else
-	m_compile_add_rawdata(ffunc, fvarget->number_instructions);
-#endif
-
-
-	if (requiresname) {
-		m_compile_add_instruction(fvarget, M_OPCODE_SENV, 0, offset + adv);
-	}
-
-	concat_comp_func_appends(func, ffunc);
-	concat_comp_func_appends(func, fvarget);
-	delete_comp_func(fvarget);
-	delete_comp_func(ffunc);
-	//printf("func escaped OK\n");
-	return adv;
-}
-
-
-
-int m_compile_read_variable(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max) {
-
-	compiler_token* t=tokens[offset];
-	if (t->token_flags & TOKEN_SCOPESPECIFIER) {
-		compiler_token* t2 = tokens[offset + 1];
-		if (t2->token_flags & TOKEN_ENVVARNAME) {
-
-			mercury_int i = add_str_as_const(t2->chars, t2->num_chars);
-			if (i == -1) {
-				func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-				func->token_error_num = offset;
-				return 0;
-			}
-			m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);
-#ifdef MERCURY_64BIT
-			m_compile_add_rawdatadouble(func, i, offset);
-#else
-			m_compile_add_rawdata(func, i, offset);
-#endif
-
-			//m_compile_cstring_load(func, t2->chars, t2->num_chars, offset);
-			if (t->chars[0] == 'l') { //local
-				m_compile_add_instruction(func, M_OPCODE_GETL, 0,offset);
-			}
-			else if (t->chars[0] == 'g') { //global
-				m_compile_add_instruction(func, M_OPCODE_GETG, 0, offset);
-			}
-			return 2;
-		}
-		else {
-			return 0;
-		}
-	}
-	else if (t->token_flags & TOKEN_ENVVARNAME) {
-		mercury_int i = add_str_as_const(t->chars, t->num_chars);
-		if (i == -1) {
-			func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-			func->token_error_num = offset;
-			return 0;
-		}
-		m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, i, offset);
-#else
-		m_compile_add_rawdata(func, i, offset);
-#endif
-
-		//m_compile_cstring_load(func,t->chars, t->num_chars, offset);
-		m_compile_add_instruction(func, M_OPCODE_GENV, 0, offset);
-		return 1;
-	}
-	else if (t->token_flags & TOKEN_STATICSTRING) {
-		mercury_int i=add_str_as_const(t->chars,t->num_chars);
-		if (i == -1) {
-			func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-			func->token_error_num = offset;
-			return 0;
-		}
-		m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);	
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, i, offset);
-#else
-		m_compile_add_rawdata(func, i, offset);
-#endif
-
-		//m_compile_cstring_load(func, t->chars, t->num_chars, offset);
-		return 1;
-	}
-	else if (t->token_flags & TOKEN_STATICNIL) {
-		m_compile_add_instruction(func,M_OPCODE_NNIL, 0, offset);
-		return 1;
-	}
-	else if (t->token_flags & TOKEN_STATICBOOLEAN) {
-		if (t->chars[0] == 't') {
-			m_compile_add_instruction(func, M_OPCODE_NTRU, 0, offset);
-		}
-		else {
-			m_compile_add_instruction(func, M_OPCODE_NFAL, 0, offset);
-		}
-		return 1;
-	}
-	else if (t->token_flags & TOKEN_STATICNUMBER) { //numbers are complex, since we have a lot of formats. eg, with + or - at the front, 0x for hex, and floats with decimals.
-		if (offset + 1 < token_max) {
-			compiler_token* t2 = tokens[offset + 1];
-			if (t2->token_flags & TOKEN_OPERATOR && t2->num_chars == 1 && t2->chars[0] == '.') { //decimal
-
-				if (offset + 2 < token_max) {
-					compiler_token* t3 = tokens[offset + 2];
-					if (t3->token_flags & TOKEN_STATICNUMBER) { //places!
-						char* s2 = (char*)malloc(sizeof(char) * (t->num_chars + t2->num_chars + t3->num_chars));
-						if (!s2)return 0;
-						memcpy(s2, t->chars, t->num_chars);
-						memcpy(s2 + t->num_chars, t2->chars, t2->num_chars);
-						memcpy(s2 + t->num_chars + t2->num_chars, t3->chars, t3->num_chars);
-						m_compile_number_string_load(func, s2, t->num_chars + t2->num_chars + t3->num_chars,offset);
-						return 3;
-					}
-				}
-				char* s = (char*)malloc(sizeof(char) * (t->num_chars + t2->num_chars));
-				if (!s)return 0;
-				memcpy(s, t->chars, t->num_chars);
-				memcpy(s + t->num_chars, t2->chars, t2->num_chars);
-				m_compile_number_string_load(func, s, t->num_chars + t2->num_chars, offset);
-				return 2;
-			}
-		}
-		m_compile_number_string_load(func,t->chars,t->num_chars, offset);
-		return 1;
-	}
-	else if (t->token_flags & TOKEN_SPECIALVARIABLECREATE) { //arrays and tables
-		mercury_int o = 0;
-		if (t->chars[0] == '[') { // a ray
-			o++;
-			m_compile_add_instruction(func, M_OPCODE_NARR, 0, offset+o);
-			mercury_int prev_datapos = POSITION_IN_DATASTRUCTURE;
-			POSITION_IN_DATASTRUCTURE = 0;
-			while (true) {
-
-				o += m_compile_read_stored_variable(func, tokens, offset + o, token_max);
-				if (offset + o > token_max) {
-					func->errorcode = M_COMPERR_ENDS_TOO_SOON;
-					func->token_error_num = offset + o;
-					return 0;
-				};
-
-				t = tokens[offset + o];
-				if (t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0]==']') {
-					return o + 1;
-				}
-				else if (t->token_flags & TOKEN_OPERATOR && t->chars[0] == ',') {
-					o++;
-				}
-				else {
-					func->token_error_num = offset + o;
-					func->errorcode = M_COMPERR_INVALID_SYMBOL;
-					return 0;
-				}
+		while(true){ //the ticky thing about tables and arrays is how many syntax options we have. [1,2,3], [1=1,2=2,3=3]
+			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 				
+				
+			if(!cur_tok){
+				break;
 			}
-			POSITION_IN_DATASTRUCTURE = prev_datapos;
-			return o;
-		}
-		else if (t->chars[0] == '{'){// ta ble
-			//printf("reading table\n");
-			o++;
-			m_compile_add_instruction(func, M_OPCODE_NTAB, 0,offset + o);
-			mercury_int prev_datapos = POSITION_IN_DATASTRUCTURE;
-			POSITION_IN_DATASTRUCTURE = 0;
-			while (true) {
-
-				o += m_compile_read_stored_variable(func, tokens, offset + o, token_max);
-				if (offset + o > token_max) {
-					func->errorcode = M_COMPERR_ENDS_TOO_SOON;
-					func->token_error_num = offset + o;
-					return 0;
-				};
-
-				t = tokens[offset + o];
-				if (t->token_flags & TOKEN_SPECIALVARIABLECREATE && t->chars[0] == '}') {
-					//printf("ret'd %i\n",o);
-					return o + 1;
-				}
-				else if (t->token_flags & TOKEN_OPERATOR && t->chars[0] == ',') {
-					o++;
-				}
-				else {
-					//printf("aw fuck\n");
-					func->token_error_num = offset + o;
-					func->errorcode = M_COMPERR_INVALID_SYMBOL;
-					return 0;
-				}
-
+				
+			//exit at closing symbol.
+			if( (cur_tok->token_flags & TOKEN_OPERATOR) && cur_tok->num_chars==1 && cur_tok->chars[0]== (is_array ? ']' : '}') ){
+				token_offset++;
+				break;
 			}
-			POSITION_IN_DATASTRUCTURE = prev_datapos;
-			return o;
-		}
-		else {
-			return 0;
-		}
-	}
-	else if (t->token_flags & TOKEN_OPERATOR) {
-	if (t->num_chars == 1 && t->chars[0] == '.') {
-		compiler_token* t2 = tokens[offset + 1];
-		if (t2->token_flags & TOKEN_STATICNUMBER) {
-			char* s = (char*)malloc(sizeof(char) * (t->num_chars + t2->num_chars));
-			if (!s)return 0;
-			memcpy(s, t->chars, t->num_chars);
-			memcpy(s + t->num_chars, t2->chars, t2->num_chars);
-			m_compile_number_string_load(func, s, t->num_chars + t2->num_chars,offset);
-			return 2;
-		}
-	}
-	return 0;
-	}
-	else if (t->token_flags & TOKEN_KEYWORD) {
-		if (t->num_chars == 8 && t->chars[0] == 'f' && t->chars[7] == 'n') { //read an anonymous function
-			return mercury_compile_read_function_define(func,tokens,offset,token_max,false);
-		}
-	}
-	return 0;
-}
-
-
-int m_compile_read_unary_op(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max) {
-	if (offset >= token_max)return 0;
-	compiler_token* t = tokens[offset];
-	if ( (t->token_flags & TOKEN_OPERATOR) && (t->token_flags & TOKEN_UANRY) ) {
-		uint16_t op = m_compile_get_operator_bytecode(t, 1);
-		m_compile_add_instruction(func, op, 0, offset);
-		return 1;
-	}
-	return 0;
-}
-
-int m_compile_read_binary_op(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max) {
-	if (offset >= token_max)return 0;
-	compiler_token* t = tokens[offset];
-	if ( (t->token_flags & TOKEN_OPERATOR ) && (t->token_flags & TOKEN_BINARY) ) {
-		uint16_t op = m_compile_get_operator_bytecode(t, 0);
-		m_compile_add_instruction(func, op, 0,offset);
-		return 1;
-	}
-	return 0;
-}
-
-
-
-
-int m_compile_read_indexing(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max) {
-	if (offset >= token_max)return 0;
-	int adv = 0;
-	bool periodmode = false;
-
-	if (!(tokens[offset]->num_chars == 1)) {
-		return 0;
-	}
-	if (tokens[offset]->chars[0] == '[')
-	{
-
-	}else if (tokens[offset]->chars[0] == '.') {
-		periodmode = true;
-	}else {
-		return 0;
-	}
-	adv++;
-	offset++;
-
-	if (offset >= token_max)return 0;
-
-
-	int a = 0;
-	if (periodmode) {
-		compiler_token* t = tokens[offset];
-		if (t->token_flags & TOKEN_ENVVARNAME) {
-
-			mercury_int i = add_str_as_const(t->chars, t->num_chars);
-			if (i == -1) {
-				func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-				func->token_error_num = offset;
+				
+			//read a variable. this could be implicit index value or an index.
+			compiler_function* idxfunc=new_compiler_function();
+			token_offset+= m_compile_read_var_statment(idxfunc,tokens,num_tokens,token_offset,i);
+			if(idxfunc->errorcode){
+				f->errorcode = idxfunc->errorcode;
+				f->token_error_num = idxfunc->token_error_num;
 				return 0;
 			}
-			m_compile_add_instruction(func, M_OPCODE_GCON, 0, offset);
-#ifdef MERCURY_64BIT
-			m_compile_add_rawdatadouble(func, i, offset);
-#else
-			m_compile_add_rawdata(func, i, offset);
-#endif
-			//m_compile_cstring_load(func, t->chars, t->num_chars, offset);
-			a = 1;
-		}
-		else {
-			return 0;
-		}
-	}
-	else {
-		a = m_compile_read_var_statment_recur(func, tokens, offset, token_max);
-	}
-	if (!a) {
-		func->errorcode = M_COMPERR_EXPECTED_VARIABLE;
-		return 0;
-	}
-	offset += a;
-	adv += a;
-
-	if (!periodmode) {
-		if (offset >= token_max)return 0;
-		if (!(tokens[offset]->num_chars == 1 && tokens[offset]->chars[0] == ']')) {
-			return 0;
-		}
-	}
-
-	if(adv)m_compile_add_instruction(func, M_OPCODE_GET, 0,offset);
-
-	if(!periodmode)adv++;
-
-	return adv;
-}
-
-int m_compile_read_fcall(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max, compiler_function* get_var_bytecode) {
-	if (offset >= token_max)return 0;
-	int advanced = 0;
-	mercury_int args_in = 0;
-	mercury_int args_out = COMPILER_NUMBER_ARGS_OUT;
-
-	if ( !(tokens[offset]->num_chars == 1 && tokens[offset]->chars[0] == '(') ) {
-		return 0;
-	}
-	offset++;
-	advanced++;
-
-	mercury_int PREV_COMP_NUM_ARG_OUT = COMPILER_NUMBER_ARGS_OUT;
-
-	COMPILER_NUMBER_ARGS_OUT = 1;
-
-	while (!(tokens[offset]->num_chars == 1 && tokens[offset]->chars[0] == ')')) {
-		if (offset >= token_max) { COMPILER_NUMBER_ARGS_OUT = PREV_COMP_NUM_ARG_OUT;  return 0; }
-
-		int a= m_compile_read_var_statment_recur(func, tokens, offset, token_max);
-		offset += a;
-		advanced+=a;
-		args_in++;
-		if (offset > token_max) { COMPILER_NUMBER_ARGS_OUT = PREV_COMP_NUM_ARG_OUT;  return 0; }
-		if (!(tokens[offset]->num_chars == 1 && tokens[offset]->chars[0] == ',')) {
-			break;
-		}
-		offset++;
-		advanced++;
-	}
-	advanced++;
-
-
-	COMPILER_NUMBER_ARGS_OUT = PREV_COMP_NUM_ARG_OUT;
-
-	concat_comp_func_appends(func, get_var_bytecode);
-	
-	m_compile_add_instruction(func, M_OPCODE_CALL, 0, offset-advanced+1);
-#ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(func, args_in, offset - advanced + 1);
-	m_compile_add_rawdatadouble(func, args_out, offset - advanced + 1);
-#else
-	m_compile_add_rawdata(func, args_in, offset);
-	m_compile_add_rawdata(func, args_out, offset);
-#endif
-
-	return advanced;
-}
-
-int m_compile_read_var_statment_recur(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max, compiler_function* operation_append) {
-	if (offset >= token_max) {
-		return 0;
-	}
-	mercury_int addo = 0;
-	bool parentheses = false;
-
-	compiler_function* f1 = init_comp_func();
-	compiler_function* f2 = init_comp_func();
-	compiler_function* f3 = init_comp_func();
-	compiler_function* f4 = init_comp_func();
-	compiler_function* ff = init_comp_func();
-	if (!(f1 && f2 && f3 && f4 && ff)) {
-		return 0;
-	}
-
-	/*
-	if (tokens[offset]->token_flags & TOKEN_OPERATOR && tokens[offset]->chars[0]=='(') {
-		offset++;
-		parentheses = true; //we should process this bytecode first before the others.
-		addo++;
-	}
-	*/
-
-	int unary_off= m_compile_read_unary_op(f2, tokens, offset, token_max);
-	offset += unary_off;
-
-	int varblock_off = 0;
-	if (tokens[offset]->token_flags & TOKEN_OPERATOR && tokens[offset]->chars[0] == '(') {
-		offset++;
-		addo++;
-		varblock_off = m_compile_read_var_statment_recur(f1, tokens, offset, token_max);
-		if (!varblock_off) {
-			delete_comp_func(f1);
-			delete_comp_func(f2);
-			delete_comp_func(f3);
-			delete_comp_func(f4);
-			delete_comp_func(ff);
-			return 0;
-		}
-		offset += varblock_off;
-		if (tokens[offset]->token_flags & TOKEN_OPERATOR && tokens[offset]->chars[0] == ')') {
-			offset++;
-			addo++;
-		}
-		else {
-			func->errorcode = M_COMPERR_PAREN_NOT_CLOSED;
-			func->token_error_num = offset;
-			return 0;
-		}
-	}
-	else {
-		varblock_off = m_compile_read_variable(f1, tokens, offset, token_max);
-		if (!varblock_off) {
-			delete_comp_func(f1);
-			delete_comp_func(f2);
-			delete_comp_func(f3);
-			delete_comp_func(f4);
-			delete_comp_func(ff);
-			return 0;
-		}
-		offset += varblock_off;
-	}
-
-
-
-	int index_off = m_compile_read_indexing(f1,tokens,offset,token_max);
-	offset += index_off;
-
-	mercury_int PREV_COMP_NUM_ARG_OUT = COMPILER_NUMBER_ARGS_OUT;
-	COMPILER_NUMBER_ARGS_OUT = 1;
-	int func_off = m_compile_read_fcall(ff , tokens, offset, token_max,f1);
-	COMPILER_NUMBER_ARGS_OUT = PREV_COMP_NUM_ARG_OUT;
-
-	offset += func_off;
-	if (func_off) {
-		delete_comp_func(f1);
-		f1 = ff;
-	}
-
-
-	int binop_off = m_compile_read_binary_op(f4, tokens, offset, token_max);
-	if (binop_off) {
-		offset += binop_off;
-		int next_off = m_compile_read_var_statment_recur(f3, tokens, offset, token_max,f4);
-		if (!next_off) {
-			delete_comp_func(f1);
-			delete_comp_func(f2);
-			delete_comp_func(f3);
-			delete_comp_func(f4);
-			delete_comp_func(ff);
-			return 0;
-		}
-		offset += next_off;
-
-		binop_off += next_off;
-	}
-
-
-	/*
-		f1 - base == a
-		f2 - unary op == #
-		f3 - bin op statment == 1
-		f4 - binary op == +
-
-		#a + 1
-	*/
-	
-	concat_comp_func_appends(f1, f2);
-	if (parentheses) {
-		concat_comp_func_appends(f1, f3);
-		if (operation_append)concat_comp_func_appends(f1, operation_append);;
-	}
-	else {
-		if (operation_append)concat_comp_func_appends(f1, operation_append);;
-		concat_comp_func_appends(f1, f3); //was f1 f3
-		//concat_comp_func_appends(f1, f4); //was f1 f4
-	}
-
-
-	concat_comp_func_appends(func, f1); //was func f1
-
-	delete_comp_func(f1);
-	delete_comp_func(f2);
-	delete_comp_func(f3);
-	delete_comp_func(f4);
-
-	return unary_off+varblock_off+index_off+func_off+binop_off + addo;
-}
-
-
-
-//a block is something like print("hello, world!") or a=5. this is to say that it is either a function call or variable assignment
-//code is comprised of many blocks
-//bytecode order of operations:
-// get -> index -> call -> unary -> binary -> set ; a=-b[c]()*4
-//how it's written:
-// set -> unary -> get -> index -> call -> binary
-int mercury_compile_compile_block(compiler_function* func, compiler_token** tokens,mercury_int offset,mercury_int token_max, int flags) {
-	//compiler_function* func= init_comp_func();
-	if (!func)return 0;
-
-	if (token_max < offset + 1) {
-		func->errorcode = M_COMPERR_ENDS_TOO_SOON;
-		func->token_error_num = offset;
-		return 0;
-	}
-
-	compiler_token* cur_tok = tokens[offset];
-	compiler_token* next_tok = tokens[offset + 1];
-
-	if (cur_tok->token_flags & TOKEN_LOOP_MODIFIER) {
-		if (COMPILER_INSIDE_LOOP) {
-			if (cur_tok->chars[0] == 'c') { //continue
-				m_compile_add_instruction(func, M_OPCODE_JMPR, 0,offset);
-#ifdef MERCURY_64BIT
-				m_compile_add_rawdatadouble(func, COMPILER_CONTINUE_JUMP_POSITION - func->number_instructions-2);
-#else
-				m_compile_add_rawdata(func, COMPILER_CONTINUE_JUMP_POSITION - func->number_instructions -1);
-#endif
+				
+			//read the next token to find out.
+			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+			if(!cur_tok){
+				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->token_error_num=token_offset;
+				return 0;
 			}
-			else if (cur_tok->chars[0] == 'b') { //break
-				void* nptr=realloc(COMPILER_BREAK_ADDRS, (COMPILER_BREAK_AMOUNTS+1) * sizeof(mercury_int));
-				if (!nptr) {
-					func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-					func->token_error_num = offset;
+				
+			if(cur_tok->token_flags & TOKEN_OPERATOR && cur_tok->num_chars==1){
+				if(cur_tok->chars[0]=='='){ //explicit index
+					add_instruction(f,M_OPCODE_CPYT,0,token_offset);
+						
+					merge_compiler_functions(f,idxfunc);
+					idxfunc=nullptr;
+					token_offset++;
+					mercury_int o= m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
+						
+					if(f->errorcode){
+						return 0;
+					}else if(!o){
+						f->errorcode=M_COMPERR_NO_VARIABLE;
+						f->token_error_num=token_offset;
+						return 0;
+					}
+						
+					add_instruction(f,M_OPCODE_SET,0,token_offset);
+					token_offset += o;
+					cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+						
+					if(!cur_tok){
+						f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+						f->token_error_num=token_offset;
+						return 0;
+					}
+						
+					if(!(cur_tok->token_flags & TOKEN_OPERATOR) && cur_tok->num_chars!=1 && !(cur_tok->chars[0]==',' || is_array ? ']' : '}')){
+						f->errorcode=M_COMPERR_WRONG_SYMBOL;
+						f->token_error_num=token_offset;
+						return 0;
+					}
+					if(cur_tok->chars[0] == ',')token_offset++;
+				}else if(cur_tok->chars[0]==',' || is_array ? ']' : '}'){ //implicit index
+					add_instruction(f,M_OPCODE_CPYT,0,token_offset);
+						
+					add_instruction(f,M_OPCODE_NINT,0,token_offset);
+					add_rawdata_double(f,*(binarydata*)&implicit_position,token_offset);
+					implicit_position++;
+						
+					merge_compiler_functions(f,idxfunc);
+					idxfunc=nullptr;
+						
+					add_instruction(f,M_OPCODE_SET,0,token_offset);
+					if(cur_tok->chars[0] == ',')token_offset++;
+				}else{
+					f->errorcode=M_COMPERR_WRONG_SYMBOL;
+					f->token_error_num=token_offset;
 					return 0;
 				}
-				COMPILER_BREAK_ADDRS = (mercury_int*)nptr;
-				m_compile_add_instruction(func, M_OPCODE_JMPR, 0,offset);
-				COMPILER_BREAK_ADDRS[COMPILER_BREAK_AMOUNTS] = func->number_instructions;
-				COMPILER_BREAK_AMOUNTS++;
-#ifdef MERCURY_64BIT
-				m_compile_add_rawdatadouble(func, func->number_instructions);
-#else
-				m_compile_add_rawdata(func, func->number_instructions);
-#endif
+			}else{
+				f->errorcode=M_COMPERR_WRONG_SYMBOL;
+				f->token_error_num=token_offset;
+				return 0;
 			}
-			return 1;
+				
+		};
+		
+	}else if(cur_tok->token_flags & (TOKEN_ENV_VAR | TOKEN_SCOPESPECIFIER) ){
+		uint16_t g_op= M_OPCODE_GENV;
+		if(cur_tok->token_flags & TOKEN_SCOPESPECIFIER){
+			if(token_matches_chars(cur_tok,"local")){
+				g_op = M_OPCODE_GETL;
+			}else if(token_matches_chars(cur_tok,"global")){
+				g_op = M_OPCODE_GETG;
+			}
+			token_offset++;
+			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+			
+			if(!cur_tok){
+				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->token_error_num=token_offset;
+				return 0;
+			}else if(!(cur_tok->token_flags & TOKEN_ENV_VAR)){
+				f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+				f->token_error_num=token_offset;
+				return 0;
+			}
+			
+			
 		}
-		else {
-			func->errorcode = M_COMPERR_KEYWORD_REQUIRES_LOOP;
-			func->token_error_num = offset;
+		
+		mercury_int ci=compiler_info_add_constant_string_from_token(i,cur_tok);
+		if (ci==-1){
+			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num=token_offset;
 			return 0;
 		}
+		add_instruction(f,M_OPCODE_GCON,0, token_offset);
+		add_rawdata_bitwidth_size(f,ci, token_offset);
+		//add_string_onto_stack(f,cur_tok->chars,cur_tok->num_chars,token_offset);
+		add_instruction(f, g_op,0,token_offset);
+		token_offset++;
+	}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='('){ //parenthesis statement reading. we read (b+c) as a variable because it makes things easier on the compiler, and helps further segment the code to be more clean. after all, a+(b+c) is functionally equivalent to computing (b+c) then doing a+.
+		token_offset++;
+
+		token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
+		if(f->errorcode){
+			return 0;
+		}
+		
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num=token_offset;
+			return 0;
+		}else if(!(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')') ){
+			f->errorcode = M_COMPERR_NESTEDSTATMENT_NOT_CLOSED;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		token_offset++;
+		
+	}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"function")){ //likewise, functions are a first class variable so there's no real reason to not include parsing it in the variable reading block.
+		token_offset++;
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num=token_offset;
+			return 0;
+		}else if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='(') ){
+			f->errorcode=M_COMPERR_WRONG_SYMBOL;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		
+		add_instruction(f,M_OPCODE_NFUN,0,token_offset);
+		
+		//binarydata* sizeoffunction=(binarydata*)(f->instructions+f->number_instructions);
+		
+		add_rawdata_bitwidth_size(f,0,token_offset);
+
+		mercury_int initial_bytecode_size=f->number_instructions;
+		
+		token_offset++;
+		
+		compiler_function* funcargreadf = new_compiler_function();
+
+		while(true){ //reading args
+			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+			
+			if(!cur_tok){
+				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->token_error_num=token_offset;
+				return 0;
+			}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')'){
+				break;
+			}
+			
+			if(cur_tok->token_flags & TOKEN_ENV_VAR){
+
+				add_string_onto_stack(funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
+				//token_offset+=m_compile_read_variable(funcargreadf,tokens,num_tokens,token_offset, nullptr); //load the var name onto the stack
+				add_instruction(funcargreadf,M_OPCODE_SWPT,0,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key
+				add_instruction(funcargreadf,M_OPCODE_SETL,0,token_offset);
+				token_offset++;
+			}else{
+				f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
+				f->token_error_num=token_offset;
+				return 0;
+			}
+			
+			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+			if(!cur_tok){
+				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->token_error_num=token_offset;
+				return 0;
+			}else if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && (cur_tok->chars[0]==')' || cur_tok->chars[0]==',')  ) ){
+				f->errorcode=M_COMPERR_WRONG_SYMBOL;
+				f->token_error_num=token_offset;
+				return 0;
+			}
+			if(cur_tok->chars[0] == ',')token_offset++;
+
+		}
+		
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num=token_offset;
+			return 0;
+		}else if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')') ){
+			f->errorcode=M_COMPERR_WRONG_SYMBOL;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		token_offset++;
+		
+		mercury_int toks_consumed=0;
+		compiler_function* ff = mercury_compile_tokens_to_bytecode(tokens, num_tokens, token_offset,&toks_consumed);
+		if (!ff) {
+			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num = token_offset;
+			return 0;
+		}
+		if(ff->errorcode){
+			f->errorcode=ff->errorcode;
+			f->token_error_num=ff->token_error_num;
+			return 0;
+		}
+		token_offset += toks_consumed;
+		merge_compiler_functions(f, funcargreadf);
+		merge_compiler_functions(f,ff);
+		add_instruction(f, M_OPCODE_EXIT, 0, token_offset);
+		//*sizeoffunction = f->number_instructions-initial_bytecode_size;
+		*(binarydata*)(f->instructions + initial_bytecode_size - MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE) = f->number_instructions - initial_bytecode_size;
+		token_offset++; //advance 1 token to step over the ending end keyword
+	}
+
+	return token_offset- initial_offset;
+}
+
+
+
+mercury_int m_compile_read_unary_op(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset){
+	mercury_int initial_offset=token_offset;
+	while(true){
+		compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			break;
+		}
+		if(cur_tok->token_flags & TOKEN_UNARY_OP && !(cur_tok->token_flags & TOKEN_SELFMODIFY_OP) ){
+			add_instruction_at_begining(f, m_compile_get_operator_opcode_from_token(cur_tok,1) ,0,token_offset); // use _at_begining so that !#a is interpreted as not length a, instead of length not a.
+			token_offset++;
+		}else{
+			break;
+		}
+	}
+	return token_offset-initial_offset;
+}
+
+mercury_int m_compile_read_binary_op(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset){
+	mercury_int initial_offset=token_offset;
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	if(!cur_tok){
+		return 0;
+	}else if(cur_tok->token_flags & TOKEN_BINARY_OP && !(cur_tok->token_flags & TOKEN_SELFMODIFY_OP) ){
+		add_instruction(f,m_compile_get_operator_opcode_from_token(cur_tok),0,token_offset);
+		token_offset++;
+	}else{
+		return 0;
+	}
+	
+	return token_offset-initial_offset;
+}
+
+
+mercury_int m_compile_read_var_indexing(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
+	mercury_int initial_offset=token_offset;
+	
+	while(true){
+		compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok || !(cur_tok->token_flags & TOKEN_MISC_OP) || cur_tok->num_chars!=1){ //soft break, since reading indexes is optional.
+			break;
+		}
+		
+		if(cur_tok->chars[0]=='.'){ //namespaced indexing
+			token_offset++;
+			compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+			if(!cur_tok){
+				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->token_error_num=token_offset;
+				return 0;
+			}else if(!(cur_tok->token_flags & TOKEN_ENV_VAR)){
+				f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
+				f->token_error_num=token_offset;
+				return 0;
+			}else{
+				token_offset+=m_compile_read_variable(f,tokens,num_tokens,token_offset,i);
+				f->number_instructions--; //truncate the GENV instruction that will be added.
+				add_instruction(f,M_OPCODE_GET,0,token_offset);
+			}
+		}else if(cur_tok->chars[0]=='['){ //specific indexing
+			token_offset++;
+			mercury_int o=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
+			if(f->errorcode){
+				return 0;
+			}else if(!o){
+				f->errorcode = M_COMPERR_NO_VARIABLE;
+				f->token_error_num=token_offset;
+				return 0;
+			}
+			token_offset+=o;
+			
+			compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+			if(!cur_tok){
+				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->token_error_num=token_offset;
+				return 0;
+			}else if(!(cur_tok->token_flags&TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==']')){
+				f->errorcode=M_COMPERR_WRONG_SYMBOL;
+				f->token_error_num=token_offset;
+				return 0;
+			}
+			
+			add_instruction(f,M_OPCODE_GET,0,token_offset);
+			token_offset++;
+		}else{
+			break;
+		}
+		
+	}
+	
+	return token_offset-initial_offset;
+}
+
+
+
+mercury_int m_compile_read_call_func(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* args_in,compiler_info* i){
+	mercury_int initial_offset=token_offset;
+
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	if(!cur_tok)return 0;
+	if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='(') ){
+		return 0;
+	}
+	token_offset++;
+
+
+	while(true){
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num=token_offset;
+			return 0;
+		}else if( (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')') ){
+			token_offset++;
+			break;
+		}
+		
+		mercury_int o=m_compile_read_var_statment(f,tokens,num_tokens, token_offset,i);
+		if(f->errorcode){
+			return 0;
+		}else if(!o){
+			f->errorcode=M_COMPERR_NO_VARIABLE;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		(*args_in)++;
+		token_offset+=o;
+		
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num=token_offset;
+			return 0;
+		}else if( (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && (cur_tok->chars[0]==')' || cur_tok->chars[0]==',') ) ){
+			if(cur_tok->chars[0]==',')token_offset++;
+		}else{
+			f->errorcode=M_COMPERR_WRONG_SYMBOL;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		
 	}
 
 
-	//goto labels:
-	if (cur_tok->token_flags & TOKEN_ENVVARNAME && next_tok->token_flags & TOKEN_OPERATOR && next_tok->chars[0] == ':' && next_tok->num_chars==1) {
-		if (!m_compile_register_jump_point_label(cur_tok->chars, cur_tok->num_chars, func->number_instructions)) {
-			func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-			func->token_error_num = offset;
+	return token_offset-initial_offset;
+}
+
+//a var statment is something like 5+5
+mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i,compiler_function* postfix_function){
+	mercury_int initial_offset=token_offset;
+	/*bytecode op order:
+	1. get variable from environment
+	2. index variable
+	3. call function
+	4. unary operation
+	5. binary operation
+	
+	written op order:
+	1. unary operation
+	2. get variable from environment
+	3. index variable
+	4. call function
+	5. binary operation*/
+	
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	//token_offset++;
+	if(!cur_tok){
+		//f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+		//f->token_error_num=token_offset;
+		return 0;
+	}
+	compiler_function* func_var = new_compiler_function();
+	compiler_function* func_index = new_compiler_function();
+	compiler_function* func_call = new_compiler_function();
+	compiler_function* func_unary = new_compiler_function();
+	compiler_function* func_binary = new_compiler_function();
+	
+	token_offset+=m_compile_read_unary_op(func_unary,tokens,num_tokens,token_offset);
+	if(func_unary->errorcode){
+		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		f->errorcode=func_unary->errorcode;
+		f->token_error_num=func_unary->token_error_num;
+		return 0;
+	}
+	
+	token_offset+=m_compile_read_variable(func_var,tokens,num_tokens,token_offset,i);
+	if(func_var->errorcode){
+		f->errorcode = func_var->errorcode;
+		f->token_error_num = func_var->token_error_num;
+		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		return 0;
+	}else if(!func_var->number_instructions){
+		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		f->errorcode=M_COMPERR_NO_VARIABLE;
+		f->token_error_num=token_offset;
+		return 0;
+	}
+	
+	token_offset+= m_compile_read_var_indexing(func_index,tokens,num_tokens,token_offset,i);
+	if(func_index->errorcode){
+		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		f->errorcode=func_index->errorcode;
+		f->token_error_num=func_index->token_error_num;
+		return 0;
+	}
+	
+	mercury_int f_args_in=0;
+	mercury_int fctokc=m_compile_read_call_func(func_call,tokens,num_tokens,token_offset,&f_args_in,i);
+	token_offset+=fctokc;
+	if(func_call->errorcode){
+		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		f->errorcode=func_call->errorcode;
+		f->token_error_num=func_call->token_error_num;
+		return 0;
+	}
+
+	
+	compiler_function* func_complete = new_compiler_function();
+	
+	
+	if(fctokc){
+		merge_compiler_functions(func_complete,func_call);
+
+		merge_compiler_functions(func_complete, func_var);
+		merge_compiler_functions(func_complete, func_index);
+
+		add_instruction(func_complete,M_OPCODE_CALL,0,token_offset-1);
+		add_rawdata_bitwidth_size(func_complete, f_args_in,token_offset-1);
+		add_rawdata_bitwidth_size(func_complete,1,token_offset-1); //args out
+	}else{
+		delete_compiler_function(func_call);
+
+		merge_compiler_functions(func_complete, func_var);
+		merge_compiler_functions(func_complete, func_index);
+	}
+	merge_compiler_functions(func_complete,func_unary);
+	
+	if(postfix_function)merge_compiler_functions(func_complete,postfix_function);
+	
+	
+	token_offset+=m_compile_read_binary_op(func_binary,tokens,num_tokens,token_offset);
+	if(func_binary->errorcode){
+		delete_compiler_function(func_complete); delete_compiler_function(func_binary);
+		f->errorcode=func_binary->errorcode;
+		f->token_error_num=func_binary->token_error_num;
+		return 0;
+	}
+	if(func_binary->number_instructions){ //if we registered a binary operator, then we need to read ahead to get the other statement, which means we get to do this whole thing again.
+		token_offset+=m_compile_read_var_statment(func_complete,tokens,num_tokens,token_offset,i,func_binary);
+	}else{
+		delete_compiler_function(func_binary);
+	}
+
+	merge_compiler_functions(f, func_complete);
+	
+	return token_offset-initial_offset;
+}
+
+
+//a statement is something like a=5, a[1]=5, a(5), or a[1](5)
+mercury_int m_compile_read_statment(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
+	mercury_int initial_offset=token_offset;
+	uint8_t get_instruction=M_OPCODE_GENV;
+	uint8_t set_instruction=M_OPCODE_SENV;
+	
+	//find local/global keyword first
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	if(!cur_tok){
+		return 0;
+	}else if(cur_tok->token_flags & TOKEN_SCOPESPECIFIER){
+		
+		if(token_matches_chars(cur_tok,"local")){
+			get_instruction = M_OPCODE_GETL;
+			set_instruction = M_OPCODE_SETL;
+		}else{
+			get_instruction = M_OPCODE_GETG;
+			set_instruction = M_OPCODE_SETG;
+		}
+		
+		token_offset++;
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->token_error_num=token_offset;
+			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			return 0;
+		}
+	}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"return") ){
+		//this is tricky, since we have to discern return a=5 and return a. one of these is a statement, while the other is a variable. why even compile code after return? well, goto exists, for one, and the cursed code that this will inevitably cause will be more than worth it. but why even allow that, you may ask. well, the compiler's job is to make code run, not pass judgments about how shitty your code is, so pass judgments we will not.
+		//well actually, having said that, i've used jump after return in this code so uh... you go get that 1% speed improvment, king!
+		token_offset++;
+		while(true){
+			compiler_function* n=new_compiler_function();
+			mercury_int o=m_compile_read_var_statment(n,tokens,num_tokens,token_offset,i);
+			cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset + o);
+			if(!cur_tok || (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[1]=='=')){
+				delete_compiler_function(n);
+				break;
+			}
+			if(n->errorcode){
+				//f->errorcode=n->errorcode;
+				//f->token_error_num=n->token_error_num;
+				delete_compiler_function(n);
+				break; //we want to break instead, because reading an arg is optional, and m_compile_read_var_statment will error if there's no arg.
+			}
+			merge_compiler_functions(f,n);
+			token_offset+=o;
+			if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[1]==',')){
+				break;
+			}
+		}
+		add_instruction(f,M_OPCODE_EXIT,0,token_offset);
+		return token_offset-initial_offset;
+	}else if(cur_tok->token_flags & (TOKEN_KEYWORD | TOKEN_LOOP_MODIFIER)){
+		return 0;
+	}
+	
+	//then find the variable we'll be interfacing with
+	if(!(cur_tok->token_flags & TOKEN_ENV_VAR)){
+		f->token_error_num=token_offset;
+		f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+		return 0;
+	}
+	
+	compiler_token* nt=m_compile_get_next_token(tokens,num_tokens,token_offset+1); //goto labels
+	if(get_instruction==M_OPCODE_GENV && nt && nt->token_flags & TOKEN_MISC_OP && nt->num_chars==1 && nt->chars[0]==':'){
+		if(!compiler_info_add_goto_label(i,cur_tok,f->number_instructions+i->additional_instructions)){
+			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num=token_offset;
 			return 0;
 		}
 		return 2;
 	}
-	if (cur_tok->token_flags & TOKEN_JUMP && next_tok->token_flags & TOKEN_ENVVARNAME) {
-		if( !m_compile_register_jump_point_goto(next_tok->chars, next_tok->num_chars, func->number_instructions+1)) {
-			func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-			func->token_error_num = offset;
-			return 0;
-		}
-		m_compile_add_instruction(func, M_OPCODE_JMPR, 0,offset);
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(func, 0, offset);
-#else
-		m_compile_add_rawdata(func, 0, offset);
-#endif
-
-		return 2;
-	}
-
-	uint16_t set_opcode=M_OPCODE_SENV;
-	uint16_t get_opcode=M_OPCODE_GENV;
-
-	mercury_int addoff = 0;
-
-
-
-	if (cur_tok->token_flags & TOKEN_EXIT) { //return is handled here because it's easier.
-		addoff++;
-
-		while (true) {
-			int a=m_compile_read_var_statment_recur(func, tokens, offset+ addoff, token_max);
-			if (!a)break;
-			addoff += a;
-			cur_tok = tokens[offset+ addoff];
-			if (cur_tok->token_flags & TOKEN_OPERATOR && cur_tok->chars[0] == ',') {
-				addoff++;
-
-			}
-			else {
-				break;
-			}
-		}
-
-		m_compile_add_instruction(func, M_OPCODE_EXIT, 0, offset);
-		return addoff;
-	}
-
-
-	if (cur_tok->token_flags & TOKEN_SCOPESPECIFIER) {
-		if (cur_tok->chars[0]=='l') {
-			get_opcode = M_OPCODE_GETL;
-			set_opcode = M_OPCODE_SETL;
-		}else if (cur_tok->chars[0] == 'g') {
-			get_opcode = M_OPCODE_GETG;
-			set_opcode = M_OPCODE_SETG;
-		}
-
-		addoff = 1;
-	}
-
-	//scan for variables
-	compiler_function* var_code = init_comp_func();
-	compiler_function* var_code_final = init_comp_func();
-	if (!var_code) {
+	
+	compiler_function* getvarfunc=new_compiler_function();
+	if (!getvarfunc) {
+		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+		f->token_error_num = token_offset;
 		return 0;
 	}
-	if (!var_code_final) {
+
+	//token_offset+=m_compile_read_variable(f,tokens,num_tokens,token_offset,i);
+	//*
+	mercury_int ci = compiler_info_add_constant_string_from_token(i, cur_tok);
+	if (ci == -1) {
+		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+		f->token_error_num = token_offset;
 		return 0;
 	}
-	bool tokenpass = false;
-	while (true) {
-		concat_comp_func_appends(var_code, var_code_final);
-		delete_comp_func(var_code_final);
-		var_code_final=init_comp_func();
-		if (!var_code_final)return 0;
+	add_instruction(getvarfunc, M_OPCODE_GCON, 0, token_offset);
+	add_rawdata_bitwidth_size(getvarfunc, ci, token_offset);
+	token_offset++;
+	//*/
 
-		if (offset + addoff > token_max) {
-			delete_comp_func(var_code);
-			delete_comp_func(var_code_final);
+	//check if we're indexing something about it.
+	while(true){
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->token_error_num=token_offset;
+			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			delete_compiler_function(getvarfunc);
 			return 0;
-		}
-		cur_tok = tokens[offset + addoff];
-		next_tok = tokens[offset + addoff + 1];
-
-		if (tokenpass) {
-			tokenpass = false;
-			if ((cur_tok->token_flags & TOKEN_ENVVARNAME)) {
-				break;
-			}
-		}
-		else {
-			if (!(cur_tok->token_flags & TOKEN_ENVVARNAME)) {
-				break;
-			}
-
-			mercury_int i = add_str_as_const(cur_tok->chars, cur_tok->num_chars);
-			if (i == -1) {
-				func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-				func->token_error_num = offset;
-				return 0;
-			}
-			m_compile_add_instruction(var_code_final, M_OPCODE_GCON, 0, offset);
-#ifdef MERCURY_64BIT
-			m_compile_add_rawdatadouble(var_code_final, i, offset);
-#else
-			m_compile_add_rawdata(var_code_final, i, offset);
-#endif
-
-			//m_compile_cstring_load(var_code_final, cur_tok->chars, cur_tok->num_chars, offset+addoff);
-			//m_compile_add_instruction(var_code, get_opcode);
-			addoff++;
-			cur_tok = tokens[offset + addoff];
-			next_tok = tokens[offset + addoff + 1];
-		}
-
-		
-
-		if (cur_tok->token_flags & TOKEN_OPERATOR) {
-			if (cur_tok->chars[0] == '.' && cur_tok->num_chars == 1) { //period indexing will skip to the next itteration so that cstring_load will capture what you're trying to get.
-				m_compile_add_instruction(var_code_final, get_opcode, 0, offset+addoff);
-				addoff++;
-				get_opcode = M_OPCODE_GET;
-				set_opcode = M_OPCODE_SET;
-			}
-			else if (cur_tok->chars[0] == '[' && cur_tok->num_chars == 1) { // bracket indexing must first read a statment, and will additonally not call cstring_load.
-				m_compile_add_instruction(var_code_final, get_opcode, 0, offset + addoff);
-				addoff++;
-				tokenpass = true;
-				get_opcode = M_OPCODE_GET;
-				set_opcode = M_OPCODE_SET;
-				addoff+=m_compile_read_var_statment_recur(var_code_final,tokens,offset+addoff,token_max);
-				addoff++;
-			}
-			else {
-				break;
-			}
-		}
-		else {
-			func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-			func->token_error_num = offset + addoff + 1;
-			return 0;
-		}
-
-	}
-
-	cur_tok = tokens[offset + addoff];
-	next_tok = tokens[offset + addoff + 1];
-
-
-	if (cur_tok->token_flags & TOKEN_OPERATOR) {
-		if (cur_tok->chars[0] == '(' && cur_tok->num_chars == 1) {
-			mercury_int PREV_COMP_NUM_ARG_OUT = COMPILER_NUMBER_ARGS_OUT;
-			COMPILER_NUMBER_ARGS_OUT = 0;
-			concat_comp_func_appends(var_code, var_code_final);
-			m_compile_add_instruction(var_code, get_opcode, 0, offset + addoff);
-			int ad = m_compile_read_fcall(func, tokens, offset + addoff, token_max, var_code);
-			delete_comp_func(var_code);
-			delete_comp_func(var_code_final);
-
-			PREV_COMP_NUM_ARG_OUT = COMPILER_NUMBER_ARGS_OUT;
-
-			addoff += ad;
-			return addoff;
-		}
-		else if (cur_tok->chars[0] == '=' && cur_tok->num_chars == 1) {
-			addoff++;
-			concat_comp_func_appends(func,var_code);
-			concat_comp_func_appends(func, var_code_final);
-			delete_comp_func(var_code);
-			delete_comp_func(var_code_final);
-
-			int ad = 0;
-			if (next_tok->token_flags & TOKEN_KEYWORD && next_tok->num_chars == 8 && next_tok->chars[0] == 'f' && next_tok->chars[7] == 'n') {
-				ad=mercury_compile_read_function_define(func, tokens, offset+addoff, token_max, false);
-			}
-			else {
-				ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
-			}
-			m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
-			addoff += ad;
-			return addoff;
-		}
-		else if (cur_tok->token_flags & TOKEN_SELFMODIFY) { // TODO: we need to bifrucate var_code into 2 sections, the first being the bulk and the seconds being the final variable. eg a is a, a[0] is 0, a[0][n] is n.
-			 // THEN, we need to replace the following code with a CPYX 2, so that way doing += and whatnot is actually faster (hopefully)
-			concat_comp_func_appends(func, var_code);
-			concat_comp_func_appends(func, var_code_final);
-			if (var_code->number_instructions) //we only copy top 2 if we need to index
-			{
-				m_compile_add_instruction(func, M_OPCODE_CPYX, 0, offset + addoff);
-#ifdef MERCURY_64BIT
-				m_compile_add_rawdatadouble(func, 2, offset + addoff);
-#else
-				m_compile_add_rawdata(func, 2, offset + addoff);
-#endif
-			}
-			else { //otherwise we can just copy top.
-				m_compile_add_instruction(func, M_OPCODE_CPYT, 0, offset + addoff);
-			}
-			m_compile_add_instruction(func, get_opcode, 0, offset + addoff);
-			delete_comp_func(var_code);
-			delete_comp_func(var_code_final);
-			//m_compile_add_instruction(func, M_OPCODE_CPYT, 0, offset + addoff);
+		}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && (cur_tok->chars[0]=='[' || cur_tok->chars[0]=='.') ){
 			
-			int ad = 0;
-			if (cur_tok->token_flags & TOKEN_BINARY) {
-				addoff++;
-				if (next_tok->token_flags & TOKEN_KEYWORD && next_tok->num_chars == 8 && next_tok->chars[0] == 'f' && next_tok->chars[7] == 'n') {
-					func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-					func->token_error_num = offset + addoff + 1;
+			add_instruction(getvarfunc,get_instruction,0,token_offset);
+			
+			get_instruction=M_OPCODE_GET;
+			set_instruction=M_OPCODE_SET;
+			token_offset++;
+			if(cur_tok->chars[0]=='['){ //explicit index
+				token_offset+=m_compile_read_var_statment(getvarfunc,tokens,num_tokens,token_offset,i);
+				cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+				if(!(cur_tok && cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==']' ) ){
+					f->token_error_num=token_offset;
+					f->errorcode = M_COMPERR_WRONG_SYMBOL;
+					delete_compiler_function(getvarfunc);
 					return 0;
 				}
-				else {
-					ad = m_compile_read_var_statment_recur(func, tokens, offset + addoff, token_max);
+				token_offset++;
+			}else{ //implicit index
+				cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+				if( !(cur_tok) ){
+					f->token_error_num=token_offset;
+					f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+					delete_compiler_function(getvarfunc);
+					return 0;
+				}else if( !(cur_tok->token_flags & TOKEN_ENV_VAR) ){
+					f->token_error_num=token_offset;
+					f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+					delete_compiler_function(getvarfunc);
+					return 0;
 				}
-				m_compile_add_instruction(func, m_compile_get_operator_bytecode(cur_tok, 0), 0, offset + addoff);
-				m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
-			}
-			else {
-				m_compile_add_instruction(func, m_compile_get_operator_bytecode(cur_tok, 0), 0, offset + addoff);
-				m_compile_add_instruction(func, set_opcode, 0, offset + addoff);
-				addoff++;
+				token_offset+=m_compile_read_variable(getvarfunc,tokens,num_tokens,token_offset,i);
+				getvarfunc->number_instructions--; //remove the last instruction, which would be GENV. hacky, i know.
 			}
 			
-			addoff += ad;
-			return addoff;
+		}else{
+			break;
 		}
-		else {
-			func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-			func->token_error_num = offset + addoff + 1;
-			return 0;
-		}
-	}
-	else {
-		func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-		func->token_error_num = offset + addoff + 1;
-		return 0;
-	}
-
-}
-
-int mercury_compile_compile_blocks_until_keyword(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max, int flags) {
-	int ad = 0;
-	while (true) {
-		if (offset + ad >= token_max) {
-			return ad;
-		}
-		compiler_token* cur_tok = tokens[offset+ ad];
-		if (cur_tok->token_flags & TOKEN_KEYWORD) {
-			return ad;
-		}
-		int a=mercury_compile_compile_block(func, tokens, offset+ ad, token_max, flags);
-		if (!a) {
-			return ad;
-		}
-		ad += a;
-	}
-}
-
-int mercury_compile_read_if_statment(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max);
-int mercury_compile_read_while_statment(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max);
-
-
-int mercury_compile_read_if_statment(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max) {
-	mercury_int instruction_position = 0;
-	mercury_int* instruction_position_blockends = nullptr;
-	int adv = 0;
-	mercury_int cur_off = offset;
-	int bodycount = 0;
-
-	if ((tokens[offset]->token_flags & TOKEN_KEYWORD) && tokens[offset]->num_chars==2 && tokens[offset]->chars[0]=='i' && tokens[offset]->chars[1] == 'f') {
-		adv++;
-		cur_off++;
-	}
-	else {
-		return 0;
-	}
-
-
-	int a = m_compile_read_var_statment_recur(func, tokens, offset + adv, token_max);
-	if (!a) {
-		return 0;
-	}
-	adv += a;
-	cur_off += a;
-
-	if ((tokens[cur_off]->token_flags & TOKEN_KEYWORD) && tokens[cur_off]->num_chars == 4 && tokens[cur_off]->chars[0] == 't' && tokens[cur_off]->chars[1] == 'h' && tokens[cur_off]->chars[2] == 'e' && tokens[cur_off]->chars[3] == 'n') {
-		adv++;
-		cur_off++;
-	}
-	else {
-		func->errorcode = M_COMPERR_IF_NEEDS_THEN;
-		func->token_error_num = cur_off+1;
-		return 0;
-	}
-
-	m_compile_add_instruction(func, M_OPCODE_JRNI, 0,cur_off);
-	instruction_position = func->number_instructions;
-	#ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(func, 0, cur_off);
-	#else
-	m_compile_add_rawdata(func, 0, cur_off);
-	#endif
-
-	while (true)
-	{
-		if (func->errorcode) {
-			return 0;
-		}
-		if (cur_off >= token_max) {
-			free(instruction_position_blockends);
-			func->errorcode = M_COMPERR_ENDS_TOO_SOON;
-			func->token_error_num = token_max-1;
-			return adv;
-		}
-		compiler_token* ct = tokens[cur_off];
-			if (ct->token_flags & TOKEN_KEYWORD) {
-				if (ct->num_chars == 2 && ct->chars[0] == 'i' && ct->chars[1] == 'f') {
-					int a = mercury_compile_read_if_statment(func,tokens, cur_off,token_max);
-					if (!a) {
-						return 0;
-					}
-					adv += a;
-					cur_off += a;
-				}
-				else if(ct->num_chars == 6 && ct->chars[0] == 'e' && ct->chars[1] == 'l' && ct->chars[2] == 's' && ct->chars[3] == 'e' && ct->chars[4] == 'i' && ct->chars[5] == 'f') {
-					adv++;
-					cur_off++;
-					bodycount++;
-					m_compile_add_instruction(func, M_OPCODE_JMPR, 0, cur_off);
-
-					mercury_int* nptr = (mercury_int*)realloc(instruction_position_blockends, sizeof(mercury_int) * bodycount);
-					if (!nptr) {
-						func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-						func->token_error_num = cur_off;
-						free(instruction_position_blockends);
-						return 0;
-					}
-					instruction_position_blockends = nptr;
-					instruction_position_blockends[bodycount - 1] = func->number_instructions;
-
-					#ifdef MERCURY_64BIT
-					m_compile_add_rawdatadouble(func, 0, cur_off);
-					#else
-					m_compile_add_rawdata(func, 0, cur_off);
-					#endif
-
-#ifdef MERCURY_64BIT
-					mercury_int diff = func->number_instructions- instruction_position -2;
-#else
-					mercury_int diff = func->number_instructions - instruction_position - 1;
-#endif
-					
-					#ifdef MERCURY_64BIT
-					*(uint64_t*)(func->instructions + instruction_position) = *((uint64_t*)(&diff));
-					#else
-					*(func->instructions + instruction_position) = *((uint32_t*)(&diff));
-					#endif
-					
-					int a = m_compile_read_var_statment_recur(func, tokens, offset + adv, token_max);
-					if (!a) {
-						return 0;
-					}
-					adv += a;
-					cur_off += a;
-
-					if ((tokens[cur_off]->token_flags & TOKEN_KEYWORD) && tokens[cur_off]->num_chars == 4 && tokens[cur_off]->chars[0] == 't' && tokens[cur_off]->chars[1] == 'h' && tokens[cur_off]->chars[2] == 'e' && tokens[cur_off]->chars[3] == 'n') {
-						adv++;
-						cur_off++;
-					}
-					else {
-						func->errorcode = M_COMPERR_ELSEIF_NEEDS_THEN;
-						func->token_error_num = cur_off + 1;
-						return 0;
-					}
-
-					m_compile_add_instruction(func, M_OPCODE_JRNI, 0, cur_off);
-					instruction_position = func->number_instructions;
-					#ifdef MERCURY_64BIT
-					m_compile_add_rawdatadouble(func, 0, cur_off);
-					#else
-					m_compile_add_rawdata(func, 0, cur_off);
-					#endif
-
-					a =mercury_compile_compile_blocks_until_keyword(func,tokens,offset,token_max,0);
-					adv += a;
-					cur_off += a;
-
-				}
-				else if (ct->num_chars == 4 && ct->chars[0] == 'e' && ct->chars[1] == 'l' && ct->chars[2] == 's' && ct->chars[3] == 'e' ) {
-					adv++;
-					cur_off++;
-
-					bodycount++;
-					m_compile_add_instruction(func, M_OPCODE_JMPR, 0, cur_off);
-
-					mercury_int* nptr = (mercury_int*)realloc(instruction_position_blockends, sizeof(mercury_int) * bodycount);
-					if (!nptr) {
-						func->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-						func->token_error_num = cur_off;
-						free(instruction_position_blockends);
-						return 0;
-					}
-					instruction_position_blockends = nptr;
-					instruction_position_blockends[bodycount - 1] = func->number_instructions;
-
-
-					mercury_int ip2= func->number_instructions;
-
-					#ifdef MERCURY_64BIT
-					m_compile_add_rawdatadouble(func, 0, cur_off);
-					#else
-					m_compile_add_rawdata(func, 0, cur_off);
-					#endif
-
-#ifdef MERCURY_64BIT
-					mercury_int diff = func->number_instructions - instruction_position - 2;
-#else
-					mercury_int diff = func->number_instructions - instruction_position - 1;
-#endif
-
-					#ifdef MERCURY_64BIT
-					* (uint64_t*)(func->instructions + instruction_position) = *((uint64_t*)(&diff));
-					#else
-					* (func->instructions + instruction_position) = *((uint32_t*)(&diff));
-					#endif
-					int a=mercury_compile_compile_blocks_until_keyword(func, tokens, offset + adv, token_max,0);
-					adv += a;
-					cur_off += a;
-
-					instruction_position = ip2;
-
-				}
-				else if (ct->num_chars == 3 && ct->chars[0] == 'e' && ct->chars[1] == 'n' && ct->chars[2] == 'd') {
-					mercury_int diff =  func->number_instructions - instruction_position - 2;
-					#ifdef MERCURY_64BIT
-					* (uint64_t*)(func->instructions + instruction_position) = *((uint64_t*)(&diff));
-					#else
-					* (func->instructions + instruction_position) = *((uint32_t*)(&diff));
-					#endif
-
-					for (int i = 0; i < bodycount; i++) {
-						mercury_int diff = func->number_instructions - instruction_position_blockends[i] -2;
-						#ifdef MERCURY_64BIT
-						* (uint64_t*)(func->instructions + instruction_position_blockends[i]) = *((uint64_t*)(&diff));
-						#else
-						* (func->instructions + instruction_position_blockends[i]) = *((uint32_t*)(&diff));
-						#endif
-					}
-					return adv+1;
-				}
-				else if (ct->num_chars ==5 && ct->chars[0] == 'w' && ct->chars[1] == 'h' && ct->chars[2] == 'i' && ct->chars[3] == 'l' && ct->chars[4] == 'e') {
-					int a=mercury_compile_read_while_statment(func,tokens,cur_off,token_max);
-					if (!a) {
-						return 0;
-					}
-					adv += a;
-					cur_off += a;
-				}
-				else if (ct->num_chars == 8 && ct->chars[0] == 'f' && ct->chars[7] == 'n') {
-					a = mercury_compile_read_function_define(func, tokens, cur_off, token_max, true);
-					if (!a) {
-						return adv;
-					}
-				}
-				else
-				{
-				free(instruction_position_blockends);
-				func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-				func->token_error_num = cur_off;
-				return adv;
-				}
-			}
-			else {
-				int a = mercury_compile_compile_blocks_until_keyword(func, tokens, cur_off, token_max,0);
-				//if (!a) {
-				//	return 0;
-				//}
-				adv += a;
-				cur_off += a;
-			}
-
-
-	}
-	return 0;
-
-}
-
-int mercury_compile_read_while_statment(compiler_function* func, compiler_token** tokens, mercury_int offset, mercury_int token_max) {
-	mercury_int cur_off = offset;
-	int adv = 0;
-
-	compiler_token* ct = tokens[offset];
-	if (!(ct->token_flags & TOKEN_KEYWORD && ct->num_chars == 5 && ct->chars[0] == 'w' && ct->chars[1] == 'h' && ct->chars[2] == 'i' && ct->chars[3] == 'l' && ct->chars[4] == 'e')) {
-		return 0;
-	}
-	adv++;
-	cur_off++;
-
-	mercury_int addrstart= func->number_instructions;
-
-	int a = m_compile_read_var_statment_recur(func, tokens, cur_off, token_max);
-	if (!a) {
-		func->errorcode = M_COMPERR_EXPECTED_VARIABLE;
-		func->token_error_num = cur_off;
-		return 0;
-	}
-	cur_off += a;
-	adv += a;
-
-	ct = tokens[cur_off];
-	if (!(ct->token_flags & TOKEN_KEYWORD && ct->num_chars == 2 && ct->chars[0] == 'd' && ct->chars[1] == 'o' )) {
-		func->errorcode = M_COMPERR_WHILE_NEEDS_DO;
-		func->token_error_num = cur_off;
-		return 0;
-	}
-	adv++;
-	cur_off++;
-
-	m_compile_add_instruction(func, M_OPCODE_JRNI, 0, cur_off);
-	mercury_int addrjmp = func->number_instructions;
-
-
-
-	mercury_int PREV_CJP = COMPILER_CONTINUE_JUMP_POSITION;
-	bool PREV_IL = COMPILER_INSIDE_LOOP;
-	mercury_int PREV_BA = COMPILER_BREAK_AMOUNTS;
-	mercury_int* PREV_BADDRS = COMPILER_BREAK_ADDRS;
-
-	COMPILER_CONTINUE_JUMP_POSITION = addrstart;
-	COMPILER_INSIDE_LOOP = true;
-	COMPILER_BREAK_AMOUNTS = 0;
-	COMPILER_BREAK_ADDRS = nullptr;
-
-
-
-	#ifdef MERCURY_64BIT
-	m_compile_add_rawdatadouble(func, 0, cur_off);
-	#else
-	m_compile_add_rawdata(func, 0, cur_off);
-	#endif
-
-
-
-
-
-	while (true) {
-		if (func->errorcode) {
-			return 0;
-		}
-		cur_off = offset + adv;
-		if (cur_off > token_max) {
-			func->errorcode = M_COMPERR_ENDS_TOO_SOON;
-			func->token_error_num = cur_off;
-			return 0;
-		}
-		ct = tokens[cur_off];
-		int a=0;
 		
-		if (ct->token_flags & TOKEN_KEYWORD) {
-			if (ct->num_chars == 3 && ct->chars[0]=='e' && ct->chars[1] == 'n' && ct->chars[2] == 'd') {
-
-				m_compile_add_instruction(func, M_OPCODE_JMPR, 0, cur_off);
-#ifdef MERCURY_64BIT
-				m_compile_add_rawdatadouble(func, addrstart - func->number_instructions-2, cur_off);
-#else
-				m_compile_add_rawdata(func, addrstart - func->number_instructions -2, cur_off);
-#endif
-
-#ifdef MERCURY_64BIT
-				mercury_int r = func->number_instructions - addrjmp - 2;
-				* (uint64_t*)(func->instructions + addrjmp) = *((uint64_t*)&r);
-#else
-				mercury_int r = func->number_instructions - addrjmp - 1;
-				* (uint32_t*)(func->instructions + addrjmp) = *((uint32_t*)&r);
-#endif
-
-
-				for (mercury_int i = 0; i < COMPILER_BREAK_AMOUNTS;i++) {
-					mercury_int addr = COMPILER_BREAK_ADDRS[i];
-#ifdef MERCURY_64BIT
-					mercury_int r = func->number_instructions - addr - 2;
-					*(uint64_t*)(func->instructions + addr) = *((uint64_t*)&r);
-#else
-					mercury_int r = func->number_instructions - addr - 1;
-					*(uint32_t*)(func->instructions + addr) = *((uint32_t*)&r);
-#endif
-				}
-				free(COMPILER_BREAK_ADDRS);
-
-				COMPILER_CONTINUE_JUMP_POSITION = PREV_CJP;
-				COMPILER_INSIDE_LOOP = PREV_IL;
-				COMPILER_BREAK_AMOUNTS = PREV_BA;
-				COMPILER_BREAK_ADDRS= PREV_BADDRS;
-
-				adv++;
-				return adv;
-			}else if (ct->num_chars == 5 && ct->chars[0] == 'w' && ct->chars[1] == 'h' && ct->chars[2] == 'i' && ct->chars[3] == 'l' && ct->chars[4] == 'e') {
-				a = mercury_compile_read_while_statment(func, tokens, cur_off, token_max);
-				if (!a) {
-					return adv;
-				}
-				adv += a;
-			}
-			else if (ct->num_chars == 2 && ct->chars[0] == 'i' && ct->chars[1] == 'f') {
-				a = mercury_compile_read_if_statment(func, tokens, cur_off, token_max);
-				if (!a) {
-					return adv;
-				}
-				adv += a;
-			}
-			else if (ct->num_chars == 8 && ct->chars[0] == 'f' && ct->chars[7] == 'n') {
-				a = mercury_compile_read_function_define(func, tokens, cur_off, token_max, true);
-				if (!a) {
-					return adv;
-				}
-			}
-			else {
-				func->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-				func->token_error_num = cur_off;
+		
+	}
+	//then check what we're doing with this. this is either a set operation, void function call, or a self-modifying set operation
+	
+ 	cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	if(!cur_tok){
+		f->token_error_num=token_offset;
+		f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+		delete_compiler_function(getvarfunc);
+		return 0;
+	}else if( !(cur_tok->token_flags & (TOKEN_MISC_OP | TOKEN_SELFMODIFY_OP)) ){
+		f->token_error_num=token_offset;
+		f->errorcode = M_COMPERR_WRONG_SYMBOL;
+		delete_compiler_function(getvarfunc);
+		return 0;
+	}
+	
+	mercury_int ito = token_offset;
+	if(token_matches_chars(cur_tok,"(")){ //function call
+		mercury_int ain=0;
+		add_instruction(getvarfunc,get_instruction,0,token_offset);
+		token_offset+=m_compile_read_call_func(f,tokens,num_tokens,token_offset,&ain,i);
+		merge_compiler_functions(f, getvarfunc);
+		if(f->errorcode){
+			return 0;
+		}
+		add_instruction(f,M_OPCODE_CALL,0, ito); //offset back by 1 to account for the closing symbol being used.
+		add_rawdata_bitwidth_size(f,ain, ito);
+		add_rawdata_bitwidth_size(f,0, ito);
+	}else if(token_matches_chars(cur_tok,"=")){ //assignment
+		token_offset++;
+		merge_compiler_functions(f, getvarfunc);
+		token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
+		if(f->errorcode){
+			return 0;
+		}
+		add_instruction(f,set_instruction,0, ito);
+	}else if(cur_tok->token_flags & TOKEN_SELFMODIFY_OP){ //assignment & modification
+		merge_compiler_functions(f, getvarfunc);
+		// stack: table, key
+		// we of course need to do both get and set in one line, so we have to get a bit tricky about the stack variables, so...
+		if (get_instruction == M_OPCODE_GET) {
+			add_instruction(f, M_OPCODE_CPYX, 0, ito);
+			add_rawdata_bitwidth_size(f, 2, ito); 
+		}
+		else { //for enviromental vars, we only have the key on the stack, since the table is implicit
+			add_instruction(f, M_OPCODE_CPYT, 0, ito);
+		}	
+		//stack: table, key, table, key
+		add_instruction(f,get_instruction,0, ito);
+		//stack: table, key, value
+		//horray, we did it. well, actually no, we still need to read the rest of the statment.
+		uint8_t insop=m_compile_get_operator_opcode_from_token(cur_tok);
+		token_offset++;
+		
+		if(cur_tok->token_flags & TOKEN_BINARY_OP){
+			token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
+			if(f->errorcode){
 				return 0;
 			}
 		}
-		else {
-			a=mercury_compile_compile_blocks_until_keyword(func,tokens,cur_off,token_max,0);
-			adv += a;
-			cur_off += a;
-		}
-
-
-		//break;
+		
+		add_instruction(f,insop,0, ito);
+		add_instruction(f, set_instruction, 0, ito);
+	}else{
+		delete_compiler_function(getvarfunc);
+		f->token_error_num=token_offset;
+		f->errorcode = M_COMPERR_NO_OPERATION_FOUND;
+		return 0;
 	}
-
-	return 0;
+	
+	return token_offset-initial_offset;
 }
 
 
 
-compiler_function* mercury_compile_compile_tokens(compiler_token** tokens, mercury_int num_tokens , mercury_int* endatend ) {
-	mercury_int cur_token = 0;
-	compiler_function* out=init_comp_func();
-	if (!out) { return nullptr; }
+mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
+	mercury_int initial_offset=token_offset;
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	
+	compiler_info oci=*ci;
+	
+	
+	if( !(cur_tok&& cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"while")) ){
+		return 0;
+	}
+	token_offset++;
+	
+	
+	ci->in_loop=true;
+	ci->loop_jumppoint_start=f->number_instructions;
+	ci->loop_endpoint_ref_count=0;
+	ci->loop_endpoint_ref_pos=nullptr;
+	
+	token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,ci);
+	if(f->errorcode)return 0;
+	
+	add_instruction(f,M_OPCODE_JRNI,0,token_offset);
+	compiler_info_add_loop_endjump(ci,f->number_instructions);
+	add_rawdata_bitwidth_size(f,0,token_offset);
+	
+	cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	if(!cur_tok){
+		f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+		f->token_error_num = token_offset;
+		return 0;
+	} else if( !(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"do")) ){
+		f->errorcode = M_COMPERR_WHILE_NEEDS_DO;
+		f->token_error_num = token_offset;
+		return 0;
+	}
+	token_offset++;
+	
+	while(true){
+		mercury_int consumed=0;
+		ci->additional_instructions=oci.additional_instructions+f->number_instructions;
+		compiler_function* bf=mercury_compile_tokens_to_bytecode(tokens,num_tokens,token_offset , &consumed,ci);
+		if(bf->errorcode){
+			f->errorcode=bf->errorcode;
+			f->token_error_num=bf->token_error_num;
+			return 0;
+		}
+		merge_compiler_functions(f,bf);
+		token_offset+=consumed;
+		
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num = token_offset;
+			return 0;
+		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"end") ){
+			token_offset++;
+			break;
+		}else{
+			f->errorcode = M_COMPERR_WRONG_SYMBOL;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		
+	}
+	
+	add_instruction(f, M_OPCODE_JMPR, 0, token_offset-1);
+	add_rawdata_double(f, ci->loop_jumppoint_start-f->number_instructions,token_offset-1);
 
-
+	for(mercury_int i=0;i<ci->loop_endpoint_ref_count;i++){
+		*(mercury_int*)(f->instructions+ci->loop_endpoint_ref_pos[i]) =f->number_instructions-ci->loop_endpoint_ref_pos[i];
+	}
+	free(ci->loop_endpoint_ref_pos);
 	
 
-	JUMP_POINT** OLD_JUMPDATABASE = COMPILER_JUMP_DATABASE;
-	mercury_int OLD_JUMPAMTS = COMPILER_JUMP_NUMBERS;
-	COMPILER_JUMP_DATABASE = nullptr;
-	COMPILER_JUMP_NUMBERS = 0;
+	oci.conditional_defaultcase = ci->conditional_defaultcase;
+	oci.conditional_jumppoint_init = ci->conditional_jumppoint_init;
+	oci.conditional_jumptoend_count = ci->conditional_jumptoend_count;
+	oci.conditional_jumptoend_points= ci->conditional_jumptoend_points;
+	propogate_compiler_info(&oci, ci);
+	*ci=oci;
+	
+	return token_offset-initial_offset;
+}
 
-	mercury_stringliteral* OLD_CONSTANT_STRINGS = CONSTANT_STRINGS;
-	mercury_int OLD_NUM_CONSTANT_STRINGS = NUM_CONSTANT_STRINGS;
-	CONSTANT_STRINGS = nullptr;
-	NUM_CONSTANT_STRINGS=0;
+mercury_int m_compile_parse_if_statement(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
+	mercury_int initial_offset=token_offset;
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	
+	compiler_info oci=*ci;
+	
+	
+	if( !(cur_tok&& cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"if")) ){
+		return 0;
+	}
+	token_offset++;
+	
+	ci->in_conditional=true;
+	ci->conditional_jumppoint_init=f->number_instructions;
+	ci->conditional_jumptoend_count=0;
+	ci->conditional_jumptoend_points=nullptr;
+	ci->conditional_defaultcase=false;
+	
+	
+	mercury_int o=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,ci);
+	if(f->errorcode){
+		return 0;
+	}else if(!o){
+		f->errorcode=M_COMPERR_NO_VARIABLE;
+		f->token_error_num=token_offset;
+		return 0;
+	}
+	token_offset+=o;
+	
+	cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	if( !(cur_tok&& cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"then")) ){
+		f->errorcode=M_COMPERR_IF_NEEDS_THEN;
+		f->token_error_num=token_offset;
+		return 0;
+	}
+	
+	
+	add_instruction(f,M_OPCODE_JRNI,0,token_offset);
+	ci->conditional_jumppoint_init=f->number_instructions;
+	add_rawdata_bitwidth_size(f,0,token_offset);
+	token_offset++;
 
-	while (true) {
-		if (cur_token >= num_tokens || out->errorcode) {
+
+	while(true){
+		mercury_int consumed=0;
+		ci->additional_instructions=oci.additional_instructions+f->number_instructions;
+		compiler_function* bf=mercury_compile_tokens_to_bytecode(tokens,num_tokens,token_offset , &consumed,ci);
+		if(bf->errorcode){
+			f->errorcode=bf->errorcode;
+			f->token_error_num=bf->token_error_num;
+			return 0;
+		}
+		merge_compiler_functions(f,bf);
+		token_offset+=consumed;
+		
+		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num = token_offset;
+			return 0;
+		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"elseif") ){
+			add_instruction(f,M_OPCODE_JMPR,0,token_offset);
+			compiler_info_add_conditional_endjump(ci,f->number_instructions);
+			add_rawdata_bitwidth_size(f,0,token_offset);
+			token_offset++;
+
+			*(mercury_int*)(f->instructions + ci->conditional_jumppoint_init) = f->number_instructions - ci->conditional_jumppoint_init;
+			
+			o=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,ci);
+			if(f->errorcode){
+				return 0;
+			}else if(!o){
+				f->errorcode=M_COMPERR_NO_VARIABLE;
+				f->token_error_num=token_offset;
+				return 0;
+			}
+			token_offset+=o;
+			
+			add_instruction(f,M_OPCODE_JRNI,0,token_offset);
+			ci->conditional_jumppoint_init=f->number_instructions;
+			add_rawdata_bitwidth_size(f,0,token_offset);
+			
+			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+			if( !(cur_tok&& cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"then")) ){
+				f->errorcode=M_COMPERR_IF_NEEDS_THEN;
+				f->token_error_num=token_offset;
+				return 0;
+			}
+			token_offset++;
+			
+		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"else") ){
+			add_instruction(f, M_OPCODE_JMPR, 0, token_offset);
+			compiler_info_add_conditional_endjump(ci, f->number_instructions);
+			add_rawdata_bitwidth_size(f, 0, token_offset);
+
+			token_offset++;
+			*(mercury_int*)(f->instructions + ci->conditional_jumppoint_init) = f->number_instructions - ci->conditional_jumppoint_init;
+			ci->conditional_defaultcase = true;
+		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"end") ){
+			token_offset++;
+			
+			if(!ci->conditional_defaultcase){ //if we didn't fall through to else, we have to set the jump point of the last if check to here.
+				*(mercury_int*)(f->instructions+ci->conditional_jumppoint_init) = f->number_instructions-ci->conditional_jumppoint_init;
+			}
+			
+			for(mercury_int i=0;i<ci->conditional_jumptoend_count;i++){
+				*(mercury_int*)(f->instructions+ci->conditional_jumptoend_points[i]) = f->number_instructions - ci->conditional_jumptoend_points[i];
+			}
+			
+			break;
+		}else{
+			f->errorcode = M_COMPERR_WRONG_SYMBOL;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		
+	}
+	
+	free(ci->conditional_jumptoend_points);
+
+	//some data we need to propogate back upwards.
+	propogate_compiler_info(&oci,ci);
+	oci.loop_jumppoint_start = ci->loop_jumppoint_start;
+	oci.loop_endpoint_ref_count = ci->loop_endpoint_ref_count;
+	oci.loop_endpoint_ref_pos = ci->loop_endpoint_ref_pos;
+	*ci=oci;
+
+	return token_offset-initial_offset;
+}
+
+
+mercury_int m_compile_read_keyword_block(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
+	mercury_int initial_offset=token_offset;
+	
+	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+	if(!cur_tok){
+		return 0;
+	}else if(!(cur_tok->token_flags & TOKEN_KEYWORD) ){
+		return 0;
+	}
+	
+	if(token_matches_chars(cur_tok,"while")){
+		token_offset+=m_compile_parse_while_loop(f,tokens,num_tokens,token_offset,ci);
+	}else if(token_matches_chars(cur_tok,"if")){
+		token_offset+=m_compile_parse_if_statement(f,tokens,num_tokens,token_offset,ci);
+	}else if(token_matches_chars(cur_tok,"goto")){
+		token_offset++;
+		compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(!cur_tok){
+			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->token_error_num=token_offset;
+			return 0;
+		}else if(!(cur_tok->token_flags & TOKEN_ENV_VAR) ){
+			f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		add_instruction(f,M_OPCODE_JMPR,0, token_offset);
+		if(!compiler_info_add_goto_jump(ci,cur_tok,f->number_instructions+ci->additional_instructions)){
+			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num=token_offset;
+			return 0;
+		}
+		add_rawdata_bitwidth_size(f,0, token_offset);
+		
+		token_offset++;
+	}else{
+		return 0;
+	}
+	
+	return token_offset-initial_offset;
+}
+
+
+
+
+compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* tokens_used, compiler_info* ci){
+	compiler_function* out = new_compiler_function();
+	if(!out)return nullptr;
+	mercury_int initial_offset=token_offset;
+	bool ci_was_defined=false;
+	if(!ci){
+		ci_was_defined=true;
+		ci=new_compiler_info();
+	}
+	
+	while(true){
+		mercury_int o1=m_compile_read_statment(out,tokens,num_tokens,token_offset,ci);
+		if(out->errorcode){
 			break;
 		}
-		compiler_token* thistoken = tokens[cur_token];
-
-		if (!(thistoken->token_flags & TOKEN_KEYWORD)) {
-			int adv = mercury_compile_compile_blocks_until_keyword(out, tokens, cur_token, num_tokens, 0);
-			cur_token += adv;
+		token_offset+=o1;
+		mercury_int o2=m_compile_read_keyword_block(out,tokens,num_tokens,token_offset,ci);
+		if(out->errorcode){
+			break;
 		}
-		else {
-			if (thistoken->num_chars == 2 && thistoken->chars[0] == 'i' && thistoken->chars[1] == 'f') {
-				int adv=mercury_compile_read_if_statment(out, tokens, cur_token, num_tokens);
-				if (!adv) {
-					return out;
+		token_offset+=o2;
+		
+		mercury_int o3=0;
+		compiler_token* cur_tok = m_compile_get_next_token(tokens,num_tokens,token_offset);
+		if(cur_tok && cur_tok->token_flags & TOKEN_LOOP_MODIFIER){
+			if(ci->in_loop){
+				if(token_matches_chars(cur_tok,"continue")){
+					add_instruction(out,M_OPCODE_JMPR,0,token_offset);
+					add_rawdata_bitwidth_size(out, ci->loop_jumppoint_start-(ci->additional_instructions+out->number_instructions)  ,token_offset);
+				}else{ //break
+					add_instruction(out,M_OPCODE_JMPR,0,token_offset);
+					if(!compiler_info_add_loop_endjump(ci,out->number_instructions+ci->additional_instructions)){
+						out->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+						out->token_error_num=token_offset;
+						break;
+					}
+					add_rawdata_bitwidth_size(out,0,token_offset);
 				}
-				cur_token += adv;
-			}else if (thistoken->num_chars == 5 && thistoken->chars[0] == 'w' && thistoken->chars[1] == 'h' && thistoken->chars[2] == 'i' && thistoken->chars[3] == 'l' && thistoken->chars[4] == 'e') {
-				int adv = mercury_compile_read_while_statment(out, tokens, cur_token, num_tokens);
-				if (!adv) {
-					return out;
-				}
-				cur_token += adv;
-			}
-			else if (thistoken->num_chars == 8 && thistoken->chars[0] == 'f' && thistoken->chars[7] == 'n') {
-				int adv = mercury_compile_read_function_define(out,tokens,cur_token,num_tokens,true);
-				if (!adv) {
-					return out;
-				}
-				cur_token += adv;
-			
-			}
-			else {
-				if (endatend && thistoken->num_chars == 3 && thistoken->chars[0] == 'e' && thistoken->chars[1] == 'n' && thistoken->chars[2] == 'd')
-				{
-					*endatend = cur_token;
-					break;
-				}
-				else {
-					out->errorcode = M_COMPERR_DID_NOT_CALL_OR_SET;
-					out->token_error_num = cur_token;
-					return out;
-				}
+				token_offset++;
+				o3=1;
+			}else{
+				out->errorcode=M_COMPERR_LOOPKEYWORD_WRONG_SPOT;
+				out->token_error_num=token_offset;
+				break;
 			}
 		}
-
-	}
-
-
-
-
-	if (COMPILER_JUMP_DATABASE) {
-		for (mercury_int i = 0; i < COMPILER_JUMP_NUMBERS; i++) {
-			JUMP_POINT* J = COMPILER_JUMP_DATABASE[i];
-			if (!J->defined)J->num_positions = 0; //do not attempt gotos if no label.
-
-			for (mercury_int n = 0; n < J->num_positions; n++) {
-				void* varaddr=(void*)(out->instructions+J->positions[n]);
-#ifdef MERCURY_64BIT
-				*(int64_t*)varaddr = J->label_point - J->positions[n]-2;
-#else
-				*(int32_t*)varaddr = J->label_point - J->positions[n]-1;
-#endif
-			}
-
-			free(J->label);
-			free(J->positions);
-			free(J);
+		
+		if(!o1 && !o2 && !o3){ //exit if no code was generated
+			break;
 		}
+		
+		
 	}
 	
-	free(COMPILER_JUMP_DATABASE);
-	COMPILER_JUMP_DATABASE=OLD_JUMPDATABASE;
-	COMPILER_JUMP_NUMBERS=OLD_JUMPAMTS;
-
-	compiler_function* append_string_constants = init_comp_func();
-	if (!append_string_constants) { return nullptr; }
-
-	for (mercury_int i = 0; i < NUM_CONSTANT_STRINGS; i++) {
-		mercury_stringliteral s = CONSTANT_STRINGS[i];
-		m_compile_cstring_load(append_string_constants,s.ptr,s.size,0);
-		m_compile_add_instruction(append_string_constants, M_OPCODE_SCON, 0, 0);
-#ifdef MERCURY_64BIT
-		m_compile_add_rawdatadouble(append_string_constants,i,0);
-#else
-		m_compile_add_rawdata(append_string_constants,i,0);
-#endif
-
-		free(s.ptr);
+	if(tokens_used)*tokens_used=token_offset-initial_offset;
+	if(ci_was_defined){
+		for(mercury_int i=0;i<ci->num_gotos;i++){
+			if(ci->goto_defined[i]){
+				for(mercury_int n=0;n<ci->goto_pos_count[i];n++){
+					mercury_int p = ci->goto_positions[i][n];
+					mercury_int* j = (mercury_int*)(out->instructions + p);
+					*j=ci->goto_labelpos[i]-p;
+				}
+			}
+		}
+		compiler_function* con_app = new_compiler_function();
+		for (mercury_int i = 0; i < ci->num_constants; i++) {
+			mercury_stringliteral s = ci->constants[i];
+			add_string_onto_stack(con_app, s.ptr, s.size, 0);
+			add_instruction(con_app, M_OPCODE_SCON, 0, 0);
+			add_rawdata_bitwidth_size(con_app, i, 0);
+		}
+		merge_compiler_functions(con_app, out);
+		out = con_app;
+		delete_compiler_info(ci);
 	}
-	concat_comp_func_appends(append_string_constants,out);
-	delete_comp_func(out);
-	out = append_string_constants;
-	
-	free(CONSTANT_STRINGS);
-	CONSTANT_STRINGS = OLD_CONSTANT_STRINGS;
-	NUM_CONSTANT_STRINGS = OLD_NUM_CONSTANT_STRINGS;
-
 	return out;
 }
 
 
+mercury_variable* mercury_compile_mstring(mercury_stringliteral* str, bool remove_debug_info){
+	mercury_variable* out=(mercury_variable*)malloc(sizeof(mercury_variable));
+	if(!out)return nullptr;
+	out->type = M_TYPE_NIL;
+	out->data.i = 0;
+	out->constant = 0;
+	
+	mercury_int num_tokens;
+	compiler_token** tokens = mercury_compile_tokenize_mstring(str,&num_tokens);
+	compiler_function* func = mercury_compile_tokens_to_bytecode(tokens,num_tokens,0);
 
+	if (func->errorcode) {
+		int req_chars;
+		char* buffer=nullptr;
 
+		char pbuf[512];
 
-
-mercury_variable* mercury_compile_mstring(mercury_stringliteral* str) {
-
-	static const char* empty_token_string = "";
-
-	mercury_variable* out = (mercury_variable*)malloc(sizeof(mercury_variable));
-	if (!out)return nullptr;
-
-	compiler_token** tokens=mercury_compile_tokenize_mstring(str);
-
-	mercury_int num_t = 0;
-	while (tokens[num_t]) { num_t++; }
-
-#if defined(DEBUG) || defined(_DEBUG)
-	for (mercury_int i = 0; i < num_t; i++) {
-		compiler_token* t = tokens[i];
-		for (mercury_int n = 0; n < t->num_chars; n++) {
-			putchar(t->chars[n]);
-		}
-		putchar('\t');
-		int flags = t->token_flags;
-		if (flags & TOKEN_OPERATOR) {
-			printf("OPERATOR ");
-		}
-		if (flags & TOKEN_UANRY) {
-			printf("UNARY ");
-		}
-		if (flags & TOKEN_BINARY) {
-			printf("BINARY ");
-		}
-		if (flags & TOKEN_TAKESTATICNUM) {
-			printf("TAKESSTATICNUM ");
-		}
-		if (flags & TOKEN_SELFMODIFY) {
-			printf("SELFMODIFY ");
-		}
-		if (flags & TOKEN_STATICSTRING) {
-			printf("STATICSTRING ");
-		}
-		if (flags & TOKEN_STATICNUMBER) {
-			printf("STATICNUMBER ");
-		}
-		if (flags & TOKEN_VARIABLE) {
-			printf("VARIABLE ");
-		}
-		if (flags & TOKEN_ENVVARNAME) {
-			printf("ENVVARNAME ");
-		}
-		if (flags & TOKEN_KEYWORD) {
-			printf("KEYWORD ");
-		}
-		if (flags & TOKEN_STATICBOOLEAN) {
-			printf("STATICBOOLEAN ");
-		}
-		if (flags & TOKEN_STATICNIL) {
-			printf("STATICNIL ");
-		}
-		if (flags & TOKEN_SCOPESPECIFIER) {
-			printf("SCOPESPECIFIER ");
-		}
-		if (flags & TOKEN_SPECIALVARIABLECREATE) {
-			printf("SPECIALVARIABLECREATE ");
-		}
-		if (flags & TOKEN_LOOP_MODIFIER) {
-			printf("LOOP_MODIFIER ");
-		}
-		if (flags & TOKEN_JUMP) {
-			printf("JUMP ");
-		}
-		if (flags & TOKEN_EXIT) {
-			printf("EXIT ");
-		}
-		
-		putchar('\n');
-	}
+		if (func->token_error_num >= num_tokens) {
+#ifdef MERCURY_DEBUG
+			printf("DEBUG/error|compiler: error registered at token %i, but we only have %i avalible.\n", func->token_error_num, num_tokens);
 #endif
+			func->token_error_num = num_tokens - 1;
+		}
+		else if (func->token_error_num < 0) {
+#ifdef MERCURY_DEBUG
+			printf("DEBUG/error|compiler: error registered at token %i when the minimum is 0\n", func->token_error_num);
+#endif
+			func->token_error_num = 0;
+		}
 
+		compiler_token* etok = tokens[func->token_error_num];
+		char* ts=(char*)malloc(etok->num_chars+1);
+		if (!ts)return nullptr;
+		memcpy(ts, etok->chars, etok->num_chars);
+		ts[etok->num_chars]='\0';
+#ifdef MERCURY_64BIT
+		snprintf(pbuf, 510, "line %lli col %lli at \"%s\": ",etok->line_num,etok->line_col,ts);
+#else
+		snprintf(pbuf, 510, "line %i col %i at \"%s\": ", etok->line_num, etok->line_col,ts);
+#endif
+		const char* reason;
 
-	compiler_function* f = mercury_compile_compile_tokens(tokens, num_t);
+		switch (func->errorcode) {	
+			case M_COMPERR_MEMORY_ALLOCATION:
+				reason = "failed to allocate memory";
+				break;
+			case M_COMPERR_NO_MORE_TOKENS:
+				reason = "no more tokens";
+				break;
+			case M_COMPERR_MALFORMED_NUMBER:
+				reason = "malformed number";
+				break;
+			case M_COMPERR_WRONG_SYMBOL:
+				reason = "wrong symbol";
+				break;
+			case M_COMPERR_NO_OPERATION_FOUND:
+				reason = "no operation performed";
+				break;
+			case M_COMPERR_WHILE_NEEDS_DO:
+				reason = "while requires 'do' keyword";
+				break;
+			case M_COMPERR_IF_NEEDS_THEN:
+				reason = "if requires 'then' keyword";
+				break;
+			case M_COMPERR_LOOPKEYWORD_WRONG_SPOT:
+				reason = "invalid location, must be in a loop";
+				break;
+			case M_COMPERR_ARRAY_NOT_CLOSED:
+				reason = "array was not closed, expected ']'";
+				break;
+			case M_COMPERR_TABLE_NOT_CLOSED:
+				reason = "table was not closed, expected '}'";
+				break;
+			case M_COMPERR_CALL_NOT_CLOSED:
+				reason = "function was not closed, expected ')'";
+				break;
+			case M_COMPERR_NESTEDSTATMENT_NOT_CLOSED:
+				reason = "parenthesis was not closed, expected ')'";
+				break;
+			case M_COMPERR_NO_VARIABLE:
+				reason = "unable to find variable statment";
+				break;
+			case M_COMPERR_NO_NAMED_VARIABLE:
+				reason = "unable to find named variable";
+				break;
+			default:
+				reason = "unspecified error.";
+		}
 
-	if (f->errorcode) {
-		mercury_stringliteral* s=mercury_generate_compiler_error_string(tokens,f->errorcode,f->token_error_num,num_t);
-		out->data.p = s;
+		req_chars = snprintf(nullptr, 0, "%s: %s.\n", pbuf, reason) + 1;
+		buffer = (char*)malloc(req_chars);
+		snprintf(buffer, req_chars, "%s%s", pbuf, reason);
+
+		if (!buffer)return nullptr;
+
 		out->type = M_TYPE_STRING;
-		return out;
+		out->data.p = mercury_cstring_to_mstring(buffer,strlen(buffer));
 	}
+	else {
+		mercury_function* nmf = (mercury_function*)malloc(sizeof(mercury_function));
+		if (!nmf)return nullptr;
 
 
+		mercury_debug_token* dts=nullptr;
 
-	out->type = M_TYPE_FUNCTION;
-	mercury_function* mf=(mercury_function*)malloc(sizeof(mercury_function));
-	if (!mf)return nullptr;
+		if (!remove_debug_info) {
+			dts = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * func->number_instructions);
+			if (!dts)return nullptr;
 
-	mf->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token)*f->number_instructions);
-	if (!mf->debug_info) {
-		free(mf);
-		return nullptr;
-	}
+			for (mercury_int i = 0; i < func->number_instructions; i++) {
+				mercury_int toknum = func->instruction_tokens[i];
 
-	for (mercury_int i = 0; i < f->number_instructions; i++) {
-		mercury_int token_n = f->instruction_tokens[i];
+				if (toknum >= num_tokens) {
+#ifdef MERCURY_DEBUG
+					printf("DEBUG/error|compiler: instruction #%i (%i/%x) was assigned by token %i, but we only have %i avalible.\n",i,func->instructions[i], func->instructions[i],toknum,num_tokens);
+#endif
+					toknum = num_tokens - 1;
+				}
+
+				compiler_token* t = tokens[toknum];
+				mercury_debug_token d;
+				d.col = t->line_col;
+				d.line = t->line_num;
+				d.chars = t->chars;
+				d.num_chars = t->num_chars;
+				*(dts + toknum) = d;
+			}
+
+			for (mercury_int i = 0; i < num_tokens; i++) {
+				compiler_token* t = tokens[i];
+				free(t);
+			}
+		}
+		else {
+			for (mercury_int i = 0; i < num_tokens; i++) {
+				compiler_token* t = tokens[i];
+				free(t->chars);
+				free(t);
+			}
+		}
 		
-		//printf("%i %i\n",i,token_n);
+		free(tokens);
+
+		nmf->enviromental = false;
+		nmf->refrences = 1;
+		nmf->instructions = func->instructions;
+		nmf->numberofinstructions = func->number_instructions;
+		nmf->debug_info = dts;
 		
+		free(func);
 
-		compiler_token* t = tokens[token_n];
-
-		mf->debug_info[i].col = t->line_col;
-		mf->debug_info[i].line = t->line_num;
-		mf->debug_info[i].token = (char*)malloc(sizeof(char) * (t->num_chars+1));
-		memcpy((void*)mf->debug_info[i].token, t->chars, t->num_chars);
-		mf->debug_info[i].token[t->num_chars] = '\0';
-
-		mf->debug_info[i].token_next = (char*)empty_token_string;
-		mf->debug_info[i].token_next_next = (char*)empty_token_string;
-		mf->debug_info[i].token_prev = (char*)empty_token_string;
-		mf->debug_info[i].token_prev_prev = (char*)empty_token_string;
-
-		if (token_n < num_t-1) {
-			compiler_token* t = tokens[token_n+1];
-			mf->debug_info[i].token_next = (char*)malloc(sizeof(char) * (t->num_chars + 1));
-			memcpy((void*)mf->debug_info[i].token_next, t->chars, t->num_chars);
-			mf->debug_info[i].token_next[t->num_chars] = '\0';
-		}
-		if (token_n < num_t - 2) {
-			compiler_token* t = tokens[token_n + 2];
-			mf->debug_info[i].token_next_next = (char*)malloc(sizeof(char) * (t->num_chars + 1));
-			memcpy((void*)mf->debug_info[i].token_next_next, t->chars, t->num_chars);
-			mf->debug_info[i].token_next_next[t->num_chars] = '\0';
-		}
-		if (token_n > 0) {
-			compiler_token* t = tokens[token_n-1];
-			mf->debug_info[i].token_prev = (char*)malloc(sizeof(char) * (t->num_chars + 1));
-			memcpy((void*)mf->debug_info[i].token_prev, t->chars, t->num_chars);
-			mf->debug_info[i].token_prev[t->num_chars] = '\0';
-		}
-		if (token_n > 1) {
-			compiler_token* t = tokens[token_n - 2];
-			mf->debug_info[i].token_prev_prev = (char*)malloc(sizeof(char) * (t->num_chars + 1));
-			memcpy((void*)mf->debug_info[i].token_prev_prev, t->chars, t->num_chars);
-			mf->debug_info[i].token_prev_prev[t->num_chars] = '\0';
-		}
+		out->data.p = nmf;
+		out->type = M_TYPE_FUNCTION;
 	}
-
-	mf->refrences = 1;
-	mf->numberofinstructions = f->number_instructions;
-	mf->enviromental = false;
-	mf->instructions = (uint32_t*)malloc(f->number_instructions * sizeof(uint32_t));
-	if (!mf->instructions)return nullptr;
-	memcpy(mf->instructions,f->instructions, f->number_instructions * sizeof(uint32_t));
-	out->data.p = mf;
-	delete_comp_func(f);
-	free(tokens);
-
+	
 	return out;
 }
