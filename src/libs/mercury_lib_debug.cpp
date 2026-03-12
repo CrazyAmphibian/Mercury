@@ -165,7 +165,7 @@ void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, merc
 
 
 void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,1);
 
 	if (args_in == 1) { //read bytecode from function
 		mercury_variable* in = mercury_pullstack(M);

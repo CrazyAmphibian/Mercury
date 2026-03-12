@@ -35,11 +35,8 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-		#ifdef MERCURY_64BIT
-			M->programcounter += 2;
-		#else
-			M->programcounter += 1;
-		#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -75,11 +72,8 @@ void M_BYTECODE_ADD(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-		#ifdef MERCURY_64BIT
-			M->programcounter += 2;
-		#else
-			M->programcounter += 1;
-		#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -142,11 +136,8 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -182,11 +173,8 @@ void M_BYTECODE_SUB(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -249,11 +237,8 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -289,11 +274,8 @@ void M_BYTECODE_MUL(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -356,11 +338,8 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -396,11 +375,8 @@ void M_BYTECODE_DIV(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -471,11 +447,8 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -511,11 +484,8 @@ void M_BYTECODE_POW(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -586,11 +556,8 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -626,11 +593,8 @@ void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -720,11 +684,8 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -760,11 +721,8 @@ void M_BYTECODE_MOD(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -832,11 +790,8 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -871,11 +826,8 @@ void M_BYTECODE_BAND(mercury_state* M, uint16_t flags) {
 		else {
 			i2 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -935,11 +887,8 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -974,11 +923,8 @@ void M_BYTECODE_BOR(mercury_state* M, uint16_t flags) {
 		else {
 			i2 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1038,11 +984,8 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1077,11 +1020,8 @@ void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags) {
 		else {
 			i2 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1140,11 +1080,8 @@ void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1214,11 +1151,8 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1253,11 +1187,8 @@ void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags) {
 		else {
 			i2 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1317,11 +1248,8 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1356,11 +1284,8 @@ void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags) {
 		else {
 			i2 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1566,11 +1491,8 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1606,11 +1528,8 @@ void M_BYTECODE_GRT(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1679,11 +1598,8 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1719,11 +1635,8 @@ void M_BYTECODE_LET(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1792,11 +1705,8 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1832,11 +1742,8 @@ void M_BYTECODE_GTE(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1905,11 +1812,8 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 		else {
 			i1 = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -1945,11 +1849,8 @@ void M_BYTECODE_LTE(mercury_state* M, uint16_t flags) {
 		else {
 			(floatcount ? i1 : i2) = *(mercury_int*)offset;
 		}
-#ifdef MERCURY_64BIT
-		M->programcounter += 2;
-#else
-		M->programcounter += 1;
-#endif
+		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	}
 	else {
 		mercury_variable* var = mercury_popstack(M);
@@ -2121,16 +2022,11 @@ void M_BYTECODE_SREG(mercury_state* M, uint16_t flags) {
 
 	mercury_int regnum = *(mercury_int*)offset;
 
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	if (regnum > 0 and regnum <= register_max) {
 		M->registers[regnum] = mercury_popstack(M);
 	}
-
 
 }
 
@@ -2140,11 +2036,7 @@ void M_BYTECODE_GREG(mercury_state* M, uint16_t flags) {
 
 	mercury_int regnum = *(mercury_int*)offset;
 
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	if (regnum > 0 and regnum <= register_max) {
 		mercury_pushstack(M, M->registers[regnum]);
@@ -2164,11 +2056,8 @@ void M_BYTECODE_GREG(mercury_state* M, uint16_t flags) {
 
 void M_BYTECODE_NINT(mercury_state* M, uint16_t flags) { //New INTeger
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
@@ -2182,11 +2071,8 @@ void M_BYTECODE_NINT(mercury_state* M, uint16_t flags) { //New INTeger
 
 void M_BYTECODE_NFLO(mercury_state* M, uint16_t flags) { //New FLOat
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	mercury_variable* out = mercury_assign_var(M);
 	if (out == nullptr) {
@@ -2270,11 +2156,7 @@ void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags) { //New STRing
 
 void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags) { //New FUNction / No FUN
 	void* offset = M->bytecode.instructions + M->programcounter;
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	mercury_int function_size = *(mercury_int*)offset;
 
@@ -2639,11 +2521,8 @@ void M_BYTECODE_CPYX(mercury_state* M, uint16_t flags) { // CoPY X elements (fro
 
 
 	mercury_int num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
-#ifdef MERCURY_64BIT
-	M->programcounter += 2;
-#else
-	M->programcounter += 1;
-#endif
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 	mercury_int start_stack_size = M->sizeofstack;
 	for (mercury_int i = 0; i < num; i++) {
 
