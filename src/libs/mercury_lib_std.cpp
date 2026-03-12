@@ -353,12 +353,10 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 						continue;
 					}
 
-					mercury_mstring_addchars(str, (char*)"[");
-
 					mercury_mstrings_append(str, key);
 					mercury_mstring_delete(key);
 
-					mercury_mstring_addchars(str, (char*)"]=",2);
+					mercury_mstring_addchars(str, (char*)"=",1);
 
 					mercury_mstrings_append(str, value);
 					mercury_mstring_delete(value);
@@ -435,13 +433,11 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 						temp = m_stringify(var->data, var->type);
 						if (!temp)continue;
 
-						mercury_mstring_addchars(str, (char*)"[");
-
 						mercury_stringliteral* temp2 = m_stringify({ i = i }, M_TYPE_INT);
 						mercury_mstrings_append(str, temp2);
 						mercury_mstring_delete(temp2);
 
-						mercury_mstring_addchars(str, (char*)"]=", 2);
+						mercury_mstring_addchars(str, (char*)"=", 1);
 
 						mercury_mstrings_append(str, temp);
 						mercury_mstring_delete(temp);
