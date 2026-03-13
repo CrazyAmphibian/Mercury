@@ -270,26 +270,7 @@ void mercury_debugdumpbytecode(mercury_fullinstruction* instructions, mercury_in
 
 
 int main(int argc, char** argv) {
-	
-#ifdef _WIN32
-	HMODULE mercury_main = LoadLibraryA("Mercury.dll");
-	if (!mercury_main) {
-		printf("failed to load mercury dynamic link.\n");
-		return 2;
-	}
-	FreeLibrary(mercury_main);
-#else
-	void* mercury_main = dlopen("mercury.so", RTLD_LAZY);
-	if (!mercury_main) {
-		printf("failed to load mercury dynamic link.\n");
-		return 2;
-	}
-	dlclose(mercury_main);
-#endif
-
 	bool interactivemode = false;
-
-	
 	mercury_array* arg_arr=mercury_newarray();
 
 	//printf("arg count: %i\n", argc);
@@ -304,7 +285,6 @@ int main(int argc, char** argv) {
 	}
 	
 	char* code=nullptr;// = (char*)"";
-
 
 	if (argc>=2) {
 		const char* fpath = argv[1];
