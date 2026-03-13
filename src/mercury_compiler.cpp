@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 enum comment_type:uint8_t {
 	COMMENT_NONE=0,

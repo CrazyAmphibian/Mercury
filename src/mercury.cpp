@@ -1790,7 +1790,7 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 BOOL WINAPI DllMain(HMODULE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 	if (fdwReason == DLL_PROCESS_ATTACH) {
 #else
-__attribute__((constructor)) dynamic_lib_load() {
+static void __attribute__((constructor)) dynamic_lib_load() {
 #endif
 
 	static const mercury_int v = MERCURY_VERSION;
