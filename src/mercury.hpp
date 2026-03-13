@@ -21,18 +21,17 @@
 #define MERCURY_DYNAMIC_LIBRARY __attribute__((visibility("default")))
 #endif 
 
-#if __x86_64__ || __ppc64__ || __aarch64__ || _WIN64
+
+#if INT64_MAX==INTPTR_MAX
 typedef int64_t mercury_int; //typedefs to ensure that our variables occupy the same space in memory.
 typedef uint64_t mercury_uint;
 typedef double mercury_float;
 #define MERCURY_64BIT
-#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE 2 //how many instructions fit into one variable. instructions are 32 bits, so on a 64 bit system this is 2. on a 32 bit system, this is 1. if you're using a 16 bit system, god help you.
 #else
 typedef __int32 mercury_int;
 typedef unsigned __int32 mercury_uint;
 typedef float mercury_float;
 #define MERCURY_32BIT
-#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE 1;
 #endif
 
 #define MERCURY_VERSION 0
@@ -42,6 +41,16 @@ typedef float mercury_float;
 #if defined(DEBUG) || defined(_DEBUG)
 #define MERCURY_DEBUG
 #endif
+
+typedef uint16_t mercury_opcode;
+typedef uint16_t mercury_insflags;
+struct mercury_fullinstruction { //basically uint32_t. this is to make it so that we don't have to do bit arithmetic, only pointer manipulation (that the compiler will do for us). dunno if that's actually faster, though.
+	mercury_insflags flags;
+	mercury_opcode opcode;
+};
+
+#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE sizeof(mercury_int)/sizeof(mercury_fullinstruction) //how many instructions fit into one variable. instructions are 32 bits, so on a 64 bit system this is 2. on a 32 bit system, this is 1. if you're using a 16 bit system, god help you.
+
 
 union mercury_rawdata { //to represent stored binary data of almost any type.
 	mercury_int i;
@@ -98,7 +107,7 @@ struct mercury_array { //gee bill, two storage types?
 struct mercury_function {
 	mercury_uint refrences = 0;
 	mercury_uint numberofinstructions = 0;
-	uint32_t* instructions = nullptr;
+	mercury_fullinstruction* instructions = nullptr;
 	bool enviromental = false;
 	mercury_debug_token* debug_info=nullptr;
 };

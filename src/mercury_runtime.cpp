@@ -16,14 +16,14 @@
 
 
 
-void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instructions) {
+void mercury_debugdumpbytecode(mercury_fullinstruction* instructions, mercury_int number_instructions) {
 	mercury_int offset = 0;
 
 
 	while (offset < number_instructions)
 	{
-		uint16_t instr = instructions[offset] & 0xFFFF;
-		uint16_t flags = instructions[offset] >> 16;
+		mercury_opcode instr = instructions[offset].opcode;
+		mercury_insflags flags = instructions[offset].flags;
 		printf("%3llu] ", offset);
 		switch (instr) {
 		case M_OPCODE_NOP:
@@ -78,20 +78,17 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("NSTR ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
+
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
 				putchar('\"');
 				char* cp = (char*)(instructions + offset + 1);
 				for (int c = 0; c < sz; c++) {
 					putchar(cp[c]);
 				}
 				putchar('\"');
-				offset += (sz + 3) / 4;
+				offset += (sz + sizeof(mercury_fullinstruction)-1) / sizeof(mercury_fullinstruction);
 				//offset++;
 			}
 			putchar('\n');
@@ -101,42 +98,31 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("NINT ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
+
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("%i\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_NFLO:
 			printf("NFLO ");
 			{
 				mercury_float sz = 0.0;
-#ifdef MERCURY_64BIT
 				sz = *((mercury_float*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_float*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("%llf\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+				printf("%f\n", sz);
 			}
 			break;
 		case M_OPCODE_NFUN:
 			printf("NFUN ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
+
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("instructions:%i\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+				printf("instructions:%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_NFAL:
@@ -185,14 +171,10 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("CPYX ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("%lli\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_CNCT:
@@ -211,46 +193,33 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("JRNI ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("%lli\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_JMPR:
 			printf("JMPR ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("%lli\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_CALL:
 		{
 			mercury_int i = 0;
 			mercury_int o = 0;
-#ifdef MERCURY_64BIT
+
 			i = *((mercury_int*)(instructions + offset + 1));
-			offset += 2;
+			offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 			o = *((mercury_int*)(instructions + offset + 1));
-			offset += 2;
-#else
-			i = *((mercury_int*)(instructions + offset + 1));
-			offset++;
-			o = *((mercury_int*)(instructions + offset + 1));
-			offset++;
-#endif
-			printf("CALL in:%lli out:%lli\n", i, o);
+			offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+			printf("CALL in:%zi out:%zi\n", i, o);
 		}
 		break;
 		case M_OPCODE_UNM:
@@ -266,28 +235,21 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			printf("SCON ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
+
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("%i\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_GCON:
 			printf("GCON ");
 			{
 				mercury_int sz = 0;
-#ifdef MERCURY_64BIT
 				sz = *((mercury_int*)(instructions + offset + 1));
-				offset += 2;
-#else
-				sz = *((mercury_int*)(instructions + offset + 1));
-				offset++;
-#endif
-				printf("%i\n", sz);
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+				printf("%zi\n", sz);
 			}
 			break;
 		default:
@@ -300,10 +262,6 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 
 
 }
-
-
-
-
 
 
 

@@ -202,7 +202,7 @@ mercury_table* mercury_newtable() {
 	mercury_table* newt = (mercury_table*)malloc(sizeof(mercury_table));
 	if (newt == nullptr) return nullptr;
 	newt->data=(mercury_subtable**)malloc(sizeof(mercury_subtable*) * M_NUMBER_OF_TYPES);
-	
+	if (!newt->data)return nullptr;
 
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* st=(mercury_subtable*)malloc(sizeof(mercury_subtable));
@@ -399,9 +399,11 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 
 
 	mercury_variable* envvarkey = (mercury_variable*)malloc(sizeof(mercury_variable));
+	if (!envvarkey)return nullptr;
 	envvarkey->type = M_TYPE_STRING;
 	envvarkey->data.p = mercury_cstring_const_to_mstring((char*)"_ENV",4);
 	mercury_variable* envvarval = (mercury_variable*)malloc(sizeof(mercury_variable));
+	if (!envvarval)return nullptr;
 	envvarval->type = M_TYPE_TABLE;
 	envvarval->data.p = newstate->enviroment;
 	mercury_setkey(newstate->enviroment, envvarkey, envvarval);
@@ -433,9 +435,11 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 	newstate->num_constants = 0;
 
 	mercury_variable* globvarkey = (mercury_variable*)malloc(sizeof(mercury_variable));
+	if (!globvarkey)return nullptr;
 	globvarkey->type = M_TYPE_STRING;
 	globvarkey->data.p = mercury_cstring_const_to_mstring((char*)"_G", 2);
 	mercury_variable* globvarval = (mercury_variable*)malloc(sizeof(mercury_variable));
+	if (!globvarval)return nullptr;
 	globvarval->type = M_TYPE_TABLE;
 	globvarval->data.p = newstate->masterstate->enviroment;
 	mercury_setkey(newstate->enviroment, globvarkey, globvarval);
@@ -467,10 +471,10 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 bool mercury_stepstate(mercury_state* M) {
 	if (M->programcounter >= M->bytecode.numberofinstructions) return false;
 
-	uint32_t instr = M->bytecode.instructions[M->programcounter];
+	mercury_fullinstruction instr = M->bytecode.instructions[M->programcounter];
 
-	uint16_t opcode= instr&0xFFFF;
-	uint16_t iflags= instr>>16;
+	mercury_opcode opcode= instr.opcode;
+	mercury_insflags iflags= instr.flags;
 
 	//printf("%i - %i %i\n", M->programcounter,iflags,opcode);
 	M->programcounter++;
@@ -564,7 +568,7 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 		ftab->refrences--;
 		if (!ftab->refrences && !ftab->enviromental) {
 
-#if defined(_DEBUG) || defined(DEBUG)
+#ifdef MERCURY_DEBUG
 			if (ftab->enviromental) {
 				printf("enviromental table %p marked for freeing. something has gone terribly worng. probably.\n");
 			}
@@ -951,9 +955,9 @@ mercury_variable* mercury_tostring(mercury_variable* var) {
 		break;
 	case M_TYPE_FLOAT:
 		#ifdef MERCURY_64BIT
-		tint = snprintf(tout, sizeof(tout), "%#.30lg", var->data.f);
+		tint = snprintf(tout, sizeof(tout), "%#.30g", var->data.f);
 		#else
-		tint = snprintf(tout, sizeof(tout), "%#.15g", var->data.f);
+		tint = snprintf(tout, sizeof(tout), "%#.5g", var->data.f);
 		#endif
 		
 		if (tint==-1) {
@@ -1151,15 +1155,15 @@ bool mercury_vars_equal(mercury_variable* var1, mercury_variable* var2) {
 }
 
 
-void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instructions) {
+void mercury_debugdumpbytecode(mercury_fullinstruction* instructions, mercury_int number_instructions) {
 	mercury_int offset = 0;
 
 
 	while (offset< number_instructions)
 	{
-		uint16_t instr = instructions[offset]& 0xFFFF;
-		uint16_t flags = instructions[offset] >> 16;
-		printf("%2llu] ", offset);
+		mercury_opcode instr = instructions[offset].opcode;
+		mercury_insflags flags = instructions[offset].flags;
+		printf("%2zu] ", offset);
 		switch (instr) {
 		case M_OPCODE_NOP:
 			printf(" NOP\n"); break;
@@ -1210,8 +1214,7 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 					putchar(cp[c]);
 				}
 				putchar('\"');
-				offset += (sz + 3) / 4;
-				//offset++;
+				offset += (sz + sizeof(mercury_fullinstruction)-1) / sizeof(mercury_fullinstruction);
 			}
 			putchar('\n');
 			
@@ -1224,7 +1227,7 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 				sz = *((mercury_int*)(instructions + offset + 1));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
-				printf("%i\n", sz);
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_NFLO:
@@ -1235,7 +1238,7 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 				sz = *((mercury_float*)(instructions + offset + 1));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
-				printf("%llf\n", sz);
+				printf("%f\n", sz);
 			}
 			break;
 		case M_OPCODE_NFUN:
@@ -1246,7 +1249,7 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 				sz = *((mercury_int*)(instructions + offset + 1));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
-				printf("instructions:%i\n", sz);
+				printf("instructions:%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_NFAL:
@@ -1299,7 +1302,7 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 				sz = *((mercury_int*)(instructions + offset + 1));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
-				printf("%lli\n", sz);
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_JMPR:
@@ -1310,7 +1313,7 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 				sz = *((mercury_int*)(instructions + offset + 1));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
-				printf("%lli\n", sz);
+				printf("%zi\n", sz);
 			}
 			break;
 		case M_OPCODE_CALL:
@@ -1323,13 +1326,12 @@ void mercury_debugdumpbytecode(uint32_t* instructions, mercury_int number_instru
 			o = *((mercury_int*)(instructions + offset + 1));
 			offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
-			printf("CALL in:%lli out:%lli\n", i, o);
+			printf("CALL in:%lli out:%zi\n", i, o);
 		}
 			break;
 		default:
 			printf("???? (%i)\n", instructions[offset]);
 		}
-
 
 		offset++;
 	}
@@ -1351,10 +1353,10 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 
 			switch (t) {
 				case M_TYPE_NIL:
-					printf("nil_%i", subt->keys[i].i);
+					printf("nil_%zi", subt->keys[i].i);
 					break;
 				case M_TYPE_INT:
-					printf("%lli", subt->keys[i].i);
+					printf("%zi", subt->keys[i].i);
 					break;
 				case M_TYPE_FLOAT:
 					printf("%f", subt->keys[i].f);
@@ -1379,10 +1381,10 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 
 			switch (var->type) {
 				case M_TYPE_INT:
-					printf("%lli", var->data.i);
+					printf("%zi", var->data.i);
 					break;
 				case M_TYPE_FLOAT:
-					printf("%llf", var->data.f);
+					printf("%f", var->data.f);
 					break;
 				case M_TYPE_TABLE:
 					if (var->data.p != tab) {
@@ -1407,19 +1409,19 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 							switch (v->type)
 							{
 							case M_TYPE_NIL:
-								printf("%i - nil", q);
+								printf("%zi - nil", q);
 								break;
 							case M_TYPE_INT:
-								printf("%i - %i", q, var->data.i);
+								printf("%zi - %zi", q, var->data.i);
 								break;
 							case M_TYPE_FLOAT:
-								printf("%i - %f", q, var->data.f);
+								printf("%zi - %f", q, var->data.f);
 								break;
 							case M_TYPE_STRING:
 							{
 								mercury_stringliteral* sp = (mercury_stringliteral*)v->data.p;
 							
-								printf("%i - ", q);
+								printf("%zi - ", q);
 								putchar('\"');
 								for (mercury_int sc = 0; sc < sp->size; sc++) {
 									putchar(sp->ptr[sc]);
@@ -1429,7 +1431,7 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 							}
 								break;
 							default:
-								printf("%i - [%i] 0x%p",q,v->type ,v->data.p);
+								printf("%zi - [%hhu] 0x%p",q,v->type ,v->data.p);
 								break;
 							}
 						}
@@ -1446,7 +1448,7 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 					}
 					break;
 				default:
-					printf("[%i] 0x%p",var->type, var->data.p);
+					printf("[%zi] 0x%p",var->type, var->data.p);
 			}
 
 			
@@ -1459,7 +1461,7 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 
 }
 
-inline const char* m_get_opcode_str(uint16_t instruction) {
+inline const char* m_get_opcode_str(mercury_opcode instruction) {
 
 	if (instruction > M_OPCODE_GCON) {
 		return "????";
@@ -1551,17 +1553,16 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 
 	mercury_int offset = 0;
 	while (offset < F->numberofinstructions) {
-		uint32_t i=F->instructions[offset];
+		mercury_fullinstruction i=F->instructions[offset];
 		offset++;
-		uint16_t flags = (i >>16);
-		uint16_t instruction = (i & 0xFFFF);
+		mercury_opcode flags = i.flags;
+		mercury_opcode instruction = i.opcode;
 		char buffer[0x2FFF];
 
-
 #ifdef MERCURY_64BIT
-	snprintf(buffer, 0x2FFF, "[%015lX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+	snprintf(buffer, 0x2FFF, "[%015zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
 #else
-	snprintf(buffer, 0x2FFF, "[%07X - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+	snprintf(buffer, 0x2FFF, "[%07zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
 #endif
 		
 		mercury_mstring_addchars(out, buffer, strlen(buffer) );
@@ -1586,7 +1587,7 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 						snprintf(buffer, 0x2FFF, " arg 1: %f", *(mercury_float*)(F->instructions+offset) );
 					}
 					else {
-						snprintf(buffer, 0x2FFF, " arg 1: %i", *(mercury_int*)(F->instructions + offset) );
+						snprintf(buffer, 0x2FFF, " arg 1: %zi", *(mercury_int*)(F->instructions + offset) );
 					}
 					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 					mercury_mstring_addchars(out,buffer, strlen(buffer) );
@@ -1596,7 +1597,7 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 						snprintf(buffer, 0x2FFF, " arg 2: %f", *(mercury_float*)(F->instructions + offset));
 					}
 					else {
-						snprintf(buffer, 0x2FFF, " arg 2: %i", *(mercury_int*)(F->instructions + offset));
+						snprintf(buffer, 0x2FFF, " arg 2: %zi", *(mercury_int*)(F->instructions + offset));
 					}
 					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 					mercury_mstring_addchars(out, buffer, strlen(buffer));
@@ -1608,14 +1609,14 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 						snprintf(buffer, 0x2FFF, " arg: %f", *(mercury_float*)(F->instructions + offset));
 					}
 					else {
-						snprintf(buffer, 0x2FFF, " arg: %i", *(mercury_int*)(F->instructions + offset));
+						snprintf(buffer, 0x2FFF, " arg: %zi", *(mercury_int*)(F->instructions + offset));
 					}
 					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 					mercury_mstring_addchars(out, buffer, strlen(buffer));
 				}
 				break;
 			case M_OPCODE_NINT: //static var inputs
-				snprintf(buffer, 0x2FFF, " %i", *(mercury_int*)(F->instructions + offset));
+				snprintf(buffer, 0x2FFF, " %zi", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
@@ -1627,7 +1628,7 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 			case M_OPCODE_NSTR:
 				{
 				mercury_int size = *(mercury_int*)(F->instructions + offset);
-				snprintf(buffer, 0x2FFF, " size:%i ", size );
+				snprintf(buffer, 0x2FFF, " size:%zi ", size );
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				size = size >= 0x2FFF ? 0x2FFF : size;
@@ -1642,15 +1643,15 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 				}
 				break;
 			case M_OPCODE_NFUN:
-				snprintf(buffer, 0x2FFF, " instructions:%i ", *(mercury_int*)(F->instructions + offset));
+				snprintf(buffer, 0x2FFF, " instructions:%zi ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
 			case M_OPCODE_CALL:
-				snprintf(buffer, 0x2FFF, " in:%i ", *(mercury_int*)(F->instructions + offset));
+				snprintf(buffer, 0x2FFF, " in:%zi ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;	
-				snprintf(buffer, 0x2FFF, " out:%i ", *(mercury_int*)(F->instructions + offset));
+				snprintf(buffer, 0x2FFF, " out:%zi ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
@@ -1660,14 +1661,14 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 			case M_OPCODE_JNIF:
 			case M_OPCODE_JRIF:
 			case M_OPCODE_JRNI:
-				snprintf(buffer, 0x2FFF, " offset:%i ", *(mercury_int*)(F->instructions + offset));
+				snprintf(buffer, 0x2FFF, " offset:%zi ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
 			case M_OPCODE_CPYX:
 			case M_OPCODE_SCON:
 			case M_OPCODE_GCON:
-				snprintf(buffer, 0x2FFF, " %i ", *(mercury_int*)(F->instructions + offset));
+				snprintf(buffer, 0x2FFF, " %zi ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;

@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 
-typedef void (*mercury_instruction) (mercury_state* M, uint16_t flags); //takes a state and 16 bit int for opflags.
+typedef void (*mercury_instruction) (mercury_state* M, mercury_insflags flags); //takes a state and 16 bit int for opflags.
 
 
-enum mercury_instructionflags :uint16_t {
+enum mercury_instructionflags :mercury_insflags {
 	M_INSTRUCTIONFLAG_ARG1STATIC = 1 << 0,
 	M_INSTRUCTIONFLAG_ARG2STATIC = 1 << 1,
 
@@ -32,87 +32,87 @@ enum mercury_instructionflags :uint16_t {
 
 
 
-void M_BYTECODE_NOP(mercury_state* M, uint16_t flags);
+void M_BYTECODE_NOP(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_ADD(mercury_state* M, uint16_t flags);
-void M_BYTECODE_SUB(mercury_state* M, uint16_t flags);
-void M_BYTECODE_MUL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_DIV(mercury_state* M, uint16_t flags);
-void M_BYTECODE_POW(mercury_state* M, uint16_t flags);
-void M_BYTECODE_IDIV(mercury_state* M, uint16_t flags);
-void M_BYTECODE_MOD(mercury_state* M, uint16_t flags);
+void M_BYTECODE_ADD(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_SUB(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_MUL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_DIV(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_POW(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_IDIV(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_MOD(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_BAND(mercury_state* M, uint16_t flags);
-void M_BYTECODE_BOR(mercury_state* M, uint16_t flags);
-void M_BYTECODE_BXOR(mercury_state* M, uint16_t flags);
-void M_BYTECODE_BNOT(mercury_state* M, uint16_t flags);
-void M_BYTECODE_BSHL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_BSHR(mercury_state* M, uint16_t flags);
+void M_BYTECODE_BAND(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_BOR(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_BXOR(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_BNOT(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_BSHL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_BSHR(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_LAND(mercury_state* M, uint16_t flags);
-void M_BYTECODE_LOR(mercury_state* M, uint16_t flags);
-void M_BYTECODE_LXOR(mercury_state* M, uint16_t flags);
-void M_BYTECODE_LNOT(mercury_state* M, uint16_t flags);
+void M_BYTECODE_LAND(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_LOR(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_LXOR(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_LNOT(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_EQL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NEQ(mercury_state* M, uint16_t flags);
-void M_BYTECODE_GRT(mercury_state* M, uint16_t flags);
-void M_BYTECODE_LET(mercury_state* M, uint16_t flags);
-void M_BYTECODE_GTE(mercury_state* M, uint16_t flags);
-void M_BYTECODE_LTE(mercury_state* M, uint16_t flags);
+void M_BYTECODE_EQL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NEQ(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_GRT(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_LET(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_GTE(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_LTE(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_SENV(mercury_state* M, uint16_t flags);
-void M_BYTECODE_GENV(mercury_state* M, uint16_t flags);
-void M_BYTECODE_SET(mercury_state* M, uint16_t flags);
-void M_BYTECODE_GET(mercury_state* M, uint16_t flags);
-void M_BYTECODE_SREG(mercury_state* M, uint16_t flags);
-void M_BYTECODE_GREG(mercury_state* M, uint16_t flags);
+void M_BYTECODE_SENV(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_GENV(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_SET(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_GET(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_SREG(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_GREG(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_NINT(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NFLO(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NTRU(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NFAL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NNIL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NSTR(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NFUN(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NTAB(mercury_state* M, uint16_t flags);
-void M_BYTECODE_NARR(mercury_state* M, uint16_t flags);
+void M_BYTECODE_NINT(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NFLO(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NTRU(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NFAL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NNIL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NSTR(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NFUN(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NTAB(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_NARR(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_JMP(mercury_state* M, uint16_t flags);
-void M_BYTECODE_JMPR(mercury_state* M, uint16_t flags);
-void M_BYTECODE_JIF(mercury_state* M, uint16_t flags);
-void M_BYTECODE_JNIF(mercury_state* M, uint16_t flags);
-void M_BYTECODE_JRIF(mercury_state* M, uint16_t flags);
-void M_BYTECODE_JRNI(mercury_state* M, uint16_t flags);
+void M_BYTECODE_JMP(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_JMPR(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_JIF(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_JNIF(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_JRIF(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_JRNI(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_CALL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_END(mercury_state* M, uint16_t flags);
+void M_BYTECODE_CALL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_END(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_LEN(mercury_state* M, uint16_t flags);
-void M_BYTECODE_CNCT(mercury_state* M, uint16_t flags);
+void M_BYTECODE_LEN(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_CNCT(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_CLS(mercury_state* M, uint16_t flags);
+void M_BYTECODE_CLS(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_GETL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_SETL(mercury_state* M, uint16_t flags);
-void M_BYTECODE_GETG(mercury_state* M, uint16_t flags);
-void M_BYTECODE_SETG(mercury_state* M, uint16_t flags);
+void M_BYTECODE_GETL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_SETL(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_GETG(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_SETG(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_CPYT(mercury_state* M, uint16_t flags);
-void M_BYTECODE_SWPT(mercury_state* M, uint16_t flags);
-void M_BYTECODE_CPYX(mercury_state* M, uint16_t flags);
+void M_BYTECODE_CPYT(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_SWPT(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_CPYX(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_UNM(mercury_state* M, uint16_t flags);
-void M_BYTECODE_INC(mercury_state* M, uint16_t flags);
-void M_BYTECODE_DEC(mercury_state* M, uint16_t flags);
+void M_BYTECODE_UNM(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_INC(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_DEC(mercury_state* M, mercury_insflags flags);
 
-void M_BYTECODE_SCON(mercury_state* M, uint16_t flags);
-void M_BYTECODE_GCON(mercury_state* M, uint16_t flags);
+void M_BYTECODE_SCON(mercury_state* M, mercury_insflags flags);
+void M_BYTECODE_GCON(mercury_state* M, mercury_insflags flags);
 
 extern mercury_instruction mercury_bytecode_list[];
 
 
-enum mercury_opcodes:uint16_t {
+enum mercury_opcodes:mercury_opcode {
 	M_OPCODE_NOP = 0,
 
 	M_OPCODE_ADD = 1,

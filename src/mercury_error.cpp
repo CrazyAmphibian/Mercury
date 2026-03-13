@@ -42,13 +42,13 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 			tchars[T.num_chars] = '\0';
 		}
 #if defined(DEBUG) || defined(_DEBUG)
-		snprintf(header, 255, "line %lli col %lli instruction #%lli (%04X) at \"%s\"", T.line + 1, T.col + 1, M->programcounter-1, 0xFFFF & M->bytecode.instructions[M->programcounter-1], tchars ? tchars : fallback);
+		snprintf(header, 255, "line %zi col %zi instruction #%zi (%04X) at \"%s\"", T.line + 1, T.col + 1, M->programcounter-1, M->bytecode.instructions[M->programcounter-1].opcode, tchars ? tchars : fallback);
 #else
-		snprintf(header, 255, "line %lli col %lli at \"%s\"", T.line + 1, T.col + 1, tchars ? tchars : fallback);
+		snprintf(header, 255, "line %zi col %zi at \"%s\"", T.line + 1, T.col + 1, tchars ? tchars : fallback);
 #endif
 	}
 	else {
-		snprintf(header, 255, "line ? col ? at ? - instruction #%lli (%04X)",M->programcounter-1,0xFFFF&M->bytecode.instructions[M->programcounter-1]);
+		snprintf(header, 255, "line ? col ? at ? - instruction #%zi (%04X)",M->programcounter-1,M->bytecode.instructions[M->programcounter-1].opcode);
 	}
 
 	switch (errorcode) {

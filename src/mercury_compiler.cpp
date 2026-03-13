@@ -69,7 +69,7 @@ struct compiler_token {
 };
 
 struct compiler_function {
-	uint32_t* instructions = nullptr;
+	mercury_fullinstruction* instructions = nullptr;
 	mercury_int* instruction_tokens = nullptr; //which token each instruction points to
 	mercury_int number_instructions = 0;
 	mercury_int tokens_consumed = 0;
@@ -885,14 +885,14 @@ inline void delete_compiler_function(compiler_function* f){
 inline bool merge_compiler_functions(compiler_function* fbase, compiler_function* fadd){
 	mercury_int nsiz=fbase->number_instructions + fadd->number_instructions;
 	
-	void* p=realloc(fbase->instructions,sizeof(uint32_t)*(nsiz) );
+	void* p=realloc(fbase->instructions,sizeof(mercury_fullinstruction)*(nsiz) );
 	if(!p)return false;
-	fbase->instructions = (uint32_t*)p;
+	fbase->instructions = (mercury_fullinstruction*)p;
 	p=realloc(fbase->instruction_tokens,sizeof(mercury_int)*(nsiz) );
 	if(!p)return false;
 	fbase->instruction_tokens = (mercury_int*)p;
 	
-	memcpy(fbase->instructions+fbase->number_instructions,fadd->instructions,sizeof(uint32_t)*fadd->number_instructions );
+	memcpy(fbase->instructions+fbase->number_instructions,fadd->instructions,sizeof(mercury_fullinstruction)*fadd->number_instructions );
 	memcpy(fbase->instruction_tokens+fbase->number_instructions,fadd->instruction_tokens,sizeof(mercury_int)*fadd->number_instructions );
 	
 	fbase->number_instructions = nsiz;
@@ -904,35 +904,39 @@ inline bool merge_compiler_functions(compiler_function* fbase, compiler_function
 	return true;
 }
 
-inline bool add_instruction(compiler_function* f, uint16_t opcode,uint16_t flags,mercury_int token_num){
-	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+1) );
+inline bool add_instruction(compiler_function* f, mercury_opcode opcode, mercury_insflags flags,mercury_int token_num){
+	void* p=realloc(f->instructions,sizeof(mercury_fullinstruction)*(f->number_instructions+1) );
 	if(!p)return false;
-	f->instructions = (uint32_t*)p;
+	f->instructions = (mercury_fullinstruction*)p;
 	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+1) );
 	if(!p)return false;
 	f->instruction_tokens = (mercury_int*)p;
 	
-	uint32_t d=flags;
-	f->instructions[f->number_instructions] = (d<<16) | opcode;
+	mercury_fullinstruction d;
+	d.flags = flags;
+	d.opcode = opcode;
+	f->instructions[f->number_instructions] = d;
 	f->instruction_tokens[f->number_instructions] = token_num;
 	
 	f->number_instructions++;
 	return true;
 }
 
-inline bool add_instruction_at_begining(compiler_function* f, uint16_t opcode,uint16_t flags,mercury_int token_num){
-	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+1) );
+inline bool add_instruction_at_begining(compiler_function* f, mercury_opcode opcode, mercury_insflags flags,mercury_int token_num){
+	void* p=realloc(f->instructions,sizeof(mercury_fullinstruction)*(f->number_instructions+1) );
 	if(!p)return false;
-	f->instructions = (uint32_t*)p;
+	f->instructions = (mercury_fullinstruction*)p;
 	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+1) );
 	if(!p)return false;
 	f->instruction_tokens = (mercury_int*)p;
 	
-	memmove(f->instructions+1,f->instructions, sizeof(uint32_t)*f->number_instructions );
+	memmove(f->instructions+1,f->instructions, sizeof(mercury_fullinstruction)*f->number_instructions );
 	memmove(f->instruction_tokens+1,f->instruction_tokens, sizeof(mercury_int)*f->number_instructions );
 	
-	uint32_t d=flags;
-	f->instructions[0] = (d<<16) | opcode;
+	mercury_fullinstruction d;
+	d.flags = flags;
+	d.opcode = opcode;
+	f->instructions[0] = d;
 	f->instruction_tokens[0] = token_num;
 	
 	f->number_instructions++;
@@ -940,34 +944,39 @@ inline bool add_instruction_at_begining(compiler_function* f, uint16_t opcode,ui
 }
 
 inline bool add_rawdata(compiler_function* f, uint32_t data,mercury_int token_num){
-	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+1) );
+	const int sizereq = sizeof(uint32_t) / sizeof(mercury_fullinstruction);
+	void* p=realloc(f->instructions,sizeof(mercury_fullinstruction)*(f->number_instructions+ sizereq) );
 	if(!p)return false;
-	f->instructions = (uint32_t*)p;
-	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+1) );
+	f->instructions = (mercury_fullinstruction*)p;
+	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+ sizereq) );
 	if(!p)return false;
 	f->instruction_tokens = (mercury_int*)p;
 	
-	f->instructions[f->number_instructions] = data;
-	f->instruction_tokens[f->number_instructions] = token_num;
+	*(uint32_t*)(f->instructions+f->number_instructions) = data;
+	for (int n = 0; n < sizereq; n++) {
+		f->instruction_tokens[f->number_instructions+n] = token_num;
+	}
 	
-	f->number_instructions++;
+	f->number_instructions+= sizereq;
 	return true;
 }
 
 #ifdef MERCURY_64BIT
 inline bool add_rawdata_double(compiler_function* f, uint64_t data,mercury_int token_num){
-	void* p=realloc(f->instructions,sizeof(uint32_t)*(f->number_instructions+2) );
+	const int sizereq = sizeof(uint64_t) / sizeof(mercury_fullinstruction);
+	void* p=realloc(f->instructions,sizeof(mercury_fullinstruction)*(f->number_instructions+ sizereq) );
 	if(!p)return false;
-	f->instructions = (uint32_t*)p;
-	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+2) );
+	f->instructions = (mercury_fullinstruction*)p;
+	p=realloc(f->instruction_tokens,sizeof(mercury_int)*(f->number_instructions+ sizereq) );
 	if(!p)return false;
 	f->instruction_tokens = (mercury_int*)p;
 	
 	*(uint64_t*)(f->instructions+f->number_instructions) = data;
-	f->instruction_tokens[f->number_instructions] = token_num;
-	f->instruction_tokens[f->number_instructions+1] = token_num;
+	for (int n = 0; n < sizereq; n++) {
+		f->instruction_tokens[f->number_instructions + n] = token_num;
+	}
 	
-	f->number_instructions+=2;
+	f->number_instructions+= sizereq;
 	return true;
 }
 #endif
@@ -993,7 +1002,7 @@ inline compiler_token* m_compile_get_next_token(compiler_token** tokens,mercury_
 	return out;
 }
 
-uint16_t m_compile_get_operator_opcode_from_token(compiler_token* t,int ttype=0){
+mercury_opcode m_compile_get_operator_opcode_from_token(compiler_token* t,int ttype=0){
 	mercury_int nc = t->num_chars;
 	if(nc==1){
 		char c=t->chars[0];
@@ -1094,16 +1103,16 @@ uint16_t m_compile_get_operator_opcode_from_token(compiler_token* t,int ttype=0)
 }
 
 inline void add_string_onto_stack(compiler_function* f,char* s,mercury_int len,mercury_int dbg_toknum){
-	mercury_int required_space = (len + 3) / 4;
+	mercury_int required_space = (len + sizeof(mercury_fullinstruction)-1) / sizeof(mercury_fullinstruction);
 	add_instruction(f, M_OPCODE_NSTR,0,dbg_toknum);
 	add_rawdata_bitwidth_size(f, len,dbg_toknum);
-	void* nptr=realloc(f->instructions, sizeof(uint32_t)*(f->number_instructions+required_space) );
+	void* nptr=realloc(f->instructions, sizeof(mercury_fullinstruction)*(f->number_instructions+required_space) );
 	if(!nptr){
 		f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
 		f->token_error_num=dbg_toknum;
 		return;
 	}
-	f->instructions=(uint32_t*)nptr;
+	f->instructions=(mercury_fullinstruction*)nptr;
 	nptr=realloc(f->instruction_tokens, sizeof(mercury_int)*(f->number_instructions+required_space) );
 	if(!nptr){
 		f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
@@ -1281,7 +1290,7 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 		};
 		
 	}else if(cur_tok->token_flags & (TOKEN_ENV_VAR | TOKEN_SCOPESPECIFIER) ){
-		uint16_t g_op= M_OPCODE_GENV;
+		mercury_opcode g_op= M_OPCODE_GENV;
 		if(cur_tok->token_flags & TOKEN_SCOPESPECIFIER){
 			if(token_matches_chars(cur_tok,"local")){
 				g_op = M_OPCODE_GETL;
@@ -1697,8 +1706,8 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 //a statement is something like a=5, a[1]=5, a(5), or a[1](5)
 mercury_int m_compile_read_statment(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
 	mercury_int initial_offset=token_offset;
-	uint8_t get_instruction=M_OPCODE_GENV;
-	uint8_t set_instruction=M_OPCODE_SENV;
+	mercury_opcode get_instruction=M_OPCODE_GENV;
+	mercury_opcode set_instruction=M_OPCODE_SENV;
 	
 	//find local/global keyword first
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -1886,7 +1895,7 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		add_instruction(f,get_instruction,0, ito);
 		//stack: table, key, value
 		//horray, we did it. well, actually no, we still need to read the rest of the statment.
-		uint8_t insop=m_compile_get_operator_opcode_from_token(cur_tok);
+		mercury_opcode insop=m_compile_get_operator_opcode_from_token(cur_tok);
 		token_offset++;
 		
 		if(cur_tok->token_flags & TOKEN_BINARY_OP){

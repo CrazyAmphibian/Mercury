@@ -762,11 +762,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 		case 'I':
 		case 'i': // integer
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "lli";
-#else
-				type = "i";
-#endif
+				type = "zi";
 				if (*num_vars) {
 					(*num_vars)--;
 					value.i = mercury_checkint(v_arr[*num_vars]);
@@ -775,11 +771,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'x': // hex int
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llx";
-#else
-				type = "x";
-#endif
+				type = "zx";
 				if (*num_vars) {
 					(*num_vars)--;
 					value.i = mercury_checkint(v_arr[*num_vars]);
@@ -788,11 +780,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'X': // hex int (capital)
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llX";
-#else
-				type = "X";
-#endif
+				type = "zX";
 				if (*num_vars) {
 					(*num_vars)--;
 					value.i = mercury_checkint(v_arr[*num_vars]);
@@ -801,11 +789,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'f':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llf";
-#else
 				type = "f";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);
@@ -815,11 +799,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'F':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llF";
-#else
 				type = "F";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);
@@ -828,11 +808,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'e':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "lle";
-#else
 				type = "e";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);
@@ -841,11 +817,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'E':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llE";
-#else
 				type = "E";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);
@@ -854,11 +826,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'g':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llg";
-#else
 				type = "g";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);
@@ -867,11 +835,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'G':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llG";
-#else
 				type = "G";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);
@@ -880,11 +844,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'a':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "lla";
-#else
 				type = "a";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);
@@ -893,11 +853,7 @@ int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringl
 			goto output;
 		case 'A':
 			if (!type) {
-#ifdef MERCURY_64BIT
-				type = "llA";
-#else
 				type = "A";
-#endif
 				if (*num_vars) {
 					(*num_vars)--;
 					value.f = mercury_checkfloat(v_arr[*num_vars]);

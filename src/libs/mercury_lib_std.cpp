@@ -69,15 +69,15 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	mercury_state* SubM = mercury_newstate(M);
 	if (function->type == M_TYPE_FUNCTION) {
 		mercury_function* func = (mercury_function*)function->data.p;
-		void* nbl = realloc(SubM->bytecode.instructions, func->numberofinstructions * sizeof(uint32_t));
+		void* nbl = realloc(SubM->bytecode.instructions, func->numberofinstructions * sizeof(mercury_fullinstruction));
 		if (!nbl) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_destroystate(SubM);
 			return;
 		}
-		SubM->bytecode.instructions = (uint32_t*)nbl;
+		SubM->bytecode.instructions = (mercury_fullinstruction*)nbl;
 		SubM->bytecode.numberofinstructions = func->numberofinstructions;
-		memcpy(SubM->bytecode.instructions, func->instructions, func->numberofinstructions * sizeof(uint32_t));
+		memcpy(SubM->bytecode.instructions, func->instructions, func->numberofinstructions * sizeof(mercury_fullinstruction));
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
@@ -246,16 +246,16 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 	}
 	if (func->type == M_TYPE_FUNCTION) {
 		mercury_function* func2 = (mercury_function*)func->data.p;
-		void* nbl = realloc(iso_M->bytecode.instructions, func2->numberofinstructions * sizeof(uint32_t));
+		void* nbl = realloc(iso_M->bytecode.instructions, func2->numberofinstructions * sizeof(mercury_fullinstruction));
 		if (!nbl) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_destroystate(iso_M);
 			free(argt);
 			return;
 		}
-		iso_M->bytecode.instructions = (uint32_t*)nbl;
+		iso_M->bytecode.instructions = (mercury_fullinstruction*)nbl;
 		iso_M->bytecode.numberofinstructions = func2->numberofinstructions;
-		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(uint32_t));
+		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(mercury_fullinstruction));
 	}
 
 
@@ -300,9 +300,9 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 		break;
 	case M_TYPE_FLOAT:
 #ifdef MERCURY_64BIT
-		tint = snprintf(tout, sizeof(tout), "%.60lg", data.f);
+		tint = snprintf(tout, sizeof(tout), "%.60g", data.f);
 #else
-		tint = snprintf(tout, sizeof(tout), "%.30lg", data.f);
+		tint = snprintf(tout, sizeof(tout), "%.30g", data.f);
 #endif
 		str = mercury_cstring_to_mstring(tout, strlen(tout));
 		break;
@@ -360,6 +360,9 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 				}
 			}
 			str->ptr=(char*)malloc(sizeof(char)* (size_total_str+2));
+			if (!str->ptr) {
+				return nullptr;
+			}
 			str->size = size_total_str+2;
 
 			str->ptr[0] = '\"';
