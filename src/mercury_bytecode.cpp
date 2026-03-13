@@ -515,7 +515,7 @@ void M_BYTECODE_POW(mercury_state* M, mercury_insflags flags) {
 	outv->type = M_TYPE_FLOAT;
 	switch (floatcount) {
 	case 0:
-		outv->data.f = pow(i2, (mercury_float)i1);
+		outv->data.f = pow((mercury_float)i2, (mercury_float)i1);
 		break;
 	case 1:
 		outv->data.f = pow((mercury_float)i1, f1);

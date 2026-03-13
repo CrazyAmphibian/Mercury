@@ -1957,8 +1957,8 @@ void mercury_lib_string_escape_c(mercury_state* M, mercury_int args_in, mercury_
 		case '\b':
 			mercury_mstring_addchars(os, (char*)"\\b", 2);
 			break;
-		case '\e':
-			mercury_mstring_addchars(os, (char*)"\\e", 2);
+		case '\x1B': //ASCII escape character
+			mercury_mstring_addchars(os, (char*)"\\x1B", 4);
 			break;
 		case '\f':
 			mercury_mstring_addchars(os, (char*)"\\f", 2);

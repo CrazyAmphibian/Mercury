@@ -302,11 +302,8 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str,mer
 							case 'b':
 								append_char_to_compiler_token(cur_tok,'\b');
 								break;
-							case 'c':
-								append_char_to_compiler_token(cur_tok,'\c');
-								break;
 							case 'e':
-								append_char_to_compiler_token(cur_tok,'\e');
+								append_char_to_compiler_token(cur_tok,'\x1B'); //ASCII escape character
 								break;
 							case 'f':
 								append_char_to_compiler_token(cur_tok,'\f');
