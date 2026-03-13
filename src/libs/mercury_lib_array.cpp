@@ -260,7 +260,7 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 	mercury_destroystate(M);
 	if (var_o->type == M_TYPE_INT) {
 		mercury_free_var(var_o);
-		return var_o->data.i;
+		return (int)var_o->data.i;
 	}
 	mercury_free_var(var_o);
 	return 0;

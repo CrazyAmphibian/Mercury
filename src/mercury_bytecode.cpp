@@ -515,13 +515,13 @@ void M_BYTECODE_POW(mercury_state* M, mercury_insflags flags) {
 	outv->type = M_TYPE_FLOAT;
 	switch (floatcount) {
 	case 0:
-		outv->data.f = pow(i2, i1);
+		outv->data.f = pow(i2, (mercury_float)i1);
 		break;
 	case 1:
-		outv->data.f = pow(i1, f1);
+		outv->data.f = pow((mercury_float)i1, f1);
 		break;
 	case 2:
-		outv->data.f = pow(f1, i1);
+		outv->data.f = pow(f1, (mercury_float)i1);
 		break;
 	case 3:
 		outv->data.f = pow(f2, f1);
@@ -756,10 +756,10 @@ void M_BYTECODE_MOD(mercury_state* M, mercury_insflags flags) {
 		outv->data.i = i2 % i1;
 		break;
 	case 1:
-		outv->data.f = fmod(i1, f1);
+		outv->data.f = fmod((mercury_float)i1, f1);
 		break;
 	case 2:
-		outv->data.f = fmod(f1, i1);
+		outv->data.f = fmod(f1, (mercury_float)i1);
 		break;
 	case 3:
 		outv->data.f = fmod(f2 , f1);
@@ -2440,7 +2440,7 @@ void M_BYTECODE_CNCT(mercury_state* M, mercury_insflags flags) { // CoNCaTenate
 
 void M_BYTECODE_CLS(mercury_state* M, mercury_insflags flags) { // CLear Stack
 	//as simple as it gets, really.
-	for (mercury_int i = 0; i < M->sizeofstack;i++) {
+	for (mercury_uint i = 0; i < M->sizeofstack;i++) {
 		mercury_unassign_var(M, mercury_popstack(M));
 	}
 
@@ -2644,7 +2644,7 @@ void M_BYTECODE_DEC(mercury_state* M, mercury_insflags flags) { //DECrement
 }
 
 void M_BYTECODE_SCON(mercury_state* M, mercury_insflags flags) { //Set CONstant
-	mercury_int con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	mercury_uint con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	if (con_num >= M->num_constants) {
@@ -2664,7 +2664,7 @@ void M_BYTECODE_SCON(mercury_state* M, mercury_insflags flags) { //Set CONstant
 }
 
 void M_BYTECODE_GCON(mercury_state* M, mercury_insflags flags) { //Get CONstant
-	mercury_int con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	mercury_uint con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	if (con_num >= M->num_constants) {
 		M_BYTECODE_NNIL(M,0);

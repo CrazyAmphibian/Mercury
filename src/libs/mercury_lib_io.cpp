@@ -48,7 +48,7 @@ void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args
 
 	char* file = mercury_mstring_to_cstring((mercury_stringliteral*)file_var->data.p);
 	const char* mode = mercury_mstring_to_cstring((mercury_stringliteral*)mode_var->data.p);
-	int mode_l = strlen(mode);
+	int mode_l = (int)strlen(mode);
 
 	if (mode_l == 1) {
 		char c = mode[0];

@@ -125,19 +125,19 @@ struct mercury_state {
 	mercury_state* parentstate = nullptr; //the parent of this state. nullptr if there is no parent
 	mercury_state* masterstate = nullptr; // the parent of the parent of the... this can also be itself.
 
-	mercury_int sizeofstack = 0;  // number of elements on the stack
+	mercury_uint sizeofstack = 0;  // number of elements on the stack
 	mercury_variable** stack = nullptr;
-	mercury_int actualstacksize = 0; // the size of the stack array
+	mercury_uint actualstacksize = 0; // the size of the stack array
 
-	mercury_int numunassignedstack = 0; // number of unused elements
+	mercury_uint numunassignedstack = 0; // number of unused elements
 	mercury_variable** unassignedstack = nullptr;
-	mercury_int sizeunassignedstack = 0; // size of the unused element array.
+	mercury_uint sizeunassignedstack = 0; // size of the unused element array.
 
 	mercury_variable** registers = nullptr;
 	mercury_variable** constants = nullptr;
-	mercury_int num_constants = 0;
+	mercury_uint num_constants = 0;
 
-	mercury_int programcounter = 0;
+	mercury_uint programcounter = 0;
 	mercury_function bytecode;
 
 

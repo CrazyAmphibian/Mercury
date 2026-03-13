@@ -10,7 +10,7 @@ void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	printf("current state: 0x%p size of stack: %zi (allocated: %zi) [unassigned: %zi allocated: %zi]\n",M,M->sizeofstack,M->actualstacksize,M->numunassignedstack,M->sizeunassignedstack);
-	for (mercury_int i = 0; i < M->sizeofstack; i++) {
+	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
 		mercury_variable* v = M->stack[i];
 		const char* typestr = "unknown";
 		switch (v->type) {
@@ -48,7 +48,7 @@ void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_
 			typestr = "thread";
 			break;
 		}
-		printf("\t[%zi] 0x%p = (%s%s %hhu) = i:%zi f:%f p:%p \n",i,v,v->constant ? "<CONSTANT> " : " ", typestr, v->type, v->data.i,v->data.f,v->data.p);
+		printf("\t[%zu] 0x%p = (%s%s %hhu) = i:%zi f:%f p:%p \n",i,v,v->constant ? "<CONSTANT> " : " ", typestr, v->type, v->data.i,v->data.f,v->data.p);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -61,7 +61,7 @@ void m_output_state(mercury_state* M, mercury_int* l,bool is_cur) {
 	for (mercury_int i = 0; i < *l; i++) {
 		putchar('\t');
 	}
-	printf("state 0x%p instruction pool: 0x%p [%zi/%zu] %s %s\n",M,M->bytecode.instructions,M->programcounter,M->bytecode.numberofinstructions,M==M->masterstate?"<MASTER> " :"", is_cur?"<CURRENT>" :"");
+	printf("state 0x%p instruction pool: 0x%p [%zu/%zu] %s %s\n",M,M->bytecode.instructions,M->programcounter,M->bytecode.numberofinstructions,M==M->masterstate?"<MASTER> " :"", is_cur?"<CURRENT>" :"");
 	(*l)++;
 }
 
@@ -152,11 +152,11 @@ void mercury_lib_debug_enviroment_dbg(mercury_state* M, mercury_int args_in, mer
 void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
-	printf("state 0x%p has %zi constants\n", M,M->num_constants);
+	printf("state 0x%p has %zu constants\n", M,M->num_constants);
 
-	for (mercury_int i = 0; i < M->num_constants; i++) {
+	for (mercury_uint i = 0; i < M->num_constants; i++) {
 		mercury_variable* c=M->constants[i];
-		printf("\t%zi : %s\n", i, m_var_to_string(c->type, c->data));
+		printf("\t%zu : %s\n", i, m_var_to_string(c->type, c->data));
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);

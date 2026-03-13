@@ -721,7 +721,7 @@ char* getprintfstring(mercury_int* args, bool* args_def, const char* type) {
 	}
 
 	memcpy(str+ptr,type,strlen(type));
-	ptr+=strlen(type);
+	ptr+=(short)strlen(type);
 
 	str[ptr] = '\0';
 	return str;

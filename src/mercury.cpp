@@ -492,23 +492,23 @@ bool mercury_stepstate(mercury_state* M) {
 }
 
 void mercury_destroystate(mercury_state* M) {
-	for (mercury_int i = 0; i < M->sizeofstack; i++) {
+	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
 		mercury_free_var(M->stack[i]);
 	}
 	free(M->stack);
-	for (mercury_int i = 0; i < M->numunassignedstack; i++) {
+	for (mercury_uint i = 0; i < M->numunassignedstack; i++) {
 		free(M->unassignedstack[i]); //do not use mercury_free_var or i will beat the shit out of you (and the memory will corrupt)
 	}
 	free(M->unassignedstack);
 
 	if (M->masterstate == M && M->registers) {
-		for (mercury_int i = 0; i < register_max; i++) {
+		for (mercury_uint i = 0; i < register_max; i++) {
 			if(M->registers[i])mercury_free_var(M->registers[i]);
 		}
 		free(M->registers);
 	}
 
-	for (mercury_int i = 0; i < M->num_constants; i++) {
+	for (mercury_uint i = 0; i < M->num_constants; i++) {
 		mercury_variable* v = M->constants[i];
 		v->constant = 0;
 		mercury_free_var(v);
