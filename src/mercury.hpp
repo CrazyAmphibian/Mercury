@@ -195,8 +195,8 @@ extern mercury_int M_NUM_LIBS;
 //functions defined in the .cpp
 
 //string
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_to_mstring(char* str, long size);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_const_to_mstring(char* str, long size);
+MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_to_mstring(char* str, mercury_int size);
+MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_const_to_mstring(char* str, mercury_int size);
 MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(mercury_stringliteral* str);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_equal(mercury_stringliteral* str1, mercury_stringliteral* str2);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstrings_concat(mercury_stringliteral* str1, mercury_stringliteral* str2);

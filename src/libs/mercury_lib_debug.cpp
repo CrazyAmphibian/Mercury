@@ -9,7 +9,7 @@
 void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
-	printf("current state: 0x%p size of stack: %li (allocated: %li) [unassigned: %li allocated: %li]\n",M,M->sizeofstack,M->actualstacksize,M->numunassignedstack,M->sizeunassignedstack);
+	printf("current state: 0x%p size of stack: %zi (allocated: %zi) [unassigned: %zi allocated: %zi]\n",M,M->sizeofstack,M->actualstacksize,M->numunassignedstack,M->sizeunassignedstack);
 	for (mercury_int i = 0; i < M->sizeofstack; i++) {
 		mercury_variable* v = M->stack[i];
 		const char* typestr = "unknown";
@@ -48,7 +48,7 @@ void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_
 			typestr = "thread";
 			break;
 		}
-		printf("\t[%i] 0x%p = (%s%s %i) = i:%i f:%f p:%p \n",i,v,v->constant ? "<CONSTANT> " : " ", typestr, v->type, v->data.i,v->data.f,v->data.p);
+		printf("\t[%zi] 0x%p = (%s%s %hhu) = i:%zi f:%f p:%p \n",i,v,v->constant ? "<CONSTANT> " : " ", typestr, v->type, v->data.i,v->data.f,v->data.p);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -61,7 +61,7 @@ void m_output_state(mercury_state* M, mercury_int* l,bool is_cur) {
 	for (mercury_int i = 0; i < *l; i++) {
 		putchar('\t');
 	}
-	printf("state 0x%p instruction pool: 0x%p [%i/%i] %s %s\n",M,M->bytecode.instructions,M->programcounter,M->bytecode.numberofinstructions,M==M->masterstate?"<MASTER> " :"", is_cur?"<CURRENT>" :"");
+	printf("state 0x%p instruction pool: 0x%p [%zi/%zu] %s %s\n",M,M->bytecode.instructions,M->programcounter,M->bytecode.numberofinstructions,M==M->masterstate?"<MASTER> " :"", is_cur?"<CURRENT>" :"");
 	(*l)++;
 }
 
@@ -80,10 +80,10 @@ char* m_var_to_string(uint8_t type,mercury_rawdata data) {
 	if (!out)return nullptr;
 	switch (type) {
 	case M_TYPE_NIL:
-		sprintf(out,"nil (%i)",data.i);
+		sprintf(out,"nil (%zi)",data.i);
 		break;
 	case M_TYPE_INT:
-		sprintf(out, "%i", data.i);
+		sprintf(out, "%zi", data.i);
 		break;
 	case M_TYPE_FLOAT:
 		sprintf(out, "%f", data.f);
@@ -123,7 +123,7 @@ char* m_var_to_string(uint8_t type,mercury_rawdata data) {
 		sprintf(out, "thread 0x%p", data.p);
 		break;
 	default:
-		sprintf(out, "unknown %i %f 0x%p", data.i, data.f, data.p);
+		sprintf(out, "unknown %zi %f 0x%p", data.i, data.f, data.p);
 		break;
 	}
 	return out;
@@ -152,11 +152,11 @@ void mercury_lib_debug_enviroment_dbg(mercury_state* M, mercury_int args_in, mer
 void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
-	printf("state 0x%p has %i constants\n", M,M->num_constants);
+	printf("state 0x%p has %zi constants\n", M,M->num_constants);
 
 	for (mercury_int i = 0; i < M->num_constants; i++) {
 		mercury_variable* c=M->constants[i];
-		printf("\t%i : %s\n", i, m_var_to_string(c->type, c->data));
+		printf("\t%zi : %s\n", i, m_var_to_string(c->type, c->data));
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -170,7 +170,7 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercu
 	if (args_in == 1) { //read bytecode from function
 		mercury_variable* in = mercury_pullstack(M);
 		if (in->type == M_TYPE_FUNCTION) {
-			printf("variable %p function %p bytecode (%u)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions );
+			printf("variable %p function %p bytecode (%zu)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions );
 			mercury_stringliteral* l = mercury_get_bytecode_debug( ((mercury_function*)in->data.p) );
 			for (mercury_int i = 0; i < l->size; i++) {
 				putchar(l->ptr[i]);
@@ -184,7 +184,7 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercu
 	}
 	else {
 
-		printf("state %p bytecode (%i/%u)\n", M, M->programcounter, M->bytecode.numberofinstructions);
+		printf("state %p bytecode (%zi/%zu)\n", M, M->programcounter, M->bytecode.numberofinstructions);
 		mercury_stringliteral* l = mercury_get_bytecode_debug(&M->bytecode);
 		for (mercury_int i = 0; i < l->size; i++) {
 			putchar(l->ptr[i]);

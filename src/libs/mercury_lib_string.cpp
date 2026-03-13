@@ -682,7 +682,7 @@ enum stringformat_argpositons {
 char* getprintfstring(mercury_int* args, bool* args_def, const char* type) {
 	char* str=(char*)malloc(sizeof(char) * 256);
 	if (!str)return nullptr;
-	int ptr = 1;
+	short ptr = 1;
 	str[0] = '%';
 
 	if (args_def[ARG_FORCEPLUS]) {
@@ -736,7 +736,7 @@ union m_rawdata_snowflake_printf { //because printf promotes floats to doubles f
 };
 
 // TODO: add a, x, g, e, p, u, o
-int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringliteral* str_out, mercury_variable** v_arr, mercury_int* num_vars) {
+mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringliteral* str_out, mercury_variable** v_arr, mercury_int* num_vars) {
 	mercury_int add_off = 0;
 
 	unsigned char nargs = 0;
@@ -1037,8 +1037,6 @@ void mercury_lib_string_format(mercury_state* M, mercury_int args_in, mercury_in
 			mercury_mstring_addchars(outstr, s->ptr+pc, 1);
 			pc++;
 		}
-	next_char:
-		{}
 	}
 
 

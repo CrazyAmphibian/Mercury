@@ -31,7 +31,7 @@ uint16_t register_max = 0xf;
 
 
 
-mercury_stringliteral* mercury_cstring_to_mstring(char* str , long size) {
+mercury_stringliteral* mercury_cstring_to_mstring(char* str , mercury_int size) {
 	mercury_stringliteral* nstr=(mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!nstr) return nullptr;
 	char* nad = (char*)malloc(sizeof(char) * size);
@@ -44,7 +44,7 @@ mercury_stringliteral* mercury_cstring_to_mstring(char* str , long size) {
 	return nstr;
 }
 
-mercury_stringliteral* mercury_cstring_const_to_mstring(char* str, long size) {
+mercury_stringliteral* mercury_cstring_const_to_mstring(char* str, mercury_int size) {
 	mercury_stringliteral* nstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!nstr) return nullptr;
 	nstr->size = size;
@@ -1448,7 +1448,7 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 					}
 					break;
 				default:
-					printf("[%zi] 0x%p",var->type, var->data.p);
+					printf("[%hhu] 0x%p",var->type, var->data.p);
 			}
 
 			
@@ -1551,7 +1551,7 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 	out->ptr = nullptr;
 	out->size = 0;
 
-	mercury_int offset = 0;
+	mercury_uint offset = 0;
 	while (offset < F->numberofinstructions) {
 		mercury_fullinstruction i=F->instructions[offset];
 		offset++;
@@ -1560,9 +1560,9 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 		char buffer[0x2FFF];
 
 #ifdef MERCURY_64BIT
-	snprintf(buffer, 0x2FFF, "[%015zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+	snprintf(buffer, 0x2FFF, "[%016zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
 #else
-	snprintf(buffer, 0x2FFF, "[%07zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+	snprintf(buffer, 0x2FFF, "[%08zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
 #endif
 		
 		mercury_mstring_addchars(out, buffer, strlen(buffer) );

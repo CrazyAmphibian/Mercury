@@ -58,7 +58,7 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 		result=snprintf(buffer, 255, "%s: memory allocation error\n",header);
 		return mercury_cstring_const_to_mstring(buffer,strlen(buffer));
 	case M_ERROR_WRONG_TYPE:
-		result = snprintf(buffer, 255, "%s: arg %i wrong type. expected %s, got %s\n", header ,(int)data3 , typetostring[(int)data2] , typetostring[(int)data1]);
+		result = snprintf(buffer, 255, "%s: arg %zi wrong type. expected %s, got %s\n", header ,(mercury_int)data3 , typetostring[(uint8_t)data2] , typetostring[(uint8_t)data1]);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_DIV_ZERO:
 		result = snprintf(buffer, 255, "%s: integer division by 0\n", header);
@@ -67,13 +67,13 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t 
 		result = snprintf(buffer, 255, "%s: failiure to execute instruction\n", header);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_CALL_NOT_FUNCTION:
-		result = snprintf(buffer, 255, "%s: attempt to call non-function value %s \n", header , typetostring[(int)data1] );
+		result = snprintf(buffer, 255, "%s: attempt to call non-function value %s \n", header , typetostring[(uint8_t)data1] );
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_INDEX_INVALID_TYPE:
-		result = snprintf(buffer, 255, "%s: attempt to index invalid variable type %s \n", header, typetostring[(int)data1]);
+		result = snprintf(buffer, 255, "%s: attempt to index invalid variable type %s \n", header, typetostring[(uint8_t)data1]);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_NOT_ENOUGH_ARGS:
-		result = snprintf(buffer, 255, "%s: incorrect number of args. expected %i, got %i \n", header, (int)data2, (int)data1);
+		result = snprintf(buffer, 255, "%s: incorrect number of args. expected %zi, got %zi \n", header, (mercury_int)data2, (mercury_int)data1);
 		return mercury_cstring_const_to_mstring(buffer, strlen(buffer));
 	case M_ERROR_CUSTOM_STRING:
 		result = snprintf(buffer, 255, "%s: %s \n", header, (char*)data1);
