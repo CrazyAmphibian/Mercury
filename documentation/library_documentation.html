@@ -1,1018 +1,1850 @@
+<!DOCTYPE html>
 <html>
 <head>
-<title>Mercury: libraries</title>
-<link rel='stylesheet' href='style.css'>
-<style>
-
-.type{
-color:#888;
-}
-.fdec{
-font-size:125%;
-font-family:monospace;
-}
-.example{
-font-family:monospace;
-}
-.desc{
-margin-left:2em;
-}
-
-</style>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title>Mercury: libraries</title>
+	<meta name="generator" content="LibreOffice 7.5.1.2 (Windows)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="2026-03-13T22:39:23.423000000"/>
+	<style type="text/css">
+		h2.cjk { font-family: "NSimSun" }
+		h2.ctl { font-family: "Arial" }
+		h3.cjk { font-family: "NSimSun" }
+		h3.ctl { font-family: "Arial" }
+		p.example { font-family: monospace }
+		h3.funcheader-western { font-family: Monospace }
+		h3.funcheader-cjk { font-family: "NSimSun" }
+		h3.funcheader-ctl { font-family: "Arial" }
+	</style>
 </head>
-<body>
-
-<h1>Mercury</h1>
-
-
-
-
-<h2>grouped types</h2>
-Some types can be grouped together, due to shared functionality, function usage, or internal semantics.
-
+<body lang="en-US" bgcolor="#dddddd" dir="ltr"><h1>grouped types</h1>
+<p>Some types can be grouped together, due to shared functionality,
+function usage, or internal semantics. 
+</p>
 <ul>
-<li>variable</li>
-<ul><li>represents any variable type</li></ul>
-<li>number</li>
-<ul><li>represents a float or int</li></ul>
-<ul><li>any number can have math performed on it</li></ul>
-<li>traversable</li>
-<ul><li>represents a table, array, or string</li></ul>
-<ul><li>these types can have the index and length operators ued on them</li></ul>
-<li>callable</li>
-<ul><li>represents a C function or Mercury function</li></ul>
-<ul><li>these types can be called, and execute code.</li></ul>
-<li>structure</li>
-<ul><li>represents a table or array</li></ul>
-<ul><li>these types hold other variables</li></ul>
-<li>serializable</li>
-<ul><li>represents a table, array, int, nil, float, bool, or string</li></ul>
-<ul><li>these types can be saved easily and portably</li></ul>
+	<li><p style="margin-bottom: 0in">variable 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">represents any variable type</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">number 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">represents a float or int</p>
+		<li><p style="margin-bottom: 0in">any number can have math
+		performed on it</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">traversable 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">represents a table, array, or
+		string</p>
+		<li><p style="margin-bottom: 0in">these types can have the index
+		and length operators used on them</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">callable 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">represents a C function or
+		Mercury function</p>
+		<li><p style="margin-bottom: 0in">these types can be called, and
+		execute code.</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">structure 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">represents a table or array</p>
+		<li><p style="margin-bottom: 0in">these types hold other variables</p>
+	</ul>
+	<li><p style="margin-bottom: 0in">serializable 
+	</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">represents a table, array, int,
+		nil, float, bool, or string</p>
+		<li><p>these types can be saved easily and portably</p>
+	</ul>
 </ul>
+<hr/>
 
+<h1>Standard library</h1>
+<h2 class="western">constants</h2>
+<table width="564" cellpadding="2" cellspacing="0">
+	<col width="160"/>
 
-<hr>
+	<col width="68"/>
 
-<h2>Standard library</h2>
-<h3>constants</h3>
-<p>
-<table>
-<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
-<tr><td>M_TYPE_NIL</td><td>Integer</td><td>0</td><td>The numeric type of nil</td></tr>
-<tr><td>M_TYPE_INT</td><td>Integer</td><td>1</td><td>The numeric type of integers</td></tr>
-<tr><td>M_TYPE_FLOAT</td><td>Integer</td><td>2</td><td>The numeric type of floats</td></tr>
-<tr><td>M_TYPE_BOOL</td><td>Integer</td><td>3</td><td>The numeric type of bools</td></tr>
-<tr><td>M_TYPE_TABLE</td><td>Integer</td><td>4</td><td>The numeric type of tables</td></tr>
-<tr><td>M_TYPE_STRING</td><td>Integer</td><td>5</td><td>The numeric type of strings</td></tr>
-<tr><td>M_TYPE_CFUNC</td><td>Integer</td><td>6</td><td>The numeric type of C functions</td></tr>
-<tr><td>M_TYPE_ARRAY</td><td>Integer</td><td>7</td><td>The numeric type of arrays</td></tr>
-<tr><td>M_TYPE_FUNCTION</td><td>Integer</td><td>8</td><td>The numeric type of Mercury functions</td></tr>
-<tr><td>M_TYPE_FILE</td><td>Integer</td><td>9</td><td>The numeric type of files</td></tr>
-<tr><td>M_TYPE_THREAD</td><td>Integer</td><td>10</td><td>The numeric type of threads</td></tr>
+	<col width="44"/>
+
+	<col width="273"/>
+
+	<tr>
+		<th width="160" style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			variable</p>
+		</th>
+		<th width="68" style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			 type </p>
+		</th>
+		<th width="44" style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			value</p>
+		</th>
+		<th width="273" style="border: 1.50pt solid #000000; padding: 0.02in"><p>
+			desc</p>
+		</th>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_NIL</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			0</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of nil</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_INT</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			1</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of integers</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_FLOAT</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			2</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of floats</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_BOOL</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			3</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of bools</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_TABLE</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			4</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of tables</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_STRING</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			5</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of strings</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_CFUNC</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			6</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of C functions</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_ARRAY</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			7</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of arrays</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_FUNCTION</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			8</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of Mercury functions</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_FILE</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			9</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of files</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr>
+		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			M_TYPE_THREAD</p>
+		</td>
+		<td width="68" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Integer</p>
+		</td>
+		<td width="44" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			10</p>
+		</td>
+		<td width="273" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The numeric type of threads</p>
+		</td>
+	</tr>
 </table>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">print (<font color="#888888">variable</font>
+...)</h3>
+<p>takes any number of arguments, converts them into a string, then
+adds them to stdout.<br/>
+arguments are separated by tab characters,
+and a newline (\n) will be added at the end.<br/>
+<br/>
+for more
+refined control, use io.post.</p>
+<p class="example">print(&quot;hello, world!&quot;) //hello,
+world!<br/>
+a=5<br/>
+b=12<br/>
+print(a,b,a+b) //5 12 17 
 </p>
-<h3>functions</h3>
-
-<div class='fdec'>print (<span class='type'>variable</span> ...)</div>
-<div class='desc'>
-<p>
-takes any number of arguments, converts them into a string, then adds them to stdout.<br>
-arguments are separated by tab characters, and a newline (\n) will be added at the end.<br>
-<br>
-for more refined control, use io.post.<br>
+<h3 class="funcheader-western">iterate (<font color="#888888">structure</font>
+data, <font color="#888888">callable</font> executor)</h3>
+<p>takes a structure and a callable. for each element, the index,
+associated data, and structure will be sent to the callable. The key
+will be the first argument, the value will be the second, and the
+structure will be the third. if the callable returns a value
+considered true by mercury boolean logic, it will stop traversing the
+structure similar to how the break keyword works in a loop. returning
+a non-true value will simply halt iteration of the current element,
+like the continue keyword in a loop.</p>
+<p class="example">a=[1,2,&quot;hello&quot;,4) <br/>
+iterate(a,print)
+<br/>
+/* <br/>
+output: <br/>
+0 1 array 0x01234567 <br/>
+1 2 array
+0x01234567 <br/>
+2 hello array 0x01234567 <br/>
+3 4 array
+0x01234567 <br/>
+*/ 
 </p>
-<p class='example'>
-<span class='m_builtin'>print</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//hello, world!</span><br>
-a<span class='m_symbol'>=</span><span class='m_number'>5</span><br>
-b<span class='m_symbol'>=</span><span class='m_number'>12</span><br>
-<span class='m_builtin'>print</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,</span>b<span class='m_symbol'>,</span>a<span class='m_symbol'>+</span>b<span class='m_symbol'>)</span> <span class='m_comment'>//5&emsp;12&emsp;17</span> <br>
+<h3 class="funcheader-western">rcall (<font color="#888888">callable</font>
+function, <font color="#888888">table</font> enviroment, <font color="#888888">variable</font>
+...)</h3>
+<p>takes a function and calls it with a restricted environment given
+by a table.<br/>
+the function will run its code as normal, but will
+not have access to any variables that were not supplied in the
+table.<br/>
+any number of args can be sent to the function. 
 </p>
-</div>
-
-<div class='fdec'>iterate (<span class='type'>structure</span> data, <span class='type'>callable</span> executor)</div>
-<div class='desc'>
-<p>
-takes a structure and a callable. for each element, the index, associated data, and structure will be sent to the callable. The key will be the first argument, the value will be the second, and the structure will be the third. if the callable returns a value considered true by mercury boolean logic, it will stop traversing the structure similar to how the break keyword works in a loop. returning a non-true value will simply halt iteration of the current element, like the continue keyword in a loop.<br>
+<p class="example">a=function() <br/>
+print(&quot;hello&quot;) <br/>
+end
+<br/>
+<br/>
+rcall(a,{}) //this will result in an error being thrown,
+because a is trying to call a nil value (print). 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>,</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span>  <br>
-<span class='m_builtin'>iterate</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,</span><span class='m_builtin'>print</span><span class='m_symbol'>)</span> <br>
-<span class='m_comment'>/*  <br>
-output: <br>
-0&emsp;1&emsp;array 0x01234567 <br>
-1&emsp;2&emsp;array 0x01234567 <br>
-2&emsp;hello&emsp;array 0x01234567 <br>
-3&emsp;4&emsp;array 0x01234567 <br>
-*/ <br>
-</span>
+<h3 class="funcheader-western">dump (<font color="#888888">serializable</font>
+variable</h3>
+<p>takes a variable, and returns a string containing data which
+represents that variable. this string, when compiled back, will be
+read as that variable. 
 </p>
-</div>
-
-<div class='fdec'>rcall (<span class='type'>callable</span> function, <span class='type'>table</span> enviroment, <span class='type'>variable</span> ...)</div>
-<div class='desc'>
-<p>
-takes a function and calls it with a restricted environment given by a table.<br>
-the function will run its code as normal, but will not have access to any variables that were not supplied in the table.<br>
-any number of args can be sent to the function.
+<p class="example">a=[&quot;hello&quot;,1,nil,true] <br/>
+dump(a)
+//returns as a string [[0]=&quot;hello&quot;,[1]=1,[3]=true] 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_keyword'>function</span><span class='m_symbol'>()</span> <br>
-<span class='m_builtin'>print</span><span class='m_symbol'>(</span><span class='m_string'>"hello"</span><span class='m_symbol'>)</span> <br>
-<span class='m_keyword'>end</span> <br>
-<br>
-<span class='m_builtin'>rcall</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,{})</span> //this will result in an error being thrown, because a is trying to call a nil value (print). <br>
+<h3 class="funcheader-western">compile (<font color="#888888">string</font>
+code)</h3>
+<p>attempts to compile a string as if it were mercury code. if
+successful, it will return a function which does that code.
+otherwise, returns nil. 
 </p>
-</div>
-
-
-<div class='fdec'>dump (<span class='type'>serializable</span> variable</div>
-<div class='desc'>
-<p>
-takes a variable, and returns a string containing data which represents that variable. this string, when compiled back, will be read as that variable.
+<p class="example">a=compile(&quot;print(\&quot;hello, world!\&quot;)&quot;)
+<br/>
+a() //hello, world! 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
-<span class='m_builtin'>dump</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns as a string [[0]="hello",[1]=1,[3]=true]</span> <br>
+<h3 class="funcheader-western">type (<font color="#888888">variable</font>
+variable)</h3>
+<p>returns the type of a variable as an integer 
 </p>
-</div>
-
-<div class='fdec'> compile (<span class='type'>string</span> code)</div>
-<div class='desc'>
-<p>
-attempts to compile a string as if it were mercury code. if successful, it will return a function which does that code. otherwise, returns nil.
+<p class="example">if type(a)!=M_TYPE_INT then <br/>
+a=0
+<br/>
+print(&quot;something went wrong!&quot;) <br/>
+end 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>compile</span><span class='m_symbol'>(</span><span class='m_string'>"print(\"hello, world!\")"</span><span class='m_symbol'>)</span> <br>
-a<span class='m_symbol'>()</span> <span class='m_comment'>//hello, world!</span> <br>
+<h3 class="funcheader-western">tostring (<font color="#888888">variable</font>
+variable)</h3>
+<p>returns a string representing a variable 
 </p>
-</div>
-
-<div class='fdec'>type (<span class='type'>variable</span> variable)</div>
-<div class='desc'>
-<p>
-returns the type of a variable as an integer
+<p class="example">a=17 <br/>
+s=tostring(a) //returns &quot;17&quot;
+<br/>
+a={} <br/>
+s=tostring(a) //returns &quot;table 0x00000000&quot;.
+the pointer will differ with each program launch. 
 </p>
-<p class='example'>
-<span class='m_keyword'>if</span> <span class='m_builtin'>type</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)!=</span><span class='m_builtin'>M_TYPE_INT</span> <span class='m_keyword'>then</span> <br>
-a<span class='m_symbol'>=</span>0 <br>
-<span class='m_builtin'>print</span><span class='m_symbol'>(</span><span class='m_string'>"something went wrong!"</span><span class='m_symbol'>)</span> <br>
-<span class='m_keyword'>end</span> <br>
+<h3 class="funcheader-western">tonumber (<font color="#888888">variable</font>
+variable)</h3>
+<p>returns a number which represents another variable. attempts to
+return an integer first, then a float. otherwise, returns nil. 
 </p>
-</div>
-
-<div class='fdec'>tostring (<span class='type'>variable</span> variable)</div>
-<div class='desc'>
-<p>
-returns a string representing a variable
+<p class="example">s=tonumber(&quot;12.47&quot;) //returns 12.47
+<br/>
+s=tonumber(true) //returns 1 <br/>
+s=tonumber({1,2}) //returns
+nil 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span>17 <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tostring</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns "17"</span> <br>
-a<span class='m_symbol'>={}</span> <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tostring</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns "table 0x00000000". the pointer will differ with each program launch.</span> <br>
+<h3 class="funcheader-western">toint (<font color="#888888">variable</font>
+variable)</h3>
+<p>returns an integer which represents another variable. Operates in
+the same manner as tonumber, but will type convert a float result
+into an int. may return nil. 
 </p>
-</div>
-
-<div class='fdec'>tonumber (<span class='type'>variable</span> variable)</div>
-<div class='desc'>
-<p>
-returns a number which represents another variable. attempts to return an integer first, then a float. otherwise, returns nil.
+<p class="example">s=toint(&quot;12.47&quot;) //returns 12
+<br/>
+s=toint(true) //returns 1 <br/>
+s=toint({1,2}) //returns nil 
 </p>
-<p class='example'>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span class='m_symbol'>(</span><span class='m_string'>"12.47"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12.47</span> <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span class='m_symbol'>(</span><span class='m_static'>true</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1</span> <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tonumber</span><span class='m_symbol'>({</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>})</span> <span class='m_comment'>//returns nil</span> <br>
+<h3 class="funcheader-western">tofloat (<font color="#888888">variable</font>
+variable)</h3>
+<p>returns a float which represents another variable. Operates in the
+same manner as tonumber, but will type convert an int result into a
+float. may return nil. 
 </p>
-</div>
-
-<div class='fdec'>toint (<span class='type'>variable</span> variable)</div>
-<div class='desc'>
-<p>
-returns an integer which represents another variable. Operates in the same manner as tonumber, but will type convert a float result into an int. may return nil.
+<p class="example">s=tofloat(&quot;12.47&quot;) //returns 12.47
+<br/>
+s=tofloat(true) //returns 1.0 <br/>
+s=tofloat({1,2}) //returns
+nil 
 </p>
-<p class='example'>
-s<span class='m_symbol'>=</span><span class='m_builtin'>toint</span><span class='m_symbol'>(</span><span class='m_string'>"12.47"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12</span> <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>toint</span><span class='m_symbol'>(</span><span class='m_static'>true</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1</span> <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>toint</span><span class='m_symbol'>({</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>})</span> <span class='m_comment'>//returns nil</span> <br>
+<h3 class="funcheader-western">loadlibrary (<font color="#888888">string</font>
+path)</h3>
+<p>attempts to load a dynamic library at the specified location. The
+library it looks for is a precompiled C/C++ file. The file is
+platform dependent. On windows, it will be a dll, and on unix
+systems, it will be an so. Returns a bool if the library was loaded
+correctly. 
 </p>
-</div>
-
-<div class='fdec'>tofloat (<span class='type'>variable</span> variable)</div>
-<div class='desc'>
-<p>
-returns a float which represents another variable. Operates in the same manner as tonumber, but will type convert an int result into a float. may return nil.
+<p class="example">s=loadlibrary(&quot;mylib.dll&quot;) //returns
+true if on windows and the file is present 
 </p>
-<p class='example'>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tofloat</span><span class='m_symbol'>(</span><span class='m_string'>"12.47"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12.47</span> <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tofloat</span><span class='m_symbol'>(</span><span class='m_static'>true</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.0</span> <br>
-s<span class='m_symbol'>=</span><span class='m_builtin'>tofloat</span><span class='m_symbol'>({</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>2</span><span class='m_symbol'>})</span> <span class='m_comment'>//returns nil</span> <br>
-</p>
-</div>
-
-<div class='fdec'>loadlibrary (<span class='type'>string</span> path)</div>
-<div class='desc'>
-<p>
-attempts to load a dynamic library at the specified location. The library it looks for is a precompiled C/C++ file. The file is platform dependent. On windows, it will be a dll, and on unix systems, it will be an so. Returns a bool if the library was loaded correctly.
-</p>
-<p class='example'>
-s<span class='m_symbol'>=</span><span class='m_builtin'>loadlibrary</span><span class='m_symbol'>(</span><span class='m_string'>"mylib.dll"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns true if on windows and the file is present</span> <br>
-</p>
-</div>
-
-
-
-</div>
-
-<h2>Math library</h2>
-<h3>constants</h3>
-<p>
-<table>
-<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
-<tr><td>pi</td><td>Float</td><td>3.141592653589793</td><td>The value of Pi</td></tr>
-<tr><td>root2</td><td>Float</td><td>1.41421356237309504</td><td>The value of the square root of 2</td></tr>
-<tr><td>e</td><td>Float</td><td>2.718281828459045</td><td>The value of euler's number</td></tr>
-<tr><td>root3</td><td>Float</td><td>1.7320508075688772</td><td>The value of the square root of 3</td></tr>
-<tr><td>golden</td><td>Float</td><td>1.6180339887498948</td><td>The value of the golden ratio</td></tr>
-<tr><td>int_max</td><td>Int</td><td>0x7FFFFFFF (32 bit) / 0x7FFFFFFFFFFFFFFF (64 bit)</td><td>The value of the largest signed integer.</td></tr>
-<tr><td>uint_max</td><td>Int</td><td>0xFFFFFFFF (32 bit) / 0xFFFFFFFFFFFFFFFF (64 bit)</td><td>The value of the largest unsigned integer.</td></tr>
+<h1>Math library</h1>
+<h2 class="western">constants</h2>
+<table cellpadding="2" cellspacing="0">
+	<tr>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			variable</p>
+		</th>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			 type </p>
+		</th>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			value</p>
+		</th>
+		<th style="border: 1.50pt solid #000000; padding: 0.02in"><p>desc</p>
+		</th>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			pi</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Float</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			3.141592653589793</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The value of Pi</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			root2</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Float</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			1.41421356237309504</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The value of the square root of 2</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			e</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Float</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			2.718281828459045</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The value of euler's number</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			root3</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Float</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			1.7320508075688772</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The value of the square root of 3</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			golden</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Float</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			1.6180339887498948</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The value of the golden ratio</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			int_max</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Int</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			0x7FFFFFFF (32 bit) / 0x7FFFFFFFFFFFFFFF (64 bit)</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The value of the largest signed integer.</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			uint_max</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Int</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			0xFFFFFFFF (32 bit) / 0xFFFFFFFFFFFFFFFF (64 bit)</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			The value of the largest unsigned integer.</p>
+		</td>
+	</tr>
 </table>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">min (<font color="#888888">number</font>
+...)</h3>
+<p>returns the lowest number provided 
 </p>
+<p class="example">math.min(12.1,1.3,4) //returns 1.3
+<br/>
+math.min(-7,1,0.4) //returns -7 
+</p>
+<h3 class="funcheader-western">max (<font color="#888888">number</font>
+...)</h3>
+<p>returns the highest number provided 
+</p>
+<p class="example">math.max(12.1,1.3,4) //returns 12.1
+<br/>
+math.max(-7,1,0.4) //returns 1 
+</p>
+<h3 class="funcheader-western">floor (<font color="#888888">number</font>
+number)</h3>
+<p>returns the next smallest integer of a number 
+</p>
+<p class="example">math.floor(12.1) //returns 12 <br/>
+math.floor(-3.1)
+//returns -4 
+</p>
+<h3 class="funcheader-western">ceil (<font color="#888888">number</font>
+number)</h3>
+<p>returns the next highest integer of a number 
+</p>
+<p class="example">math.ceil(12.1) //returns 13 <br/>
+math.ceil(-3.1)
+//returns -3 
+</p>
+<h3 class="funcheader-western">radians (<font color="#888888">number</font>
+angle)</h3>
+<p>returns a float converting the supplied angle from degrees into
+radians 
+</p>
+<p class="example" style="margin-bottom: 0in">math.radians(90.0)
+//returns 1.57... 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
+</p>
+<h3 class="funcheader-western">degrees (<font color="#888888">number</font>
+angle)</h3>
+<p>returns a float converting the supplied angle from radians into
+degrees 
+</p>
+<p class="example" style="margin-bottom: 0in">math.degrees(math.pi/2.0)
+//returns 90.0 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<h3>functions</h3>
-<div class='fdec'>min (<span class='type'>number</span> ...)</div>
-<div class='desc'>
-<p>
-returns the lowest number provided
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>min</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>,</span><span class='m_number'>1.3</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.3</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>min</span><span class='m_symbol'>(</span><span class='m_number'>-7</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>0.4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns -7</span> <br>
+<h3 class="funcheader-western">log (<font color="#888888">number</font>
+number, [<font color="#888888">number</font> base=math.e])</h3>
+<p>returns the logarithm of a number given a base. if a base is not
+provided, e will be used instead. 
 </p>
-</div>
+<p class="example" style="margin-bottom: 0in">math.log(64,2.0)
+//returns 6.0 <br/>
+math.log(105) //returns 2.02... 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>max (<span class='type'>number</span> ...)</div>
-<div class='desc'>
-<p>
-returns the highest number provided
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>max</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>,</span><span class='m_number'>1.3</span><span class='m_symbol'>,</span><span class='m_number'>4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12.1</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>max</span><span class='m_symbol'>(</span><span class='m_number'>-7</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>0.4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1</span> <br>
+<h3 class="funcheader-western">abs (<font color="#888888">number</font>
+number)</h3>
+<p>returns the absolute value of a number 
 </p>
-</div>
+<p class="example" style="margin-bottom: 0in">math.abs(-64) //returns
+64 <br/>
+math.abs(-3.7) //returns 3.7 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>floor (<span class='type'>number</span> number)</div>
-<div class='desc'>
-<p>
-returns the next smallest integer of a number
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>floor</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 12</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>floor</span><span class='m_symbol'>(</span><span class='m_number'>-3.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns -4</span> <br>
+<h3 class="funcheader-western">sin (<font color="#888888">number</font>
+angle)</h3>
+<h3 class="funcheader-western">cos (<font color="#888888">number</font>
+angle)</h3>
+<h3 class="funcheader-western">tan (<font color="#888888">number</font>
+angle)</h3>
+<p>returns the sine, cosine, or tangent of a given angle as a float.
+the angle is assumed to be in radians. 
 </p>
-</div>
+<p class="example" style="margin-bottom: 0in">math.sin(1.2) //returns
+0.93... <br/>
+math.cos(1.2) //returns 0.36... <br/>
+math.tan(1.2)
+//returns 2.57... 
+</p>
+<p class="example" style="margin-bottom: 0in"><font face="monospace">asin
+(<font color="#888888">number</font> ratio)</font></p>
+<p class="example" style="margin-bottom: 0in"><font face="monospace">acos
+(<font color="#888888">number</font> ratio)</font></p>
+<p class="example"><font face="monospace">atan (<font color="#888888">number</font>
+ratio)</font></p>
+<p>returns the arcsine, arccosine, or arctangent of a given length
+ratio as a float. the result is in radians. 
+</p>
+<p class="example" style="margin-bottom: 0in">math.asin(0.93)
+//returns 1.2... <br/>
+math.acos(0.36) //returns 1.2...
+<br/>
+math.atan(2.57) //returns 1.2... 
+</p>
+<p class="example"><font face="monospace">atan2 (<font color="#888888">number</font>
+y, <font color="#888888">number</font> x)</font></p>
+<p>returns an angle as a float in radians to reach another point at
+the relative coordinates x,y 
+</p>
+<p class="example" style="margin-bottom: 0in">math.atan2(10,10)
+//returns 0.78... 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>ceil (<span class='type'>number</span> number)</div>
-<div class='desc'>
-<p>
-returns the next highest integer of a number
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>ceil</span><span class='m_symbol'>(</span><span class='m_number'>12.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 13</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>ceil</span><span class='m_symbol'>(</span><span class='m_number'>-3.1</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns -3</span> <br>
+<h3 class="funcheader-western">randomseed ([<font color="#888888">int</font>
+seed])</h3>
+<p>If no parameter is given, returns the current random seed state as
+an int. otherwise, if an integer is provided, it sets the random seed
+state. 
 </p>
-</div>
-
-<div class='fdec'>radians (<span class='type'>number</span> angle)</div>
-<div class='desc'>
-<p>
-returns a float converting the supplied angle from degrees into radians
+<p class="example" style="margin-bottom: 0in">math.randomseed(os.time())
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>radians</span><span class='m_symbol'>(</span><span class='m_number'>90.0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.57...</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>degrees (<span class='type'>number</span> angle)</div>
-<div class='desc'>
-<p>
-returns a float converting the supplied angle from radians into degrees
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>degrees</span><span class='m_symbol'>(</span><span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>pi</span><span class='m_symbol'>/</span><span class='m_number'>2.0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 90.0</span> <br>
-</div>
-
-<div class='fdec'>log (<span class='type'>number</span> number, [<span class='type'>number</span> base=math.e])</div>
-<div class='desc'>
-<p>
-returns the logarithm of a number given a base. if a base is not provided, e will be used instead.
+<h3 class="funcheader-western">random ([<font color="#888888">number</font>
+minimum, <font color="#888888">number</font> maximum])</h3>
+<p>returns a random number as a float. if no arguments are provided,
+the number will be between 0 and 1, otherwise, it will be between
+minimum and maximum. 
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>log</span><span class='m_symbol'>(</span><span class='m_number'>64</span><span class='m_symbol'>,</span><span class='m_number'>2.0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 6.0</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>log</span><span class='m_symbol'>(</span><span class='m_number'>105</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2.02...</span> <br>
-</div>
-
-<div class='fdec'>abs (<span class='type'>number</span> number)</div>
-<div class='desc'>
-<p>
-returns the absolute value of a number
+<p class="example" style="margin-bottom: 0in">math.random(1,5) //may
+return 4.671... 
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>abs</span><span class='m_symbol'>(</span><span class='m_number'>-64</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 64</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>abs</span><span class='m_symbol'>(</span><span class='m_number'>-3.7</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 3.7</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>sin (<span class='type'>number</span> angle)</div>
-<div class='fdec'>cos (<span class='type'>number</span> angle)</div>
-<div class='fdec'>tan (<span class='type'>number</span> angle)</div>
-<div class='desc'>
-<p>
-returns the sine, cosine, or tangent of a given angle as a float. the angle is assumed to be in radians.
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>sin</span><span class='m_symbol'>(</span><span class='m_number'>1.2</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 0.93...</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>cos</span><span class='m_symbol'>(</span><span class='m_number'>1.2</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 0.36...</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>tan</span><span class='m_symbol'>(</span><span class='m_number'>1.2</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2.57...</span> <br>
-</div>
-
-<div class='fdec'>asin (<span class='type'>number</span> ratio)</div>
-<div class='fdec'>acos (<span class='type'>number</span> ratio)</div>
-<div class='fdec'>atan (<span class='type'>number</span> ratio)</div>
-<div class='desc'>
-<p>
-returns the arcsine, arccosine, or arctangent of a given length ratio as a float. the result is in radians.
+<h3 class="funcheader-western">randomint (<font color="#888888">int</font>
+minimum, <font color="#888888">int</font> maximum)</h3>
+<p>returns a random number as an int. the random number will be
+between minimum and maximum, inclusive. 
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>asin</span><span class='m_symbol'>(</span><span class='m_number'>0.93</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.2...</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>acos</span><span class='m_symbol'>(</span><span class='m_number'>0.36</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.2...</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>atan</span><span class='m_symbol'>(</span><span class='m_number'>2.57</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 1.2...</span> <br>
-</div>
-
-<div class='fdec'>atan2 (<span class='type'>number</span> y, <span class='type'>number</span> x)</div>
-<div class='desc'>
-<p>
-returns an angle as a float in radians to reach another point at the relative coordinates x,y
+<p class="example" style="margin-bottom: 0in">math.randomint(1,5)
+//may return 4 
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>atan2</span><span class='m_symbol'>(</span><span class='m_number'>10</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>10</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 0.78...</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>randomseed ([<span class='type'>int</span> seed])</div>
-<div class='desc'>
-<p>
-If no parameter is given, returns the current random seed state as an int. otherwise, if an integer is provided, it sets the random seed state.
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>randomseed</span><span class='m_symbol'>(</span><span class='m_builtin'>os</span><span class='m_symbol'></span><span class='m_symbol'>.</span><span class='m_symbol'></span><span class='m_builtin'>time</span><span class='m_symbol'>())</span> <span class='m_comment'></span> <br>
-</div>
-
-<div class='fdec'>random ([<span class='type'>number</span> minimum, <span class='type'>number</span> maximum])</div>
-<div class='desc'>
-<p>
-returns a random number as a float. if no arguments are provided, the number will be between 0 and 1, otherwise, it will be between minimum and maximum.
+<h3 class="funcheader-western">isnan (<font color="#888888">float</font>
+number)</h3>
+<p>returns a bool if the supplied float is a non-number value. this
+includes all types of NaN, as well as infinity. If a non-float value
+is supplied, it will always return false. 
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>random</span><span class='m_symbol'>(</span><span class='m_number'>1</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>5</span><span class='m_symbol'>)</span> <span class='m_comment'>//may return 4.671...</span> <br>
-</div>
-
-<div class='fdec'>randomint (<span class='type'>int</span> minimum, <span class='type'>int</span> maximum)</div>
-<div class='desc'>
-<p>
-returns a random number as an int. the random number will be between minimum and maximum, inclusive.
+<p class="example">math.isnan(0/0) //returns true <br/>
+math.isnan(10/0)
+//returns true <br/>
+math.isnan(0/10) //returns false 
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>randomint</span><span class='m_symbol'>(</span><span class='m_number'>1</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>5</span><span class='m_symbol'>)</span> <span class='m_comment'>//may return 4</span> <br>
-</div>
-
-<div class='fdec'>isnan (<span class='type'>float</span> number)</div>
-<div class='desc'>
-<p>
-returns a bool if the supplied float is a non-number value. this includes all types of NaN, as well as infinity. If a non-float value is supplied, it will always return false.
+<h1>String library</h1>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">sub (<font color="#888888">string</font>
+string, <font color="#888888">int</font> start, <font color="#888888">int</font>
+end)</h3>
+<p>returns a sub string of a given string with a specified offset. 
 </p>
-<p class='example'>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>isnan</span><span class='m_symbol'>(</span><span class='m_number'>0</span><span class='m_symbol'></span><span class='m_symbol'>/</span><span class='m_symbol'></span><span class='m_number'>0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns true</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>isnan</span><span class='m_symbol'>(</span><span class='m_number'>10</span><span class='m_symbol'></span><span class='m_symbol'>/</span><span class='m_symbol'></span><span class='m_number'>0</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns true</span> <br>
-<span class='m_builtin'>math</span><span class='m_symbol'>.</span><span class='m_builtin'>isnan</span><span class='m_symbol'>(</span><span class='m_number'>0</span><span class='m_symbol'></span><span class='m_symbol'>/</span><span class='m_symbol'></span><span class='m_number'>10</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns false</span> <br>
-</div>
-
-<h2>String library</h2>
-<h3>functions</h3>
-
-<div class='fdec'>sub (<span class='type'>string</span> string, <span class='type'>int</span> start, <span class='type'>int</span> end)</div>
-<div class='desc'>
-<p>
-returns a sub string of a given string with a specified offset.
+<p class="example" style="margin-bottom: 0in">string.sub(&quot;hello,
+world!&quot;,0,4) //returns &quot;hello&quot; 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>sub</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_number'>0</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_symbol'></span><span class='m_number'>4</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "hello"</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>reverse (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-returns a string which contains the reverse copy of the input string
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>reverse</span><span class='m_symbol'>(</span><span class='m_string'>"hello"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "olleh"</span> <br>
-</div>
-
-<div class='fdec'>find (<span class='type'>string</span> string, <span class='type'>string</span> match, [<span class='type'>int</span> start=0])</div>
-<div class='desc'>
-<p>
-attempts to find the string match inside of the provided string. if found, returns the position in the string where it occurs. otherwise, returns nil.
+<h3 class="funcheader-western">reverse (<font color="#888888">string</font>
+string)</h3>
+<p>returns a string which contains the reverse copy of the input
+string 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>find</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_string'>"ll"</span><span class='m_symbol'></span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2</span> <br>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>find</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_string'>"ll"</span><span class='m_symbol'></span><span class='m_symbol'>,</span><span class='m_number'>3</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns nil</span> <br>
-</div>
-
-<div class='fdec'>replace (<span class='type'>string</span> string, <span class='type'>string</span> match, <span class='type'>string</span> replacement, [<span class='type'>int</span> max replacments=infinity])</div>
-<div class='desc'>
-<p>
-searches a string for all occurrences of a match, and replaces them with another string. if the max replacements argument is provided, it can be used to limit the number of replacements done.
+<p class="example" style="margin-bottom: 0in">string.reverse(&quot;hello&quot;)
+//returns &quot;olleh&quot; 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>replace</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l"</span><span class='m_symbol'></span><span class='m_symbol'><span class='m_symbol'>,</span><span class='m_string'>"t"</span><span class='m_symbol'>,</span><span class='m_number'>2</span>)</span> <span class='m_comment'>//returns "hetto, world!"</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>count (<span class='type'>string</span> string, <span class='type'>string</span> match)</div>
-<div class='desc'>
-<p>
-returns the number of times the match is found in the string.
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>count</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 3</span> <br>
-</div>
-
-<div class='fdec'>toarray (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-returns an array representing the characters in a string.
+<h3 class="funcheader-western">find (<font color="#888888">string</font>
+string, <font color="#888888">string</font> match, [<font color="#888888">int</font>
+start=0])</h3>
+<p>attempts to find the string match inside of the provided string.
+if found, returns the position in the string where it occurs.
+otherwise, returns nil. 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>toarray</span><span class='m_symbol'>(</span><span class='m_string'>"hello"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns [104,101,108,108,111]</span> <br>
-</div>
-
-<div class='fdec'>fromarray (<span class='type'>array</span> array)</div>
-<div class='desc'>
-<p>
-converts an array into a string. integers will have their lower 8 bits turned into a character. all other types will be ignored, and replaced with the null character (\x00).
+<p class="example" style="margin-bottom: 0in">string.find(&quot;hello,
+world!&quot;,&quot;ll&quot;) //returns 2 <br/>
+string.find(&quot;hello,
+world!&quot;,&quot;ll&quot;,3) //returns nil 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>fromarray</span><span class='m_symbol'>([</span><span class='m_number'>104<span class='m_symbol'>,</span>101<span class='m_symbol'>,</span>108<span class='m_symbol'>,</span>108<span class='m_symbol'>,</span>111</span><span class='m_symbol'>])</span> <span class='m_comment'>//returns "hello" </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>upper (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-takes a string and returns it with all uppercase characters.
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>upper</span><span class='m_symbol'>(</span><span class='m_string'>"Hello, World!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "HELLO, WORLD!" </span> <br>
-</div>
-
-<div class='fdec'>lower (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-takes a string and returns it with all lowercase characters.
+<h3 class="funcheader-western">replace (<font color="#888888">string</font>
+string, <font color="#888888">string</font> match, <font color="#888888">string</font>
+replacement, [<font color="#888888">int</font> max
+replacements=infinity])</h3>
+<p>searches a string for all occurrences of a match, and replaces
+them with another string. if the max replacements argument is
+provided, it can be used to limit the number of replacements done. 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>lower</span><span class='m_symbol'>(</span><span class='m_string'>"Hello, World!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "hello, world!" </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in">string.replace(&quot;hello,
+world!&quot;,&quot;l&quot;,&quot;t&quot;,2) //returns &quot;hetto,
+world!&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>format (<span class='type'>string</span> formatstring ,<span class='type'>variable</span>  ...)</div>
-<div class='desc'>
-<p>
-takes a formatted string and adds in received values. works with similar syntax to C's printf.<br>
-formats start with a %, followed by a character depending on the value. this function will type coerce, and will never cause an error from the variadic arguments.<br>
-<br>
-<b>types</b>
-<table>
-<tr><th>character</th><th>type</th><th>extra</th></tr>
-<tr><td>%</td><td>the character %</td></tr>
-<tr><td>i, I</td><td>an integer value</td><td>flags, width</td></tr>
-<tr><td>f, F</td><td>a float value</td><td>flags, width, percision</td></tr>
-<tr><td>e, E</td><td>a float value in scientific notation</td><td>flags, width, percision</td></tr>
-<tr><td>g, G</td><td>a float value. changes from fixed-point (f) and scientific (e) depending on the value and precision.</td><td>flags, width, percision</td></tr>
-<tr><td>s, S</td><td>a string value</td></tr>
-<tr><td>x, X</td><td>an integer value as hexadecimal</td><td>flags, width</td></tr>
-<tr><td>a, A</td><td>a float value as hexadecimal</td><td>flags, width, percision</td></tr>
-<tr><td>p, P</td><td>a pointer value for complex datatypes. other datatypes will be 0</td><td>flags, width</td></tr>
+</p>
+<h3 class="funcheader-western">count (<font color="#888888">string</font>
+string, <font color="#888888">string</font> match)</h3>
+<p>returns the number of times the match is found in the string. 
+</p>
+<p class="example" style="margin-bottom: 0in">string.count(&quot;hello,
+world!&quot;,&quot;l&quot;) //returns 3 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">toarray (<font color="#888888">string</font>
+string)</h3>
+<p>returns an array representing the characters in a string. 
+</p>
+<p class="example" style="margin-bottom: 0in">string.toarray(&quot;hello&quot;)
+//returns [104,101,108,108,111] 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">fromarray (<font color="#888888">array</font>
+array)</h3>
+<p>converts an array into a string. integers will have their lower 8
+bits turned into a character. all other types will be ignored, and
+replaced with the null character (\x00). 
+</p>
+<p class="example" style="margin-bottom: 0in">string.fromarray([104,101,108,108,111])
+//returns &quot;hello&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">upper (<font color="#888888">string</font>
+string)</h3>
+<p>takes a string and returns it with all uppercase characters. 
+</p>
+<p class="example" style="margin-bottom: 0in">string.upper(&quot;Hello,
+World!&quot;) //returns &quot;HELLO, WORLD!&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">lower (<font color="#888888">string</font>
+string)</h3>
+<p>takes a string and returns it with all lowercase characters. 
+</p>
+<p class="example" style="margin-bottom: 0in">string.lower(&quot;Hello,
+World!&quot;) //returns &quot;hello, world!&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">format (<font color="#888888">string</font>
+formatstring, <font color="#888888">variable, </font>...)</h3>
+<p style="margin-bottom: 0in">takes a formatted string and adds in
+received values. works with similar syntax to C's printf.<br/>
+formats
+start with a %, followed by a character depending on the value. this
+function will type coerce, and will never cause an error from the
+variadic arguments.<br/>
+<br/>
+<b>types</b> 
+</p>
+<table cellpadding="2" cellspacing="0">
+	<tr>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			character</p>
+		</th>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			type</p>
+		</th>
+		<th style="border: 1.50pt solid #000000; padding: 0.02in"><p>extra</p>
+		</th>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			the character %</p>
+		</td>
+		<td valign="top" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"></td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			i, I</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			an integer value</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			f, F</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a float value</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width, percision</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			e, E</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a float value in scientific notation</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width, percision</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			g, G</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a float value. changes from fixed-point (f) and scientific (e)
+			depending on the value and precision.</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width, percision</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			s, S</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a string value</p>
+		</td>
+		<td valign="top" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"></td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			x, X</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			an integer value as hexadecimal</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a, A</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a float value as hexadecimal</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width, percision</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			p, P</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a pointer value for complex datatypes. other datatypes will be 0</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width</p>
+		</td>
+	</tr>
 </table>
-<br>
-<b>flags</b>
-<table>
-<tr><th>character</th><th>effect</th></tr>
-<tr><td>-</td><td>aligns left instead of right. overrides 0.</td></tr>
-<tr><td>+</td><td>positive numbers will start with +. overrides " "</td></tr>
-<tr><td> </td><td>positive numbers will add a space in front</td></tr>
-<tr><td>#</td><td>changes how certain types are displayed.</td></tr>
-<tr><td>0</td><td>width padding will use 0 instead of space for numbers.</td></tr>
+<p style="margin-bottom: 0in"><br/>
+<b>flags</b> 
+</p>
+<table cellpadding="2" cellspacing="0">
+	<tr>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			character</p>
+		</th>
+		<th style="border: 1.50pt solid #000000; padding: 0.02in"><p>effect</p>
+		</th>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			-</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			aligns left instead of right. overrides 0.</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			+</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			positive numbers will start with +. overrides &quot; &quot;</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"></td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			positive numbers will add a space in front</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			#</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			changes how certain types are displayed.</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			0</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			width padding will use 0 instead of space for numbers.</p>
+		</td>
+	</tr>
 </table>
+<p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>format</span><span class='m_symbol'>(</span><span class='m_string'>"the time is %2i:%02i"</span><span class='m_symbol'>,</span>hours<span class='m_symbol'>,</span>minutes<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in">string.format(&quot;the
+time is %2i:%02i&quot;,hours,minutes) 
+</p>
+<p class="example"><br/>
+<br/>
 
-<br>
-
-<h3>Mercury String Patterns</h3>
-string patterns follow the behavior of character specifier. for example, %l matches any letter. to make it match more than one, add %+ or %- to the end of it (%l%+ or %l%-). pattern sequences are always 2 characters wide, and start with a % to make them stand out and for clarity.<br>
-<b>Character Matches</b>
-<table>
-<tr><th>sequence</th><th>type</th></tr>
-<tr><td>%n</td><td>any number</td></tr>
-<tr><td>%l</td><td>any letter</td></tr>
-<tr><td>%w</td><td>any lowercase letter</td></tr>
-<tr><td>%u</td><td>any uppercase letter</td></tr>
-<tr><td>%a</td><td>any alphanumeric character</td></tr>
-<tr><td>%s</td><td>any symbol</td></tr>
-<tr><td>% </td><td>any whitespace character</td></tr>
-<tr><td>%.</td><td>wildcard - any character.</td></tr>
-<tr><td>%%</td><td>the character %</td></tr>
+</p>
+<h2 class="western">Mercury String Patterns</h2>
+<p>string patterns follow the behavior of character specifier. for
+example, %l matches any letter. to make it match more than one, add
+%+ or %- to the end of it (%l%+ or %l%-). pattern sequences are
+always 2 characters wide, and start with a % to make them stand out
+and for clarity.</p>
+<h3 class="western"><br/>
+<b>Character Matches</b> 
+</h3>
+<table cellpadding="2" cellspacing="0">
+	<tr>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			sequence</p>
+		</th>
+		<th style="border: 1.50pt solid #000000; padding: 0.02in"><p>type</p>
+		</th>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%n</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			any number</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%l</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			any letter</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%w</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			any lowercase letter</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%u</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			any uppercase letter</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%a</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			any alphanumeric character</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%s</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			any symbol</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			% 
+			</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			any whitespace character</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%.</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			wildcard - any character.</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%%</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			the character %</p>
+		</td>
+	</tr>
 </table>
-<br>
-<b>Count Specifier</b>
-<table>
-<tr><th>sequence</th><th>type</th></tr>
-<tr><td>%*</td><td>0 to infinity matches, greedy</td></tr>
-<tr><td>%~</td><td>0 to infinity matches</td></tr>
-<tr><td>%+</td><td>1 to infinity matches, greedy</td></tr>
-<tr><td>%-</td><td>1 to infinity matches</td></tr>
-<tr><td>%?</td><td>0 or 1 matches</td></tr>
-<tr><td>%!</td><td>1 match (default behavior)</td></tr>
-<tr><td>%/</td><td>0 to infinity characters besides the match, greedy</td></tr>
-<tr><td>%\</td><td>0 to infinity characters besides the match</td></tr>
-<tr><td>%#</td><td>1 to infinity characters besides the match, greedy</td></tr>
-<tr><td>%@</td><td>1 to infinity characters besides the match</td></tr>
-<tr><td>%|</td><td>0 or 1 characters besides the match, greedy</td></tr>
-<tr><td>%=</td><td>1 character besides the match</td></tr>
-
+<h3 class="western"><br/>
+<b>Count Specifier</b> 
+</h3>
+<table cellpadding="2" cellspacing="0">
+	<tr>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			sequence</p>
+		</th>
+		<th style="border: 1.50pt solid #000000; padding: 0.02in"><p>type</p>
+		</th>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%*</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			0 to infinity matches, greedy</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%~</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			0 to infinity matches</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%+</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			1 to infinity matches, greedy</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%-</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			1 to infinity matches</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%?</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			0 or 1 matches</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%!</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			1 match (default behavior)</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%/</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			0 to infinity characters besides the match, greedy</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%\</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			0 to infinity characters besides the match</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%#</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			1 to infinity characters besides the match, greedy</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%@</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			1 to infinity characters besides the match</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%|</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			0 or 1 characters besides the match, greedy</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			%=</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			1 character besides the match</p>
+		</td>
+	</tr>
 </table>
-<br><br>
+<p><br/>
+<br/>
 
-<div class='fdec'>pfind (<span class='type'>string</span> string,<span class='type'>string</span> pattern match,[<span class='type'>int</span> start=0])</div>
-<div class='desc'>
-<p>
-The same principal as string.find, put uses pattern matching on the match string.
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pfind</span><span class='m_symbol'>(</span><span class='m_string'>"result: 12.7"</span><span class='m_symbol'>,</span><span class='m_string'>"-%?%n%+.%?%n%*"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 8 </span> <br>
-</div>
-
-<div class='fdec'>pextract (<span class='type'>string</span> string,<span class='type'>string</span> pattern match)</div>
-<div class='desc'>
-<p>
-Takes a string and a pattern match, and returns all matches as an array. if none were found, an empty array will be returned.
+<h3 class="funcheader-western">pfind (<font color="#888888">string</font>
+string,<font color="#888888">string</font> pattern match,[<font color="#888888">int</font>
+start=0])</h3>
+<p>The same principal as string.find, put uses pattern matching on
+the match string. 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pextract</span><span class='m_symbol'>(</span><span class='m_string'>"result: 12.7"</span><span class='m_symbol'>,</span><span class='m_string'>"-%?%n%+.%?%n%*"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns ["12.7"] </span> <br>
-</div>
-
-<div class='fdec'>preplace (<span class='type'>string</span> string, <span class='type'>string</span> match, <span class='type'>string</span> replacement, [<span class='type'>int</span> max replacments=infinity])</div>
-<div class='desc'>
-<p>
-same function as string.replace, but works with pattern matching for finding occurances.
+<p class="example" style="margin-bottom: 0in">string.pfind(&quot;result:
+12.7&quot;,&quot;-%?%n%+.%?%n%*&quot;) //returns 8 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>preplace</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l%+"</span><span class='m_symbol'></span><span class='m_symbol'><span class='m_symbol'>,</span><span class='m_string'>"t"</span><span class='m_symbol'>,</span><span class='m_number'>1</span>)</span> <span class='m_comment'>//returns "heto, world!"</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>pcount (<span class='type'>string</span> string, <span class='type'>string</span> match)</div>
-<div class='desc'>
-<p>
-same as string.count, but uses pattern matches.
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>pcount</span><span class='m_symbol'>(</span><span class='m_string'>"hello, world!"</span><span class='m_symbol'>,</span><span class='m_string'>"l%+"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns 2</span> <br>
-</div>
-
-
-
-<div class='fdec'>escape (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-takes a string, and substitutes characters so that it could be interpreted properly as a string in mercury. replaces quote mark (") and backslash (\)
+<h3 class="funcheader-western">pextract (<font color="#888888">string</font>
+string,<font color="#888888">string</font> pattern match)</h3>
+<p>Takes a string and a pattern match, and returns all matches as an
+array. if none were found, an empty array will be returned. 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape</span><span class='m_symbol'>(</span><span class='m_string'>"this is a \"cool\" test!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "this is a \"cool\" test!"</span> <br>
-</div>
-
-<div class='fdec'>escape_url (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-takes a string, and substitutes characters so that it could be interpreted properly as a URL location. this does not create a URL adress, as many control characters will be escaped, such as ( / + or &
+<p class="example" style="margin-bottom: 0in">string.pextract(&quot;result:
+12.7&quot;,&quot;-%?%n%+.%?%n%*&quot;) //returns [&quot;12.7&quot;] 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape_url</span><span class='m_symbol'>(</span><span class='m_string'>"awesome cool file/thing.odt"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "awesome%20cool%20file%2Fthing.odt"</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>escape_c (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-takes a string, and substitutes characters that conform to the C escape sequence standards. does not escape hex characters, but will escape null.
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape_c</span><span class='m_symbol'>(</span><span class='m_string'>"how\tinteresting!\0\\\nquite!"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "how\tinteresting!\0\\\nquite!"</span> <br>
-</div>
-
-<div class='fdec'>escape_html (<span class='type'>string</span> string)</div>
-<div class='desc'>
-<p>
-takes a string, and substitutes characters so that the text may be used in HTML or XML without causing any special formatting changes.<br>
-escapes the following characters: &lt; &gt; &amp; " '
+<h3 class="funcheader-western">preplace (<font color="#888888">string</font>
+string, <font color="#888888">string</font> match, <font color="#888888">string</font>
+replacement, [<font color="#888888">int</font> max
+replacments=infinity])</h3>
+<p>same function as string.replace, but works with pattern matching
+for finding occurances. 
 </p>
-<p class='example'>
-<span class='m_builtin'>string</span><span class='m_symbol'>.</span><span class='m_builtin'>escape_html</span><span class='m_symbol'>(</span><span class='m_string'>"&lt;span class='thing'&gt;woah!&lt;/span&gt;"</span><span class='m_symbol'>)</span> <span class='m_comment'>//returns "&amp;lt;span class=&amp;#39;thing&amp;#39;&amp;gt;woah!&amp;lt;/span&amp;gt;"</span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in">string.preplace(&quot;hello,
+world!&quot;,&quot;l%+&quot;,&quot;t&quot;,1) //returns &quot;heto,
+world!&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<h2>Array library</h2>
-<h3>constants</h3>
-<p>
-<table>
-<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
-<tr><td>SORTING_GREATER_TO_LESSER</td><td>C function</td><td>n/a</td><td>sorting function. largest number to smallest</td></tr>
-<tr><td>SORTING_LESSER_TO_GREATER</td><td>C function</td><td>n/a</td><td>sorting function. smallest number to largest</td></tr>
-<tr><td>SORTING_GREATER_TO_LESSER_MAGNITUDE</td><td>C function</td><td>n/a</td><td>sorting function. biggest number to smallest, takes absolute value</td></tr>
-<tr><td>SORTING_LESSER_TO_GREATER_MAGNITUDE</td><td>C function</td><td>n/a</td><td>sorting function. smallest number to biggest, takes absolute value</td></tr>
-<tr><td>SORTING_ALPHABETICAL_A_TO_Z</td><td>C function</td><td>n/a</td><td>sorting function. arranges strings to be alphabetical A to Z</td></tr>
-<tr><td>SORTING_ALPHABETICAL_Z_TO_A</td><td>C function</td><td>n/a</td><td>sorting function. arranges strings to be alphabetical Z to A</td></tr>
+</p>
+<h3 class="funcheader-western">pcount (<font color="#888888">string</font>
+string, <font color="#888888">string</font> match)</h3>
+<p>same as string.count, but uses pattern matches. 
+</p>
+<p class="example" style="margin-bottom: 0in">string.pcount(&quot;hello,
+world!&quot;,&quot;l%+&quot;) //returns 2 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">escape (<font color="#888888">string</font>
+string)</h3>
+<p>takes a string, and substitutes characters so that it could be
+interpreted properly as a string in mercury. replaces quote mark (&quot;)
+and backslash (\) 
+</p>
+<p class="example" style="margin-bottom: 0in">string.escape(&quot;this
+is a \&quot;cool\&quot; test!&quot;) //returns &quot;this is a
+\&quot;cool\&quot; test!&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">escape_url (<font color="#888888">string</font>
+string)</h3>
+<p>takes a string, and substitutes characters so that it could be
+interpreted properly as a URL location. this does not create a URL
+adress, as many control characters will be escaped, such as ( / + or
+&amp; 
+</p>
+<p class="example" style="margin-bottom: 0in">string.escape_url(&quot;awesome
+cool file/thing.odt&quot;) //returns
+&quot;awesome%20cool%20file%2Fthing.odt&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">escape_c (<font color="#888888">string</font>
+string)</h3>
+<p>takes a string, and substitutes characters that conform to the C
+escape sequence standards. does not escape hex characters, but will
+escape null. 
+</p>
+<p class="example" style="margin-bottom: 0in">string.escape_c(&quot;how\tinteresting!\0\\\nquite!&quot;)
+//returns &quot;how\tinteresting!\0\\\nquite!&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">escape_html (<font color="#888888">string</font>
+string)</h3>
+<p>takes a string, and substitutes characters so that the text may be
+used in HTML or XML without causing any special formatting
+changes.<br/>
+escapes the following characters: &lt; &gt; &amp; &quot;
+' 
+</p>
+<p class="example">string.escape_html(&quot;&lt;span
+class='thing'&gt;woah!&lt;/span&gt;&quot;) //returns &quot;&amp;lt;span
+class=&amp;#39;thing&amp;#39;&amp;gt;woah!&amp;lt;/span&amp;gt;&quot;
+</p>
+<h1>Array library</h1>
+<h2 class="western">constants</h2>
+<table cellpadding="2" cellspacing="0">
+	<tr>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			variable</p>
+		</th>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			 type </p>
+		</th>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			value</p>
+		</th>
+		<th style="border: 1.50pt solid #000000; padding: 0.02in"><p>desc</p>
+		</th>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			SORTING_GREATER_TO_LESSER</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			C function</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			n/a</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			sorting function. largest number to smallest</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			SORTING_LESSER_TO_GREATER</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			C function</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			n/a</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			sorting function. smallest number to largest</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			SORTING_GREATER_TO_LESSER_MAGNITUDE</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			C function</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			n/a</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			sorting function. biggest number to smallest, takes absolute value</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			SORTING_LESSER_TO_GREATER_MAGNITUDE</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			C function</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			n/a</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			sorting function. smallest number to biggest, takes absolute value</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			SORTING_ALPHABETICAL_A_TO_Z</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			C function</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			n/a</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			sorting function. arranges strings to be alphabetical A to Z</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			SORTING_ALPHABETICAL_Z_TO_A</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			C function</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			n/a</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			sorting function. arranges strings to be alphabetical Z to A</p>
+		</td>
+	</tr>
 </table>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">flush (<font color="#888888">array</font>
+array)</h3>
+<p>removes all nil entries from an array, so that all values spanning
+0 to the maximum have a value 
 </p>
-<h3>functions</h3>
-
-<div class='fdec'>flush (<span class='type'>array</span> array)</div>
-<div class='desc'>
-<p>
-removes all nil entries from an array, so that all values spanning 0 to the maximum have a value
+<p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,nil,true]
+<br/>
+array.flush(a) //a is now [&quot;hello&quot;,1,true] 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
-<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>flush</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//a is now ["hello",1,true] </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>copy (<span class='type'>array</span> array)</div>
-<div class='desc'>
-<p>
-returns a new array containing the same values as the old one, but as a seperate object.
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
-b<span class='m_symbol'>=</span><span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>copy</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-<span class='m_builtin'>print</span><span class='m_symbol'>(</span>a<span class='m_symbol'>==</span>b<span class='m_symbol'>)</span> <span class='m_comment'>//false </span> <br>
+<h3 class="funcheader-western">copy (<font color="#888888">array</font>
+array)</h3>
+<p>returns a new array containing the same values as the old one, but
+as a seperate object. 
 </p>
-</div>
-
-<div class='fdec'>insert (<span class='type'>array</span> array, <span class='type'>variable</span> element, [<span class='type'>int</span> index=end])</div>
-<div class='desc'>
-<p>
-adds element to array. if index is specified, the new element will be at that location, shifting all other elements forward to make space. if not provided, it will instead add the element to the end of the array.
+<p class="example">a=[&quot;hello&quot;,1,nil,true] <br/>
+b=array.copy(a)
+<br/>
+print(a==b) //false 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
-<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>insert</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_number'>4</span>,<span class='m_number'>1</span>)</span> <span class='m_comment'>//array is now ["hello",4,1,true] </span> <br>
-</div>
-
-<div class='fdec'>remove (<span class='type'>array</span> array, <span class='type'>int</span> index)</div>
-<div class='desc'>
-<p>
-removes an element from an array. shifts all other elements backwards to fill in the removed element's space.
+<h3 class="funcheader-western">insert (<font color="#888888">array</font>
+array, <font color="#888888">variable</font> element, [<font color="#888888">int</font>
+index=end])</h3>
+<p>adds element to array. if index is specified, the new element will
+be at that location, shifting all other elements forward to make
+space. if not provided, it will instead add the element to the end of
+the array. 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
-<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>remove</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_number'>1</span>)</span> <span class='m_comment'>//array is now ["hello",true] </span> <br>
-</div>
-
-<div class='fdec'>swap (<span class='type'>array</span> array, <span class='type'>int</span> index1, <span class='type'>int</span> index2)</div>
-<div class='desc'>
-<p>
-swaps the positions of 2 variables in an array. if a position does not exist, nil will be used instead.
+<p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,true]
+<br/>
+array.insert(a,4,1) //array is now [&quot;hello&quot;,4,1,true]
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
-<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>swap</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_number'>0</span>,<span class='m_number'>2</span>)</span> <span class='m_comment'>//array is now [true,1,"hello"] </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>sort (<span class='type'>array</span> array, <span class='type'>callable</span> sorting function</div>
-<div class='desc'>
-<p>
-takes an array, and runs a storting function through it.<br>
-mercury functions take 2 values and should return 1, 0, or -1.<br>
-the array library adds sorting functions. these are given the type of C functions, but should not be called, and undefined behavior will result if they are.
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_number'>7</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_number'>3</span></span><span class='m_symbol'>]</span> <br>
-<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>sort</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_builtin'>array</span>.<span class='m_builtin'>SORTING_GREATER_TO_LESSER</span>)</span> <span class='m_comment'>//array is now [7,3,1] </span> <br>
-</div>
-
-<div class='fdec'>concat (<span class='type'>array</span> array, <span class='type'>string</span> separator)</div>
-<div class='desc'>
-<p>
-returns a string formed from each element in an array, from 0 to the end, and adds the separator string between each element. automatically runs tostring on each element.
+<h3 class="funcheader-western">remove (<font color="#888888">array</font>
+array, <font color="#888888">int</font> index)</h3>
+<p>removes an element from an array. shifts all other elements
+backwards to fill in the removed element's space. 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=[</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span>true</span><span class='m_symbol'>]</span> <br>
-<span class='m_builtin'>array</span><span class='m_symbol'>.</span><span class='m_builtin'>concat</span><span class='m_symbol'>(</span>a<span class='m_symbol'>,<span class='m_string'>","</span>)</span> <span class='m_comment'>//returns "hello,1,true" </span> <br>
-</div>
-
-
-<h2>IO library</h2>
-<h3>functions</h3>
-<div class='fdec'>open (<span class='type'>string</span> path, <span class='type'>string</span> mode)</div>
-<div class='desc'>
-<p>
-attempts to open a file at the specified path. if succesful, returns a file, otherwise, returns nil.<br>
-mode specifies how the file is treated and what can be done. mode can be any C file mode.
+<p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,true]
+<br/>
+array.remove(a,1) //array is now [&quot;hello&quot;,true] 
 </p>
-<p class='example'>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'>//returns a file if test.txt exists. </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>close (<span class='type'>file</span> file)</div>
-<div class='desc'>
-<p>
-closes an open file. this is needed to allow other programs to modify the files.
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'> </span> <br>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>close</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>read (<span class='type'>file</span> file)</div>
-<div class='desc'>
-<p>
-returns a string containing a file's entire contents. returns nil if a file was unable to be read.
+<h3 class="funcheader-western">swap (<font color="#888888">array</font>
+array, <font color="#888888">int</font> index1, <font color="#888888">int</font>
+index2)</h3>
+<p>swaps the positions of 2 variables in an array. if a position does
+not exist, nil will be used instead. 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'> </span> <br>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>read</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//returns the contents of the file. </span> <br> 
-</div>
-
-<div class='fdec'>write (<span class='type'>file</span> file, <span class='type'>string</span> data)</div>
-<div class='desc'>
-<p>
-attempts to write data to a file.
+<p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,true]
+<br/>
+array.swap(a,0,2) //array is now [true,1,&quot;hello&quot;] 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"w"</span>)</span> <span class='m_comment'> </span> <br>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>write</span><span class='m_symbol'>(</span>a<span class='m_symbol'><span class='m_symbol'>,<span class='m_string'>"hello!"</span>)</span> <span class='m_comment'> </span> <br> 
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>getfiles (<span class='type'>string</span> path)</div>
-<div class='desc'>
-<p>
-returns an array of strings containing the files in a specified directory. if the directory could not be located, returns an empty array instead. If an empty string is given, returns the files in the current working directory. Does not include implicit paths . or ..
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>getfiles</span><span class='m_symbol'>(</span><span class='m_string'>"data"</span>)</span> <span class='m_comment'>//might return something like ["test.txt","image.jpg","cool_song.mp3"] </span> <br>
-</div>
-
-<div class='fdec'>getdirs (<span class='type'>string</span> path)</div>
-<div class='desc'>
-<p>
-returns an array of strings containing the directories in another specified directory. if the directory could not be located, returns an empty array instead. If an empty string is given, returns the directories in the current working directory. Does not include implicit paths . or ..
+<h3 class="funcheader-western">sort (<font color="#888888">array</font>
+array, <font color="#888888">callable</font> sorting function)</h3>
+<p>takes an array, and runs a storting function through it.<br/>
+mercury
+functions take 2 values and should return 1, 0, or -1.<br/>
+the array
+library adds sorting functions. these are given the type of C
+functions, but should not be called, and undefined behavior will
+result if they are. 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>getdirs</span><span class='m_symbol'>(</span><span class='m_string'>""</span>)</span> <span class='m_comment'>//might return something like ["data","stuff"] </span> <br>
-</div>
-
-<div class='fdec'>lines (<span class='type'>file</span> file)</div>
-<div class='desc'>
-<p>
-returns an array of strings containing each line in a file. The file must be in read mode for any results to return. Does not include the newline characters themselves.
+<p class="example" style="margin-bottom: 0in">a=[7,1,3]
+<br/>
+array.sort(a,array.SORTING_GREATER_TO_LESSER) //array is now
+[7,3,1] 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>open</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>,<span class='m_string'>"r"</span>)</span> <span class='m_comment'> </span> <br>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>lines</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'>//might return ["this","is","","a test"] </span> <br> 
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>post (<span class='type'>string</span> text)</div>
-<div class='desc'>
-<p>
-writes a string to stdout. unlike print, the input must be a string. additionally, this function is not variadic, and will not add any terminating newlines.
 </p>
-<p class='example'>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>post</span><span class='m_symbol'>(</span><span class='m_string'>"hello!\n"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>prompt ()</div>
-<div class='desc'>
-<p>
-awaits input from stdin. input will be accepted after the user hits enter. returns a string containing the text, minus newlines.
+<h3 class="funcheader-western">concat (<font color="#888888">array</font>
+array, <font color="#888888">string</font> separator)</h3>
+<p>returns a string formed from each element in an array, from 0 to
+the end, and adds the separator string between each element.
+automatically runs tostring on each element. 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>prompt</span><span class='m_symbol'>()</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>input ()</div>
-<div class='desc'>
-<p>
-awaits a single keypress from stdin. does not require pressing enter. returns the input as a single character.<br>
-use caution if using this in a loop, as the control+C break sequence will not be captured by the program, and instead be sent as raw input. instead. you should check for the sequence 0x03
+<p class="example">a=[&quot;hello&quot;,1,true] <br/>
+array.concat(a,&quot;,&quot;)
+//returns &quot;hello,1,true&quot; 
 </p>
-<p class='example'>
-a<span class='m_symbol'>=</span><span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>input</span><span class='m_symbol'>()</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>remove (<span class='type'>string</span> path)</div>
-<div class='desc'>
-<p>
-attempts to remove a file with the given path. if successful, returns true, otherwise false.
+<h1>IO library</h1>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">open (<font color="#888888">string</font>
+path, <font color="#888888">string</font> mode)</h3>
+<p>attempts to open a file at the specified path. if succesful,
+returns a file, otherwise, returns nil.<br/>
+mode specifies how the
+file is treated and what can be done. Mode must be read, write, or
+append, extended optional. The binary mode flag is automatically
+applied, so a file opened with &quot;r&quot; will open in &quot;rb&quot;,
+and &quot;w+&quot; will open in &quot;wb+&quot;</p>
+<p class="example" style="margin-bottom: 0in">io.open(&quot;test.txt&quot;,&quot;r&quot;)
+//returns a file if test.txt exists. 
 </p>
-<p class='example'>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>remove</span><span class='m_symbol'>(</span><span class='m_string'>"test.txt"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>removedir (<span class='type'>string</span> path)</div>
-<div class='desc'>
-<p>
-attempts to remove a directory with the given name/path. if successful, returns true, otherwise false. can only remove empty directories.
 </p>
-<p class='example'>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>remove</span><span class='m_symbol'>(</span><span class='m_string'>"data"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>createdir (<span class='type'>string</span> path)</div>
-<div class='desc'>
-<p>
-attempts to create a directory with the given name/path. if successful, returns true, otherwise false.
+<h3 class="funcheader-western">close (<font color="#888888">file</font>
+file)</h3>
+<p>closes an open file. this is needed to allow other programs to
+modify the files. 
 </p>
-<p class='example'>
-<span class='m_builtin'>io</span><span class='m_symbol'>.</span><span class='m_builtin'>createdir</span><span class='m_symbol'>(</span><span class='m_string'>"data"</span><span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;r&quot;)
+<br/>
+io.close(a) 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<h2>OS library</h2>
-<h3>constants</h3>
-<p>
-<table>
-<tr><th>variable</th><th>&emsp;type&emsp;</th><th>value</th><th>desc</th></tr>
-<tr><td>IS_POSIX</td><td>Bool</td><td>depends on system</td><td>whether or not the mercury is running on a POSIX system (eg, Linux, MacOS)</td></tr>
-<tr><td>IS_UNIX</td><td>Bool</td><td>depends on system</td><td>same value as IS_POSIX</td></tr>
-<tr><td>IS_64BIT</td><td>Bool</td><td>false (32 bit) / true (64 bit)</td><td>whether or not the mercury is running on a 64 bit system</td></tr>
+</p>
+<h3 class="funcheader-western">read (<font color="#888888">file</font>
+file)</h3>
+<p>returns a string containing a file's entire contents. returns nil
+if a file was unable to be read. 
+</p>
+<p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;r&quot;)
+<br/>
+io.read(a) //returns the contents of the file. 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">write (<font color="#888888">file</font>
+file, <font color="#888888">string</font> data)</h3>
+<p>attempts to write data to a file. 
+</p>
+<p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;w&quot;)
+<br/>
+io.write(a,&quot;hello!&quot;) 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">getfiles (<font color="#888888">string</font>
+path)</h3>
+<p>returns an array of strings containing the files in a specified
+directory. if the directory could not be located, returns an empty
+array instead. If an empty string is given, returns the files in the
+current working directory. Does not include implicit paths . or .. 
+</p>
+<p class="example" style="margin-bottom: 0in">a=io.getfiles(&quot;data&quot;)
+//might return something like
+[&quot;test.txt&quot;,&quot;image.jpg&quot;,&quot;cool_song.mp3&quot;]
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">getdirs (<font color="#888888">string</font>
+path)</h3>
+<p>returns an array of strings containing the directories in another
+specified directory. if the directory could not be located, returns
+an empty array instead. If an empty string is given, returns the
+directories in the current working directory. Does not include
+implicit paths . or .. 
+</p>
+<p class="example" style="margin-bottom: 0in">a=io.getdirs(&quot;&quot;)
+//might return something like [&quot;data&quot;,&quot;stuff&quot;] 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">lines (<font color="#888888">file</font>
+file)</h3>
+<p>returns an array of strings containing each line in a file. The
+file must be in read mode for any results to return. Does not include
+the newline characters themselves. 
+</p>
+<p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;r&quot;)
+<br/>
+io.lines(a) //might return [&quot;this&quot;,&quot;is&quot;,&quot;&quot;,&quot;a
+test&quot;] 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">post (<font color="#888888">string</font>
+text)</h3>
+<p>writes a string to stdout. unlike print, the input must be a
+string. additionally, this function is not variadic, and will not add
+any terminating newlines. 
+</p>
+<p class="example" style="margin-bottom: 0in">io.post(&quot;hello!\n&quot;)
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">prompt ()</h3>
+<p>awaits input from stdin. input will be accepted after the user
+hits enter. returns a string containing the text, minus newlines. 
+</p>
+<p class="example" style="margin-bottom: 0in">a=io.prompt() 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">input ()</h3>
+<p>awaits a single keypress from stdin. does not require pressing
+enter. returns the input as a single character.<br/>
+use caution if
+using this in a loop, as the control+C break sequence will not be
+captured by the program, and instead be sent as raw input. instead.
+you should check for the sequence 0x03 
+</p>
+<p class="example" style="margin-bottom: 0in">a=io.input() 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">remove (<font color="#888888">string</font>
+path)</h3>
+<p>attempts to remove a file with the given path. if successful,
+returns true, otherwise false. 
+</p>
+<p class="example" style="margin-bottom: 0in">io.remove(&quot;test.txt&quot;)
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">removedir (<font color="#888888">string</font>
+path)</h3>
+<p>attempts to remove a directory with the given name/path. if
+successful, returns true, otherwise false. can only remove empty
+directories. 
+</p>
+<p class="example" style="margin-bottom: 0in">io.remove(&quot;data&quot;)
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">createdir (<font color="#888888">string</font>
+path)</h3>
+<p>attempts to create a directory with the given name/path. if
+successful, returns true, otherwise false. 
+</p>
+<p class="example">io.createdir(&quot;data&quot;) 
+</p>
+<h1>OS library</h1>
+<h2 class="western">constants</h2>
+<table cellpadding="2" cellspacing="0">
+	<tr>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			variable</p>
+		</th>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			 type </p>
+		</th>
+		<th style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.02in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			value</p>
+		</th>
+		<th style="border: 1.50pt solid #000000; padding: 0.02in"><p>desc</p>
+		</th>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			IS_POSIX</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Bool</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			depends on system</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			whether or not the mercury is running on a POSIX system (eg,
+			Linux, MacOS)</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			IS_UNIX</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Bool</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			depends on system</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			same value as IS_POSIX</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			IS_64BIT</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			Bool</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			false (32 bit) / true (64 bit)</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			whether or not the mercury is running on a 64 bit system</p>
+		</td>
+	</tr>
 </table>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">time ()</h3>
+<p>returns an integer of the current time in seconds since the epoch
+(unix time) 
 </p>
-
-<h3>functions</h3>
-
-<div class='fdec'>time ()</div>
-<div class='desc'>
-<p>
-returns an integer of the current time in seconds since the epoch (unix time)
+<p class="example" style="margin-bottom: 0in">os.time() //result
+varies when program is executed 
 </p>
-<p class='example'>
-<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>time</span><span class='m_symbol'>()</span> <span class='m_comment'> //result varies when program is executed </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>clock ()</div>
-<div class='desc'>
-<p>
-returns a float of how long the program has been running
 </p>
-<p class='example'>
-<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>clock</span><span class='m_symbol'>()</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>execute (<span class='type'>string</span> command)</div>
-<div class='desc'>
-<p>
-executes a string as if it were a shell command. input is platform-dependent. returns any text the command writes. This function uses C's popen function.
+<h3 class="funcheader-western">clock ()</h3>
+<p>returns a float of how long the program has been running 
 </p>
-<p class='example'>
-<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>execute</span><span class='m_symbol'>(<span class='m_string'>"curl www.test-site.com"</span>)</span> <span class='m_comment'> //returns a web request result </span> <br>
-</div>
-
-<div class='fdec'>call (<span class='type'>string</span> command)</div>
-<div class='desc'>
-<p>
-executes a string as if it were a shell command. input is platform-dependent. returns a code from the command. This function uses C's system function. Some commands may work better with this function compared to execute.
+<p class="example" style="margin-bottom: 0in">os.clock() 
 </p>
-<p class='example'>
-<span class='m_builtin'>os</span><span class='m_symbol'>.</span><span class='m_builtin'>call</span><span class='m_symbol'>(<span class='m_string'>"curl www.test-site.com"</span>)</span> <span class='m_comment'> //returns 0 </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<h2>Thread library</h2>
-<h3>functions</h3>
-
-<div class='fdec'>new (<span class='type'>function</span> function, [<span class='type'>table</span> enviroment=_ENV], <span class='type'>variable</span> ...)</div>
-<div class='desc'>
-<p>
-creates a new thread with a given function, and immedietly begins execution. caution is advised when multithreading, as no safeguards are put in place to prevent data races. Some datatypes are unsafe to access across threads.<br>
-optional second arg specifies an environment override to prevent the thread from modifying global data. can be supplied with nil to ignore it.<br>
-accepts any number of further arguments, which will be supplied to the thread function as parameters.<br>
-returns a thread object. if no return value is specified, the thread will not be created.
 </p>
-<p class='example'>
-function a() <br>
-&emsp;return 20 <br>
-end <br>
-t=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>new</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>isfinished (<span class='type'>thread</span> thread)</div>
-<div class='desc'>
-<p>
-returns a bool if a thread has finished execution.
+<h3 class="funcheader-western">execute (<font color="#888888">string</font>
+command)</h3>
+<p>executes a string as if it were a shell command. input is
+platform-dependent. returns any text the command writes. This
+function uses C's popen function. 
 </p>
-b=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>isfinished</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
-
-<div class='fdec'>isrunning (<span class='type'>thread</span> thread)</div>
-<div class='desc'>
-<p>
-returns a bool if a thread is executing code. will always returns the inverse result of isfinished.
+<p class="example" style="margin-bottom: 0in">os.execute(&quot;curl
+www.test-site.com&quot;) //returns a web request result 
 </p>
-b=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>isrunning</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-</div>
+<p class="example" style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>fetch (<span class='type'>thread</span> thread)</div>
-<div class='desc'>
-<p>
-returns the next variable from a finished thread. if there are no more variables returned by the thread, nil will be given instead. Will halt execution of the main thread to wait for the thread to finish.
 </p>
-b=<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>fetch</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'> //would return 20 in the above example. </span> <br>
-</div>
-
-<div class='fdec'>abort (<span class='type'>thread</span> thread)</div>
-<div class='desc'>
-<p>
-kills a thread. This should only be used in dire circumstances where a thread is held up indefinitely, as resources will not properly be freed.
+<h3 class="funcheader-western">call (<font color="#888888">string</font>
+command)</h3>
+<p>executes a string as if it were a shell command. input is
+platform-dependent. returns a code from the command. This function
+uses C's system function. Some commands may work better with this
+function compared to execute. 
 </p>
-<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>abort</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'>  </span> <br>
-</div>
-
-<div class='fdec'>getcount (<span class='type'>thread</span> thread)</div>
-<div class='desc'>
-<p>
-returns the next number of results that a thread has in the form of an integer, or 0, if the thread is still running.
+<p class="example">os.call(&quot;curl www.test-site.com&quot;)
+//returns 0 
 </p>
-while thread.getcount(t) do <br>
-&emsp;thread.fetch(t) <br>
-end <br>
-</div>
-
-<div class='fdec'>await (<span class='type'>thread</span> thread)</div>
-<div class='desc'>
-<p>
-halts the main thread until the supplied thread is finished.
+<h1>Thread library</h1>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">new (<font color="#888888">function</font>
+function, [<font color="#888888">table</font> enviroment=_ENV],
+<font color="#888888">variable</font> ...)</h3>
+<p>creates a new thread with a given function, and immedietly begins
+execution. caution is advised when multithreading, as no safeguards
+are put in place to prevent data races. Some datatypes are unsafe to
+access across threads.<br/>
+optional second arg specifies an
+environment override to prevent the thread from modifying global
+data. can be supplied with nil to ignore it.<br/>
+accepts any number
+of further arguments, which will be supplied to the thread function
+as parameters.<br/>
+returns a thread object. if no return value is
+specified, the thread will not be created. 
 </p>
-<span class='m_builtin'>thread</span><span class='m_symbol'>.</span><span class='m_builtin'>await</span><span class='m_symbol'>(</span>t<span class='m_symbol'>)</span> <span class='m_comment'>  </span> <br>
-</div>
-
-
-<h2>Table library</h2>
-<h3>functions</h3>
-
-<div class='fdec'>copy (<span class='type'>table</span> table)</div>
-<div class='desc'>
-<p>
-creates a new table which contains the same values as the supplied table.
+<p class="example" style="margin-bottom: 0in">function a() <br/>
+ return
+20 <br/>
+end <br/>
+t=thread.new(a) 
 </p>
-<p class='example'>
-a<span class='m_symbol'>={</span><span class='m_string'>"hello"</span><span class='m_symbol'>,</span><span class='m_number'>1</span><span class='m_symbol'>,</span><span class='m_static'>nil<span class='m_symbol'>,</span>true</span><span class='m_symbol'>}</span> <br>
-b<span class='m_symbol'>=</span><span class='m_builtin'>table</span><span class='m_symbol'>.</span><span class='m_builtin'>copy</span><span class='m_symbol'>(</span>a<span class='m_symbol'>)</span> <span class='m_comment'> </span> <br>
-<span class='m_builtin'>print</span><span class='m_symbol'>(</span>a<span class='m_symbol'>==</span>b<span class='m_symbol'>)</span> <span class='m_comment'>//false </span> <br>
+<p class="example" style="margin-bottom: 0in"><br/>
+
 </p>
-</div>
-
-<h2>Debug library</h2>
-<h3>functions</h3>
-
-
-<div class='fdec'>dumpstack ()</div>
-<div class='desc'>
-<p>
-logs information about the current state's stack to stdout, including how many variables are on the stack, what the variables's values are, and unallocated variables, as well as the allocated size of the stack array. Returns no value.
+<h3 class="funcheader-western">isfinished (<font color="#888888">thread</font>
+thread)</h3>
+<p>returns a bool if a thread has finished execution. 
 </p>
-</div>
-
-<div class='fdec'>dumpstate ()</div>
-<div class='desc'>
-<p>
-logs information about the current state structure to stdout, including how far the each state is into execution, the instruction address, and which state is the parent state recursively, until the master state is reached. Returns no value.
+<p style="margin-bottom: 0in">b=thread.isfinished(t) 
 </p>
-</div>
+<p style="margin-bottom: 0in"><br/>
 
-<div class='fdec'>dumpenv ()</div>
-<div class='desc'>
-<p>
-logs information about the environment to stdout, including associated state, and all values stored inside the environment table, and does so for each parent state until the master state. Returns no value.
 </p>
-</div>
-
-<div class='fdec'>dumpconstants ()</div>
-<div class='desc'>
-<p>
-logs information about the state's constants to stdout, including how many constants the state has, and what the values of the constants are. Returns no value.
+<h3 class="funcheader-western">isrunning (<font color="#888888">thread</font>
+thread)</h3>
+<p>returns a bool if a thread is executing code. will always returns
+the inverse result of isfinished. 
 </p>
-</div>
-
-<div class='fdec'>dumpbytecode ([<span class='type'>function</span> function=_ENV])</div>
-<div class='desc'>
-<p>
-logs information about the provided function to stdout, including the number of instructions, and each opcode and additional information. Returns no value. if no arg is given, instead uses the current state's bytecode. 
+<p style="margin-bottom: 0in">b=thread.isrunning(t) 
 </p>
-</div>
+<p style="margin-bottom: 0in"><br/>
 
+</p>
+<h3 class="funcheader-western">fetch (<font color="#888888">thread</font>
+thread)</h3>
+<p>returns the next variable from a finished thread. if there are no
+more variables returned by the thread, nil will be given instead.
+Will halt execution of the main thread to wait for the thread to
+finish. 
+</p>
+<p style="margin-bottom: 0in">b=thread.fetch(t) //would return 20 in
+the above example. 
+</p>
+<p style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">abort (<font color="#888888">thread</font>
+thread)</h3>
+<p>kills a thread. This should only be used in dire circumstances
+where a thread is held up indefinitely, as resources will not
+properly be freed. 
+</p>
+<p style="margin-bottom: 0in">thread.abort(t) 
+</p>
+<p style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">getcount (<font color="#888888">thread</font>
+thread)</h3>
+<p>returns the next number of results that a thread has in the form
+of an integer, or 0, if the thread is still running. 
+</p>
+<p style="margin-bottom: 0in">while thread.getcount(t) do
+<br/>
+ thread.fetch(t) <br/>
+end 
+</p>
+<p style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">await (<font color="#888888">thread</font>
+thread)</h3>
+<p>halts the main thread until the supplied thread is finished. 
+</p>
+<p>thread.await(t) 
+</p>
+<h1>Table library</h1>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">copy (<font color="#888888">table</font>
+table)</h3>
+<p>creates a new table which contains the same values as the supplied
+table. 
+</p>
+<p class="example">a={&quot;hello&quot;,1,nil,true} <br/>
+b=table.copy(a)
+<br/>
+print(a==b) //false 
+</p>
+<h1>Debug library</h1>
+<h2 class="western">functions</h2>
+<h3 class="funcheader-western">dumpstack ()</h3>
+<p>logs information about the current state's stack to stdout,
+including how many variables are on the stack, what the variables's
+values are, and unallocated variables, as well as the allocated size
+of the stack array. Returns no value. 
+</p>
+<h3 class="funcheader-western">dumpstate ()</h3>
+<p>logs information about the current state structure to stdout,
+including how far the each state is into execution, the instruction
+address, and which state is the parent state recursively, until the
+master state is reached. Returns no value. 
+</p>
+<h3 class="funcheader-western">dumpenv ()</h3>
+<p>logs information about the environment to stdout, including
+associated state, and all values stored inside the environment table,
+and does so for each parent state until the master state. Returns no
+value. 
+</p>
+<h3 class="funcheader-western">dumpconstants ()</h3>
+<p>logs information about the state's constants to stdout, including
+how many constants the state has, and what the values of the
+constants are. Returns no value. 
+</p>
+<h3 class="funcheader-western">dumpbytecode ([<font color="#888888">function</font>
+function=_ENV])</h3>
+<p>logs information about the provided function to stdout, including
+the number of instructions, and each opcode and additional
+information. Returns no value. if no arg is given, instead uses the
+current state's bytecode. 
+</p>
 </body>
 </html>
