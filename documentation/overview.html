@@ -5,20 +5,21 @@
 	<title></title>
 	<meta name="generator" content="LibreOffice 7.5.1.2 (Windows)"/>
 	<meta name="created" content="2025-09-30T14:45:59.071000000"/>
-	<meta name="changed" content="2026-03-11T14:06:47.955000000"/>
+	<meta name="changed" content="2026-03-13T23:52:08.438000000"/>
 	<style type="text/css">
 		h2.cjk { font-family: "NSimSun" }
 		h2.ctl { font-family: "Arial" }
 		h3.cjk { font-family: "NSimSun" }
 		h3.ctl { font-family: "Arial" }
-		p.codeblock-western { font-family: "Liberation Mono", monospace; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
-		p.codeblock-cjk { background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
-		p.codeblock-ctl { background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
+		p.codeblock-western { font-family: "Liberation Mono", monospace; margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
+		p.codeblock-cjk { margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
+		p.codeblock-ctl { margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
 		h4.cjk { font-family: "NSimSun" }
 		h4.ctl { font-family: "Arial" }
 	</style>
 </head>
-<body lang="en-US" dir="ltr"><h1 align="center">Mercury</h1>
+<body lang="en-US" dir="ltr"><p align="center" style="margin-top: 0.17in; text-decoration: none; page-break-after: avoid">
+<font face="Liberation Sans, sans-serif"><font size="7" style="font-size: 40pt"><b>Mercury</b></font></font></p>
 <p>Mercury is an interpreted dynamically-typed language with a simple
 but robust syntax.</p>
 <h2 class="western">Why Mercury?</h2>
@@ -614,6 +615,179 @@ way to index with a string</p>
 <p class="codeblock-western">print(my_table[&quot;a&quot;]) // 1</p>
 <p class="codeblock-western">print(my_table.a) // 1. not to be
 confused with my_table[a]</p>
+<p><br/>
+<br/>
+
+</p>
+<h2 class="western">The Compiler</h2>
+<p>Mercury's compiler is (intentionally) very simple, generating code
+with two single-pass phases. The extent of the compiler's knowledge
+is at most backreferences to jump labels, and sometimes a couple of
+tokens ahead. This means that the compiler has very little ability to
+detect any code issues or inevitable runtime errors, requiring more
+careful programming.</p>
+<h3 class="western">Phase 0: source code</h3>
+<p>Consider the following program for the example:</p>
+<p class="codeblock-western"><span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;Hello,
+world!&quot;</span><span style="background: #5983b0">)</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">a</span><span style="background: #5983b0">=</span><span style="background: #ff6d6d">5</span></p>
+<p class="codeblock-western"><span style="background: #ff8000">if</span>
+<span style="background: #ffff00">a</span><span style="background: #5983b0">&gt;</span><span style="background: #ff6d6d">0</span>
+<span style="background: #ff8000">then</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;a
+is positive&quot;</span><span style="background: #5983b0">)</span></p>
+<p class="codeblock-western"><span style="background: #ff8000">end</span></p>
+<h3 class="western">Phase 1: tokenization</h3>
+<p>The first phase of the compiler is to convert the source code into
+tokens to make the rest of the compilation easier and simpler. The
+tokenization phase cannot raise compiler errors, and will run from
+the first to the last character of the source code. Once the tokens
+are split from source code, some basic processing on a per-token
+basis is done to categorize them. Whitespace characters (including
+semicolon) are completely ignored when tokenizing (outside of
+separating symbols and strings)</p>
+<p>Tokens themselves store the associated source code text, as well
+as position in the code, and the type of the token.</p>
+<p>The above source code, displayed as 1 token per line</p>
+<p class="codeblock-western"><span style="background: #ffff00">Print</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">(</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">Hello,
+world!</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">)</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">a</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">=</span></p>
+<p class="codeblock-western"><span style="background: #ff6d6d">5</span></p>
+<p class="codeblock-western"><span style="background: #ff8000">if</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">a</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">&gt;</span></p>
+<p class="codeblock-western"><span style="background: #ff6d6d">0</span></p>
+<p class="codeblock-western"><span style="background: #ff8000">then</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">print</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">(</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">a is
+positive</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">)</span></p>
+<p class="codeblock-western"><span style="background: #ff8000">end</span></p>
+<h3 class="western">Phase 2: bytecode generation</h3>
+<p>Once the array of tokens is generated, the program converts them
+into usable bytecode. The generation stage of the compiler is where
+compiler errors are raised and  the majority early exits will occur.</p>
+<p>The above source code, displayed as 1 instruction size per line,
+in 32 bit big endian space, and uninitialized memory set to NULL for
+simplicity. Some features such as constants have been removed for the
+sake of readability.</p>
+<p class="codeblock-western"><span style="background: #81d41a">0x00000023
+   NSTR (New STRing)</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x0000000D
+   13  </span>
+</p>
+<p class="codeblock-western"><span style="background: #81d41a">0x48656C6C
+   Hell</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x6F2C2077
+   o, w</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x6F726C64
+   orld</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x21000000
+   !   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">0x00000005
+   5   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x7072696E
+   prin</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">0x74000000
+   t   </span>
+</p>
+<p class="codeblock-western"><span style="background: #5983b0">0x0000002D
+   CALL (CALL function)</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">0x00000001
+   1   </span>
+</p>
+<p class="codeblock-western"><span style="background: #5983b0">0x00000000
+   0   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">0x0000000D
+   1   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x61000000
+   a   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ff3838">0x0000001E
+   NINT (New Integer)</span></p>
+<p class="codeblock-western"><font color="#000000"><span style="background: #ff3838">0x00000005
+   5   </span></font>
+</p>
+<p class="codeblock-western"><span style="background: #5983b0">0x00000018
+   SENV (Set ENVironmental variable)</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">0x0000000D
+   1   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x61000000
+   a   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x00000019
+   GENV (Get ENVironmental variable)</span></p>
+<p class="codeblock-western"><span style="background: #ff3838">0x0000001E
+   NINT (New Integer)</span></p>
+<p class="codeblock-western"><span style="background: #ff3838">0x00000000
+   0</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">0x0000001E
+   GRT  (GReaTer than)</span></p>
+<p class="codeblock-western"><span style="background: #ff8000">0x0000002C
+   JRNI (Jump Relative Not If)</span></p>
+<p class="codeblock-western"><span style="background: #ff8000">0x0000000F
+   15  </span>
+</p>
+<p class="codeblock-western"><span style="background: #81d41a">0x00000023
+   NSTR (New STRing)</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x0000000D
+   13  </span>
+</p>
+<p class="codeblock-western"><span style="background: #81d41a">0x61206973
+   a is</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x20706F73
+    pos</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x69746976
+   itiv</span></p>
+<p class="codeblock-western"><span style="background: #81d41a">0x65000000
+   e   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">0x00000005
+   5   </span>
+</p>
+<p class="codeblock-western"><span style="background: #ffff00">0x7072696E
+   prin</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">0x74000000
+   t   </span>
+</p>
+<p class="codeblock-western"><span style="background: #5983b0">0x0000002D
+   CALL (CALL function)</span></p>
+<p class="codeblock-western"><span style="background: #5983b0">0x00000001
+   1   </span>
+</p>
+<p class="codeblock-western"><span style="background: #5983b0">0x00000000
+   0   </span>
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
 <p><br/>
 <br/>
 
