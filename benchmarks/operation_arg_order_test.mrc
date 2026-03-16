@@ -16,8 +16,8 @@ a=-a
 a~=181983
 a&=255
 
-if a!=137 then
-	print("operations test failed! we got "..a .." but expected 137.")
+if a!=33 then
+	print("operations test failed! we got "..a .." but expected 33.")
 else
 	print("operations test passed!")
 end

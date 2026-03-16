@@ -1,11 +1,11 @@
 #include "mercury_bytecode.hpp"
 #include "mercury.hpp"
-#include "malloc.h"
 #include "mercury_error.hpp"
-#include "math.h"
-#include "string.h"
-
-#include "stdio.h"
+#include <malloc.h>
+#include <math.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdint.h>
 
 void M_BYTECODE_NOP(mercury_state* M, mercury_insflags flags) {
 	return;
@@ -13,46 +13,33 @@ void M_BYTECODE_NOP(mercury_state* M, mercury_insflags flags) {
 
 
 void M_BYTECODE_ADD(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1;
 	mercury_float f2;
 	mercury_int i1;
 	mercury_int i2;
 
-	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
+	mercury_variable* outv = mercury_assign_var(M);
 	if (outv == nullptr) { 
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return; 
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset= M->bytecode.instructions+M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) { 
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) { 
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
+	switch (var->type)
 		{
 		case M_TYPE_INT:
 			i1 = var->data.i;
 			break;
 		case M_TYPE_FLOAT:
 			f1 = var->data.f;
-			floatcount++;
+			argsfloat |= 1;
 			break;
 		default:
 			mercury_raise_error(M, M_ERROR_WRONG_TYPE,  (void*)M_TYPE_INT, (void*)var->type);
@@ -60,53 +47,48 @@ void M_BYTECODE_ADD(mercury_state* M, mercury_insflags flags) {
 			mercury_unassign_var(M, var);
 			return;
 		}
-		mercury_unassign_var(M, var);
+	mercury_unassign_var(M, var);
+		
+	var = mercury_popstack(M);
+	if (var == nullptr) { 
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return; 
 	}
-
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
-	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) { 
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return; 
-		}
-		switch (var->type)
+	switch (var->type)
 		{
 		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
+			i2 = var->data.i;
 			break;
 		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount++;
+			f2= var->data.f;
+			argsfloat |= 2;
 			break;
 		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT) , (void*)var->type );
+			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT) , (void*)var->type );
 			mercury_unassign_var(M, outv);
 			mercury_unassign_var(M, var);
 			return;
 		}
-		mercury_unassign_var(M, var);
-	}
+	mercury_unassign_var(M, var);
 
-	if (floatcount) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.f = f1 + (floatcount == 2 ? f2 : (mercury_float)i1);
-	}
-	else {
+	switch (argsfloat) {
+	case 0:
 		outv->type = M_TYPE_INT;
-		outv->data.i = i1+i2;
+		outv->data.i = i1 + i2;
+		break;
+	case 1:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = f1 + (mercury_float)i2;
+		break;
+	case 2:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = (mercury_float)i1 + f2;
+		break;
+	case 3:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = f1 + f2;
+		break;
 	}
 	mercury_pushstack(M, outv);
 
@@ -114,7 +96,7 @@ void M_BYTECODE_ADD(mercury_state* M, mercury_insflags flags) {
 }
 
 void M_BYTECODE_SUB(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1;
 	mercury_float f2;
@@ -127,87 +109,70 @@ void M_BYTECODE_SUB(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		argsfloat|=1;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
+
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		argsfloat|=2;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
-
-	if (floatcount) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.f = (floatcount == 2 ? f2 : (mercury_float)i1) - f1;
-	}
-	else {
+	mercury_unassign_var(M, var);
+	switch (argsfloat) {
+	case 0:
 		outv->type = M_TYPE_INT;
-		outv->data.i = i2-i1;
+		outv->data.i = i2 - i1;
+		break;
+	case 1:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = (mercury_float)i2 - f1;
+		break;
+	case 2:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = f2 - (mercury_float)i1;
+		break;
+	case 3:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = f2 - f1;
+		break;
 	}
 	mercury_pushstack(M, outv);
 
@@ -215,7 +180,7 @@ void M_BYTECODE_SUB(mercury_state* M, mercury_insflags flags) {
 }
 
 void M_BYTECODE_MUL(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1;
 	mercury_float f2;
@@ -228,87 +193,69 @@ void M_BYTECODE_MUL(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		argsfloat|=1;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		argsfloat|=2;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (floatcount) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.f = (floatcount == 2 ? f2 : (mercury_float)i1) * f1;
-	}
-	else {
+	switch (argsfloat) {
+	case 0:
 		outv->type = M_TYPE_INT;
 		outv->data.i = i2 * i1;
+		break;
+	case 1:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = (mercury_float)i2 * f1;
+		break;
+	case 2:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = f2 * (mercury_float)i1;
+		break;
+	case 3:
+		outv->type = M_TYPE_FLOAT;
+		outv->data.f = f2 * f1;
+		break;
 	}
 	mercury_pushstack(M, outv);
 
@@ -316,12 +263,8 @@ void M_BYTECODE_MUL(mercury_state* M, mercury_insflags flags) {
 }
 
 void M_BYTECODE_DIV(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
-
 	mercury_float f1;
 	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
@@ -329,108 +272,61 @@ void M_BYTECODE_DIV(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount+=2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		f1 = (mercury_float)var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount+=2;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		f2 = (mercury_float)var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_FLOAT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
-
+	mercury_unassign_var(M, var);
 
 	outv->type = M_TYPE_FLOAT;
-	switch (floatcount) {
-	case 0:
-		outv->data.f = (mercury_float)i2 / (mercury_float)i1;
-		break;
-	case 1:
-		outv->data.f = (mercury_float)f1 / i1;
-		break;
-	case 2:
-		outv->data.f = (mercury_float)i1 / f1;
-		break;
-	case 3:
-		outv->data.f = f2 / f1;
-		break;
-	}
+	outv->data.f = f2 / f1;
+	
 	mercury_pushstack(M, outv);
 
 	return;
 }
 
 void M_BYTECODE_POW(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
-
 	mercury_float f1;
 	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
 
 	mercury_variable* outv = mercury_assign_var(M);// (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outv == nullptr) {
@@ -438,95 +334,53 @@ void M_BYTECODE_POW(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_FLOAT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		f1 = (mercury_float)var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_FLOAT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount+=2;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount+=2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		f2 = (mercury_float)var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_FLOAT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
 	outv->type = M_TYPE_FLOAT;
-	switch (floatcount) {
-	case 0:
-		outv->data.f = pow((mercury_float)i2, (mercury_float)i1);
-		break;
-	case 1:
-		outv->data.f = pow((mercury_float)i1, f1);
-		break;
-	case 2:
-		outv->data.f = pow(f1, (mercury_float)i1);
-		break;
-	case 3:
-		outv->data.f = pow(f2, f1);
-		break;
-	}
+	outv->data.f = pow(f2, f1);
+
 	mercury_pushstack(M, outv);
 
 	return;
@@ -534,10 +388,6 @@ void M_BYTECODE_POW(mercury_state* M, mercury_insflags flags) {
 
 
 void M_BYTECODE_IDIV(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
-
-	mercury_float f1;
-	mercury_float f2;
 	mercury_int i1;
 	mercury_int i2;
 
@@ -547,122 +397,66 @@ void M_BYTECODE_IDIV(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		i1 = (mercury_int)var->data.f;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount+=2;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount+=2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		i2 = (mercury_int)var->data.f;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
 	outv->type = M_TYPE_INT;
-	switch (floatcount) {
-	case 0:
-		if (i1 == 0) {
-			mercury_raise_error(M, M_ERROR_DIV_ZERO);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		outv->data.i = i2 / i1;
-		break;
-	case 1:
-		if ((mercury_int)f1 == 0) {
-			mercury_raise_error(M, M_ERROR_DIV_ZERO);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		outv->data.i = i1 / (mercury_int)f1;
-		break;
-	case 2:
-		if (i1 == 0) {
-			mercury_raise_error(M, M_ERROR_DIV_ZERO);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		outv->data.i = (mercury_int)f1 / i1;
-		break;
-	case 3:
-		if ((mercury_int)f1 == 0) {
-			mercury_raise_error(M, M_ERROR_DIV_ZERO);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		outv->data.i = (mercury_int)f2 / (mercury_int)f1;
-		break;
+
+	if (i1 == 0) {
+		mercury_raise_error(M, M_ERROR_DIV_ZERO);
+		mercury_unassign_var(M, outv);
+		return;
 	}
+	outv->data.i = i2 / i1;
+
 	mercury_pushstack(M, outv);
 
 	return;
 }
 
 void M_BYTECODE_MOD(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1;
 	mercury_float f2;
@@ -675,91 +469,63 @@ void M_BYTECODE_MOD(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount++;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount++;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		argsfloat|=1;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount+=2;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount+=2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		argsfloat|=2;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
 	outv->type = M_TYPE_FLOAT;
-	switch (floatcount) {
+	switch (argsfloat) {
 	case 0:
 		outv->type = M_TYPE_INT;
 		outv->data.i = i2 % i1;
 		break;
 	case 1:
-		outv->data.f = fmod((mercury_float)i1, f1);
+		outv->data.f = fmod((mercury_float)i2, f1);
 		break;
 	case 2:
-		outv->data.f = fmod(f1, (mercury_float)i1);
+		outv->data.f = fmod(f2, (mercury_float)i1);
 		break;
 	case 3:
 		outv->data.f = fmod(f2 , f1);
@@ -782,86 +548,50 @@ void M_BYTECODE_BAND(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			i1 = *(mercury_int*)offset;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i1 = var->data.i;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+		i1 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			i2 = *(mercury_int*)offset;
-			outfloat = true;
-		}
-		else {
-			i2 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i2 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i2 = var->data.i;
-			outfloat = true;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_FLOAT:
+		outfloat = true;
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (outfloat) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.i = i2 & i1;
-	}
-	else {
-		outv->type = M_TYPE_INT;
-		outv->data.i = i2 & i1;
-	}
+	outv->data.i = i2 & i1;
+	outv->type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
+
 	mercury_pushstack(M, outv);
 
 	return;
@@ -879,86 +609,50 @@ void M_BYTECODE_BOR(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			i1 = *(mercury_int*)offset;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i1 = var->data.i;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+		i1 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			i2 = *(mercury_int*)offset;
-			outfloat = true;
-		}
-		else {
-			i2 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i2 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i2 = var->data.i;
-			outfloat = true;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_FLOAT:
+		outfloat = true;
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (outfloat) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.i = i2 | i1;
-	}
-	else {
-		outv->type = M_TYPE_INT;
-		outv->data.i = i2 | i1;
-	}
+	outv->data.i = i2 | i1;
+	outv->type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
+
 	mercury_pushstack(M, outv);
 
 	return;
@@ -976,86 +670,51 @@ void M_BYTECODE_BXOR(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			i1 = *(mercury_int*)offset;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i1 = var->data.i;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+		i1 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			i2 = *(mercury_int*)offset;
-			outfloat = true;
-		}
-		else {
-			i2 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i2 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i2 = var->data.i;
-			outfloat = true;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_FLOAT:
+		outfloat = true;
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (outfloat) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.i = i2 ^ i1;
-	}
-	else {
-		outv->type = M_TYPE_INT;
-		outv->data.i = i2 ^ i1;
-	}
+	outv->data.i = i2 ^ i1;
+	outv->type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
+	
 	mercury_pushstack(M, outv);
 
 	return;
@@ -1072,60 +731,36 @@ void M_BYTECODE_BNOT(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			i1 = *(mercury_int*)offset;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i1 = var->data.i;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_FLOAT:
+		outfloat = true;
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
+	
 
 
-	if (outfloat) {
-		outv->type = M_TYPE_FLOAT;
+	outv->type = outfloat?M_TYPE_FLOAT: M_TYPE_INT;
 #ifdef MERCURY_64BIT
-		outv->data.i = 0xffffffffffffffff ^ i1;
+	outv->data.i = 0xffffffffffffffff ^ i1;
 #else
-		outv->data.i = 0xffffffff ^ i1;
+	outv->data.i = 0xffffffff ^ i1;
 #endif
-		outv->data.i = 0xf ^ i1;
-	}
-	else {
-		outv->type = M_TYPE_INT;
-#ifdef MERCURY_64BIT
-		outv->data.i = 0xffffffffffffffff ^ i1;
-#else
-		outv->data.i = 0xffffffff ^ i1;
-#endif
-		
-	}
+
 	mercury_pushstack(M, outv);
 
 	return;
@@ -1143,86 +778,50 @@ void M_BYTECODE_BSHL(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			i1 = *(mercury_int*)offset;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i1 = var->data.i;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+		i1 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
-
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			i2 = *(mercury_int*)offset;
-			outfloat = true;
-		}
-		else {
-			i2 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_unassign_var(M, var);
+	
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i2 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i2 = var->data.i;
-			outfloat = true;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_FLOAT:
+		outfloat = true;
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (outfloat) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.i = i2 << i1;
-	}
-	else {
-		outv->type = M_TYPE_INT;
-		outv->data.i = i2 << i1;
-	}
+	outv->data.i = i2 << i1;
+	outv->type = outfloat?M_TYPE_FLOAT: M_TYPE_INT;
+
 	mercury_pushstack(M, outv);
 
 	return;
@@ -1240,86 +839,50 @@ void M_BYTECODE_BSHR(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			i1 = *(mercury_int*)offset;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i1 = var->data.i;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+		i1 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			i2 = *(mercury_int*)offset;
-			outfloat = true;
-		}
-		else {
-			i2 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i2 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			i2 = var->data.i;
-			outfloat = true;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_FLOAT:
+		outfloat = true;
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (outfloat) {
-		outv->type = M_TYPE_FLOAT;
-		outv->data.i = i2 >> i1;
-	}
-	else {
-		outv->type = M_TYPE_INT;
-		outv->data.i = i2 >> i1;
-	}
+	outv->data.i = i2 >> i1;
+	outv->type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
+
 	mercury_pushstack(M, outv);
 
 	return;
@@ -1469,7 +1032,7 @@ void M_BYTECODE_NEQ(mercury_state* M, mercury_insflags flags) {
 
 
 void M_BYTECODE_GRT(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1=0;
 	mercury_float f2=0;
@@ -1482,92 +1045,64 @@ void M_BYTECODE_GRT(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount |= 2;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount |= 2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		argsfloat |= 1;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount |= 1;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount |= 1;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		argsfloat |= 2;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	switch (floatcount) {
+	switch (argsfloat) {
 	case 0:
-		outv->data.i = i1 < i2;
+		outv->data.i = i2>i1;
 		break;
 	case 1:
-		outv->data.i = (mercury_float)i1 < f1;
+		outv->data.i = i2 > f1;
 		break;
 	case 2:
-		outv->data.i = f1 < (mercury_float)i1;
+		outv->data.i = f2 > i1;
 		break;
 	case 3:
-		outv->data.i = f1 < f2;
+		outv->data.i = f2 > f1;
 		break;
 	}
 	outv->type = M_TYPE_BOOL;
@@ -1576,7 +1111,7 @@ void M_BYTECODE_GRT(mercury_state* M, mercury_insflags flags) {
 }
 
 void M_BYTECODE_LET(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1 = 0;
 	mercury_float f2 = 0;
@@ -1589,92 +1124,64 @@ void M_BYTECODE_LET(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount |= 2;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount |= 2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		argsfloat |= 1;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount |= 1;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount |= 1;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		argsfloat |= 2;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	switch (floatcount) {
+	switch (argsfloat) {
 	case 0:
-		outv->data.i = i1 > i2;
+		outv->data.i = i2 < i1;
 		break;
 	case 1:
-		outv->data.i = (mercury_float)i1 > f1;
+		outv->data.i = i2 < f1;
 		break;
 	case 2:
-		outv->data.i = f1 > (mercury_float)i1;
+		outv->data.i = f2 < i1;
 		break;
 	case 3:
-		outv->data.i = f1 > f2;
+		outv->data.i = f2 < f1;
 		break;
 	}
 	outv->type = M_TYPE_BOOL;
@@ -1683,7 +1190,7 @@ void M_BYTECODE_LET(mercury_state* M, mercury_insflags flags) {
 }
 
 void M_BYTECODE_GTE(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1 = 0;
 	mercury_float f2 = 0;
@@ -1696,92 +1203,64 @@ void M_BYTECODE_GTE(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount |= 2;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount |= 2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		argsfloat |= 1;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount |= 1;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount |= 1;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		argsfloat |= 2;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	switch (floatcount) {
+	switch (argsfloat) {
 	case 0:
-		outv->data.i = i1 <= i2;
+		outv->data.i = i2 >= i1;
 		break;
 	case 1:
-		outv->data.i = (mercury_float)i1 <= f1;
+		outv->data.i = i2 >= f1;
 		break;
 	case 2:
-		outv->data.i = f1 <= (mercury_float)i1;
+		outv->data.i = f2 >= i1;
 		break;
 	case 3:
-		outv->data.i = f1 <= f2;
+		outv->data.i = f2 >= f1;
 		break;
 	}
 	outv->type = M_TYPE_BOOL;
@@ -1790,7 +1269,7 @@ void M_BYTECODE_GTE(mercury_state* M, mercury_insflags flags) {
 }
 
 void M_BYTECODE_LTE(mercury_state* M, mercury_insflags flags) {
-	uint8_t floatcount = 0;
+	uint8_t argsfloat = 0;
 
 	mercury_float f1 = 0;
 	mercury_float f2 = 0;
@@ -1803,92 +1282,64 @@ void M_BYTECODE_LTE(mercury_state* M, mercury_insflags flags) {
 		return;
 	}
 
-	if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-			f1 = *(mercury_float*)offset;
-			floatcount |= 2;
-		}
-		else {
-			i1 = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	mercury_variable* var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			i1 = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = var->data.f;
-			floatcount |= 2;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i1 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f1 = var->data.f;
+		argsfloat |= 1;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-		void* offset = M->bytecode.instructions + M->programcounter;
-		if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-			(floatcount ? f2 : f1) = *(mercury_float*)offset;
-			floatcount |= 1;
-		}
-		else {
-			(floatcount ? i1 : i2) = *(mercury_int*)offset;
-		}
-		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-
+	var = mercury_popstack(M);
+	if (var == nullptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_unassign_var(M, outv);
+		return;
 	}
-	else {
-		mercury_variable* var = mercury_popstack(M);
-		if (var == nullptr) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_unassign_var(M, outv);
-			return;
-		}
-		switch (var->type)
-		{
-		case M_TYPE_INT:
-			(floatcount ? i1 : i2) = var->data.i;
-			break;
-		case M_TYPE_FLOAT:
-			(floatcount ? f2 : f1) = var->data.f;
-			floatcount |= 1;
-			break;
-		default:
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(floatcount ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
-			mercury_unassign_var(M, outv);
-			mercury_unassign_var(M, var);
-			return;
-		}
+	switch (var->type)
+	{
+	case M_TYPE_INT:
+		i2 = var->data.i;
+		break;
+	case M_TYPE_FLOAT:
+		f2 = var->data.f;
+		argsfloat |= 2;
+		break;
+	default:
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)(argsfloat ? M_TYPE_FLOAT : M_TYPE_INT), (void*)var->type);
+		mercury_unassign_var(M, outv);
 		mercury_unassign_var(M, var);
+		return;
 	}
+	mercury_unassign_var(M, var);
 
-	switch (floatcount) {
+	switch (argsfloat) {
 	case 0:
-		outv->data.i = i1 >= i2;
+		outv->data.i = i2 <= i1;
 		break;
 	case 1:
-		outv->data.i = (mercury_float)i1 >= f1;
+		outv->data.i = i2 <= f1;
 		break;
 	case 2:
-		outv->data.i = f1 >= (mercury_float)i1;
+		outv->data.i = f2 <= i1;
 		break;
 	case 3:
-		outv->data.i = f1 >= f2;
+		outv->data.i = f2 <= f1;
 		break;
 	}
 	outv->type = M_TYPE_BOOL;
@@ -2594,9 +2045,16 @@ void M_BYTECODE_UNM(mercury_state* M, mercury_insflags flags) { //UNary Minus
 }
 
 void M_BYTECODE_INC(mercury_state* M, mercury_insflags flags) { //INCrement
-	mercury_variable* var = mercury_popstack(M);
+	mercury_variable* var;
+	if (M->sizeofstack) {
+		var = M->stack[M->sizeofstack-1];
+	}
+	else {
+		var = nullptr;
+	}
+	
 	if (!var) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)M_TYPE_NIL);
 		return;
 	}
 
@@ -2610,18 +2068,22 @@ void M_BYTECODE_INC(mercury_state* M, mercury_insflags flags) { //INCrement
 		break;
 	default:
 		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-		mercury_unassign_var(M, var);
 		return;
 	}
-
-	mercury_pushstack(M, var);
 	return;
 }
 
 void M_BYTECODE_DEC(mercury_state* M, mercury_insflags flags) { //DECrement
-	mercury_variable* var = mercury_popstack(M);
+	mercury_variable* var;
+	if (M->sizeofstack) {
+		var = M->stack[M->sizeofstack - 1];
+	}
+	else {
+		var = nullptr;
+	}
+
 	if (!var) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)M_TYPE_NIL);
 		return;
 	}
 
@@ -2635,11 +2097,8 @@ void M_BYTECODE_DEC(mercury_state* M, mercury_insflags flags) { //DECrement
 		break;
 	default:
 		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_INT, (void*)var->type);
-		mercury_unassign_var(M, var);
 		return;
 	}
-
-	mercury_pushstack(M, var);
 	return;
 }
 

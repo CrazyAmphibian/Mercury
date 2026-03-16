@@ -1380,53 +1380,6 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 		mercury_mstring_addchars(out, buffer, strlen(buffer) );
 
 		switch (instruction) {
-			case M_OPCODE_ADD: //can take 2 static number args.
-			case M_OPCODE_SUB:
-			case M_OPCODE_MUL:
-			case M_OPCODE_DIV:
-			case M_OPCODE_POW:
-			case M_OPCODE_IDIV:
-			case M_OPCODE_MOD:
-			case M_OPCODE_BAND:
-			case M_OPCODE_BOR:
-			case M_OPCODE_BXOR:
-			case M_OPCODE_GRT:
-			case M_OPCODE_LET:
-			case M_OPCODE_GTE:
-			case M_OPCODE_LTE:
-				if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-					if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-						snprintf(buffer, 0x2FFF, " arg 1: %f", *(mercury_float*)(F->instructions+offset) );
-					}
-					else {
-						snprintf(buffer, 0x2FFF, " arg 1: %zi", *(mercury_int*)(F->instructions + offset) );
-					}
-					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-					mercury_mstring_addchars(out,buffer, strlen(buffer) );
-				}
-				if (flags & M_INSTRUCTIONFLAG_ARG2STATIC) {
-					if (flags & M_INSTRUCTIONFLAG_ARG2ALT) {
-						snprintf(buffer, 0x2FFF, " arg 2: %f", *(mercury_float*)(F->instructions + offset));
-					}
-					else {
-						snprintf(buffer, 0x2FFF, " arg 2: %zi", *(mercury_int*)(F->instructions + offset));
-					}
-					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-					mercury_mstring_addchars(out, buffer, strlen(buffer));
-				} 
-				break;
-			case M_OPCODE_BNOT: //1 possible static number arg
-				if (flags & M_INSTRUCTIONFLAG_ARG1STATIC) {
-					if (flags & M_INSTRUCTIONFLAG_ARG1ALT) {
-						snprintf(buffer, 0x2FFF, " arg: %f", *(mercury_float*)(F->instructions + offset));
-					}
-					else {
-						snprintf(buffer, 0x2FFF, " arg: %zi", *(mercury_int*)(F->instructions + offset));
-					}
-					offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-					mercury_mstring_addchars(out, buffer, strlen(buffer));
-				}
-				break;
 			case M_OPCODE_NINT: //static var inputs
 				snprintf(buffer, 0x2FFF, " %zi", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
