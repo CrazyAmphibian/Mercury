@@ -4,85 +4,85 @@
 #include <stdint.h>
 
 
-typedef void (*mercury_instruction) (mercury_state* const M); //takes a state and 16 bit int for opflags.
+typedef void (*mercury_instruction) (mercury_state* const M_CPP_restrict M); //takes a state
 
 
-void M_BYTECODE_NOP(mercury_state* const M);
+void M_BYTECODE_NOP(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_ADD(mercury_state* const M);
-void M_BYTECODE_SUB(mercury_state* const M);
-void M_BYTECODE_MUL(mercury_state* const M);
-void M_BYTECODE_DIV(mercury_state* const M);
-void M_BYTECODE_POW(mercury_state* const M);
-void M_BYTECODE_IDIV(mercury_state* const M);
-void M_BYTECODE_MOD(mercury_state* const M);
+void M_BYTECODE_ADD(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SUB(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_MUL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_DIV(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_POW(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_IDIV(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_BAND(mercury_state* const M);
-void M_BYTECODE_BOR(mercury_state* const M);
-void M_BYTECODE_BXOR(mercury_state* const M);
-void M_BYTECODE_BNOT(mercury_state* const M);
-void M_BYTECODE_BSHL(mercury_state* const M);
-void M_BYTECODE_BSHR(mercury_state* const M);
+void M_BYTECODE_BAND(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_BOR(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_BXOR(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_BNOT(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_LAND(mercury_state* const M);
-void M_BYTECODE_LOR(mercury_state* const M);
-void M_BYTECODE_LXOR(mercury_state* const M);
-void M_BYTECODE_LNOT(mercury_state* const M);
+void M_BYTECODE_LAND(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_LOR(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_LXOR(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_LNOT(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_EQL(mercury_state* const M);
-void M_BYTECODE_NEQ(mercury_state* const M);
-void M_BYTECODE_GRT(mercury_state* const M);
-void M_BYTECODE_LET(mercury_state* const M);
-void M_BYTECODE_GTE(mercury_state* const M);
-void M_BYTECODE_LTE(mercury_state* const M);
+void M_BYTECODE_EQL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NEQ(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_SENV(mercury_state* const M);
-void M_BYTECODE_GENV(mercury_state* const M);
-void M_BYTECODE_SET(mercury_state* const M);
-void M_BYTECODE_GET(mercury_state* const M);
-void M_BYTECODE_SREG(mercury_state* const M);
-void M_BYTECODE_GREG(mercury_state* const M);
+void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SREG(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GREG(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_NINT(mercury_state* const M);
-void M_BYTECODE_NFLO(mercury_state* const M);
-void M_BYTECODE_NTRU(mercury_state* const M);
-void M_BYTECODE_NFAL(mercury_state* const M);
-void M_BYTECODE_NNIL(mercury_state* const M);
-void M_BYTECODE_NSTR(mercury_state* const M);
-void M_BYTECODE_NFUN(mercury_state* const M);
-void M_BYTECODE_NTAB(mercury_state* const M);
-void M_BYTECODE_NARR(mercury_state* const M);
+void M_BYTECODE_NINT(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NFLO(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NTRU(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NFAL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NNIL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NTAB(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_NARR(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_JMP(mercury_state* const M);
-void M_BYTECODE_JMPR(mercury_state* const M);
-void M_BYTECODE_JIF(mercury_state* const M);
-void M_BYTECODE_JNIF(mercury_state* const M);
-void M_BYTECODE_JRIF(mercury_state* const M);
-void M_BYTECODE_JRNI(mercury_state* const M);
+void M_BYTECODE_JMP(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_JMPR(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_JIF(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_JNIF(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_JRIF(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_JRNI(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_CALL(mercury_state* const M);
-void M_BYTECODE_END(mercury_state* const M);
+void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_END(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_LEN(mercury_state* const M);
-void M_BYTECODE_CNCT(mercury_state* const M);
+void M_BYTECODE_LEN(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_CLS(mercury_state* const M);
+void M_BYTECODE_CLS(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_GETL(mercury_state* const M);
-void M_BYTECODE_SETL(mercury_state* const M);
-void M_BYTECODE_GETG(mercury_state* const M);
-void M_BYTECODE_SETG(mercury_state* const M);
+void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_CPYT(mercury_state* const M);
-void M_BYTECODE_SWPT(mercury_state* const M);
-void M_BYTECODE_CPYX(mercury_state* const M);
+void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SWPT(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_CPYX(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_UNM(mercury_state* const M);
-void M_BYTECODE_INC(mercury_state* const M);
-void M_BYTECODE_DEC(mercury_state* const M);
+void M_BYTECODE_UNM(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_INC(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_DEC(mercury_state* const M_CPP_restrict M);
 
-void M_BYTECODE_SCON(mercury_state* const M);
-void M_BYTECODE_GCON(mercury_state* const M);
+void M_BYTECODE_SCON(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GCON(mercury_state* const M_CPP_restrict M);
 
 extern mercury_instruction mercury_bytecode_list[];
 

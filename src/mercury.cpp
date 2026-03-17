@@ -44,7 +44,7 @@ mercury_stringliteral* mercury_cstring_to_mstring(const char* const M_CPP_restri
 	return nstr;
 }
 
-mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const str, const mercury_int size) {
+mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size) {
 	mercury_stringliteral* nstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!nstr) return nullptr;
 	nstr->size = size;
@@ -53,7 +53,7 @@ mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const str, c
 	return nstr;
 }
 
-char* mercury_mstring_to_cstring(const mercury_stringliteral* const str) {
+char* mercury_mstring_to_cstring(const mercury_stringliteral* const M_CPP_restrict str) {
 	mercury_int sz = strlen(str->ptr); //use this mecause null terminator
 	//printf("%i/%i %s",str->size,sz,str->ptr);
 	if(sz > str->size)sz = str->size;
@@ -66,7 +66,7 @@ char* mercury_mstring_to_cstring(const mercury_stringliteral* const str) {
 }
 
 
-mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const str) {
+mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_CPP_restrict str) {
 	if (str->constant) {
 		mercury_stringliteral* nstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 		if (nstr == nullptr) return nullptr;
@@ -163,7 +163,7 @@ bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, c
 	return true;
 }
 
-void mercury_mstring_delete(mercury_stringliteral* const str) {
+void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str) {
 	if (str) {
 		free(str->ptr);
 		free(str);
@@ -913,8 +913,8 @@ mercury_int mercury_array_len(const mercury_array* const arr) {
 
 
 
-mercury_variable* mercury_tostring(mercury_variable* var) {
-	mercury_variable* newvar = (mercury_variable*)malloc(sizeof(mercury_variable));
+mercury_variable* mercury_tostring(const mercury_variable* const M_CPP_restrict var) {
+	mercury_variable* const newvar = (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (newvar == nullptr) return nullptr;
 	newvar->type = M_TYPE_STRING;
 	newvar->data.p = nullptr;

@@ -163,7 +163,7 @@ struct mercury_threadholder {
 };
 
 
-typedef void (*mercury_cfunc) (mercury_state* M, mercury_int args_in, mercury_int args_out);
+typedef void (*mercury_cfunc) (mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 
 //type defenitions
 extern uint8_t M_NUMBER_OF_TYPES;
@@ -200,16 +200,16 @@ extern mercury_int M_NUM_LIBS;
 
 //string
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const str, const mercury_int size);
-MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(const mercury_stringliteral* const str);
+MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
+MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(const mercury_stringliteral* const M_CPP_restrict str);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
-MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_stringliteral* str);
+MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mercury_int start, mercury_int end);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_tostring(mercury_variable* const var);
+MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_tostring(const mercury_variable* const M_CPP_restrict var);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_append(mercury_stringliteral* const basestr, const mercury_stringliteral* const appstr);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, const mercury_int len=1);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const str);
+MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_CPP_restrict str);
 
 //table
 MERCURY_DYNAMIC_LIBRARY mercury_table* mercury_newtable();

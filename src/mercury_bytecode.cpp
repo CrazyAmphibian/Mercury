@@ -7,12 +7,12 @@
 #include <stdio.h>
 #include <stdint.h>
 
-void M_BYTECODE_NOP(mercury_state* const M) {
+void M_BYTECODE_NOP(mercury_state* const M_CPP_restrict M) {
 	return;
 }
 
 
-void M_BYTECODE_ADD(mercury_state* const M) {
+void M_BYTECODE_ADD(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1;
@@ -95,7 +95,7 @@ void M_BYTECODE_ADD(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_SUB(mercury_state* const M) {
+void M_BYTECODE_SUB(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1;
@@ -178,7 +178,7 @@ void M_BYTECODE_SUB(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_MUL(mercury_state* const M) {
+void M_BYTECODE_MUL(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1;
@@ -261,7 +261,7 @@ void M_BYTECODE_MUL(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_DIV(mercury_state* const M) {
+void M_BYTECODE_DIV(mercury_state* const M_CPP_restrict M) {
 	mercury_float f1;
 	mercury_float f2;
 
@@ -323,7 +323,7 @@ void M_BYTECODE_DIV(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_POW(mercury_state* const M) {
+void M_BYTECODE_POW(mercury_state* const M_CPP_restrict M) {
 	mercury_float f1;
 	mercury_float f2;
 
@@ -386,7 +386,7 @@ void M_BYTECODE_POW(mercury_state* const M) {
 }
 
 
-void M_BYTECODE_IDIV(mercury_state* const M) {
+void M_BYTECODE_IDIV(mercury_state* const M_CPP_restrict M) {
 	mercury_int i1;
 	mercury_int i2;
 
@@ -454,7 +454,7 @@ void M_BYTECODE_IDIV(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_MOD(mercury_state* const M) {
+void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1;
@@ -535,7 +535,7 @@ void M_BYTECODE_MOD(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_BAND(mercury_state* const M) {
+void M_BYTECODE_BAND(mercury_state* const M_CPP_restrict M) {
 	bool outfloat = 0;
 
 	mercury_int i1;
@@ -596,7 +596,7 @@ void M_BYTECODE_BAND(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_BOR(mercury_state* const M) {
+void M_BYTECODE_BOR(mercury_state* const M_CPP_restrict M) {
 	bool outfloat = 0;
 
 	mercury_int i1;
@@ -657,7 +657,7 @@ void M_BYTECODE_BOR(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_BXOR(mercury_state* const M) {
+void M_BYTECODE_BXOR(mercury_state* const M_CPP_restrict M) {
 	bool outfloat = 0;
 
 	mercury_int i1;
@@ -719,7 +719,7 @@ void M_BYTECODE_BXOR(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_BNOT(mercury_state* const M) {
+void M_BYTECODE_BNOT(mercury_state* const M_CPP_restrict M) {
 	bool outfloat = 0;
 
 	mercury_int i1;
@@ -765,7 +765,7 @@ void M_BYTECODE_BNOT(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_BSHL(mercury_state* const M) {
+void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M) {
 	bool outfloat = 0;
 
 	mercury_int i1;
@@ -826,7 +826,7 @@ void M_BYTECODE_BSHL(mercury_state* const M) {
 	return;
 }
 
-void M_BYTECODE_BSHR(mercury_state* const M) {
+void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M) {
 	bool outfloat = 0;
 
 	mercury_int i1;
@@ -889,7 +889,7 @@ void M_BYTECODE_BSHR(mercury_state* const M) {
 
 
 
-void M_BYTECODE_LAND(mercury_state* const M) {
+void M_BYTECODE_LAND(mercury_state* const M_CPP_restrict M) {
 	const mercury_variable* const var2 = mercury_popstack(M);
 	const mercury_variable* const var1 = mercury_popstack(M);
 
@@ -915,7 +915,7 @@ void M_BYTECODE_LAND(mercury_state* const M) {
 	mercury_pushstack(M, (mercury_variable*)var1);
 }
 
-void M_BYTECODE_LOR(mercury_state* const M) {
+void M_BYTECODE_LOR(mercury_state* const M_CPP_restrict M) {
 	const mercury_variable* const var2 = mercury_popstack(M);
 	const mercury_variable* const var1 = mercury_popstack(M);
 
@@ -928,7 +928,7 @@ void M_BYTECODE_LOR(mercury_state* const M) {
 	mercury_pushstack(M, (mercury_variable*)var2);
 }
 
-void M_BYTECODE_LXOR(mercury_state* const M) {
+void M_BYTECODE_LXOR(mercury_state* const M_CPP_restrict M) {
 	const mercury_variable* const var2 = mercury_popstack(M);
 	const mercury_variable* const var1 = mercury_popstack(M);
 
@@ -962,7 +962,7 @@ void M_BYTECODE_LXOR(mercury_state* const M) {
 	}
 }
 
-void M_BYTECODE_LNOT(mercury_state* const M) {
+void M_BYTECODE_LNOT(mercury_state* const M_CPP_restrict M) {
 	const mercury_variable* const var1 = mercury_popstack(M);
 
 	if (mercury_checkbool(var1)) {
@@ -981,7 +981,7 @@ void M_BYTECODE_LNOT(mercury_state* const M) {
 }
 
 
-void M_BYTECODE_EQL(mercury_state* const M) {
+void M_BYTECODE_EQL(mercury_state* const M_CPP_restrict M) {
 	const mercury_variable* const var2 = mercury_popstack(M);
 	const mercury_variable* const var1 = mercury_popstack(M);
 
@@ -1005,7 +1005,7 @@ void M_BYTECODE_EQL(mercury_state* const M) {
 	}
 }
 
-void M_BYTECODE_NEQ(mercury_state* const M) {
+void M_BYTECODE_NEQ(mercury_state* const M_CPP_restrict M) {
 	const mercury_variable* const var2 = mercury_popstack(M);
 	const mercury_variable* const var1 = mercury_popstack(M);
 
@@ -1030,7 +1030,7 @@ void M_BYTECODE_NEQ(mercury_state* const M) {
 }
 
 
-void M_BYTECODE_GRT(mercury_state* const M) {
+void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1=0;
@@ -1109,7 +1109,7 @@ void M_BYTECODE_GRT(mercury_state* const M) {
 	mercury_pushstack(M, outv);
 }
 
-void M_BYTECODE_LET(mercury_state* const M) {
+void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1 = 0;
@@ -1188,7 +1188,7 @@ void M_BYTECODE_LET(mercury_state* const M) {
 	mercury_pushstack(M, outv);
 }
 
-void M_BYTECODE_GTE(mercury_state* const M) {
+void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1 = 0;
@@ -1267,7 +1267,7 @@ void M_BYTECODE_GTE(mercury_state* const M) {
 	mercury_pushstack(M, outv);
 }
 
-void M_BYTECODE_LTE(mercury_state* const M) {
+void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 	uint8_t argsfloat = 0;
 
 	mercury_float f1 = 0;
@@ -1346,7 +1346,7 @@ void M_BYTECODE_LTE(mercury_state* const M) {
 	mercury_pushstack(M, outv);
 }
 
-void M_BYTECODE_SENV(mercury_state* const M) {
+void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 	const mercury_variable* const value = mercury_popstack(M);
 	mercury_variable* const key = mercury_popstack(M);
 
@@ -1364,7 +1364,7 @@ void M_BYTECODE_SENV(mercury_state* const M) {
 	mercury_setkey(M->enviroment, key, value,M);
 }
 
-void M_BYTECODE_GENV(mercury_state* const M) {
+void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 	mercury_variable* const key = mercury_popstack(M);
 
 	mercury_state* check_state = M;
@@ -1384,7 +1384,7 @@ void M_BYTECODE_GENV(mercury_state* const M) {
 }
 
 
-void M_BYTECODE_SET(mercury_state* const M) {
+void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
 	mercury_variable* const value = mercury_popstack(M);
 	mercury_variable* const key = mercury_popstack(M);
 	mercury_variable* const table = mercury_popstack(M);
@@ -1417,7 +1417,7 @@ void M_BYTECODE_SET(mercury_state* const M) {
 	
 }
 
-void M_BYTECODE_GET(mercury_state* const M) {
+void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 	mercury_variable* const key = mercury_popstack(M);
 	mercury_variable* const table = mercury_popstack(M);
 
@@ -1467,7 +1467,7 @@ void M_BYTECODE_GET(mercury_state* const M) {
 
 
 
-void M_BYTECODE_SREG(mercury_state* const M) {
+void M_BYTECODE_SREG(mercury_state* const M_CPP_restrict M) {
 	const mercury_uint regnum = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
 
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
@@ -1482,7 +1482,7 @@ void M_BYTECODE_SREG(mercury_state* const M) {
 }
 
 
-void M_BYTECODE_GREG(mercury_state* const M) {
+void M_BYTECODE_GREG(mercury_state* const M_CPP_restrict M) {
 	const mercury_uint regnum = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
 
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
@@ -1503,7 +1503,7 @@ void M_BYTECODE_GREG(mercury_state* const M) {
 
 }
 
-void M_BYTECODE_NINT(mercury_state* const M) { //New INTeger
+void M_BYTECODE_NINT(mercury_state* const M_CPP_restrict M) { //New INTeger
 	void* const offset = M->bytecode.instructions + M->programcounter;
 
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
@@ -1518,7 +1518,7 @@ void M_BYTECODE_NINT(mercury_state* const M) { //New INTeger
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NFLO(mercury_state* const M) { //New FLOat
+void M_BYTECODE_NFLO(mercury_state* const M_CPP_restrict M) { //New FLOat
 	void* const offset = M->bytecode.instructions + M->programcounter;
 
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
@@ -1533,7 +1533,7 @@ void M_BYTECODE_NFLO(mercury_state* const M) { //New FLOat
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NTRU(mercury_state* const M) { //New TRUe
+void M_BYTECODE_NTRU(mercury_state* const M_CPP_restrict M) { //New TRUe
 	mercury_variable* const out = mercury_assign_var(M);
 	if (out == nullptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -1544,7 +1544,7 @@ void M_BYTECODE_NTRU(mercury_state* const M) { //New TRUe
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NFAL(mercury_state* const M) { //New FALse
+void M_BYTECODE_NFAL(mercury_state* const M_CPP_restrict M) { //New FALse
 	mercury_variable* const out = mercury_assign_var(M);
 	if (out == nullptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -1555,7 +1555,7 @@ void M_BYTECODE_NFAL(mercury_state* const M) { //New FALse
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NNIL(mercury_state* const M) { //New NIL
+void M_BYTECODE_NNIL(mercury_state* const M_CPP_restrict M) { //New NIL
 	mercury_variable* const out = mercury_assign_var(M);
 	if (out == nullptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -1566,7 +1566,7 @@ void M_BYTECODE_NNIL(mercury_state* const M) { //New NIL
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NSTR(mercury_state* const M) { //New STRing
+void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M) { //New STRing
 	const mercury_uint string_size = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
@@ -1598,7 +1598,7 @@ void M_BYTECODE_NSTR(mercury_state* const M) { //New STRing
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NFUN(mercury_state* const M) { //New FUNction / No FUN
+void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / No FUN
 	const mercury_uint function_size = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
@@ -1639,7 +1639,7 @@ void M_BYTECODE_NFUN(mercury_state* const M) { //New FUNction / No FUN
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NTAB(mercury_state* const M) { //New TABle
+void M_BYTECODE_NTAB(mercury_state* const M_CPP_restrict M) { //New TABle
 	mercury_variable* const out = mercury_assign_var(M);
 	if (out == nullptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -1656,7 +1656,7 @@ void M_BYTECODE_NTAB(mercury_state* const M) { //New TABle
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_NARR(mercury_state* const M) { //New ARRay
+void M_BYTECODE_NARR(mercury_state* const M_CPP_restrict M) { //New ARRay
 	mercury_variable* const out = mercury_assign_var(M);
 	if (out == nullptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -1673,15 +1673,15 @@ void M_BYTECODE_NARR(mercury_state* const M) { //New ARRay
 	mercury_pushstack(M, out);
 }
 
-void M_BYTECODE_JMP(mercury_state* const M) { //JuMP
+void M_BYTECODE_JMP(mercury_state* const M_CPP_restrict M) { //JuMP
 	M->programcounter = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
 }
 
-void M_BYTECODE_JMPR(mercury_state* const M) { //JuMP Relative
+void M_BYTECODE_JMPR(mercury_state* const M_CPP_restrict M) { //JuMP Relative
 	M->programcounter += *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 }
 
-void M_BYTECODE_JIF(mercury_state* const M) { //Jump IF
+void M_BYTECODE_JIF(mercury_state* const M_CPP_restrict M) { //Jump IF
 	mercury_variable* const ck = mercury_popstack(M);
 	if(mercury_checkbool(ck)){
 		M->programcounter = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
@@ -1692,7 +1692,7 @@ void M_BYTECODE_JIF(mercury_state* const M) { //Jump IF
 	mercury_unassign_var(M, ck);
 }
 
-void M_BYTECODE_JNIF(mercury_state* const M) { //Jump Not IF
+void M_BYTECODE_JNIF(mercury_state* const M_CPP_restrict M) { //Jump Not IF
 	mercury_variable* const ck = mercury_popstack(M);
 	if (!mercury_checkbool(ck)) {
 		M->programcounter = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
@@ -1703,7 +1703,7 @@ void M_BYTECODE_JNIF(mercury_state* const M) { //Jump Not IF
 	mercury_unassign_var(M, ck);
 }
 
-void M_BYTECODE_JRIF(mercury_state* const M) { //Jump Relative IF
+void M_BYTECODE_JRIF(mercury_state* const M_CPP_restrict M) { //Jump Relative IF
 	mercury_variable* const ck = mercury_popstack(M);
 	if (mercury_checkbool(ck)) {
 		M->programcounter += *(mercury_int*)(M->bytecode.instructions + M->programcounter);
@@ -1714,7 +1714,7 @@ void M_BYTECODE_JRIF(mercury_state* const M) { //Jump Relative IF
 	mercury_unassign_var(M, ck);
 }
 
-void M_BYTECODE_JRNI(mercury_state* const M) { //Jump Relative Not If
+void M_BYTECODE_JRNI(mercury_state* const M_CPP_restrict M) { //Jump Relative Not If
 	mercury_variable* const ck = mercury_popstack(M);
 	if (!mercury_checkbool(ck)) {
 		M->programcounter += *(mercury_int*)(M->bytecode.instructions + M->programcounter);
@@ -1725,7 +1725,7 @@ void M_BYTECODE_JRNI(mercury_state* const M) { //Jump Relative Not If
 	mercury_unassign_var(M, ck);
 }
 
-void M_BYTECODE_CALL(mercury_state* const M) { //CALL function
+void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 	const mercury_int args_in = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	
@@ -1767,11 +1767,11 @@ void M_BYTECODE_CALL(mercury_state* const M) { //CALL function
 	mercury_unassign_var(M, ck);
 }
 
-void M_BYTECODE_END(mercury_state* const M) { //end state execution
+void M_BYTECODE_END(mercury_state* const M_CPP_restrict M) { //end state execution
 	M->programcounter = M->bytecode.numberofinstructions;
 }
 
-void M_BYTECODE_LEN(mercury_state* const M) { //LENgth
+void M_BYTECODE_LEN(mercury_state* const M_CPP_restrict M) { //LENgth
 	mercury_variable* const var = mercury_popstack(M);
 	mercury_variable* out; 
 	switch (var->type) {
@@ -1804,7 +1804,7 @@ void M_BYTECODE_LEN(mercury_state* const M) { //LENgth
 	mercury_pushstack(M,out);
 }
 
-void M_BYTECODE_CNCT(mercury_state* const M) { // CoNCaTenate
+void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 	mercury_variable* const v2 = mercury_popstack(M);
 	mercury_variable* const v1 = mercury_popstack(M);
 
@@ -1846,7 +1846,7 @@ void M_BYTECODE_CNCT(mercury_state* const M) { // CoNCaTenate
 }
 
 
-void M_BYTECODE_CLS(mercury_state* const M) { // CLear Stack
+void M_BYTECODE_CLS(mercury_state* const M_CPP_restrict M) { // CLear Stack
 	//as simple as it gets, really.
 	for (mercury_uint i = 0; i < M->sizeofstack;i++) {
 		mercury_unassign_var(M, mercury_popstack(M));
@@ -1855,31 +1855,31 @@ void M_BYTECODE_CLS(mercury_state* const M) { // CLear Stack
 }
 
 
-void M_BYTECODE_GETL(mercury_state* const M) { //GET Local
+void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 	//yeah, this is pretty simple.
 	mercury_pushstack(M,mercury_getkey(M->enviroment, mercury_popstack(M), M));
 }
 
-void M_BYTECODE_SETL(mercury_state* const M) { //SET Local
+void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	//ditto.
 	const mercury_variable* const value=mercury_popstack(M);
 	mercury_variable* const key=mercury_popstack(M);
 	mercury_setkey(M->enviroment, key, value,M);
 }
 
-void M_BYTECODE_GETG(mercury_state* const M) { //GET Global
+void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
 	//ditto.
 	mercury_pushstack(M, mercury_getkey(M->masterstate->enviroment, mercury_popstack(M), M));
 }
 
-void M_BYTECODE_SETG(mercury_state* const M) { //SET Global
+void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 	//ditto.
 	const mercury_variable* const value = mercury_popstack(M);
 	mercury_variable* const key = mercury_popstack(M);
 	mercury_setkey(M->masterstate->enviroment, key, value,M);
 }
 
-void M_BYTECODE_CPYT(mercury_state* const M) { // CoPY Top (of stack)
+void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M) { // CoPY Top (of stack)
 	if (!M->sizeofstack)return; //nothing on stack, nothing to copy.
 
 	const mercury_variable* const val= M->stack[M->sizeofstack - 1];
@@ -1894,7 +1894,7 @@ void M_BYTECODE_CPYT(mercury_state* const M) { // CoPY Top (of stack)
 }
 
 
-void M_BYTECODE_SWPT(mercury_state* const M) { //SWaP Top. swaps the top and second top of stack.
+void M_BYTECODE_SWPT(mercury_state* const M_CPP_restrict M) { //SWaP Top. swaps the top and second top of stack.
 	//so basically, 1,2 -> 2,1
 	if (!M->sizeofstack) { //no stack? nothing to do.
 		return;
@@ -1917,7 +1917,7 @@ void M_BYTECODE_SWPT(mercury_state* const M) { //SWaP Top. swaps the top and sec
 	}
 }
 
-void M_BYTECODE_CPYX(mercury_state* const M) { // CoPY X elements (from top of stack)
+void M_BYTECODE_CPYX(mercury_state* const M_CPP_restrict M) { // CoPY X elements (from top of stack)
 	if (!M->sizeofstack)return; //nothing on stack, nothing to copy.
 
 	const mercury_uint num = *(mercury_uint*)(M->bytecode.instructions + M->programcounter);
@@ -1949,7 +1949,7 @@ void M_BYTECODE_CPYX(mercury_state* const M) { // CoPY X elements (from top of s
 
 
 
-void M_BYTECODE_UNM(mercury_state* const M) { //UNary Minus
+void M_BYTECODE_UNM(mercury_state* const M_CPP_restrict M) { //UNary Minus
 	mercury_variable* var;
 	if (M->sizeofstack) {
 		var = M->stack[M->sizeofstack - 1];
@@ -1978,7 +1978,7 @@ void M_BYTECODE_UNM(mercury_state* const M) { //UNary Minus
 	return;
 }
 
-void M_BYTECODE_INC(mercury_state* const M) { //INCrement
+void M_BYTECODE_INC(mercury_state* const M_CPP_restrict M) { //INCrement
 	mercury_variable* var;
 	if (M->sizeofstack) {
 		var = M->stack[M->sizeofstack-1];
@@ -2007,7 +2007,7 @@ void M_BYTECODE_INC(mercury_state* const M) { //INCrement
 	return;
 }
 
-void M_BYTECODE_DEC(mercury_state* const M) { //DECrement
+void M_BYTECODE_DEC(mercury_state* const M_CPP_restrict M) { //DECrement
 	mercury_variable* var;
 	if (M->sizeofstack) {
 		var = M->stack[M->sizeofstack - 1];
@@ -2036,7 +2036,7 @@ void M_BYTECODE_DEC(mercury_state* const M) { //DECrement
 	return;
 }
 
-void M_BYTECODE_SCON(mercury_state* const M) { //Set CONstant
+void M_BYTECODE_SCON(mercury_state* const M_CPP_restrict M) { //Set CONstant
 	const mercury_uint con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
@@ -2056,7 +2056,7 @@ void M_BYTECODE_SCON(mercury_state* const M) { //Set CONstant
 	M->constants[con_num] = v;
 }
 
-void M_BYTECODE_GCON(mercury_state* const M) { //Get CONstant
+void M_BYTECODE_GCON(mercury_state* const M_CPP_restrict M) { //Get CONstant
 	const mercury_uint con_num = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	if (con_num >= M->num_constants) {
