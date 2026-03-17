@@ -214,7 +214,7 @@ MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_
 //table
 MERCURY_DYNAMIC_LIBRARY mercury_table* mercury_newtable();
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_state* const M_CPP_restrict M=nullptr);
-MERCURY_DYNAMIC_LIBRARY mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_variable* value, mercury_state* const M_CPP_restrict M=nullptr);
+MERCURY_DYNAMIC_LIBRARY mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M=nullptr);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_destroytable(mercury_table* const table);
@@ -239,7 +239,7 @@ MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_pullstack(mercury_state* const
 MERCURY_DYNAMIC_LIBRARY bool mercury_unassign_var(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_assign_var(mercury_state* const M_CPP_restrict M);
 MERCURY_DYNAMIC_LIBRARY void mercury_free_var(mercury_variable* const M_CPP_restrict var, const bool keep_struct = false);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_clonevariable(mercury_variable* const var, mercury_state* const M_CPP_restrict M=nullptr);
+MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_clonevariable(const mercury_variable* const var, mercury_state* const M_CPP_restrict M=nullptr);
 
 //misc
 MERCURY_DYNAMIC_LIBRARY bool mercury_checkbool(const mercury_variable* const M_CPP_restrict var);

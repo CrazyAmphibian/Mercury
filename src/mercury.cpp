@@ -300,7 +300,7 @@ mercury_variable* mercury_getkey(const mercury_table* const table, mercury_varia
 	return outvar;
 }
 
-mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_variable* value, mercury_state* const M_CPP_restrict M) {
+mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M) {
 
 	mercury_subtable* subt = table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
@@ -315,7 +315,7 @@ mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_
 					mercury_free_var(subt->values[i]);
 					mercury_free_var(key);
 				}
-				subt->values[i] = value;
+				subt->values[i] = (mercury_variable*)value;
 				return i;
 			}
 		}
@@ -329,7 +329,7 @@ mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_
 					mercury_free_var(subt->values[i]);
 					mercury_free_var(key);
 				}
-				subt->values[i] = value;
+				subt->values[i] = (mercury_variable*)value;
 				return i;
 			}
 		}
@@ -345,7 +345,7 @@ mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_
 	subt->values = (mercury_variable**)nptr;
 
 	subt->keys[subt->size] = key->data;
-	subt->values[subt->size] = value;
+	subt->values[subt->size] = (mercury_variable*)value;
 
 	subt->size++;
 
@@ -752,7 +752,7 @@ bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 	return true;
 }
 
-mercury_variable* mercury_clonevariable(mercury_variable* const var,mercury_state* const M_CPP_restrict M) {
+mercury_variable* mercury_clonevariable(const mercury_variable* const var,mercury_state* const M_CPP_restrict M) {
 	mercury_variable* out=nullptr;
 	if (M) {
 		out=mercury_assign_var(M);
