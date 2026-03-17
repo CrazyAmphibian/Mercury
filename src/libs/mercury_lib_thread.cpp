@@ -40,7 +40,7 @@ void* threadfunction(void* param) {
 
 
 //creates a thread, given a function and input variable. optional table to act as the enviroment. defaults current env.
-void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -180,7 +180,7 @@ void mercury_lib_thread_new(mercury_state* M, mercury_int args_in, mercury_int a
 
 
 //bool if thread is finished. simple.
-void mercury_lib_thread_checkfinish(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -214,7 +214,7 @@ void mercury_lib_thread_checkfinish(mercury_state* M, mercury_int args_in, mercu
 
 
 //gets a value
-void mercury_lib_thread_getvalue(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -254,7 +254,7 @@ void mercury_lib_thread_getvalue(mercury_state* M, mercury_int args_in, mercury_
 
 
 //dire circumstances. use with caution
-void mercury_lib_thread_abort(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_thread_abort(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -295,7 +295,7 @@ void mercury_lib_thread_abort(mercury_state* M, mercury_int args_in, mercury_int
 
 
 //returns number of values. 0 if not finished.
-void mercury_lib_thread_getnumvalues(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -336,7 +336,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* M, mercury_int args_in, merc
 
 
 //waits for a closure
-void mercury_lib_thread_waitfor(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_thread_waitfor(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -373,7 +373,7 @@ void mercury_lib_thread_waitfor(mercury_state* M, mercury_int args_in, mercury_i
 
 
 //inverse of is finished.
-void mercury_lib_thread_checkrunning(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;

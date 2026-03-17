@@ -15,7 +15,7 @@
 #endif
 
 //throws stuff into stdout. adds a newline at the end, seperates with a tab. designed to be variadic.
-void mercury_lib_std_print(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_std_print(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 
 	mercury_variable** vartable = (mercury_variable**)malloc(sizeof(mercury_variable*) * args_in);
 	if (vartable == nullptr && args_in) {
@@ -53,7 +53,7 @@ void mercury_lib_std_print(mercury_state* M, mercury_int args_in, mercury_int ar
 
 
 //traverses a list-like variable entry-by-entry. useful for serializing tables, most likley. arg 1 is the thing, and arg 2 is the function.
-void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 
 	mercury_variable* function = mercury_popstack(M);
@@ -203,7 +203,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 TODO:
 get return args
 */
-void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 2) {
 		mercury_raise_error(M,M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
 		return;
@@ -446,7 +446,7 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 
 
 //takes a variable and generates a string which represents that variable.
-void mercury_lib_std_dump(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		return;
@@ -475,7 +475,7 @@ void mercury_lib_std_dump(mercury_state* M, mercury_int args_in, mercury_int arg
 }
 
 
-void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		return;
@@ -496,7 +496,7 @@ void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int 
 }
 
 
-void mercury_lib_std_type(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_std_type(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		return;
@@ -517,7 +517,7 @@ void mercury_lib_std_type(mercury_state* M, mercury_int args_in, mercury_int arg
 
 
 
-void mercury_lib_std_tostring(mercury_state* M, mercury_int args_in, mercury_int args_out) { //pretty easy, actually. we already have a function.
+void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //pretty easy, actually. we already have a function.
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		return;
@@ -532,7 +532,7 @@ void mercury_lib_std_tostring(mercury_state* M, mercury_int args_in, mercury_int
 }
 
 
-void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int args_out) { //bit more complicated.
+void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //bit more complicated.
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		return;
@@ -592,7 +592,7 @@ void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int
 
 
 
-void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in, mercury_int args_out) { //dangerous, hell yeah!
+void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //dangerous, hell yeah!
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
 	mercury_variable* i = mercury_popstack(M);
@@ -639,7 +639,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in,
 }
 
 
-void mercury_lib_std_toint(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_std_toint(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		return;
@@ -666,7 +666,7 @@ void mercury_lib_std_toint(mercury_state* M, mercury_int args_in, mercury_int ar
 }
 
 
-void mercury_lib_std_tofloat(mercury_state* M, mercury_int args_in, mercury_int args_out) { //basically the same thing as the above.
+void mercury_lib_std_tofloat(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //basically the same thing as the above.
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		return;

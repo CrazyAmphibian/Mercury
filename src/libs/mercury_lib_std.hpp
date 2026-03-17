@@ -9,17 +9,17 @@ contains things for basic debugging and some misc. utility functions.
 
 #define MERCURY_LIB_STD
 
-void mercury_lib_std_print(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_dump(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_compile(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_type(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_tostring(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_tonumber(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_dynamic_library_load(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_toint(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_std_tofloat(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_std_print(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_type(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_toint(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_tofloat(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 
 const mercury_int m_const_type_nil = M_TYPE_NIL;
 const mercury_int m_const_type_int = M_TYPE_INT;

@@ -21,7 +21,7 @@
 
 
 
-void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args_out) { //opens a file. nuff said.
+void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //opens a file. nuff said.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		return;
 	}
@@ -128,7 +128,7 @@ void mercury_lib_io_open(mercury_state* M, mercury_int args_in, mercury_int args
 
 
 
-void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -190,7 +190,7 @@ void mercury_lib_io_read(mercury_state* M, mercury_int args_in, mercury_int args
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void mercury_lib_io_close(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_io_close(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -212,7 +212,7 @@ void mercury_lib_io_close(mercury_state* M, mercury_int args_in, mercury_int arg
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
-void mercury_lib_io_write(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		return;
 	}
@@ -243,7 +243,7 @@ void mercury_lib_io_write(mercury_state* M, mercury_int args_in, mercury_int arg
 
 
 
-void mercury_lib_io_getfiles(mercury_state* M, mercury_int args_in, mercury_int args_out) { //an array of strings
+void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //an array of strings
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -329,7 +329,7 @@ void mercury_lib_io_getfiles(mercury_state* M, mercury_int args_in, mercury_int 
 }
 
 
-void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int args_out) { //an array of strings
+void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //an array of strings
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -419,7 +419,7 @@ void mercury_lib_io_getdirs(mercury_state* M, mercury_int args_in, mercury_int a
 
 
 
-void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int args_out) { //returns an array of the lines, sans newline characters.
+void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //returns an array of the lines, sans newline characters.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -495,7 +495,7 @@ void mercury_lib_io_lines(mercury_state* M, mercury_int args_in, mercury_int arg
 }
 
 
-void mercury_lib_io_post(mercury_state* M, mercury_int args_in, mercury_int args_out) { //send characters to stdout directly
+void mercury_lib_io_post(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //send characters to stdout directly
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -515,7 +515,7 @@ void mercury_lib_io_post(mercury_state* M, mercury_int args_in, mercury_int args
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
-void mercury_lib_io_prompt(mercury_state* M, mercury_int args_in, mercury_int args_out) { //read a line from stdin
+void mercury_lib_io_prompt(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //read a line from stdin
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0)) {
 		return;
 	}
@@ -559,7 +559,7 @@ void mercury_lib_io_prompt(mercury_state* M, mercury_int args_in, mercury_int ar
 
 
 
-void mercury_lib_io_remove(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_io_remove(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -589,7 +589,7 @@ void mercury_lib_io_remove(mercury_state* M, mercury_int args_in, mercury_int ar
 }
 
 
-void mercury_lib_io_removedir(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_io_removedir(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -625,7 +625,7 @@ void mercury_lib_io_removedir(mercury_state* M, mercury_int args_in, mercury_int
 
 
 
-void mercury_lib_io_createdir(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_io_createdir(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -659,7 +659,7 @@ void mercury_lib_io_createdir(mercury_state* M, mercury_int args_in, mercury_int
 
 
 
-void mercury_lib_io_input(mercury_state* M, mercury_int args_in, mercury_int args_out) { //read a single char stdin. no newline required! (platform dependant, though. :/)
+void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //read a single char stdin. no newline required! (platform dependant, though. :/)
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0)) {
 		return;
 	}

@@ -9,27 +9,27 @@ contains things for basic debugging and some misc. utility functions.
 #define MERCURY_LIB_MATH
 
 
-void mercury_lib_math_min(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_max(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_floor(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_ceil(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_radians(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_degrees(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_log(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_absolute(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_sin(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_cos(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_tan(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_asin(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_acos(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_atan(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_isnan(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_max(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_floor(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_ceil(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_radians(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_degrees(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_absolute(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_sin(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_cos(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_tan(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_asin(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_acos(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_atan(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 
 
-void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_int args_out);
-void mercury_lib_math_randomseed(mercury_state* M, mercury_int args_in, mercury_int args_out);
+void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 
 const mercury_float m_math_pi = 3.141592653589793; //15 digits should be enough i hope. doubles cannot store a more precise approximation than this.
 const mercury_float m_math_root2 = 1.41421356237309504; //gee bill, 17 digits?

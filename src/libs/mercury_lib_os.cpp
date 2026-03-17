@@ -8,7 +8,7 @@
 
 
 
-void mercury_lib_os_time(mercury_state* M, mercury_int args_in, mercury_int args_out) { //gets the current unix/epoch time.
+void mercury_lib_os_time(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //gets the current unix/epoch time.
 	for (mercury_int i = 0; i < args_in; i++) {
 		mercury_unassign_var(M, mercury_popstack(M));
 	}
@@ -32,7 +32,7 @@ void mercury_lib_os_time(mercury_state* M, mercury_int args_in, mercury_int args
 	}
 }
 
-void mercury_lib_os_execute(mercury_state* M, mercury_int args_in, mercury_int args_out) { //dangerous!
+void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //dangerous!
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -119,7 +119,7 @@ void mercury_lib_os_execute(mercury_state* M, mercury_int args_in, mercury_int a
 }
 
 
-void mercury_lib_os_call(mercury_state* M, mercury_int args_in, mercury_int args_out) { //dangerous!
+void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //dangerous!
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -168,7 +168,7 @@ void mercury_lib_os_call(mercury_state* M, mercury_int args_in, mercury_int args
 }
 
 
-void mercury_lib_os_clock(mercury_state* M, mercury_int args_in, mercury_int args_out) { //gets the time since program startup.
+void mercury_lib_os_clock(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //gets the time since program startup.
 	for (mercury_int i = 0; i < args_in; i++) {
 		mercury_unassign_var(M, mercury_popstack(M));
 	}

@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int args_out) { //discards nil values.
+void mercury_lib_array_flush(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //discards nil values.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in,1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -53,7 +53,7 @@ void mercury_lib_array_flush(mercury_state* M, mercury_int args_in, mercury_int 
 }
 
 
-void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int args_out) { //creates a copy of all values. not recursive. arrays are refrences so this will make a new one.
+void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //creates a copy of all values. not recursive. arrays are refrences so this will make a new one.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -133,7 +133,7 @@ void mercury_lib_array_copy(mercury_state* M, mercury_int args_in, mercury_int a
 
 
 
-void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int args_out) { //add at index, shifts values forward.
+void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //add at index, shifts values forward.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2,3)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -172,7 +172,7 @@ void mercury_lib_array_insert(mercury_state* M, mercury_int args_in, mercury_int
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
-void mercury_lib_array_remove(mercury_state* M, mercury_int args_in, mercury_int args_out) { //gets rid of a value and shifts ones after down.
+void mercury_lib_array_remove(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //gets rid of a value and shifts ones after down.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -205,7 +205,7 @@ void mercury_lib_array_remove(mercury_state* M, mercury_int args_in, mercury_int
 }
 
 
-void mercury_lib_array_swap(mercury_state* M, mercury_int args_in, mercury_int args_out) { //duh.
+void mercury_lib_array_swap(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //duh.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -267,7 +267,7 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 }
 
 
-void mercury_lib_array_sort(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 2) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
@@ -520,7 +520,7 @@ int mercury_sort_alphabet_za(const void* a, const void* b) {
 
 
 
-void mercury_lib_array_concat(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;

@@ -6,7 +6,7 @@
 #include <malloc.h>
 
 //dumps length and contents of stack
-void mercury_lib_debug_stack_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_debug_stack_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	printf("current state: 0x%p size of stack: %zi (allocated: %zi) [unassigned: %zi allocated: %zi]\n",M,M->sizeofstack,M->actualstacksize,M->numunassignedstack,M->sizeunassignedstack);
@@ -65,7 +65,7 @@ void m_output_state(mercury_state* M, mercury_int* l,bool is_cur) {
 	(*l)++;
 }
 
-void mercury_lib_debug_state_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_debug_state_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	mercury_int c = 0;
@@ -129,12 +129,12 @@ char* m_var_to_string(uint8_t type,mercury_rawdata data) {
 	return out;
 }
 
-void mercury_lib_debug_enviroment_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_debug_enviroment_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
-
-	while (M) {
-		mercury_table* e = M->enviroment;
-		printf("state 0x%p, evniroment 0x%p\n", M, e);
+	const mercury_state* S = M;
+	while (S) {
+		mercury_table* e = S->enviroment;
+		printf("state 0x%p, evniroment 0x%p\n", S, e);
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* st = e->data[t];
 			for (mercury_int i = 0; i < st->size; i++) {
@@ -142,14 +142,14 @@ void mercury_lib_debug_enviroment_dbg(mercury_state* M, mercury_int args_in, mer
 			}
 
 		}
-		M = M->parentstate;
+		S = S->parentstate;
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
-void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_debug_constants_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	printf("state 0x%p has %zu constants\n", M,M->num_constants);
@@ -164,7 +164,7 @@ void mercury_lib_debug_constants_dbg(mercury_state* M, mercury_int args_in, merc
 
 
 
-void mercury_lib_debug_bytecode_dbg(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,1);
 
 	if (args_in == 1) { //read bytecode from function

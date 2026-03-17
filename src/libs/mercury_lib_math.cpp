@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 //returns the smallest value. takes vararg. if no values are provided, returns infinity
-void mercury_lib_math_min(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_out < 1)return;
 	mercury_variable* out = mercury_assign_var(M);
 	out->data.f = INFINITY;
@@ -55,7 +55,7 @@ void mercury_lib_math_min(mercury_state* M, mercury_int args_in, mercury_int arg
 
 
 //returns the biggestvalue. takes vararg. if no values are provided, returns negative infinity
-void mercury_lib_math_max(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_max(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_out < 1)return;
 	mercury_variable* out = mercury_assign_var(M);
 	out->data.f = -INFINITY;
@@ -101,7 +101,7 @@ void mercury_lib_math_max(mercury_state* M, mercury_int args_in, mercury_int arg
 }
 
 //will return an int.
-void mercury_lib_math_floor(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_floor(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -130,7 +130,7 @@ void mercury_lib_math_floor(mercury_state* M, mercury_int args_in, mercury_int a
 
 
 //will return an int.
-void mercury_lib_math_ceil(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_ceil(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -160,7 +160,7 @@ void mercury_lib_math_ceil(mercury_state* M, mercury_int args_in, mercury_int ar
 
 
 
-void mercury_lib_math_to_radians(mercury_state* M, mercury_int args_in, mercury_int args_out) { //degrees to radians
+void mercury_lib_math_to_radians(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //degrees to radians
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -191,7 +191,7 @@ void mercury_lib_math_to_radians(mercury_state* M, mercury_int args_in, mercury_
 }
 
 
-void mercury_lib_math_to_degrees(mercury_state* M, mercury_int args_in, mercury_int args_out) { //radians to degrees
+void mercury_lib_math_to_degrees(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //radians to degrees
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -222,7 +222,7 @@ void mercury_lib_math_to_degrees(mercury_state* M, mercury_int args_in, mercury_
 }
 
 
-void mercury_lib_math_log(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1,2)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -286,7 +286,7 @@ void mercury_lib_math_log(mercury_state* M, mercury_int args_in, mercury_int arg
 
 
 
-void mercury_lib_math_to_absolute(mercury_state* M, mercury_int args_in, mercury_int args_out) { //absolute value
+void mercury_lib_math_to_absolute(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //absolute value
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -322,7 +322,7 @@ void mercury_lib_math_to_absolute(mercury_state* M, mercury_int args_in, mercury
 
 
 
-void mercury_lib_math_to_sin(mercury_state* M, mercury_int args_in, mercury_int args_out) { //sine
+void mercury_lib_math_to_sin(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //sine
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -352,7 +352,7 @@ void mercury_lib_math_to_sin(mercury_state* M, mercury_int args_in, mercury_int 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void mercury_lib_math_to_cos(mercury_state* M, mercury_int args_in, mercury_int args_out) { //cosine
+void mercury_lib_math_to_cos(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //cosine
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -383,7 +383,7 @@ void mercury_lib_math_to_cos(mercury_state* M, mercury_int args_in, mercury_int 
 }
 
 
-void mercury_lib_math_to_tan(mercury_state* M, mercury_int args_in, mercury_int args_out) { //tangent
+void mercury_lib_math_to_tan(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //tangent
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -413,7 +413,7 @@ void mercury_lib_math_to_tan(mercury_state* M, mercury_int args_in, mercury_int 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void mercury_lib_math_to_asin(mercury_state* M, mercury_int args_in, mercury_int args_out) { //arcsine
+void mercury_lib_math_to_asin(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //arcsine
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -446,7 +446,7 @@ void mercury_lib_math_to_asin(mercury_state* M, mercury_int args_in, mercury_int
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void mercury_lib_math_to_acos(mercury_state* M, mercury_int args_in, mercury_int args_out) { //arccosine
+void mercury_lib_math_to_acos(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //arccosine
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -477,7 +477,7 @@ void mercury_lib_math_to_acos(mercury_state* M, mercury_int args_in, mercury_int
 }
 
 
-void mercury_lib_math_to_atan(mercury_state* M, mercury_int args_in, mercury_int args_out) { //arctangent
+void mercury_lib_math_to_atan(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //arctangent
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -507,7 +507,7 @@ void mercury_lib_math_to_atan(mercury_state* M, mercury_int args_in, mercury_int
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void mercury_lib_math_to_atan2(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -590,7 +590,7 @@ uint32_t m_random() {
 
 
 
-void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,2)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -652,7 +652,7 @@ void mercury_lib_math_random(mercury_state* M, mercury_int args_in, mercury_int 
 }
 
 
-void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -694,7 +694,7 @@ void mercury_lib_math_randomint(mercury_state* M, mercury_int args_in, mercury_i
 
 
 
-void mercury_lib_math_randomseed(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -727,7 +727,7 @@ void mercury_lib_math_randomseed(mercury_state* M, mercury_int args_in, mercury_
 }
 
 
-void mercury_lib_math_isnan(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;

@@ -7,7 +7,7 @@
 #include <string.h>
 #endif
 
-void mercury_lib_string_sub(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 3) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
 		return;
@@ -54,7 +54,7 @@ void mercury_lib_string_sub(mercury_state* M, mercury_int args_in, mercury_int a
 
 
 
-void mercury_lib_string_reverse(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_reverse(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -107,7 +107,7 @@ void mercury_lib_string_reverse(mercury_state* M, mercury_int args_in, mercury_i
 
 
 
-void mercury_lib_string_find(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 2) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
@@ -198,7 +198,7 @@ void mercury_lib_string_find(mercury_state* M, mercury_int args_in, mercury_int 
 
 
 
-void mercury_lib_string_replace(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 3) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
 		return;
@@ -295,7 +295,7 @@ void mercury_lib_string_replace(mercury_state* M, mercury_int args_in, mercury_i
 	}
 }
 
-void mercury_lib_string_count(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_count(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 2) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
@@ -354,7 +354,7 @@ void mercury_lib_string_count(mercury_state* M, mercury_int args_in, mercury_int
 	}
 }
 
-void mercury_lib_string_toarray(mercury_state* M, mercury_int args_in, mercury_int args_out) { //converts the bytes to an array of ints.
+void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //converts the bytes to an array of ints.
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
 		return;
@@ -401,7 +401,7 @@ void mercury_lib_string_toarray(mercury_state* M, mercury_int args_in, mercury_i
 	}
 }
 
-void mercury_lib_string_fromarray(mercury_state* M, mercury_int args_in, mercury_int args_out) { //converts an array of ints into a string
+void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //converts an array of ints into a string
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
 		return;
@@ -459,7 +459,7 @@ void mercury_lib_string_fromarray(mercury_state* M, mercury_int args_in, mercury
 }
 
 
-void mercury_lib_string_separate(mercury_state* M, mercury_int args_in, mercury_int args_out) { //seperates a string into an array of smaller strings.
+void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //seperates a string into an array of smaller strings.
 	if (args_in < 2) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
 		return;
@@ -553,7 +553,7 @@ void mercury_lib_string_separate(mercury_state* M, mercury_int args_in, mercury_
 }
 
 
-void mercury_lib_string_upper(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -612,7 +612,7 @@ void mercury_lib_string_upper(mercury_state* M, mercury_int args_in, mercury_int
 }
 
 
-void mercury_lib_string_lower(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -982,7 +982,7 @@ mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury
 
 
 
-void mercury_lib_string_format(mercury_state* M, mercury_int args_in, mercury_int args_out) { //c-style printf formatting.
+void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //c-style printf formatting.
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -1466,7 +1466,7 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 
 
 
-void mercury_lib_string_p_find(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 2) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
@@ -1549,7 +1549,7 @@ void mercury_lib_string_p_find(mercury_state* M, mercury_int args_in, mercury_in
 	}
 }
 
-void mercury_lib_string_p_extract(mercury_state* M, mercury_int args_in, mercury_int args_out) { //returns all instances of a match in an array.
+void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //returns all instances of a match in an array.
 	if (args_in < 2) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
@@ -1622,7 +1622,7 @@ void mercury_lib_string_p_extract(mercury_state* M, mercury_int args_in, mercury
 	}
 }
 
-void mercury_lib_string_p_replace(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 3) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)3);
 		return;
@@ -1713,7 +1713,7 @@ void mercury_lib_string_p_replace(mercury_state* M, mercury_int args_in, mercury
 }
 
 
-void mercury_lib_string_p_count(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 2) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)2);
 		return;
@@ -1776,7 +1776,7 @@ void mercury_lib_string_p_count(mercury_state* M, mercury_int args_in, mercury_i
 }
 
 
-void mercury_lib_string_escape_mercury(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -1837,7 +1837,7 @@ void mercury_lib_string_escape_mercury(mercury_state* M, mercury_int args_in, me
 }
 
 
-void mercury_lib_string_escape_url(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -1915,7 +1915,7 @@ void mercury_lib_string_escape_url(mercury_state* M, mercury_int args_in, mercur
 }
 
 
-void mercury_lib_string_escape_c(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
@@ -2008,7 +2008,7 @@ void mercury_lib_string_escape_c(mercury_state* M, mercury_int args_in, mercury_
 	}
 }
 
-void mercury_lib_string_escape_html(mercury_state* M, mercury_int args_in, mercury_int args_out) {
+void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 1) {
 		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
 		return;
