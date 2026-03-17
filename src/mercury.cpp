@@ -31,7 +31,7 @@ uint16_t register_max = 0xf;
 
 
 
-mercury_stringliteral* mercury_cstring_to_mstring(char* str , mercury_int size) {
+mercury_stringliteral* mercury_cstring_to_mstring(const char* const M_CPP_restrict str , const mercury_int size) {
 	mercury_stringliteral* nstr=(mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!nstr) return nullptr;
 	char* nad = (char*)malloc(sizeof(char) * size);
@@ -44,16 +44,16 @@ mercury_stringliteral* mercury_cstring_to_mstring(char* str , mercury_int size) 
 	return nstr;
 }
 
-mercury_stringliteral* mercury_cstring_const_to_mstring(char* str, mercury_int size) {
+mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const str, const mercury_int size) {
 	mercury_stringliteral* nstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!nstr) return nullptr;
 	nstr->size = size;
-	nstr->ptr = str;
+	nstr->ptr = (char*)str;
 	nstr->constant = true;
 	return nstr;
 }
 
-char* mercury_mstring_to_cstring(mercury_stringliteral* str) {
+char* mercury_mstring_to_cstring(const mercury_stringliteral* const str) {
 	mercury_int sz = strlen(str->ptr); //use this mecause null terminator
 	//printf("%i/%i %s",str->size,sz,str->ptr);
 	if(sz > str->size)sz = str->size;
@@ -66,7 +66,7 @@ char* mercury_mstring_to_cstring(mercury_stringliteral* str) {
 }
 
 
-mercury_stringliteral* mercury_copystring(mercury_stringliteral* str) {
+mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const str) {
 	if (str->constant) {
 		mercury_stringliteral* nstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 		if (nstr == nullptr) return nullptr;
@@ -88,7 +88,7 @@ mercury_stringliteral* mercury_copystring(mercury_stringliteral* str) {
 }
 
 
-bool mercury_mstrings_equal(mercury_stringliteral* str1, mercury_stringliteral* str2) {
+bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
 
 	if (str1->size != str2->size) {
 		return false;
@@ -104,7 +104,7 @@ bool mercury_mstrings_equal(mercury_stringliteral* str1, mercury_stringliteral* 
 	return true;
 }
 
-mercury_stringliteral* mercury_mstrings_concat(mercury_stringliteral* str1, mercury_stringliteral* str2) {
+mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
 	mercury_stringliteral* nstr=(mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (nstr == nullptr) return nullptr;
 
@@ -123,7 +123,7 @@ mercury_stringliteral* mercury_mstrings_concat(mercury_stringliteral* str1, merc
 }
 
 //like concat, but does not return a new string. adds appstr to the end of basestr.
-bool mercury_mstrings_append(mercury_stringliteral* basestr, mercury_stringliteral* appstr) { 
+bool mercury_mstrings_append(mercury_stringliteral* const basestr, const mercury_stringliteral* const appstr) {
 	if (basestr->constant) {
 		char* nptr = (char*)malloc( sizeof(char) * (basestr->size + appstr->size));
 		if (!nptr)return false;
@@ -143,7 +143,7 @@ bool mercury_mstrings_append(mercury_stringliteral* basestr, mercury_stringliter
 	return true;
 }
 
-bool mercury_mstring_addchars(mercury_stringliteral* str, char* chars, mercury_int len) {
+bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, const mercury_int len) {
 	if (str->constant) {
 		char* nptr = (char*)malloc(sizeof(char) * (str->size + len));
 		if (!nptr)return false;
@@ -163,7 +163,7 @@ bool mercury_mstring_addchars(mercury_stringliteral* str, char* chars, mercury_i
 	return true;
 }
 
-void mercury_mstring_delete(mercury_stringliteral* str) {
+void mercury_mstring_delete(mercury_stringliteral* const str) {
 	if (str) {
 		free(str->ptr);
 		free(str);
@@ -225,7 +225,7 @@ mercury_table* mercury_newtable() {
 	return newt;
 }
 
-void mercury_destroytable(mercury_table* table) { //not ideal, but it works. kind of.
+void mercury_destroytable(mercury_table* const table) { //not ideal, but it works. kind of.
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st->size; i2++) {
@@ -237,7 +237,7 @@ void mercury_destroytable(mercury_table* table) { //not ideal, but it works. kin
 }
 
 
-bool mercury_tablehaskey(mercury_table* table, mercury_variable* key) {
+bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
 	mercury_subtable* subt = table->data[key->type];
 	if (key->type != M_TYPE_STRING) {
 		for (mercury_int i = 0; i < subt->size; i++) {
@@ -256,7 +256,7 @@ bool mercury_tablehaskey(mercury_table* table, mercury_variable* key) {
 	return false;
 }
 
-mercury_variable* mercury_getkey(mercury_table* table, mercury_variable* key, mercury_state* M) {
+mercury_variable* mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_state* const M_CPP_restrict M) {
 	mercury_variable* outvar = M?mercury_assign_var(M):(mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outvar == nullptr) return nullptr;
 	outvar->type = M_TYPE_NIL;
@@ -300,7 +300,7 @@ mercury_variable* mercury_getkey(mercury_table* table, mercury_variable* key, me
 	return outvar;
 }
 
-mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_variable* value, mercury_state* M) {
+mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_variable* value, mercury_state* const M_CPP_restrict M) {
 
 	mercury_subtable* subt = table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
@@ -352,7 +352,7 @@ mercury_int mercury_setkey(mercury_table* table, mercury_variable* key, mercury_
 	return subt->size-1;
 }
 
-bool mercury_tables_equal(mercury_table* table1, mercury_table* table2) { //returns true if every single value of the tables match. no, it's not recursive, because fuck that (also because refs).
+bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2) { //returns true if every single value of the tables match. no, it's not recursive, because fuck that (also because refs).
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* subt1=table1->data[i];
 		mercury_subtable* subt2=table2->data[i];
@@ -385,7 +385,7 @@ bool mercury_tables_equal(mercury_table* table1, mercury_table* table2) { //retu
 
 
 
-mercury_state* mercury_newstate(mercury_state* parent) {
+mercury_state* mercury_newstate(mercury_state* const parent) {
 	mercury_state* newstate=(mercury_state*)malloc(sizeof(mercury_state));
 	if (newstate == nullptr) return nullptr;
 
@@ -425,7 +425,7 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 	else {
 		newstate->registers = parent->registers;
 		newstate->masterstate = parent->masterstate;
-		newstate->parentstate = parent;
+		newstate->parentstate = (mercury_state*)parent;
 
 		parent->enviroment->refrences+=1;
 		parent->masterstate->enviroment->refrences += 1;
@@ -468,7 +468,7 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 
 
 
-bool mercury_stepstate(mercury_state* M) {
+bool mercury_stepstate(mercury_state* const M_CPP_restrict M) {
 	if (M->programcounter >= M->bytecode.numberofinstructions) return false;
 
 	mercury_opcode opcode = M->bytecode.instructions[M->programcounter];
@@ -488,7 +488,7 @@ bool mercury_stepstate(mercury_state* M) {
 	return true;
 }
 
-void mercury_destroystate(mercury_state* M) {
+void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
 		mercury_free_var(M->stack[i]);
 	}
@@ -518,7 +518,7 @@ void mercury_destroystate(mercury_state* M) {
 	free(M);
 }
 
-bool mercury_unassign_var(mercury_state* M,mercury_variable* var) {
+bool mercury_unassign_var(mercury_state* const M_CPP_restrict M,mercury_variable* const var) {
 	if (var->constant)return false;
 	if (!(M->sizeunassignedstack > M->numunassignedstack)) {
 		void* nptr=realloc(M->unassignedstack, sizeof(mercury_variable*) * (M->numunassignedstack + 1) );
@@ -534,7 +534,7 @@ bool mercury_unassign_var(mercury_state* M,mercury_variable* var) {
 }
 
 
-mercury_variable* mercury_assign_var(mercury_state* M) {
+mercury_variable* mercury_assign_var(mercury_state* const M_CPP_restrict M) {
 	if (M->numunassignedstack) {
 		M->numunassignedstack--;
 		mercury_variable* nvar = M->unassignedstack[M->numunassignedstack];
@@ -553,7 +553,7 @@ mercury_variable* mercury_assign_var(mercury_state* M) {
 	return nvar;
 }
 
-void mercury_free_var(mercury_variable* var,bool keep_struct) {
+void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep_struct) {
 	if (var == nullptr)return;
 	if (var->constant)return;
 
@@ -667,7 +667,7 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 	if(!keep_struct)free(var);
 }
 
-mercury_variable* mercury_popstack(mercury_state* M) {
+mercury_variable* mercury_popstack(mercury_state* const M_CPP_restrict M) {
 
 	if (M->sizeofstack==0) {
 		mercury_variable* newvar = mercury_assign_var(M);
@@ -684,7 +684,7 @@ mercury_variable* mercury_popstack(mercury_state* M) {
 }
 
 //takes from the bottom instead of the top of stack
-mercury_variable* mercury_pullstack(mercury_state* M) {
+mercury_variable* mercury_pullstack(mercury_state* const M_CPP_restrict M) {
 
 	if (M->sizeofstack == 0) {
 		mercury_variable* newvar = mercury_assign_var(M);
@@ -704,7 +704,7 @@ mercury_variable* mercury_pullstack(mercury_state* M) {
 }
 
 
-bool mercury_pushstack(mercury_state* M, mercury_variable* var) {
+bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
 	if (!(M->actualstacksize>M->sizeofstack)) {
 		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable*));
 		if (nstackptr == nullptr) return false;
@@ -752,7 +752,7 @@ bool mercury_pushstack(mercury_state* M, mercury_variable* var) {
 	return true;
 }
 
-mercury_variable* mercury_clonevariable(mercury_variable* var,mercury_state* M) {
+mercury_variable* mercury_clonevariable(mercury_variable* const var,mercury_state* const M_CPP_restrict M) {
 	mercury_variable* out=nullptr;
 	if (M) {
 		out=mercury_assign_var(M);
@@ -807,7 +807,7 @@ mercury_array* mercury_newarray() {
 	return nar;
 }
 
-bool mercury_setarray(mercury_array* array, mercury_variable* var, mercury_int pos, mercury_state* M) {
+bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos, mercury_state* const M_CPP_restrict M) {
 	if (pos < 0) return false;
 	mercury_int subnumber = pos >> MERCURY_ARRAY_BLOCKSIZE;
 	mercury_int mantisa = pos & ((1 << MERCURY_ARRAY_BLOCKSIZE) - 1);
@@ -840,12 +840,12 @@ bool mercury_setarray(mercury_array* array, mercury_variable* var, mercury_int p
 			mercury_free_var(subblock[mantisa]);
 		}
 	}
-	subblock[mantisa] = var;
+	subblock[mantisa] = (mercury_variable*)var;
 
 	return true;
 }
 
-mercury_variable* mercury_getarray(mercury_array* array, mercury_int pos, mercury_state* M) {
+mercury_variable* mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_state* const M_CPP_restrict M) {
 	mercury_variable* out;
 	if (pos < 0) {
 		out = M?mercury_assign_var(M):(mercury_variable*)malloc(sizeof(mercury_variable));
@@ -898,7 +898,7 @@ mercury_variable* mercury_getarray(mercury_array* array, mercury_int pos, mercur
 
 }
 
-mercury_int mercury_array_len(mercury_array* arr) {
+mercury_int mercury_array_len(const mercury_array* const arr) {
 	if (!arr->size)return 0;
 	mercury_variable** suba=arr->values[arr->size-1];
 	mercury_int slen = 0;
@@ -1066,7 +1066,7 @@ mercury_variable* mercury_tostring(mercury_variable* var) {
 	return newvar;
 }
 
-bool mercury_checkbool(mercury_variable* var) {
+bool mercury_checkbool(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
 	case M_TYPE_NIL:
 		return false;
@@ -1085,7 +1085,7 @@ bool mercury_checkbool(mercury_variable* var) {
 }
 
 //type coersion when you really need it
-mercury_int mercury_checkint(mercury_variable* var) {
+mercury_int mercury_checkint(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
 	case M_TYPE_NIL:
 		return 0;
@@ -1105,7 +1105,7 @@ mercury_int mercury_checkint(mercury_variable* var) {
 	}
 }
 //see above
-mercury_float mercury_checkfloat(mercury_variable* var) {
+mercury_float mercury_checkfloat(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
 	case M_TYPE_NIL:
 		return 0.0;
@@ -1125,7 +1125,7 @@ mercury_float mercury_checkfloat(mercury_variable* var) {
 	}
 }
 //ditto
-void* mercury_checkpointer(mercury_variable* var) {
+void* mercury_checkpointer(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
 	case M_TYPE_NIL:
 	case M_TYPE_BOOL:
@@ -1138,7 +1138,7 @@ void* mercury_checkpointer(mercury_variable* var) {
 }
 
 
-bool mercury_vars_equal(mercury_variable* var1, mercury_variable* var2) {
+bool mercury_vars_equal(const mercury_variable* const var1, const mercury_variable* const var2) {
 	if (var1->type != var2->type) {
 		return false;
 	}
