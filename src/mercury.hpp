@@ -43,14 +43,8 @@ typedef float mercury_float;
 #endif
 
 typedef uint16_t mercury_opcode;
-typedef uint16_t mercury_insflags;
-struct mercury_fullinstruction { //basically uint32_t. this is to make it so that we don't have to do bit arithmetic, only pointer manipulation (that the compiler will do for us). dunno if that's actually faster, though.
-	mercury_insflags flags;
-	mercury_opcode opcode;
-};
 
-#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE sizeof(mercury_int)/sizeof(mercury_fullinstruction) //how many instructions fit into one variable. instructions are 32 bits, so on a 64 bit system this is 2. on a 32 bit system, this is 1. if you're using a 16 bit system, god help you.
-
+#define MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE sizeof(mercury_int)/sizeof(mercury_opcode) //how many instructions fit into one variable. instructions are 16 bits, so on a 64 bit system this is 4. on a 32 bit system, this is 2. if for some reason you're running a 16 bit system, this is 1.
 
 union mercury_rawdata { //to represent stored binary data of almost any type.
 	mercury_int i;
@@ -107,7 +101,7 @@ struct mercury_array { //gee bill, two storage types?
 struct mercury_function {
 	mercury_uint refrences = 0;
 	mercury_uint numberofinstructions = 0;
-	mercury_fullinstruction* instructions = nullptr;
+	mercury_opcode* instructions = nullptr;
 	bool enviromental = false;
 	mercury_debug_token* debug_info=nullptr;
 };

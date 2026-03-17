@@ -471,14 +471,11 @@ mercury_state* mercury_newstate(mercury_state* parent) {
 bool mercury_stepstate(mercury_state* M) {
 	if (M->programcounter >= M->bytecode.numberofinstructions) return false;
 
-	mercury_fullinstruction instr = M->bytecode.instructions[M->programcounter];
-
-	mercury_opcode opcode= instr.opcode;
-	mercury_insflags iflags= instr.flags;
+	mercury_opcode opcode = M->bytecode.instructions[M->programcounter];
 
 	//printf("%i - %i %i\n", M->programcounter,iflags,opcode);
 	M->programcounter++;
-	mercury_bytecode_list[opcode](M, iflags);
+	mercury_bytecode_list[opcode](M);
 
 	/*
 	printf("post stack: %i\n", M->sizeofstack);
@@ -570,7 +567,7 @@ void mercury_free_var(mercury_variable* var,bool keep_struct) {
 
 #ifdef MERCURY_DEBUG
 			if (ftab->enviromental) {
-				printf("enviromental table %p marked for freeing. something has gone terribly worng. probably.\n");
+				printf("enviromental table %p marked for freeing. something has gone terribly worng. probably.\n",ftab);
 			}
 #endif
 			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
@@ -1365,16 +1362,14 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 
 	mercury_uint offset = 0;
 	while (offset < F->numberofinstructions) {
-		mercury_fullinstruction i=F->instructions[offset];
+		mercury_opcode instruction =F->instructions[offset];
 		offset++;
-		mercury_opcode flags = i.flags;
-		mercury_opcode instruction = i.opcode;
 		char buffer[0x2FFF];
 
 #ifdef MERCURY_64BIT
-	snprintf(buffer, 0x2FFF, "[%016zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+	snprintf(buffer, 0x2FFF, "[%016zX - %04hX] %s", offset - 1, instruction, m_get_opcode_str(instruction));
 #else
-	snprintf(buffer, 0x2FFF, "[%08zX - %04hX|%04hX] %s", offset - 1, flags, instruction, m_get_opcode_str(instruction));
+	snprintf(buffer, 0x2FFF, "[%08zX - %04hX] %s", offset - 1, instruction, m_get_opcode_str(instruction));
 #endif
 		
 		mercury_mstring_addchars(out, buffer, strlen(buffer) );
@@ -1401,7 +1396,7 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 					char c = *(((char*)(F->instructions + offset)) + i);
 					buffer[i] = c;
 				}
-				offset += (size + 3) / 4;
+				offset += (size + sizeof(mercury_opcode)) / sizeof(mercury_opcode);
 				mercury_mstring_addchars(out, (char*)"\"", 1);
 				mercury_mstring_addchars(out, buffer, size);
 				mercury_mstring_addchars(out, (char*)"\"", 1);

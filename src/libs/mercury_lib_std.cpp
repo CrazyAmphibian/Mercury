@@ -69,15 +69,15 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 	mercury_state* SubM = mercury_newstate(M);
 	if (function->type == M_TYPE_FUNCTION) {
 		mercury_function* func = (mercury_function*)function->data.p;
-		void* nbl = realloc(SubM->bytecode.instructions, func->numberofinstructions * sizeof(mercury_fullinstruction));
+		void* nbl = realloc(SubM->bytecode.instructions, func->numberofinstructions * sizeof(mercury_opcode));
 		if (!nbl) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_destroystate(SubM);
 			return;
 		}
-		SubM->bytecode.instructions = (mercury_fullinstruction*)nbl;
+		SubM->bytecode.instructions = (mercury_opcode*)nbl;
 		SubM->bytecode.numberofinstructions = func->numberofinstructions;
-		memcpy(SubM->bytecode.instructions, func->instructions, func->numberofinstructions * sizeof(mercury_fullinstruction));
+		memcpy(SubM->bytecode.instructions, func->instructions, func->numberofinstructions * sizeof(mercury_opcode));
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
@@ -121,7 +121,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 						}
 						mercury_free_var(o);
 
-						M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
+						M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
 					}
 				}
 			}
@@ -174,7 +174,7 @@ void mercury_lib_std_iterate(mercury_state* M, mercury_int args_in, mercury_int 
 					}
 					mercury_free_var(o);
 				}
-				M_BYTECODE_CLS(SubM, 0); //clear the stack to clean stuff up.
+				M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
 				
 			}
 		}
@@ -246,16 +246,16 @@ void mercury_lib_std_restricted_call(mercury_state* M, mercury_int args_in, merc
 	}
 	if (func->type == M_TYPE_FUNCTION) {
 		mercury_function* func2 = (mercury_function*)func->data.p;
-		void* nbl = realloc(iso_M->bytecode.instructions, func2->numberofinstructions * sizeof(mercury_fullinstruction));
+		void* nbl = realloc(iso_M->bytecode.instructions, func2->numberofinstructions * sizeof(mercury_opcode));
 		if (!nbl) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_destroystate(iso_M);
 			free(argt);
 			return;
 		}
-		iso_M->bytecode.instructions = (mercury_fullinstruction*)nbl;
+		iso_M->bytecode.instructions = (mercury_opcode*)nbl;
 		iso_M->bytecode.numberofinstructions = func2->numberofinstructions;
-		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(mercury_fullinstruction));
+		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(mercury_opcode));
 	}
 
 

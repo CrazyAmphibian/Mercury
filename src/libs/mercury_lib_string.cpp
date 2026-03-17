@@ -1323,7 +1323,7 @@ bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercur
 	for (mercury_int i = 0; i < num_patterns; i++) {
 
 		M_PATTERN P = patterns[i];
-		printf("pattern %i: ",i);
+		printf("pattern %zi: ",i);
 
 		if (P.match_type & MATCH_SINGLE) {
 			printf("MATCH_SINGLE ");

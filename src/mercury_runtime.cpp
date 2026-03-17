@@ -176,7 +176,7 @@ int main(int argc, char** argv) {
 			M->bytecode.numberofinstructions = 0;
 			free(M->bytecode.debug_info);
 
-			for (mercury_int i = 0; i < M->sizeofstack;i++) {
+			for (mercury_uint i = 0; i < M->sizeofstack;i++) {
 				mercury_unassign_var(M,mercury_popstack(M)); //clean up the stack
 			}
 		}
