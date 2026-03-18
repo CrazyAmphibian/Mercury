@@ -9,7 +9,7 @@
 void mercury_lib_debug_stack_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
-	printf("current state: 0x%p size of stack: %zi (allocated: %zi) [unassigned: %zi allocated: %zi]\n",M,M->sizeofstack,M->actualstacksize,M->numunassignedstack,M->sizeunassignedstack);
+	printf("current state: 0x%p size of stack: %zi (allocated: %zi) [unassigned: %zi allocated: %zi]\n",M,M->sizeofstack,M->allocatedstacksize,M->numunassignedstack,M->allocatedunassignedstack);
 	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
 		mercury_variable* v = M->stack[i];
 		const char* typestr = "unknown";

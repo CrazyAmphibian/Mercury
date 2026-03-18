@@ -131,11 +131,11 @@ struct mercury_state {
 
 	mercury_uint sizeofstack = 0;  // number of elements on the stack
 	mercury_variable** stack = nullptr;
-	mercury_uint actualstacksize = 0; // the size of the stack array
+	mercury_uint allocatedstacksize = 0; // the size of the stack array
 
 	mercury_uint numunassignedstack = 0; // number of unused elements
 	mercury_variable** unassignedstack = nullptr;
-	mercury_uint sizeunassignedstack = 0; // size of the unused element array.
+	mercury_uint allocatedunassignedstack = 0; // size of the unused element array.
 
 	mercury_variable** registers = nullptr;
 	mercury_variable** constants = nullptr;

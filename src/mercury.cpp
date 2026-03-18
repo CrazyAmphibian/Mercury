@@ -446,12 +446,12 @@ mercury_state* mercury_newstate(mercury_state* const parent) {
 
 
 	newstate->sizeofstack = 0;
-	newstate->actualstacksize = 0;
+	newstate->allocatedstacksize = 0;
 	newstate->stack = nullptr;
 
 	newstate->unassignedstack = nullptr;
 	newstate->numunassignedstack = 0;
-	newstate->sizeunassignedstack = 0;
+	newstate->allocatedunassignedstack = 0;
 
 	newstate->programcounter = 0;
 
@@ -520,10 +520,10 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 
 bool mercury_unassign_var(mercury_state* const M_CPP_restrict M,mercury_variable* const var) {
 	if (var->constant)return false;
-	if (!(M->sizeunassignedstack > M->numunassignedstack)) {
+	if (!(M->allocatedunassignedstack > M->numunassignedstack)) {
 		void* nptr=realloc(M->unassignedstack, sizeof(mercury_variable*) * (M->numunassignedstack + 1) );
 		if (nptr == nullptr) return false;
-		M->sizeunassignedstack = M->numunassignedstack + 1;
+		M->allocatedunassignedstack = M->numunassignedstack + 1;
 		M->unassignedstack = (mercury_variable**)nptr;
 	}
 	mercury_free_var(var, true);
@@ -705,12 +705,12 @@ mercury_variable* mercury_pullstack(mercury_state* const M_CPP_restrict M) {
 
 
 bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
-	if (!(M->actualstacksize>M->sizeofstack)) {
+	if (!(M->allocatedstacksize >M->sizeofstack)) {
 		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable*));
 		if (nstackptr == nullptr) return false;
 		M->stack = (mercury_variable**)nstackptr;
 
-		M->actualstacksize = M->sizeofstack + 1;
+		M->allocatedstacksize = M->sizeofstack + 1;
 	}
 
 	M->stack[M->sizeofstack] = var;
