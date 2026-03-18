@@ -253,3 +253,4 @@ MERCURY_DYNAMIC_LIBRARY bool mercury_register_library(void* data, char* key, cha
 MERCURY_DYNAMIC_LIBRARY void mercury_populate_enviroment_with_libs(mercury_state* M);
 
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F);
+MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_rawbinary_debug(mercury_function* F);

@@ -194,3 +194,35 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
+
+
+void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0, 1);
+
+	if (args_in == 1) { //read bytecode from function
+		mercury_variable* in = mercury_pullstack(M);
+		if (in->type == M_TYPE_FUNCTION) {
+			printf("variable %p function %p bytecode (%zu)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions);
+			mercury_stringliteral* l = mercury_get_bytecode_rawbinary_debug(((mercury_function*)in->data.p));
+			for (mercury_int i = 0; i < l->size; i++) {
+				putchar(l->ptr[i]);
+			}
+			putchar('\n');
+		}
+		else {
+			printf("variable %p (type %hhu) is not a function (type %hhu). failed to dump bytecode.", in, in->type, M_TYPE_FUNCTION);
+		}
+		mercury_unassign_var(M, in);
+	}
+	else {
+
+		printf("state %p bytecode (%zi/%zu)\n", M, M->programcounter, M->bytecode.numberofinstructions);
+		mercury_stringliteral* l = mercury_get_bytecode_rawbinary_debug(&M->bytecode);
+		for (mercury_int i = 0; i < l->size; i++) {
+			putchar(l->ptr[i]);
+		}
+		putchar('\n');
+	}
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+}

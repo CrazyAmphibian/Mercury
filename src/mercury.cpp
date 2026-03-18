@@ -1396,7 +1396,7 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 					char c = *(((char*)(F->instructions + offset)) + i);
 					buffer[i] = c;
 				}
-				offset += (size + sizeof(mercury_opcode)) / sizeof(mercury_opcode);
+				offset += (size + sizeof(mercury_opcode)-1) / sizeof(mercury_opcode);
 				mercury_mstring_addchars(out, (char*)"\"", 1);
 				mercury_mstring_addchars(out, buffer, size);
 				mercury_mstring_addchars(out, (char*)"\"", 1);
@@ -1439,6 +1439,38 @@ mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F) {
 	return out;
 }
 
+//same as above, but does not auto-advance or detect variables for alternate debugging
+mercury_stringliteral* mercury_get_bytecode_rawbinary_debug(mercury_function* F) {
+	mercury_stringliteral* out = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	if (!out)return nullptr;
+	out->constant = false;
+	out->ptr = nullptr;
+	out->size = 0;
+
+	mercury_uint offset = 0;
+	while (offset < F->numberofinstructions) {
+		mercury_opcode instruction = F->instructions[offset];
+		offset++;
+		char buffer[0x2FFF];
+
+		char charbuffer[3]="\0\0";
+
+		charbuffer[0]= instruction & 0xFF;
+		charbuffer[0] = (charbuffer[0] < '\x20') ? charbuffer[0] = '\x20' : charbuffer[0]; //prevent control characters messing everything up, since this normally gets printed to stdout.
+		charbuffer[1]= (instruction >> 8) & 0xFF;
+		charbuffer[1] = (charbuffer[1] < '\x20') ? charbuffer[1] = '\x20' : charbuffer[1];
+
+#ifdef MERCURY_64BIT
+		snprintf(buffer, 0x2FFF, "[%016zX - %04hX\t%s\t%hi\t%hu\t%s]", offset - 1, instruction, m_get_opcode_str(instruction), instruction, instruction,charbuffer);
+#else
+		snprintf(buffer, 0x2FFF, "[%08zX - %04hX\t%s\t%hi\t%hu\t%s]", offset - 1, instruction, m_get_opcode_str(instruction), instruction, instruction, charbuffer);
+#endif
+
+		mercury_mstring_addchars(out, buffer, strlen(buffer));
+		mercury_mstring_addchars(out, (char*)"\n", 1);
+	}
+	return out;
+}
 
 
 bool mercury_register_library(void* data, const char* key, const char* table,uint8_t type=M_TYPE_CFUNC) {
@@ -1697,6 +1729,7 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_debug_enviroment_dbg, "dumpenv", "debug");
 	mercury_register_library(mercury_lib_debug_constants_dbg, "dumpconstants", "debug");
 	mercury_register_library(mercury_lib_debug_bytecode_dbg, "dumpbytecode", "debug");
+	mercury_register_library(mercury_lib_debug_bytecode_rawbinary_dbg, "dumprawbytecode", "debug");
 
 #endif
 
