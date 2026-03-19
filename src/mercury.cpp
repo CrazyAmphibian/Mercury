@@ -239,19 +239,8 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 
 bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
 	const mercury_subtable* const subt = table->data[key->type];
-	if (key->type != M_TYPE_STRING) {
-		for (mercury_int i = 0; i < subt->size; i++) {
-			if (subt->keys[i].i == key->data.i) {
-				return true;
-			}
-		}
-	}
-	else {
-		for (mercury_int i = 0; i < subt->size; i++) {
-			if (mercury_mstrings_equal((mercury_stringliteral*)subt->keys[i].p, (mercury_stringliteral*)key->data.p) ) {
-				return true;
-			}
-		}
+	for (mercury_int i = 0; i < subt->size; i++) {
+		if (mercury_vars_equal(subt->keys[i],key))return true;
 	}
 	return false;
 }
@@ -259,21 +248,12 @@ bool mercury_tablehaskey(const mercury_table* const table, const mercury_variabl
 mercury_variable* mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_state* const M_CPP_restrict M) {
 	const mercury_subtable* const subt=table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (key->type == M_TYPE_STRING) {
-			if (mercury_mstrings_equal((mercury_stringliteral*)subt->keys[i].p , (mercury_stringliteral*)key->data.p)) {
-				if(M)mercury_unassign_var(M, key);
-				return mercury_clonevariable(subt->values[i],M);
-			}
-		}
-		else {
-			if (subt->keys[i].i == key->data.i) {
-				if (M)mercury_unassign_var(M, key);
-				return mercury_clonevariable(subt->values[i], M);
-			}
+		if (mercury_vars_equal(subt->keys[i], key)) {
+			if (M)mercury_unassign_var(M, key);
+			return mercury_clonevariable(subt->values[i], M);
 		}
 	}
 	if (M)mercury_unassign_var(M, key);
-
 	mercury_variable* const outvar = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (outvar == nullptr) return nullptr;
 	outvar->type = M_TYPE_NIL;
@@ -282,50 +262,30 @@ mercury_variable* mercury_getkey(const mercury_table* const table, mercury_varia
 }
 
 mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M) {
-
 	mercury_subtable* subt = table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
-
-		if (key->type == M_TYPE_STRING) {
-			if ( mercury_mstrings_equal( (mercury_stringliteral*)subt->keys[i].p , (mercury_stringliteral*)key->data.p) ) {
-				if (M) {
-					mercury_unassign_var(M, subt->values[i]);
-					mercury_unassign_var(M, key);
-				}
-				else {
-					mercury_free_var(subt->values[i]);
-					mercury_free_var(key);
-				}
-				subt->values[i] = (mercury_variable*)value;
-				return i;
+		if (mercury_vars_equal(subt->keys[i],key)) {
+			if (M) {
+				mercury_unassign_var(M, subt->values[i]);
+				mercury_unassign_var(M, key);
 			}
-		}
-		else {
-			if (subt->keys[i].i == key->data.i) {
-				if (M) {
-					mercury_unassign_var(M,subt->values[i]);
-					mercury_unassign_var(M,key);
-				}
-				else {
-					mercury_free_var(subt->values[i]);
-					mercury_free_var(key);
-				}
-				subt->values[i] = (mercury_variable*)value;
-				return i;
+			else {
+				mercury_free_var(subt->values[i]);
+				mercury_free_var(key);
 			}
+			subt->values[i] = (mercury_variable*)value;
+			return i;
 		}
-
-
 	}
 
-	void* nptr=realloc(subt->keys,sizeof(mercury_rawdata)*(subt->size+1) );
+	void* nptr=realloc(subt->keys,sizeof(mercury_variable*)*(subt->size+1) );
 	if (nptr == nullptr) return -1;
-	subt->keys = (mercury_rawdata*)nptr;
+	subt->keys = (mercury_variable**)nptr;
 	nptr = realloc(subt->values, sizeof(mercury_variable*) * (subt->size + 1));
 	if (nptr == nullptr) return -1;
 	subt->values = (mercury_variable**)nptr;
 
-	subt->keys[subt->size] = key->data;
+	subt->keys[subt->size] = key;
 	subt->values[subt->size] = (mercury_variable*)value;
 
 	subt->size++;
@@ -343,18 +303,13 @@ bool mercury_tables_equal(const mercury_table* const table1, const mercury_table
 		}
 
 		for (mercury_int i1 = 0; i1 < subt1->size; i1++) { //not ideal. O(n^2)... this is what i get for not ordering anything.
-			bool found = false;
 			for (mercury_int i2 = 0; i2 < subt2->size; i2++) {
-				if (subt1->keys[i1].i==subt2->keys[i2].i) {
-					mercury_variable* v1 = subt1->values[i1];
-					mercury_variable* v2 = subt1->values[i1];
-					if (v1->type == v2->type && v1->data.i==v2->data.i) {
-						found = true;
-						break;
-					}
+				if(mercury_vars_equal(subt1->keys[i1],subt2->keys[i2])) {
+					goto found;
 				}
 			}
-			if (!found) return false;
+			return false;
+			found:;
 		}
 
 	}
@@ -554,11 +509,8 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 				mercury_subtable* st = ftab->data[t];
 				for (mercury_int i = 0; i < st->size; i++) {
-					mercury_variable* v = st->values[i];
-					mercury_free_var(v,true);
-					v->type = t;	//because keys are stored as raw data, we have to do a bit of hax. still, this is a neat way to save some processing and memory.
-					v->data = st->keys[i];
-					mercury_free_var(v);
+					mercury_free_var(st->values[i]);
+					mercury_free_var(st->keys[i]);
 				}
 				free(st->keys);
 				free(st->values);
@@ -1122,27 +1074,27 @@ bool mercury_vars_equal(const mercury_variable* const var1, const mercury_variab
 }
 
 
-void mercury_debugdumptable(mercury_table* tab,int level=0) {
+void mercury_debugdumptable(mercury_table* tab,int level) {
 	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 		mercury_subtable* subt = tab->data[t];
 		for (mercury_int i = 0; i < subt->size; i++) {
 			for (int n = 0; n < level; n++) {
 				putchar('\t');
 			}
-
+			mercury_rawdata keydat = subt->keys[i]->data;
 			switch (t) {
 				case M_TYPE_NIL:
-					printf("nil_%zi", subt->keys[i].i);
+					printf("nil_%zi", keydat.i);
 					break;
 				case M_TYPE_INT:
-					printf("%zi", subt->keys[i].i);
+					printf("%zi", keydat.i);
 					break;
 				case M_TYPE_FLOAT:
-					printf("%f", subt->keys[i].f);
+					printf("%f", keydat.f);
 					break;
 				case M_TYPE_STRING:
 					{
-					mercury_stringliteral* str = (mercury_stringliteral*)subt->keys[i].p;
+					mercury_stringliteral* str = (mercury_stringliteral*)keydat.p;
 					putchar('\"');
 					for (mercury_int i2 = 0; i2 < str->size; i2++) {
 						putchar(str->ptr[i2]);
@@ -1151,7 +1103,7 @@ void mercury_debugdumptable(mercury_table* tab,int level=0) {
 					putchar('\"');
 					break;
 				default:
-					printf("0x%p", subt->keys[i].p);
+					printf("0x%p", keydat.p);
 			}
 
 			printf(" - ");
@@ -1502,13 +1454,16 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 
 			mercury_stringliteral* sp= mercury_cstring_to_mstring((char*)lib->table, strlen(lib->table));
 
-			mercury_variable tidx;
-			tidx.type = M_TYPE_STRING;
-			tidx.data.p = sp;
-			mercury_variable* t=mercury_getkey(M->enviroment, &tidx);
+			mercury_variable* tidx = (mercury_variable*)malloc(sizeof(mercury_variable));
+			if (!tidx) { free(k); free(v); continue; }
+			tidx->type = M_TYPE_STRING;
+			tidx->constant = true;
+			tidx->data.p = sp;
+			mercury_variable* t=mercury_getkey(M->enviroment, tidx);
 
 			if (t->type == M_TYPE_TABLE) {
 				mercury_setkey((mercury_table*)t->data.p,k,v);
+				free(tidx);
 			}
 			else {
 				mercury_table* nt=mercury_newtable();
@@ -1523,7 +1478,7 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 				vv->type = M_TYPE_TABLE;
 				vv->data.p = nt;
 
-				mercury_setkey(M->enviroment, &tidx, vv);
+				mercury_setkey(M->enviroment, tidx, vv);
 			}
 
 

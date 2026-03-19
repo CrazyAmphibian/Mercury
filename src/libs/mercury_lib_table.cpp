@@ -42,7 +42,7 @@ void mercury_lib_table_copy(mercury_state* const M_CPP_restrict M, const mercury
 			return;
 		}
 		
-		st_n->keys = (mercury_rawdata*)malloc(sizeof(mercury_rawdata) * st_o->size);
+		st_n->keys = (mercury_variable**)malloc(sizeof(mercury_variable*) * st_o->size);
 		if (!st_n->keys) {
 			free(st_n->values);
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -50,17 +50,11 @@ void mercury_lib_table_copy(mercury_state* const M_CPP_restrict M, const mercury
 		}
 
 		st_n->size = st_o->size;
-		memcpy(st_n->values, st_o->values, sizeof(mercury_variable*) * st_o->size);
 
-		if (t == M_TYPE_STRING) {
-			for (mercury_int i = 0; i < st_n->size; i++) {
-				st_n->keys[i].p = mercury_copystring((mercury_stringliteral*)st_o->keys[i].p);
-			}
+		for (mercury_int i = 0; i < st_o->size; i++) {
+			st_n->keys[i] = mercury_clonevariable(st_o->keys[i], M);
+			st_n->values[i] = mercury_clonevariable(st_o->values[i], M);
 		}
-		else {
-			memcpy(st_n->keys, st_o->keys, sizeof(mercury_rawdata) * st_o->size);
-		}
-		
 	}
 	newtab->refrences = 1;
 

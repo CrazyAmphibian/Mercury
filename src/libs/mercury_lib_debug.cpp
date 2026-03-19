@@ -138,7 +138,7 @@ void mercury_lib_debug_enviroment_dbg(mercury_state* const M_CPP_restrict M, con
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* st = e->data[t];
 			for (mercury_int i = 0; i < st->size; i++) {
-				printf("\t%s = %s\n", m_var_to_string(t, st->keys[i]), m_var_to_string(st->values[i]->type, st->values[i]->data));
+				printf("\t%s = %s\n", m_var_to_string(t, st->keys[i]->data), m_var_to_string(st->values[i]->type, st->values[i]->data));
 			}
 
 		}

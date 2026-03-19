@@ -82,7 +82,7 @@ struct mercury_stringrefrence {
 
 struct mercury_subtable {
 	mercury_int size = 0;
-	mercury_rawdata* keys = nullptr;
+	mercury_variable** keys = nullptr;
 	mercury_variable** values = nullptr;
 };
 
@@ -254,3 +254,4 @@ MERCURY_DYNAMIC_LIBRARY void mercury_populate_enviroment_with_libs(mercury_state
 
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_rawbinary_debug(mercury_function* F);
+MERCURY_DYNAMIC_LIBRARY void mercury_debugdumptable(mercury_table* tab, int level = 0);

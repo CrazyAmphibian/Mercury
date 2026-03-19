@@ -138,13 +138,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* subt = tab->data[t];
 			for (mercury_int i = 0; i < subt->size; i++) {
-				mercury_variable ik;
-				ik.constant = false;
-				ik.type = t;
-				ik.data = subt->keys[i];
+				mercury_variable ik= *(subt->keys[i]);
 				mercury_variable* k = mercury_clonevariable(&ik);
 				mercury_variable* v = mercury_clonevariable(subt->values[i]);
-
 				
 				if (function->type == M_TYPE_CFUNC) {
 					mercury_pushstack(SubM, k);
@@ -321,7 +317,7 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 			for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 				mercury_subtable* st = t->data[i];
 				for (mercury_int n = 0; n < st->size; n++) {
-					mercury_stringliteral* key=m_stringify(st->keys[n],i);
+					mercury_stringliteral* key=m_stringify(st->keys[n]->data,i);
 					mercury_variable* v = st->values[n];
 					mercury_stringliteral* value=m_stringify(v->data, v->type);
 

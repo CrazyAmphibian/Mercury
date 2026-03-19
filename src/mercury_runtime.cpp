@@ -93,6 +93,9 @@ int main(int argc, char** argv) {
 	mercury_setkey(M->enviroment, atk_v, at_v);
 	mercury_populate_enviroment_with_libs(M);
 
+#ifdef MERCURY_DEBUG
+	mercury_debugdumptable(M->enviroment);
+#endif
 
 	start:
 	if (interactivemode) {
