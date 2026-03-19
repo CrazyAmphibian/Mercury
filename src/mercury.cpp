@@ -238,7 +238,7 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 
 
 bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
-	mercury_subtable* subt = table->data[key->type];
+	const mercury_subtable* const subt = table->data[key->type];
 	if (key->type != M_TYPE_STRING) {
 		for (mercury_int i = 0; i < subt->size; i++) {
 			if (subt->keys[i].i == key->data.i) {
@@ -257,46 +257,27 @@ bool mercury_tablehaskey(const mercury_table* const table, const mercury_variabl
 }
 
 mercury_variable* mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_state* const M_CPP_restrict M) {
-	mercury_variable* outvar = M?mercury_assign_var(M):(mercury_variable*)malloc(sizeof(mercury_variable));
-	if (outvar == nullptr) return nullptr;
-	outvar->type = M_TYPE_NIL;
-	outvar->data.i = 0;
-
-	mercury_subtable* subt=table->data[key->type];
+	const mercury_subtable* const subt=table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
-
 		if (key->type == M_TYPE_STRING) {
 			if (mercury_mstrings_equal((mercury_stringliteral*)subt->keys[i].p , (mercury_stringliteral*)key->data.p)) {
-				if (subt->values[i]->type == M_TYPE_STRING) {
-					outvar->type = M_TYPE_STRING;
-					outvar->data.p = mercury_copystring((mercury_stringliteral*)subt->values[i]->data.p);
-				}
-				else {
-					outvar->type = subt->values[i]->type;
-					outvar->data = subt->values[i]->data;
-				}
 				if(M)mercury_unassign_var(M, key);
-				return outvar;
+				return mercury_clonevariable(subt->values[i],M);
 			}
 		}
 		else {
-
-
 			if (subt->keys[i].i == key->data.i) {
-				if (subt->values[i]->type == M_TYPE_STRING) {
-					outvar->type = M_TYPE_STRING;
-					outvar->data.p = mercury_copystring((mercury_stringliteral*)subt->values[i]->data.p);
-				}
-				else {
-					outvar->type = subt->values[i]->type;
-					outvar->data = subt->values[i]->data;
-				}
 				if (M)mercury_unassign_var(M, key);
-				return outvar;
+				return mercury_clonevariable(subt->values[i], M);
 			}
 		}
 	}
 	if (M)mercury_unassign_var(M, key);
+
+	mercury_variable* const outvar = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
+	if (outvar == nullptr) return nullptr;
+	outvar->type = M_TYPE_NIL;
+	outvar->data.i = 0;
 	return outvar;
 }
 
@@ -854,8 +835,8 @@ mercury_variable* mercury_getarray(mercury_array* const array, const mercury_int
 		out->type = M_TYPE_NIL;
 		return out;
 	}
-	mercury_int subnumber = pos >> MERCURY_ARRAY_BLOCKSIZE;
-	mercury_int mantisa = pos & ((1 << MERCURY_ARRAY_BLOCKSIZE) - 1);
+	const mercury_int subnumber = pos >> MERCURY_ARRAY_BLOCKSIZE;
+	const mercury_int mantisa = pos & ((1 << MERCURY_ARRAY_BLOCKSIZE) - 1);
 
 	if (subnumber >= array->size) {
 		out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
@@ -875,18 +856,7 @@ mercury_variable* mercury_getarray(mercury_array* const array, const mercury_int
 	}
 
 	if (subblock[mantisa]) {
-		out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (!out)return nullptr;
-
-		mercury_variable* v = subblock[mantisa];
-		out->type = v->type;
-		if (out->type == M_TYPE_STRING) {
-			out->data.p = mercury_copystring((mercury_stringliteral*)v->data.p);
-		}
-		else {
-			out->data.i = v->data.i;
-		}
-		return out;
+		return mercury_clonevariable(subblock[mantisa],M);
 	}
 	else {
 		out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
@@ -898,9 +868,9 @@ mercury_variable* mercury_getarray(mercury_array* const array, const mercury_int
 
 }
 
-mercury_int mercury_array_len(const mercury_array* const arr) {
+mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
 	if (!arr->size)return 0;
-	mercury_variable** suba=arr->values[arr->size-1];
+	const mercury_variable* const* const suba=arr->values[arr->size-1]; //did somebody say const?
 	mercury_int slen = 0;
 	for (mercury_int i = 0; i < (1 << MERCURY_ARRAY_BLOCKSIZE); i++) {
 		if (suba[i] && suba[i]->type) {
