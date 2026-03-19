@@ -1,10 +1,10 @@
 #include "mercury.hpp"
-
 #include "mercury_bytecode.hpp"
 #include "mercury_compiler.hpp"
-#include "stdio.h"
-#include "malloc.h"
-#include "string.h"
+
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>

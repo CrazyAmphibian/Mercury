@@ -2,9 +2,9 @@
 #include "mercury_compiler.hpp"
 #include "mercury_bytecode.hpp"
 
-#include "stdio.h"
-#include "malloc.h"
-#include "string.h"
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
 
 #ifdef _WIN32
 #include <Windows.h>

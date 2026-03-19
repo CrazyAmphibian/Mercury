@@ -3,7 +3,7 @@
 
 #include "mercury_lib_math.hpp"
 
-#include "math.h"
+#include <math.h>
 #include <stdlib.h>
 
 //returns the smallest value. takes vararg. if no values are provided, returns infinity

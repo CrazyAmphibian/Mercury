@@ -2,9 +2,9 @@
 #include"../mercury_error.hpp"
 #include"../mercury_bytecode.hpp"
 
-#include"malloc.h"
-#include"stdio.h"
-#include"string.h"
+#include<malloc.h>
+#include<stdio.h>
+#include<string.h>
 #include <stdlib.h>
 
 
