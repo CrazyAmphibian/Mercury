@@ -532,19 +532,7 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 		mercury_array* farray = (mercury_array*)var->data.p; //get the array
 		farray->refrences--;
 		if (!farray->refrences) { //if this is the last refrence, destroy all
-			
-			for (mercury_int i1 = 0; i1 < (farray->size); i1++) {
-				mercury_variable** vt = farray->values[i1];
-				if (!vt)continue;
-				for (mercury_int i2 = 0; i2 < (1 << MERCURY_ARRAY_BLOCKSIZE); i2++) {
-					mercury_variable* v = vt[i2];
-					if (!v)continue;
-					mercury_free_var(v);
-				}
-				free(vt);
-			}
-			free(farray->values);
-			free(farray);
+			mercury_destroyarray(farray);
 		}
 		}
 		break;
@@ -740,96 +728,263 @@ mercury_array* mercury_newarray() {
 	return nar;
 }
 
-bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos, mercury_state* const M_CPP_restrict M) {
-	if (pos < 0) return false;
-	mercury_int subnumber = pos >> MERCURY_ARRAY_BLOCKSIZE;
-	mercury_int mantisa = pos & ((1 << MERCURY_ARRAY_BLOCKSIZE) - 1);
+void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
+	if (arr->values) {
+#ifdef MERCURY_64BIT
+		//this can't be the best way to do it. i mean... just look at this piece of shit.
+		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
+			mercury_variable****** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
+				mercury_variable***** const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
+					mercury_variable**** const st3 = st2[i3];
+					if (!st3)continue;
+					for (int i4 = (MERCURY_SIZE_SUBARRAY_4 - 1); i4 > 0; i4--) {
+						mercury_variable*** const st4 = st3[i4];
+						if (!st4)continue;
+						for (int i5 = (MERCURY_SIZE_SUBARRAY_5 - 1); i5 > 0; i5--) {
+							mercury_variable** const st5 = st4[i5];
+							if (!st5)continue;
+							for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 > 0; i6--) {
+								mercury_variable* const var = st5[i6];
+								if (var && var->type)return mercury_free_var(var);
+							}
+							free(st5);
+						}
+						free(st4);
+					}
+					free(st3);
+				}
+				free(st2);
+			}
+			free(st1);
+		}
+#else
+		//it's less shit here but still not great.
+		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
+			mercury_variable****** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
+				mercury_variable***** const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
+					mercury_variable* const var = st2[i3];
+					if (var && var->type)return mercury_free_var(var);
+				}
+				free(st2);
+			}
+			free(st1);
+		}
+#endif
+	}
+	free(arr->values);
+	free(arr);
+}
 
-	if (subnumber >= array->size) {
-		void* nptr=realloc(array->values, sizeof(mercury_variable**) * (subnumber+1) );
-		if (!nptr)return false;
-		array->values = (mercury_variable***)nptr;
-		for (mercury_int i = array->size;i<=subnumber;i++) {
-			array->values[i] = nullptr;
-		}
-		array->size = subnumber + 1;
-	}
-	mercury_variable** subblock = array->values[subnumber];
-	if (!subblock) {
-		void* nptr=malloc(sizeof(mercury_variable*) * (1 << MERCURY_ARRAY_BLOCKSIZE));
-		if (!nptr)return false;
-		subblock = (mercury_variable**)nptr;
-		array->values[subnumber] = subblock;
-		for (mercury_int i = 0; i < (1 << MERCURY_ARRAY_BLOCKSIZE); i++) {
-			subblock[i] = nullptr;
+bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos, mercury_state* const M_CPP_restrict M) {
+#ifdef MERCURY_64BIT
+	if (!array->values) {
+		array->values = (mercury_variable*******)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
+		if (!array->values) {
+			return false;
 		}
 	}
-	if (subblock[mantisa])
-	{
-		if (M){
-			mercury_unassign_var(M, subblock[mantisa]);
+
+	int current_subindex = get_array_index_from_mint_1(pos);
+	mercury_variable ******sa1 = array->values[current_subindex];
+	if (!sa1) {
+		sa1=(mercury_variable******)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
+		if (!sa1) {
+			return false;
+		}
+		array->values[current_subindex]=sa1;
+	}
+	
+	current_subindex = get_array_index_from_mint_2(pos);
+	mercury_variable***** sa2 = sa1[current_subindex];
+	if (!sa2) {
+		sa2 = (mercury_variable*****)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
+		if (!sa2) {
+			return false;
+		}
+		sa1[current_subindex] = sa2;
+	}
+
+	current_subindex = get_array_index_from_mint_3(pos);
+	mercury_variable**** sa3 = sa2[current_subindex];
+	if (!sa3) {
+		sa3 = (mercury_variable****)calloc(MERCURY_SIZE_SUBARRAY_4, sizeof(void*));
+		if (!sa3) {
+			return false;
+		}
+		sa2[current_subindex] = sa3;
+	}
+
+	current_subindex = get_array_index_from_mint_4(pos);
+	mercury_variable*** sa4 = sa3[current_subindex];
+	if (!sa4) {
+		sa4 = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_5, sizeof(void*));
+		if (!sa4) {
+			return false;
+		}
+		sa3[current_subindex] = sa4;
+	}
+
+	current_subindex = get_array_index_from_mint_5(pos);
+	mercury_variable** sa5 = sa4[current_subindex];
+	if (!sa5) {
+		sa5 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_6, sizeof(void*));
+		if (!sa5) {
+			return false;
+		}
+		sa4[current_subindex] = sa5;
+	}
+
+	current_subindex = get_array_index_from_mint_6(pos);
+	mercury_variable* arrvar = sa5[current_subindex];
+	if (arrvar) {
+		if (M) {
+			mercury_unassign_var(M, arrvar);
 		}
 		else {
-			mercury_free_var(subblock[mantisa]);
+			mercury_free_var(arrvar);
 		}
 	}
-	subblock[mantisa] = (mercury_variable*)var;
+	sa5[current_subindex] = (mercury_variable*)var;
+#else
+	if (!array->values) {
+		array->values = (mercury_variable****)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
+		if (!array->values) {
+			return false;
+		}
+	}
 
+	int current_subindex = get_array_index_from_mint_1(pos);
+	mercury_variable*** sa1 = array->values[current_subindex];
+	if (!sa1) {
+		sa1 = (mercury_variable******)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
+		if (!sa1) {
+			return false;
+		}
+		array->values[current_subindex] = sa1;
+	}
+
+	current_subindex = get_array_index_from_mint_2(pos);
+	mercury_variable** sa2 = sa1[current_subindex];
+	if (!sa2) {
+		sa2 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
+		if (!sa2) {
+			return false;
+		}
+		sa1[current_subindex] = sa2;
+	}
+
+	current_subindex = get_array_index_from_mint_6(pos);
+	mercury_variable* arrvar = sa2[current_subindex];
+	if (arrvar) {
+		if (M) {
+			mercury_unassign_var(M, arrvar);
+		}
+		else {
+			mercury_free_var(arrvar);
+		}
+	}
+	sa2[current_subindex] = (mercury_variable*)var;
+#endif
 	return true;
 }
 
 mercury_variable* mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_state* const M_CPP_restrict M) {
-	mercury_variable* out;
-	if (pos < 0) {
-		out = M?mercury_assign_var(M):(mercury_variable*)malloc(sizeof(mercury_variable));
-		if (!out)return nullptr;
-		out->data.i = 0;
-		out->type = M_TYPE_NIL;
-		return out;
+	if (!array->values)goto no_index;
+#ifdef MERCURY_64BIT
+	{
+		int current_subindex = get_array_index_from_mint_1(pos);
+		mercury_variable****** sa1 = array->values[current_subindex];
+		if (!sa1)goto no_index;
+		current_subindex = get_array_index_from_mint_2(pos);
+		mercury_variable***** sa2 = sa1[current_subindex];
+		if (!sa2)goto no_index;
+		current_subindex = get_array_index_from_mint_3(pos);
+		mercury_variable**** sa3 = sa2[current_subindex];
+		if (!sa3)goto no_index;
+		current_subindex = get_array_index_from_mint_4(pos);
+		mercury_variable*** sa4 = sa3[current_subindex];
+		if (!sa4)goto no_index;
+		current_subindex = get_array_index_from_mint_5(pos);
+		mercury_variable** sa5 = sa4[current_subindex];
+		if (!sa5)goto no_index;
+		current_subindex = get_array_index_from_mint_6(pos);
+		mercury_variable* var = sa5[current_subindex];
+		if (var)return mercury_clonevariable(var, M);
 	}
-	const mercury_int subnumber = pos >> MERCURY_ARRAY_BLOCKSIZE;
-	const mercury_int mantisa = pos & ((1 << MERCURY_ARRAY_BLOCKSIZE) - 1);
-
-	if (subnumber >= array->size) {
-		out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (!out)return nullptr;
-		out->data.i = 0;
-		out->type = M_TYPE_NIL;
-		return out;
+#else
+	{
+		int current_subindex = get_array_index_from_mint_1(pos);
+		mercury_variable*** sa1 = array->values[current_subindex];
+		if (!sa1)goto no_index;
+		current_subindex = get_array_index_from_mint_2(pos);
+		mercury_variable** sa2 = sa1[current_subindex];
+		if (!sa2)goto no_index;
+		current_subindex = get_array_index_from_mint_3(pos);
+		mercury_variable* var = sa2[current_subindex];
+		if (var)return mercury_clonevariable(var, M);
 	}
-
-	mercury_variable** subblock = array->values[subnumber];
-	if (!subblock) {
-		out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (!out)return nullptr;
-		out->data.i = 0;
-		out->type = M_TYPE_NIL;
-		return out;
-	}
-
-	if (subblock[mantisa]) {
-		return mercury_clonevariable(subblock[mantisa],M);
-	}
-	else {
-		out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (!out)return nullptr;
-		out->data.i = 0;
-		out->type = M_TYPE_NIL;
-		return out;
-	}
-
+#endif
+	no_index:
+	mercury_variable* out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
+	if (!out)return nullptr;
+	out->data.i = 0;
+	out->type = M_TYPE_NIL;
+	return out;
 }
 
 mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
-	if (!arr->size)return 0;
-	const mercury_variable* const* const suba=arr->values[arr->size-1]; //did somebody say const?
-	mercury_int slen = 0;
-	for (mercury_int i = 0; i < (1 << MERCURY_ARRAY_BLOCKSIZE); i++) {
-		if (suba[i] && suba[i]->type) {
-			slen = i;
+	if (!arr->values)return -1;
+	mercury_int out = 0;
+#ifdef MERCURY_64BIT
+	//this can't be the best way to do it. i mean... just look at this piece of shit.
+	for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1>=0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
+		mercury_variable****** const st1 = arr->values[i1];
+		if (!st1)continue;
+		for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 >= 0; i2--) {
+			mercury_variable***** const st2 = st1[i2];
+			if (!st2)continue;
+			for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 >= 0; i3--) {
+				mercury_variable**** const st3 = st2[i3];
+				if (!st3)continue;
+				for (int i4 = (MERCURY_SIZE_SUBARRAY_4 - 1); i4 >= 0; i4--) {
+					mercury_variable*** const st4 = st3[i4];
+					if (!st4)continue;
+					for (int i5 = (MERCURY_SIZE_SUBARRAY_5 - 1); i5 >= 0; i5--) {
+						mercury_variable** const st5 = st4[i5];
+						if (!st5)continue;
+						for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 > 0; i6--) {
+							const mercury_variable* const var = st5[i6];
+							if (var && var->type)return mercury_reconstruct_array_index(i1,i2,i3,i4,i5,i6);
+						}
+					}
+				}
+			}
 		}
 	}
-	return (slen | ((arr->size-1) << MERCURY_ARRAY_BLOCKSIZE)) +1;
+#else
+	//it's less shit here but still not great.
+	for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
+		mercury_variable****** const st1 = arr->values[i1];
+		if (!st1)continue;
+		for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
+			mercury_variable***** const st2 = st1[i2];
+			if (!st2)continue;
+			for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
+				const mercury_variable* const var = st2[i3];
+				if (var && var->type)return mercury_reconstruct_array_index(i1, i2, i3);
+			}
+		}
+	}
+#endif
+	return -1;
 }
 
 

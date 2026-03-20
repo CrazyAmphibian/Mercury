@@ -105,8 +105,90 @@ struct mercury_debug_token {
 struct mercury_array { //gee bill, two storage types?
 	mercury_int size = 0;
 	mercury_uint refrences = 0;
-	mercury_variable*** values = nullptr; //array of arrays of pointers to structs. array -> array -> struct*
+#ifdef MERCURY_64BIT
+	mercury_variable******* values = nullptr; //array of arrays of arrays of arrays of arrays of arrays of pointers to structs.  array ->  array ->  array ->  array -> array -> array -> struct*. who needs efficency, anyways? hey look pal, you wanted 64 bit indexes, you're gonna get 64 bit indexes.
+#else
+	mercury_variable**** values = nullptr; //array of arrays of arrays of pointers to structs. array -> array -> array -> struct*
+#endif
 };
+
+/*
+arrays are split into subarrays. this is to make it so that sparse arrays don't eat up all your dedotated wam.
+this is done asymetrically, naturally. This is done so that iterating is still somewhat fast for close indexes.
+*/
+#ifdef MERCURY_64BIT
+/*
+on a 64 bit system, bits are layed out like this:
+<---------------------------64 bits---------------------------->
+<10 bits-><10 bits-><10 bits-><10 bits-><--12 bits-><--12 bits->
+<most sig ------------------------------------------> least sig>
+ensures that worst case, a single variable will consume 12kb 
+*/
+inline int get_array_index_from_mint_1(mercury_uint i) {
+	return (i >> 54);
+}
+inline int get_array_index_from_mint_2(mercury_uint i) {
+	return (i >> 44) & 0b1111111111;
+}
+inline int get_array_index_from_mint_3(mercury_uint i) {
+	return (i >> 34) & 0b1111111111;
+}
+inline int get_array_index_from_mint_4(mercury_uint i) {
+	return (i >> 24) & 0b1111111111;
+}
+inline int get_array_index_from_mint_5(mercury_uint i) {
+	return (i >> 12) & 0b111111111111;
+}
+inline int get_array_index_from_mint_6(mercury_uint i) {
+	return i & 0b111111111111;
+}
+constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111 + 1;
+constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111 + 1;
+constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b1111111111 + 1;
+constexpr int MERCURY_SIZE_SUBARRAY_4 = 0b1111111111 + 1;
+constexpr int MERCURY_SIZE_SUBARRAY_5 = 0b111111111111 + 1;
+constexpr int MERCURY_SIZE_SUBARRAY_6 = 0b111111111111 + 1;
+
+constexpr int MERCURY_WIDTH_SUBARRAY_1 = 10;
+constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;
+constexpr int MERCURY_WIDTH_SUBARRAY_3 = 10;
+constexpr int MERCURY_WIDTH_SUBARRAY_4 = 10;
+constexpr int MERCURY_WIDTH_SUBARRAY_5 = 12;
+constexpr int MERCURY_WIDTH_SUBARRAY_6 = 12;
+
+inline mercury_int mercury_reconstruct_array_index(int i1, int i2, int i3, int i4, int i5, int i6) {
+	return (((((((((i1 << MERCURY_WIDTH_SUBARRAY_2) | i2) << MERCURY_WIDTH_SUBARRAY_3) | i3) << MERCURY_WIDTH_SUBARRAY_4) | i4) << MERCURY_WIDTH_SUBARRAY_5) | i5) << MERCURY_WIDTH_SUBARRAY_6) | i6;
+}
+#else
+/*
+on a 32 bit system, bits are layed out like this:
+<------------32 bits----------->
+<10 bits-><10 bits-><--12 bits->
+<most sig ----------> least sig>
+ensures that worst case, a single variable will consume 6kb
+*/
+inline int get_array_index_from_mint_1(mercury_uint i) {
+	return (i >> 22);
+}
+inline int get_array_index_from_mint_2(mercury_uint i) {
+	return (i >> 12)&0b1111111111;
+}
+inline int get_array_index_from_mint_3(mercury_uint i) {
+	return i&0b111111111111;
+}
+constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111;
+constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111;
+constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b111111111111;
+
+constexpr int MERCURY_WIDTH_SUBARRAY_1 = 10;
+constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;
+constexpr int MERCURY_WIDTH_SUBARRAY_3 = 12;
+
+inline mercury_int mercury_reconstruct_array_index(int i1, int i2, int i3) {
+	return (((((((((i1 << MERCURY_WIDTH_SUBARRAY_2) | i2) << MERCURY_WIDTH_SUBARRAY_3) | i3) << MERCURY_WIDTH_SUBARRAY_4) | i4) << MERCURY_WIDTH_SUBARRAY_5) | i5) << MERCURY_WIDTH_SUBARRAY_6) | i6;
+	return (((i1 << MERCURY_WIDTH_SUBARRAY_2) | i2) << MERCURY_WIDTH_SUBARRAY_3) | i3;
+}
+#endif
 
 struct mercury_function {
 	mercury_uint refrences = 0;
@@ -184,7 +266,6 @@ enum M_TYPE_ENUMS:uint8_t {
 
 extern uint16_t register_max;// = 0xf; //registers rage from 0 to this number
 
-#define MERCURY_ARRAY_BLOCKSIZE 8
 
 struct mercury_libdef {
 	uint8_t type = M_TYPE_CFUNC;
@@ -213,6 +294,7 @@ MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_
 
 //table
 MERCURY_DYNAMIC_LIBRARY mercury_table* mercury_newtable();
+MERCURY_DYNAMIC_LIBRARY void mercury_destroyarray(mercury_array* const M_CPP_restrict arr);
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_state* const M_CPP_restrict M=nullptr);
 MERCURY_DYNAMIC_LIBRARY mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M=nullptr);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2);

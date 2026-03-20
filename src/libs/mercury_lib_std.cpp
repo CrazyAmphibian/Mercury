@@ -85,47 +85,95 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 		mercury_array* arr = (mercury_array*)listlike->data.p;
 		mercury_int srefs = arr->refrences;
 
-		for (mercury_int b = 0; b < arr->size; b++) {
-			if (!arr->values[b])continue;
-			for (mercury_int i = 0; i < (1 << MERCURY_ARRAY_BLOCKSIZE) - 1; i++) {
-				mercury_variable* var = arr->values[b][i];
-				if (var) {
-					mercury_variable* idxvar = mercury_assign_var(M);
-					idxvar->data.i = (b << MERCURY_ARRAY_BLOCKSIZE) | i;
-					idxvar->type = M_TYPE_INT;
 
-					if (function->type == M_TYPE_CFUNC) {
-						mercury_pushstack(SubM, idxvar);
-						mercury_pushstack(SubM, var);
-						mercury_pushstack(SubM, listlike);
-						((mercury_cfunc)function->data.p)(SubM,3,1);
+		if (arr->values) {
+#ifdef MERCURY_64BIT
+			for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+				mercury_variable****** const st1 = arr->values[i1];
+				if (!st1)continue;
+				for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+					mercury_variable***** const st2 = st1[i2];
+					if (!st2)continue;
+					for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+						mercury_variable**** const st3 = st2[i3];
+						if (!st3)continue;
+						for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+							mercury_variable*** const st4 = st3[i4];
+							if (!st4)continue;
+							for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+								mercury_variable** const st5 = st4[i5];
+								if (!st5)continue;
+								for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+									mercury_variable* const var = st5[i6];
+									const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+#else
+			for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+				mercury_variable****** const st1 = arr->values[i1];
+				if (!st1)continue;
+				for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+					mercury_variable***** const st2 = st1[i2];
+					if (!st2)continue;
+					for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+						mercury_variable* const var = st2[i3];
+						const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+#endif
+						if (var) {
+							mercury_variable* idxvar = mercury_assign_var(M);
+							idxvar->data.i = index;
+							idxvar->type = M_TYPE_INT;
 
-						mercury_variable* o = mercury_pullstack(SubM);
-						if (mercury_checkbool(o)) {
-							b = arr->size; //soft break from both loops.
-							i = (1 << MERCURY_ARRAY_BLOCKSIZE) - 1;
+							if (function->type == M_TYPE_CFUNC) {
+								mercury_pushstack(SubM, idxvar);
+								mercury_pushstack(SubM, var);
+								mercury_pushstack(SubM, listlike);
+								((mercury_cfunc)function->data.p)(SubM, 3, 1);
+
+								mercury_variable* o = mercury_pullstack(SubM);
+								if (mercury_checkbool(o)) { //soft break from all loops
+#ifdef MERCURY_64BIT
+									i1 = i2 = i3 = i4 = i5 = i6 = INT_MAX-1;
+#else
+									i1 = i2 = i3 = INT_MAX-1;
+#endif
+								}
+								mercury_free_var(o);
+							}
+							else { //M functions get args in the reverse order. confusing, but it works.
+								mercury_pushstack(SubM, listlike);
+								mercury_pushstack(SubM, var);
+								mercury_pushstack(SubM, idxvar);
+								while (mercury_stepstate(SubM));
+								SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
+
+								mercury_variable* o = mercury_pullstack(SubM);
+								if (mercury_checkbool(o)) { //soft break from all loops
+#ifdef MERCURY_64BIT
+									i1 = i2 = i3 = i4 = i5 = i6 = INT_MAX-1;
+#else
+									i1 = i2 = i3 = INT_MAX-1;
+#endif
+								}
+								mercury_free_var(o);
+
+								M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
+							}
 						}
-						mercury_free_var(o);
-					}
-					else { //M functions get args in the reverse order. confusing, but it works.
-						mercury_pushstack(SubM, listlike);
-						mercury_pushstack(SubM, var);
-						mercury_pushstack(SubM, idxvar);
-						while (mercury_stepstate(SubM));
-						SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
 
-						mercury_variable* o = mercury_pullstack(SubM);
-						if (mercury_checkbool(o)) {
-							b = arr->size; //soft break from both loops.
-							i = (1 << MERCURY_ARRAY_BLOCKSIZE) - 1;
+
+#ifdef MERCURY_64BIT
+								}
+							}
 						}
-						mercury_free_var(o);
-
-						M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
 					}
 				}
 			}
+#else
+					}
+				}
+			}
+#endif
 		}
+
 		arr->refrences = srefs;
 
 
@@ -397,34 +445,68 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 		str = mercury_cstring_to_mstring((char*)"[", 1);
 		{
 			mercury_array* arr = (mercury_array*)data.p;
-			for (mercury_int block = 0; block < arr->size; block++) {
-				//mercury_int block = i >> MERCURY_ARRAY_BLOCKSIZE;
 
-				if (arr->values[block]) {
-					for (mercury_int pos = 0; pos < (1 << MERCURY_ARRAY_BLOCKSIZE); pos++) {
-						//mercury_int pos = i & ((1 << MERCURY_ARRAY_BLOCKSIZE) - 1);
-						if (!arr->values[block][pos])continue;
-						mercury_int i = (block << MERCURY_ARRAY_BLOCKSIZE) | pos;
+			if (arr->values) {
+#ifdef MERCURY_64BIT
+				for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+					mercury_variable****** const st1 = arr->values[i1];
+					if (!st1)continue;
+					for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+						mercury_variable***** const st2 = st1[i2];
+						if (!st2)continue;
+						for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+							mercury_variable**** const st3 = st2[i3];
+							if (!st3)continue;
+							for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+								mercury_variable*** const st4 = st3[i4];
+								if (!st4)continue;
+								for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+									mercury_variable** const st5 = st4[i5];
+									if (!st5)continue;
+									for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+										mercury_variable* const var = st5[i6];
+										const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+#else
+				for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+					mercury_variable****** const st1 = arr->values[i1];
+					if (!st1)continue;
+					for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+						mercury_variable***** const st2 = st1[i2];
+						if (!st2)continue;
+						for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+							mercury_variable* const var = st2[i3];
+							const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+#endif
+							if (var) {
+								temp = m_stringify(var->data, var->type);
+								if (!temp)continue;
 
-						mercury_variable* var = arr->values[block][pos];
-						temp = m_stringify(var->data, var->type);
-						if (!temp)continue;
+								mercury_stringliteral* temp2 = m_stringify({ index }, M_TYPE_INT);
+								mercury_mstrings_append(str, temp2);
+								mercury_mstring_delete(temp2);
 
-						mercury_stringliteral* temp2 = m_stringify({ i = i }, M_TYPE_INT);
-						mercury_mstrings_append(str, temp2);
-						mercury_mstring_delete(temp2);
+								mercury_mstring_addchars(str, (char*)"=", 1);
 
-						mercury_mstring_addchars(str, (char*)"=", 1);
+								mercury_mstrings_append(str, temp);
+								mercury_mstring_delete(temp);
 
-						mercury_mstrings_append(str, temp);
-						mercury_mstring_delete(temp);
+								mercury_mstring_addchars(str, (char*)",");
+							}
 
-						mercury_mstring_addchars(str, (char*)",");
+#ifdef MERCURY_64BIT
+									}
+								}
+							}
+						}
 					}
 				}
+#else
+						}
+					}
+				}
+#endif				
 			}
 		}
-
 		mercury_mstring_addchars(str, (char*)"]");
 		break;
 	default:
