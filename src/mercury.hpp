@@ -103,7 +103,6 @@ struct mercury_debug_token {
 };
 
 struct mercury_array { //gee bill, two storage types?
-	mercury_int size = 0;
 	mercury_uint refrences = 0;
 #ifdef MERCURY_64BIT
 	mercury_variable******* values = nullptr; //array of arrays of arrays of arrays of arrays of arrays of pointers to structs.  array ->  array ->  array ->  array -> array -> array -> struct*. who needs efficency, anyways? hey look pal, you wanted 64 bit indexes, you're gonna get 64 bit indexes.

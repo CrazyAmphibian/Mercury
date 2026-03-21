@@ -721,7 +721,6 @@ mercury_array* mercury_newarray() {
 	mercury_array* nar = (mercury_array*)malloc(sizeof(mercury_array));
 	if (nar == nullptr)return nullptr;
 
-	nar->size = 0;
 	nar->refrences = 1;
 	nar->values = nullptr;
 
