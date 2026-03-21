@@ -185,7 +185,6 @@ constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;
 constexpr int MERCURY_WIDTH_SUBARRAY_3 = 12;
 
 inline mercury_int mercury_reconstruct_array_index(int i1, int i2, int i3) {
-	return (((((((((i1 << MERCURY_WIDTH_SUBARRAY_2) | i2) << MERCURY_WIDTH_SUBARRAY_3) | i3) << MERCURY_WIDTH_SUBARRAY_4) | i4) << MERCURY_WIDTH_SUBARRAY_5) | i5) << MERCURY_WIDTH_SUBARRAY_6) | i6;
 	return (((i1 << MERCURY_WIDTH_SUBARRAY_2) | i2) << MERCURY_WIDTH_SUBARRAY_3) | i3;
 }
 #endif

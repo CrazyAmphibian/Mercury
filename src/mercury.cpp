@@ -764,10 +764,10 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 #else
 		//it's less shit here but still not great.
 		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
-			mercury_variable****** const st1 = arr->values[i1];
+			mercury_variable*** const st1 = arr->values[i1];
 			if (!st1)continue;
 			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
-				mercury_variable***** const st2 = st1[i2];
+				mercury_variable** const st2 = st1[i2];
 				if (!st2)continue;
 				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
 					mercury_variable* const var = st2[i3];
@@ -864,7 +864,7 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	int current_subindex = get_array_index_from_mint_1(pos);
 	mercury_variable*** sa1 = array->values[current_subindex];
 	if (!sa1) {
-		sa1 = (mercury_variable******)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
+		sa1 = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
 		if (!sa1) {
 			return false;
 		}
@@ -881,7 +881,7 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 		sa1[current_subindex] = sa2;
 	}
 
-	current_subindex = get_array_index_from_mint_6(pos);
+	current_subindex = get_array_index_from_mint_3(pos);
 	mercury_variable* arrvar = sa2[current_subindex];
 	if (arrvar) {
 		if (M) {
@@ -972,10 +972,10 @@ mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
 #else
 	//it's less shit here but still not great.
 	for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
-		mercury_variable****** const st1 = arr->values[i1];
+		mercury_variable*** const st1 = arr->values[i1];
 		if (!st1)continue;
 		for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
-			mercury_variable***** const st2 = st1[i2];
+			mercury_variable** const st2 = st1[i2];
 			if (!st2)continue;
 			for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
 				const mercury_variable* const var = st2[i3];

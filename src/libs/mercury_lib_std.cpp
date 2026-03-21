@@ -108,10 +108,10 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 									const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
 #else
 			for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
-				mercury_variable****** const st1 = arr->values[i1];
+				mercury_variable*** const st1 = arr->values[i1];
 				if (!st1)continue;
 				for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
-					mercury_variable***** const st2 = st1[i2];
+					mercury_variable** const st2 = st1[i2];
 					if (!st2)continue;
 					for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
 						mercury_variable* const var = st2[i3];
@@ -468,10 +468,10 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 										const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
 #else
 				for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
-					mercury_variable****** const st1 = arr->values[i1];
+					mercury_variable*** const st1 = arr->values[i1];
 					if (!st1)continue;
 					for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
-						mercury_variable***** const st2 = st1[i2];
+						mercury_variable** const st2 = st1[i2];
 						if (!st2)continue;
 						for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
 							mercury_variable* const var = st2[i3];

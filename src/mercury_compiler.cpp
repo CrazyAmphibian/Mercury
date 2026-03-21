@@ -1260,7 +1260,7 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 					add_instruction(f,M_OPCODE_CPYT,token_offset);
 						
 					add_instruction(f,M_OPCODE_NINT,token_offset);
-					add_rawdata_double(f,*(binarydata*)&implicit_position,token_offset);
+					add_rawdata_bitwidth_size(f,*(binarydata*)&implicit_position,token_offset);
 					implicit_position++;
 						
 					merge_compiler_functions(f,idxfunc);
@@ -1977,7 +1977,7 @@ mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token** to
 	}
 	
 	add_instruction(f, M_OPCODE_JMPR, token_offset-1);
-	add_rawdata_double(f, ci->loop_jumppoint_start-f->number_instructions,token_offset-1);
+	add_rawdata_bitwidth_size(f, ci->loop_jumppoint_start-f->number_instructions,token_offset-1);
 
 	for(mercury_int i=0;i<ci->loop_endpoint_ref_count;i++){
 		*(mercury_int*)(f->instructions+ci->loop_endpoint_ref_pos[i]) =f->number_instructions-ci->loop_endpoint_ref_pos[i];

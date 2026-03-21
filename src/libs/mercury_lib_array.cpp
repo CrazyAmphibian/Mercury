@@ -105,10 +105,10 @@ void mercury_lib_array_flush(mercury_state* const M_CPP_restrict M, const mercur
 #else
 		//it's less shit here but still not great.
 		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1>>1; i1++) { //bitshift right once because we are ignoring negative values, and those start with 1
-			mercury_variable****** const st1 = arr->values[i1];
+			mercury_variable*** const st1 = arr->values[i1];
 			if (!st1)continue;
 			for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
-				mercury_variable***** const st2 = st1[i2];
+				mercury_variable** const st2 = st1[i2];
 				if (!st2)continue;
 				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
 					mercury_variable* const var = st2[i3];
@@ -126,10 +126,10 @@ void mercury_lib_array_flush(mercury_state* const M_CPP_restrict M, const mercur
 			}
 		}
 		for (int i1 = MERCURY_SIZE_SUBARRAY_1 - 1; i1 > (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1--) { //now do the negative values. these count backwards
-			mercury_variable****** const st1 = arr->values[i1];
+			mercury_variable*** const st1 = arr->values[i1];
 			if (!st1)continue;
 			for (int i2 = MERCURY_SIZE_SUBARRAY_2; i2 >= 0; i2--) {
-				mercury_variable***** const st2 = st1[i2];
+				mercury_variable** const st2 = st1[i2];
 				if (!st2)continue;
 				for (int i3 = MERCURY_SIZE_SUBARRAY_3; i3 >= 0; i3--) {
 					mercury_variable* const var = st2[i3];
@@ -188,12 +188,12 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 
 
 	if (arr1->values) {
+#ifdef MERCURY_64BIT
 		arr2->values = (mercury_variable*******)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
 		if (!arr2->values) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
-#ifdef MERCURY_64BIT
 		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
 			mercury_variable****** const st1_1 = arr1->values[i1];
 			if (!st1_1)continue;
@@ -249,6 +249,11 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 			}
 		}
 #else
+		arr2->values = (mercury_variable****)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
+		if (!arr2->values) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
 		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
 			mercury_variable*** const st1_1 = arr1->values[i1];
 			if (!st1_1)continue;
@@ -268,7 +273,7 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 				}
 				st1_2[i2] = st2_2;
 				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
-					const mercury_variable* const var = st5_1[i3];
+					const mercury_variable* const var = st2_1[i3];
 					if (var)st2_2[i3] = mercury_clonevariable(var, M);
 				}
 			}
