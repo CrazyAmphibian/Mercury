@@ -1778,7 +1778,7 @@ void M_BYTECODE_LEN(mercury_state* const M_CPP_restrict M) { //LENgth
 	case M_TYPE_ARRAY:
 		out = mercury_assign_var(M);
 		out->type = M_TYPE_INT;
-		out->data.i = mercury_array_len((mercury_array*)var->data.p);
+		out->data.i = mercury_array_len((mercury_array*)var->data.p)+1;
 		break;
 	case M_TYPE_STRING:
 		out = mercury_assign_var(M);
