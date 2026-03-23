@@ -225,7 +225,7 @@ mercury_table* mercury_newtable() {
 	return newt;
 }
 
-void mercury_destroytable(mercury_table* const table) { //not ideal, but it works. kind of.
+void mercury_destroytable(mercury_table* const M_CPP_restrict table) { //not ideal, but it works. kind of.
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st->size; i2++) {
@@ -505,17 +505,7 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 	{
 		mercury_table* ftab = (mercury_table*)var->data.p;
 		if (!ftab->refrences && !ftab->enviromental) {
-			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
-				mercury_subtable* st = ftab->data[t];
-				for (mercury_int i = 0; i < st->size; i++) {
-					mercury_free_var(st->values[i]);
-					mercury_free_var(st->keys[i]);
-				}
-				free(st->keys);
-				free(st->values);
-				free(st);
-			}
-			free(ftab);
+			mercury_destroytable(ftab);
 		}
 	}
 		break;
