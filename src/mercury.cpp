@@ -273,6 +273,7 @@ mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const k
 				mercury_free_var(subt->values[i]);
 				mercury_free_var(key);
 			}
+			//mercury_increment_variable_refrences(value);
 			subt->values[i] = (mercury_variable*)value;
 			return i;
 		}
@@ -285,6 +286,8 @@ mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const k
 	if (nptr == nullptr) return -1;
 	subt->values = (mercury_variable**)nptr;
 
+	//mercury_increment_variable_refrences(key);
+	//mercury_increment_variable_refrences(value);
 	subt->keys[subt->size] = key;
 	subt->values[subt->size] = (mercury_variable*)value;
 
@@ -493,19 +496,14 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 	if (var == nullptr)return;
 	if (var->constant)return;
 
+	mercury_decrement_variable_refrences(var);
+
 	switch (var->type)
 	{
 	case M_TYPE_TABLE:
 	{
 		mercury_table* ftab = (mercury_table*)var->data.p;
-		ftab->refrences--;
 		if (!ftab->refrences && !ftab->enviromental) {
-
-#ifdef MERCURY_DEBUG
-			if (ftab->enviromental) {
-				printf("enviromental table %p marked for freeing. something has gone terribly worng. probably.\n",ftab);
-			}
-#endif
 			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 				mercury_subtable* st = ftab->data[t];
 				for (mercury_int i = 0; i < st->size; i++) {
@@ -530,7 +528,7 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 	case M_TYPE_ARRAY:
 		{
 		mercury_array* farray = (mercury_array*)var->data.p; //get the array
-		farray->refrences--;
+		//printf("arr %p refc: %zu\n", farray, farray->refrences);
 		if (!farray->refrences) { //if this is the last refrence, destroy all
 			mercury_destroyarray(farray);
 		}
@@ -539,7 +537,6 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 	case M_TYPE_FUNCTION:
 		{
 		mercury_function* ffunction = (mercury_function*)var->data.p;
-		ffunction->refrences--;
 		if (!ffunction->refrences) {
 			//free(ffunction->instructions); //this causes a heap issue. dunno why.
 			free(ffunction);
@@ -549,7 +546,6 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 	case M_TYPE_FILE:
 	{
 		mercury_filewrapper* fw = (mercury_filewrapper*)var->data.p;
-		fw->refrences--;
 		if (!fw->refrences) {
 			if (fw->open)fclose(fw->file);
 			free(fw);
@@ -559,7 +555,6 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 	case M_TYPE_THREAD:
 	{
 		mercury_threadholder* t = (mercury_threadholder*)var->data.p;
-		t->refrences--;
 		if (!t->refrences) {
 			if (!t->finished) { //you stupid son of a bitch why are you like this?
 #if defined(_WIN32) || defined(_WIN64)
@@ -637,38 +632,7 @@ bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 	M->stack[M->sizeofstack] = var;
 	M->sizeofstack++;
 
-	switch (var->type) {
-	case M_TYPE_ARRAY:
-	{
-		mercury_array* a = (mercury_array*)var->data.p;
-		a->refrences++;
-	}
-		break;
-	case M_TYPE_TABLE:
-	{
-		mercury_table* t = (mercury_table*)var->data.p;
-		t->refrences++;
-	}
-		break;
-	case M_TYPE_FUNCTION:
-	{
-		mercury_function* f = (mercury_function*)var->data.p;
-		f->refrences++;
-	}
-		break;
-	case M_TYPE_FILE:
-	{
-		mercury_filewrapper* w = (mercury_filewrapper*)var->data.p;
-		w->refrences++;
-	}
-		break;
-	case M_TYPE_THREAD:
-	{
-		mercury_threadholder* t = (mercury_threadholder*)var->data.p;
-		t->refrences++;
-	}
-		break;
-	}
+	mercury_increment_variable_refrences(var);
 
 	return true;
 }
@@ -689,29 +653,11 @@ mercury_variable* mercury_clonevariable(const mercury_variable* const var,mercur
 		case M_TYPE_STRING:
 			out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
 			break;
-		case M_TYPE_TABLE:
-			((mercury_table*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_ARRAY:
-			((mercury_array*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_FILE:
-			((mercury_filewrapper*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_THREAD:
-			((mercury_threadholder*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_FUNCTION:
-			((mercury_function*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
 		default:
 			out->data = var->data;
 	}
+
+	mercury_increment_variable_refrences(var);
 	
 	return out;
 }
@@ -851,6 +797,7 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 			mercury_free_var(arrvar);
 		}
 	}
+	//mercury_increment_variable_refrences(var);
 	sa5[current_subindex] = (mercury_variable*)var;
 #else
 	if (!array->values) {
@@ -890,6 +837,7 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 			mercury_free_var(arrvar);
 		}
 	}
+	//mercury_increment_variable_refrences(var);
 	sa2[current_subindex] = (mercury_variable*)var;
 #endif
 	return true;

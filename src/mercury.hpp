@@ -335,3 +335,43 @@ MERCURY_DYNAMIC_LIBRARY void mercury_populate_enviroment_with_libs(mercury_state
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_rawbinary_debug(mercury_function* F);
 MERCURY_DYNAMIC_LIBRARY void mercury_debugdumptable(mercury_table* tab, int level = 0);
+
+
+inline void mercury_increment_variable_refrences(const mercury_variable* const M_CPP_restrict var) {
+	switch (var->type) {
+	case M_TYPE_TABLE:
+		((mercury_table*)var->data.p)->refrences++;
+		break;
+	case M_TYPE_ARRAY:
+		((mercury_array*)var->data.p)->refrences++;
+		break;
+	case M_TYPE_FUNCTION:
+		((mercury_function*)var->data.p)->refrences++;
+		break;
+	case M_TYPE_FILE:
+		((mercury_filewrapper*)var->data.p)->refrences++;
+		break;
+	case M_TYPE_THREAD:
+		((mercury_threadholder*)var->data.p)->refrences++;
+		break;
+	}
+}
+inline void mercury_decrement_variable_refrences(mercury_variable* const M_CPP_restrict var) {
+	switch (var->type) {
+	case M_TYPE_TABLE:
+		((mercury_table*)var->data.p)->refrences--;
+		break;
+	case M_TYPE_ARRAY:
+		((mercury_array*)var->data.p)->refrences--;
+		break;
+	case M_TYPE_FUNCTION:
+		((mercury_function*)var->data.p)->refrences--;
+		break;
+	case M_TYPE_FILE:
+		((mercury_filewrapper*)var->data.p)->refrences--;
+		break;
+	case M_TYPE_THREAD:
+		((mercury_threadholder*)var->data.p)->refrences--;
+		break;
+	}
+}

@@ -6,7 +6,7 @@
 #include<stdio.h>
 #include<string.h>
 #include <stdlib.h>
-#include <climits.h>
+#include <limits.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -81,9 +81,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
-		listlike->constant = true; //prevents the array being garbage collected when we mess with the substate.
+		//listlike->constant = true; //prevents the array being garbage collected when we mess with the substate.
 		mercury_array* arr = (mercury_array*)listlike->data.p;
-		mercury_int srefs = arr->refrences;
+		//mercury_int srefs = arr->refrences;
 
 
 		if (arr->values) {
@@ -124,8 +124,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 							if (function->type == M_TYPE_CFUNC) {
 								mercury_pushstack(SubM, idxvar);
-								mercury_pushstack(SubM, var);
-								mercury_pushstack(SubM, listlike);
+								mercury_pushstack(SubM, mercury_clonevariable(var));
+								mercury_pushstack(SubM, mercury_clonevariable(listlike));
 								((mercury_cfunc)function->data.p)(SubM, 3, 1);
 
 								mercury_variable* o = mercury_pullstack(SubM);
@@ -139,8 +139,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 								mercury_free_var(o);
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
-								mercury_pushstack(SubM, listlike);
-								mercury_pushstack(SubM, var);
+								mercury_pushstack(SubM, mercury_clonevariable(listlike));
+								mercury_pushstack(SubM, mercury_clonevariable(var));
 								mercury_pushstack(SubM, idxvar);
 								while (mercury_stepstate(SubM));
 								SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
@@ -174,14 +174,14 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 #endif
 		}
 
-		arr->refrences = srefs;
+		//arr->refrences = srefs;
 
 
 	}
 	else if (listlike->type == M_TYPE_TABLE) {
-		listlike->constant = true;
+		//listlike->constant = true;
 		mercury_table* tab = (mercury_table*)listlike->data.p;
-		mercury_int srefs = tab->refrences;
+		//mercury_int srefs = tab->refrences;
 
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* subt = tab->data[t];
@@ -193,7 +193,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 				if (function->type == M_TYPE_CFUNC) {
 					mercury_pushstack(SubM, k);
 					mercury_pushstack(SubM, v);
-					mercury_pushstack(SubM, listlike);
+					mercury_pushstack(SubM, mercury_clonevariable(listlike));
 					((mercury_cfunc)function->data.p)(SubM, 3, 1);
 					mercury_variable* o=mercury_pullstack(SubM);
 					if (mercury_checkbool(o)) {
@@ -204,7 +204,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					
 				}
 				else {
-					mercury_pushstack(SubM, listlike);
+					mercury_pushstack(SubM, mercury_clonevariable(listlike));
 					mercury_pushstack(SubM, v);
 					mercury_pushstack(SubM, k);
 					
@@ -222,7 +222,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 				
 			}
 		}
-		tab->refrences = srefs;
+		//tab->refrences = srefs;
 
 
 	}
@@ -234,7 +234,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 	mercury_destroystate(SubM);
 
-	listlike->constant = false;
+	//listlike->constant = false;
 	mercury_unassign_var(M, function);
 	mercury_unassign_var(M, listlike);
 
