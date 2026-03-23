@@ -229,6 +229,7 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st->size; i2++) {
+			mercury_free_var(st->keys[i2]);
 			mercury_free_var(st->values[i2]);
 		}
 		free(st);
