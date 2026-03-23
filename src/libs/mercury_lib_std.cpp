@@ -6,7 +6,7 @@
 #include<stdio.h>
 #include<string.h>
 #include <stdlib.h>
-
+#include <climits.h>
 
 #ifdef _WIN32
 #include <Windows.h>
