@@ -124,8 +124,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 							if (function->type == M_TYPE_CFUNC) {
 								mercury_pushstack(SubM, idxvar);
-								mercury_pushstack(SubM, var);
-								mercury_pushstack(SubM, listlike);
+								mercury_pushstack(SubM, mercury_clonevariable(var));
+								mercury_pushstack(SubM, mercury_clonevariable(listlike));
 								((mercury_cfunc)function->data.p)(SubM, 3, 1);
 
 								mercury_variable* o = mercury_pullstack(SubM);
@@ -140,8 +140,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
 								mercury_pushstack(SubM, listlike);
-								mercury_pushstack(SubM, var);
-								mercury_pushstack(SubM, idxvar);
+								mercury_pushstack(SubM, mercury_clonevariable(var));
+								mercury_pushstack(SubM, mercury_clonevariable(idxvar));
 								while (mercury_stepstate(SubM));
 								SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
 
