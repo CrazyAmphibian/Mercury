@@ -694,7 +694,7 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 							if (!st5)continue;
 							for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 > 0; i6--) {
 								mercury_variable* const var = st5[i6];
-								if (var)return mercury_free_var(var);
+								if (var && var->type)return mercury_free_var(var);
 							}
 							free(st5);
 						}
