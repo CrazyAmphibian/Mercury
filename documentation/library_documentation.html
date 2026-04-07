@@ -5,7 +5,8 @@
 	<title>Mercury: libraries</title>
 	<meta name="generator" content="LibreOffice 7.5.1.2 (Windows)"/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2026-03-13T22:39:23.423000000"/>
+	<meta name="changed" content="2026-04-07T13:29:12.657000000"/>
+	<meta name="created" content="00:00:00">
 	<style type="text/css">
 		h2.cjk { font-family: "NSimSun" }
 		h2.ctl { font-family: "Arial" }
@@ -91,7 +92,6 @@ function usage, or internal semantics.
 			desc</p>
 		</th>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_NIL</p>
@@ -106,7 +106,6 @@ function usage, or internal semantics.
 			The numeric type of nil</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_INT</p>
@@ -121,7 +120,6 @@ function usage, or internal semantics.
 			The numeric type of integers</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_FLOAT</p>
@@ -136,7 +134,6 @@ function usage, or internal semantics.
 			The numeric type of floats</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_BOOL</p>
@@ -151,7 +148,6 @@ function usage, or internal semantics.
 			The numeric type of bools</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_TABLE</p>
@@ -166,7 +162,6 @@ function usage, or internal semantics.
 			The numeric type of tables</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_STRING</p>
@@ -181,7 +176,6 @@ function usage, or internal semantics.
 			The numeric type of strings</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_CFUNC</p>
@@ -196,7 +190,6 @@ function usage, or internal semantics.
 			The numeric type of C functions</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_ARRAY</p>
@@ -211,7 +204,6 @@ function usage, or internal semantics.
 			The numeric type of arrays</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_FUNCTION</p>
@@ -226,7 +218,6 @@ function usage, or internal semantics.
 			The numeric type of Mercury functions</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_FILE</p>
@@ -241,7 +232,6 @@ function usage, or internal semantics.
 			The numeric type of files</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr>
 		<td width="160" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			M_TYPE_THREAD</p>
@@ -1713,6 +1703,237 @@ function compared to execute.
 <p class="example">os.call(&quot;curl www.test-site.com&quot;)
 //returns 0 
 </p>
+<h3 class="funcheader-western">get_date (<font color="#888888">in</font><font color="#888888">t</font><font color="#888888">
+</font>epoch_time)</h3>
+<p>Returns a table containing data about the date given an epoch
+timestep. The following data is given:</p>
+<table width="100%" cellpadding="4" cellspacing="0" style="page-break-inside: avoid">
+	<col width="100*"/>
+
+	<col width="156*"/>
+
+	<tr valign="top">
+		<td width="39%" style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			<b>Key</b></p>
+		</td>
+		<td width="61%" style="border: 1.50pt solid #000000; padding: 0.04in"><p>
+			<b>Value</b></p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			seconds</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The number of seconds in the time as an integer from 0 to 60</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			minutes</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The number of minutes in the time as an integer from 0 to 60</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			hours</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The number of hours in the time as an integer from 1 to 24</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			hours12</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The number of hours in the time as an integer from 1 to 12</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			ispm</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			A boolean if a 12 hour clock would read the time as PM, to be used
+			with hours12</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			year</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The year of the time, as an integer</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			month</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The month of the time, as an integer from 1 to 12</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			dayofweek</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The day of the week, as an integer from 0 to 6, with 0
+			representing Sunday.</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			dayofmonth</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The day of the month, as an integer from 1 to 31.</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			dayofyear</p>
+		</td>
+		<td width="61%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
+			The day of the year, as an integer from 1 to 366</p>
+		</td>
+	</tr>
+</table>
+<p><br/>
+<br/>
+
+</p>
+<p class="example">print(&quot;the year is &quot; ..
+os.get_date(os.time()).year)</p>
+<h3 class="funcheader-western">get_time (<font color="#888888">table</font><font color="#888888">
+</font>date)</h3>
+<p>Returns an integer as epoch time, based upon the date table
+provided. The function uses the following keys, though does have
+fallback values:</p>
+<p>returns -1 on an error.  Behavior before the epoch (January 1<sup>st</sup>,
+1970) is system dependent, and may fail.</p>
+<table width="100%" cellpadding="4" cellspacing="0" style="page-break-inside: avoid">
+	<col width="62*"/>
+
+	<col width="149*"/>
+
+	<col width="45*"/>
+
+	<tr valign="top">
+		<td width="24%" style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			<b>Key</b></p>
+		</td>
+		<td width="58%" style="border-top: 1.50pt solid #000000; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			<b>Value</b></p>
+		</td>
+		<td width="18%" style="border: 1.50pt solid #000000; padding: 0.04in"><p>
+			<b>Default</b></p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			seconds</p>
+		</td>
+		<td width="58%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			The number of seconds in the time as an integer from 0 to 60</p>
+		</td>
+		<td width="18%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in" sdval="0" sdnum="1033;"><p>
+			0</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			minutes</p>
+		</td>
+		<td width="58%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			The number of minutes in the time as an integer from 0 to 60</p>
+		</td>
+		<td width="18%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in" sdval="0" sdnum="1033;"><p>
+			0</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			hours</p>
+		</td>
+		<td width="58%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			The number of hours in the time as an integer from 1 to 24</p>
+		</td>
+		<td width="18%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in" sdval="1" sdnum="1033;"><p>
+			1</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			dayofmonth</p>
+		</td>
+		<td width="58%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			The day of the month, as an integer from 1 to 31.</p>
+		</td>
+		<td width="18%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in" sdval="1" sdnum="1033;"><p>
+			1</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			month</p>
+		</td>
+		<td width="58%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			The month of the time, as an integer from 1 to 12</p>
+		</td>
+		<td width="18%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in" sdval="1" sdnum="1033;"><p>
+			1</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			year</p>
+		</td>
+		<td width="58%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			The year of the time, as an integer</p>
+		</td>
+		<td width="18%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in" sdval="1900" sdnum="1033;"><p>
+			1900</p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr valign="top">
+		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			daylightsavings</p>
+		</td>
+		<td width="58%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
+			If daylight savings is active. 0=no, 1=yes, -1=auto detect</p>
+		</td>
+		<td width="18%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in" sdval="0" sdnum="1033;"><p>
+			0</p>
+		</td>
+	</tr>
+</table>
+<p style="margin-bottom: 0in"><br/>
+
+</p>
+<p style="margin-bottom: 0in">print(&quot;the time during january
+3rd, 2143 is &quot;..get_time({&quot;year&quot;=2143,&quot;month&quot;=1,&quot;dayofmonth&quot;=3}))</p>
 <h1>Thread library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader-western">new (<font color="#888888">function</font>

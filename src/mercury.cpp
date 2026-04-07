@@ -1839,6 +1839,8 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_os_execute, "execute", "os");
 	mercury_register_library(mercury_lib_os_call, "call", "os");
 	mercury_register_library(mercury_lib_os_clock, "clock", "os");
+	mercury_register_library(mercury_lib_os_getdate, "get_date", "os");
+	mercury_register_library(mercury_lib_os_gettime, "get_time", "os");
 	mercury_register_library((void*)&m_os_isposix, "IS_POSIX", "os", M_TYPE_BOOL);
 	mercury_register_library((void*)&m_os_isposix, "IS_UNIX", "os", M_TYPE_BOOL);
 	mercury_register_library((void*)&m_os_is64bit, "IS_64BIT", "os", M_TYPE_BOOL);
