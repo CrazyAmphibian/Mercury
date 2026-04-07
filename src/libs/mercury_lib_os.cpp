@@ -200,7 +200,7 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	if (!args_out)return;
 
-	mercury_variable* tvar=mercury_pullstack(M);
+	mercury_variable* tvar= mercury_popstack(M);
 	time_t t;
 	switch (tvar->type) {
 	case M_TYPE_INT:
@@ -295,7 +295,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	if (!args_out)return;
 
-	mercury_variable* tvar = mercury_pullstack(M);
+	mercury_variable* tvar = mercury_popstack(M);
 	if(tvar->type!=M_TYPE_TABLE) {
 		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)tvar->type, (void*)M_TYPE_TABLE);
 		return;
