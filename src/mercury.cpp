@@ -104,6 +104,15 @@ bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercu
 	return true;
 }
 
+bool mercury_mstring_equal_cstring(const mercury_stringliteral* const mstr,const char* const cstr) {
+	if (mstr->ptr == cstr)return true;
+	if (strlen(cstr) != mstr->size)return false;
+	for (mercury_int i = 0; i < mstr->size; i++) {
+		if (mstr->ptr[i] != cstr[i])return false;
+	}
+	return true;
+}
+
 mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
 	mercury_stringliteral* nstr=(mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (nstr == nullptr) return nullptr;
@@ -317,7 +326,68 @@ bool mercury_tables_equal(const mercury_table* const table1, const mercury_table
 }
 
 
+mercury_variable* mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_state* const M_CPP_restrict M) {
+	const mercury_subtable* const subt = table->data[M_TYPE_STRING];
+	for (mercury_int i = 0; i < subt->size; i++) {
+		if(mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i]->data.p,key)){
+			return mercury_clonevariable(subt->values[i], M);
+		}
+	}
+	mercury_variable* const outvar = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
+	if (outvar == nullptr) return nullptr;
+	outvar->type = M_TYPE_NIL;
+	outvar->data.i = 0;
+	return outvar;
+}
 
+
+bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M) {
+	mercury_subtable* subt = table->data[M_TYPE_STRING];
+	for (mercury_int i = 0; i < subt->size; i++) {
+		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i]->data.p,key)) {
+			if (M) {
+				mercury_unassign_var(M, subt->values[i]);
+			}
+			else {
+				mercury_free_var(subt->values[i]);
+			}
+			subt->values[i] = (mercury_variable*)value;
+		}
+	}
+
+	void* nptr = realloc(subt->keys, sizeof(mercury_variable*) * (subt->size + 1));
+	if (nptr == nullptr) return -1;
+	subt->keys = (mercury_variable**)nptr;
+	nptr = realloc(subt->values, sizeof(mercury_variable*) * (subt->size + 1));
+	if (nptr == nullptr) return -1;
+	subt->values = (mercury_variable**)nptr;
+
+	mercury_variable* kv;
+	if (M) {
+		kv = mercury_assign_var(M);
+	}
+	else {
+		kv = (mercury_variable*)malloc(sizeof(mercury_variable));
+		if (!kv)return -1;
+	}
+	kv->constant = 0;
+	kv->type = M_TYPE_STRING;
+	kv->data.p = mercury_cstring_to_mstring(key,strlen(key));
+	subt->keys[subt->size] = kv;
+	subt->values[subt->size] = (mercury_variable*)value;
+
+	subt->size++;
+
+	return subt->size - 1;
+}
+
+bool mercury_table_has_cstring_key(const mercury_table* const table, const char* const key) {
+	const mercury_subtable* const subt = table->data[M_TYPE_STRING];
+	for (mercury_int i = 0; i < subt->size; i++) {
+		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i]->data.p, key))return true;
+	}
+	return false;
+}
 
 
 
