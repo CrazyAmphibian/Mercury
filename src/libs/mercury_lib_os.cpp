@@ -342,7 +342,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_unassign_var(M, var);
 
 	var = mercury_table_get_cstring_keyvalue(tab, "dayofmonth", M);
-	timedata.tm_mday = mercury_checkint();
+	timedata.tm_mday = mercury_checkint(var);
 	mercury_unassign_var(M, var);
 	
 	mercury_table_get_cstring_keyvalue(tab, "daylightsavings", M);
