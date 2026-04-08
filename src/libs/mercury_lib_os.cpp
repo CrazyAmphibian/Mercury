@@ -306,8 +306,13 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_table* tab = (mercury_table*)tvar->data.p;
 	mercury_variable* var;
 
-	timedata.tm_sec= mercury_checkint(mercury_table_get_cstring_keyvalue(tab, "seconds", M));
-	timedata.tm_min= mercury_checkint(mercury_table_get_cstring_keyvalue(tab, "minutes", M));
+	var = mercury_table_get_cstring_keyvalue(tab, "seconds", M);
+	timedata.tm_sec= mercury_checkint(var);
+	mercury_unassign_var(M, var);
+
+	var = mercury_table_get_cstring_keyvalue(tab, "minutes", M);
+	timedata.tm_min= mercury_checkint(var);
+	mercury_unassign_var(M, var);
 	
 	var = mercury_table_get_cstring_keyvalue(tab, "hours", M);
 	if (var->type == M_TYPE_INT || var->type == M_TYPE_FLOAT) {
@@ -336,8 +341,13 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	mercury_unassign_var(M, var);
 
-	timedata.tm_mday = mercury_checkint(mercury_table_get_cstring_keyvalue(tab, "dayofmonth", M));
-	timedata.tm_isdst = mercury_checkint(mercury_table_get_cstring_keyvalue(tab, "daylightsavings", M));
+	var = mercury_table_get_cstring_keyvalue(tab, "dayofmonth", M);
+	timedata.tm_mday = mercury_checkint();
+	mercury_unassign_var(M, var);
+	
+	mercury_table_get_cstring_keyvalue(tab, "daylightsavings", M);
+	timedata.tm_isdst = mercury_checkint(var);
+	mercury_unassign_var(M, var);
 
 	mercury_variable* out= mercury_assign_var(M);
 	if (!out) {
