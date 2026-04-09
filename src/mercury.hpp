@@ -319,6 +319,7 @@ MERCURY_DYNAMIC_LIBRARY void mercury_destroystate(mercury_state* const M_CPP_res
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_popstack(mercury_state* const M_CPP_restrict M);
 MERCURY_DYNAMIC_LIBRARY bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_pullstack(mercury_state* const M_CPP_restrict M);
+MERCURY_DYNAMIC_LIBRARY bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
 
 MERCURY_DYNAMIC_LIBRARY bool mercury_unassign_var(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_assign_var(mercury_state* const M_CPP_restrict M);

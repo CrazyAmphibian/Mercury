@@ -1370,7 +1370,7 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 	mercury_state* check_state = M;
 	while (check_state) {
 		if (mercury_tablehaskey(check_state->enviroment, key)) {
-			mercury_pushstack(M, mercury_getkey(check_state->enviroment, key, M));
+			mercury_pushstack_unrefed(M, mercury_getkey(check_state->enviroment, key, M));
 			//mercury_unassign_var(M, key);
 			return;
 		}
@@ -1462,7 +1462,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		//mercury_unassign_var(M, key);
 	}
 	mercury_unassign_var(M, table);
-	mercury_pushstack(M, out);
+	mercury_pushstack_unrefed(M, out);
 }
 
 
@@ -1857,7 +1857,7 @@ void M_BYTECODE_CLS(mercury_state* const M_CPP_restrict M) { // CLear Stack
 
 void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 	//yeah, this is pretty simple.
-	mercury_pushstack(M,mercury_getkey(M->enviroment, mercury_popstack(M), M));
+	mercury_pushstack_unrefed(M,mercury_getkey(M->enviroment, mercury_popstack(M), M));
 }
 
 void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
@@ -1869,7 +1869,7 @@ void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 
 void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
 	//ditto.
-	mercury_pushstack(M, mercury_getkey(M->masterstate->enviroment, mercury_popstack(M), M));
+	mercury_pushstack_unrefed(M, mercury_getkey(M->masterstate->enviroment, mercury_popstack(M), M));
 }
 
 void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
