@@ -1636,7 +1636,7 @@ void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / N
 	out->data.p = fptr;
 	M->programcounter += function_size;
 
-	mercury_pushstack(M, out);
+	mercury_pushstack_unrefed(M, out);
 }
 
 void M_BYTECODE_NTAB(mercury_state* const M_CPP_restrict M) { //New TABle
@@ -1653,7 +1653,7 @@ void M_BYTECODE_NTAB(mercury_state* const M_CPP_restrict M) { //New TABle
 	}
 	out->type = M_TYPE_TABLE;
 	out->data.p = (void*)ntab;
-	mercury_pushstack(M, out);
+	mercury_pushstack_unrefed(M, out);
 }
 
 void M_BYTECODE_NARR(mercury_state* const M_CPP_restrict M) { //New ARRay
@@ -1670,7 +1670,7 @@ void M_BYTECODE_NARR(mercury_state* const M_CPP_restrict M) { //New ARRay
 	}
 	out->type = M_TYPE_ARRAY;
 	out->data.p = (void*)narr;
-	mercury_pushstack(M, out);
+	mercury_pushstack_unrefed(M, out);
 }
 
 void M_BYTECODE_JMP(mercury_state* const M_CPP_restrict M) { //JuMP
@@ -1742,11 +1742,11 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 		//FM->bytecode.numberofinstructions = func->numberofinstructions;
 		memcpy(&FM->bytecode, ck->data.p, sizeof(mercury_function));
 		for (mercury_int i = 0; i < args_in;i++) {
-			mercury_pushstack(FM, mercury_popstack(M));
+			mercury_pushstack_unrefed(FM, mercury_popstack(M));
 		}
 		while (mercury_stepstate(FM)) {};
 		for (mercury_int i = 0; i < args_out; i++) {
-			mercury_pushstack(M, mercury_pullstack(FM));
+			mercury_pushstack_unrefed(M, mercury_pullstack(FM));
 			
 		}
 		FM->bytecode.instructions = nullptr; //so the bytecode isn't freed

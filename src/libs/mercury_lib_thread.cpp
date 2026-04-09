@@ -168,7 +168,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 	}
 
-	mercury_pushstack(M, out);
+	mercury_pushstack_unrefed(M, out);
 
 	for (mercury_int a = 1; a < args_out; a++) {
 		mercury_variable* mv = mercury_assign_var(M);
