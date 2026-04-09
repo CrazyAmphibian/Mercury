@@ -238,8 +238,11 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st->size; i2++) {
+			mercury_free_var(st->keys[i2]);
 			mercury_free_var(st->values[i2]);
 		}
+		free(st->keys);
+		free(st->values);
 		free(st);
 	}
 	free(table);
@@ -511,16 +514,17 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 		free(M->registers);
 	}
 
+	//if (M->parentstate)M->parentstate->enviroment->refrences--;
+
+	if(M->enviroment)mercury_destroytable(M->enviroment);
+	if(M->bytecode.instructions)free(M->bytecode.instructions);
+
 	for (mercury_uint i = 0; i < M->num_constants; i++) {
 		mercury_variable* v = M->constants[i];
 		v->constant = 0;
 		mercury_free_var(v);
 	}
 
-	//if (M->parentstate)M->parentstate->enviroment->refrences--;
-
-	if(M->enviroment)mercury_destroytable(M->enviroment);
-	if(M->bytecode.instructions)free(M->bytecode.instructions);
 	free(M);
 }
 
@@ -576,17 +580,7 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 				printf("enviromental table %p marked for freeing. something has gone terribly worng. probably.\n",ftab);
 			}
 #endif
-			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
-				mercury_subtable* st = ftab->data[t];
-				for (mercury_int i = 0; i < st->size; i++) {
-					mercury_free_var(st->values[i]);
-					mercury_free_var(st->keys[i]);
-				}
-				free(st->keys);
-				free(st->values);
-				free(st);
-			}
-			free(ftab);
+			mercury_destroytable(ftab);
 		}
 	}
 		break;
@@ -755,6 +749,7 @@ bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_va
 
 	M->stack[M->sizeofstack] = var;
 	M->sizeofstack++;
+	return true;
 }
 
 mercury_variable* mercury_clonevariable(const mercury_variable* const var,mercury_state* const M_CPP_restrict M) {
