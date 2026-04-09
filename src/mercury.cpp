@@ -1881,6 +1881,7 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_debug_constants_dbg, "dumpconstants", "debug");
 	mercury_register_library(mercury_lib_debug_bytecode_dbg, "dumpbytecode", "debug");
 	mercury_register_library(mercury_lib_debug_bytecode_rawbinary_dbg, "dumprawbytecode", "debug");
+	mercury_register_library(mercury_lib_debug_refcount_dbg, "showrefs", "debug");
 
 #endif
 

@@ -168,7 +168,7 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,1);
 
 	if (args_in == 1) { //read bytecode from function
-		mercury_variable* in = mercury_pullstack(M);
+		mercury_variable* in = mercury_popstack(M);
 		if (in->type == M_TYPE_FUNCTION) {
 			printf("variable %p function %p bytecode (%zu)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions );
 			mercury_stringliteral* l = mercury_get_bytecode_debug( ((mercury_function*)in->data.p) );
@@ -200,7 +200,7 @@ void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restric
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0, 1);
 
 	if (args_in == 1) { //read bytecode from function
-		mercury_variable* in = mercury_pullstack(M);
+		mercury_variable* in = mercury_popstack(M);
 		if (in->type == M_TYPE_FUNCTION) {
 			printf("variable %p function %p bytecode (%zu)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions);
 			mercury_stringliteral* l = mercury_get_bytecode_rawbinary_debug(((mercury_function*)in->data.p));
@@ -223,6 +223,36 @@ void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restric
 		}
 		putchar('\n');
 	}
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+}
+
+
+void mercury_lib_debug_refcount_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
+	mercury_variable* in = mercury_popstack(M);
+
+	switch (in->type) {
+		case M_TYPE_TABLE:
+			printf("table has %zu refrences.\n", ((mercury_table*)in->data.p)->refrences);
+			break;
+		case M_TYPE_ARRAY:
+			printf("array has %zu refrences.\n", ((mercury_array*)in->data.p)->refrences);
+			break;
+		case M_TYPE_FUNCTION:
+			printf("function has %zu refrences.\n", ((mercury_function*)in->data.p)->refrences);
+			break;
+		case M_TYPE_THREAD:
+			printf("thread has %zu refrences.\n", ((mercury_threadholder*)in->data.p)->refrences);
+			break;
+		case M_TYPE_FILE:
+			printf("file has %zu refrences.\n", ((mercury_filewrapper*)in->data.p)->refrences);
+			break;
+		default:
+			printf("type is not refcounted.\n");
+	}
+	mercury_unassign_var(M, in);
+
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
