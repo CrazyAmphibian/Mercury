@@ -452,7 +452,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 			if (c == '\n' || c == '\r' || c==EOF) {
 				if (cbuf) {
 					mercury_stringliteral* s= mercury_cstring_to_mstring(buf,cbuf);
-					mercury_variable* v=(mercury_variable*)malloc(sizeof(mercury_variable));
+					mercury_variable* v=mercury_assign_var(M);
 					if (!v) {
 						mercury_raise_error(M, M_ERROR_ALLOCATION);
 						rewind(f);
@@ -489,7 +489,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 
 	out->type = M_TYPE_ARRAY;
 	out->data.p = arr;
-	mercury_pushstack(M, out);
+	mercury_pushstack_unrefed(M, out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }

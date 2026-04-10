@@ -810,7 +810,7 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 	if (arr->values) {
 #ifdef MERCURY_64BIT
 		//this can't be the best way to do it. i mean... just look at this piece of shit.
-		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
+		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 > 0; i1--) {
 			mercury_variable****** const st1 = arr->values[i1];
 			if (!st1)continue;
 			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
@@ -841,7 +841,7 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 		}
 #else
 		//it's less shit here but still not great.
-		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
+		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 > 0; i1--) {
 			mercury_variable*** const st1 = arr->values[i1];
 			if (!st1)continue;
 			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {

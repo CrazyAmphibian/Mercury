@@ -81,7 +81,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
-		listlike->constant = true; //prevents the array being garbage collected when we mess with the substate.
+		//listlike->constant = true; //prevents the array being garbage collected when we mess with the substate.
 		mercury_array* arr = (mercury_array*)listlike->data.p;
 		mercury_int srefs = arr->refrences;
 
@@ -124,8 +124,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 							if (function->type == M_TYPE_CFUNC) {
 								mercury_pushstack(SubM, idxvar);
-								mercury_pushstack(SubM, mercury_clonevariable(var));
-								mercury_pushstack(SubM, mercury_clonevariable(listlike));
+								mercury_pushstack_unrefed(SubM, mercury_clonevariable(var));
+								mercury_pushstack_unrefed(SubM, mercury_clonevariable(listlike));
 								((mercury_cfunc)function->data.p)(SubM, 3, 1);
 
 								mercury_variable* o = mercury_pullstack(SubM);
@@ -140,8 +140,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
 								mercury_pushstack(SubM, listlike);
-								mercury_pushstack(SubM, mercury_clonevariable(var));
-								mercury_pushstack(SubM, mercury_clonevariable(idxvar));
+								mercury_pushstack_unrefed(SubM, mercury_clonevariable(var));
+								mercury_pushstack_unrefed(SubM, mercury_clonevariable(idxvar));
 								while (mercury_stepstate(SubM));
 								SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
 
@@ -179,7 +179,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 	}
 	else if (listlike->type == M_TYPE_TABLE) {
-		listlike->constant = true;
+		//listlike->constant = true;
 		mercury_table* tab = (mercury_table*)listlike->data.p;
 		mercury_int srefs = tab->refrences;
 
@@ -191,8 +191,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 				mercury_variable* v = mercury_clonevariable(subt->values[i]);
 				
 				if (function->type == M_TYPE_CFUNC) {
-					mercury_pushstack(SubM, k);
-					mercury_pushstack(SubM, v);
+					mercury_pushstack_unrefed(SubM, k);
+					mercury_pushstack_unrefed(SubM, v);
 					mercury_pushstack(SubM, listlike);
 					((mercury_cfunc)function->data.p)(SubM, 3, 1);
 					mercury_variable* o=mercury_pullstack(SubM);
@@ -205,8 +205,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 				}
 				else {
 					mercury_pushstack(SubM, listlike);
-					mercury_pushstack(SubM, v);
-					mercury_pushstack(SubM, k);
+					mercury_pushstack_unrefed(SubM, v);
+					mercury_pushstack_unrefed(SubM, k);
 					
 					while (mercury_stepstate(SubM));
 					SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
@@ -234,7 +234,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 	mercury_destroystate(SubM);
 
-	listlike->constant = false;
+	//listlike->constant = false;
 	mercury_unassign_var(M, function);
 	mercury_unassign_var(M, listlike);
 
