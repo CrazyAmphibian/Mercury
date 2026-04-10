@@ -123,7 +123,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 							idxvar->type = M_TYPE_INT;
 
 							if (function->type == M_TYPE_CFUNC) {
-								mercury_pushstack(SubM, idxvar);
+								mercury_pushstack_unrefed(SubM, idxvar);
 								mercury_pushstack_unrefed(SubM, mercury_clonevariable(var));
 								mercury_pushstack_unrefed(SubM, mercury_clonevariable(listlike));
 								((mercury_cfunc)function->data.p)(SubM, 3, 1);
@@ -137,11 +137,12 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 #endif
 								}
 								mercury_free_var(o);
+								M_BYTECODE_CLS(SubM);
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
-								mercury_pushstack(SubM, listlike);
+								mercury_pushstack_unrefed(SubM, mercury_clonevariable(listlike));
 								mercury_pushstack_unrefed(SubM, mercury_clonevariable(var));
-								mercury_pushstack_unrefed(SubM, mercury_clonevariable(idxvar));
+								mercury_pushstack_unrefed(SubM, idxvar);
 								while (mercury_stepstate(SubM));
 								SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
 

@@ -117,6 +117,7 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 		out->type = M_TYPE_NIL;
 		out->data.i = 0;
 	}
+	free(file);
 
 	mercury_unassign_var(M, file_var);
 	mercury_unassign_var(M, mode_var);
@@ -473,6 +474,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 					void* n=realloc(buf, bsize * 2);
 					if (!n) {
 						mercury_raise_error(M, M_ERROR_ALLOCATION);
+						free(buf);
 						rewind(f);
 						return;
 					}
@@ -483,7 +485,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 		}
 		rewind(f);
 	}
-
+	free(buf);
 	mercury_unassign_var(M, fil_var);
 	
 
