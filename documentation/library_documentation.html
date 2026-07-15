@@ -5,7 +5,8 @@
 	<title>Mercury: libraries</title>
 	<meta name="generator" content="LibreOffice 7.5.1.2 (Windows)"/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2026-04-07T13:29:12.657000000"/>
+	<meta name="changed" content="2026-07-15T13:26:27.987000000"/>
+	<meta name="created" content="00:00:00">
 	<meta name="created" content="00:00:00">
 	<style type="text/css">
 		h2.cjk { font-family: "NSimSun" }
@@ -318,7 +319,8 @@ dump(a)
 code)</h3>
 <p>attempts to compile a string as if it were mercury code. if
 successful, it will return a function which does that code.
-otherwise, returns a string containing the error encountered when compiling. 
+otherwise, returns a string containing the error encountered when
+compiling. 
 </p>
 <p class="example">a=compile(&quot;print(\&quot;hello, world!\&quot;)&quot;)
 <br/>
@@ -598,10 +600,12 @@ math.cos(1.2) //returns 0.36... <br/>
 math.tan(1.2)
 //returns 2.57... 
 </p>
-<h3 class="funcheader-western" style="margin-bottom: 0in"><font face="monospace">asin
-(<font color="#888888">number</font> ratio)</font></h3>
-<h3 class="funcheader-western" style="margin-bottom: 0in"><font face="monospace">acos
-(<font color="#888888">number</font> ratio)</font></h3>
+<h3 class="funcheader-western" style="margin-top: 0in; margin-bottom: 0in">
+<font face="monospace">asin (<font color="#888888">number</font>
+ratio)</font></h3>
+<h3 class="funcheader-western" style="margin-top: 0in; margin-bottom: 0in">
+<font face="monospace">acos (<font color="#888888">number</font>
+ratio)</font></h3>
 <h3 class="funcheader-western"><font face="monospace">atan (<font color="#888888">number</font>
 ratio)</font></h3>
 <p>returns the arcsine, arccosine, or arctangent of a given length
@@ -613,7 +617,7 @@ math.acos(0.36) //returns 1.2...
 <br/>
 math.atan(2.57) //returns 1.2... 
 </p>
-<h3 class="example"><font face="monospace">atan2 (<font color="#888888">number</font>
+<h3 class="western"><font face="monospace">atan2 (<font color="#888888">number</font>
 y, <font color="#888888">number</font> x)</font></h3>
 <p>returns an angle as a float in radians to reach another point at
 the relative coordinates x,y 
@@ -1711,7 +1715,7 @@ function compared to execute.
 <p class="example">os.call(&quot;curl www.test-site.com&quot;)
 //returns 0 
 </p>
-<h3 class="funcheader-western">get_date (<font color="#888888">in</font><font color="#888888">t</font><font color="#888888">
+<h3 class="funcheader-western">get_date (<font color="#888888">int
 </font>epoch_time)</h3>
 <p>Returns a table containing data about the date given an epoch
 timestep. The following data is given:</p>
@@ -1728,7 +1732,6 @@ timestep. The following data is given:</p>
 			<b>Value</b></p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			seconds</p>
@@ -1737,7 +1740,6 @@ timestep. The following data is given:</p>
 			The number of seconds in the time as an integer from 0 to 60</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			minutes</p>
@@ -1746,7 +1748,6 @@ timestep. The following data is given:</p>
 			The number of minutes in the time as an integer from 0 to 60</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			hours</p>
@@ -1755,7 +1756,6 @@ timestep. The following data is given:</p>
 			The number of hours in the time as an integer from 1 to 24</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			hours12</p>
@@ -1764,7 +1764,6 @@ timestep. The following data is given:</p>
 			The number of hours in the time as an integer from 1 to 12</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			ispm</p>
@@ -1774,7 +1773,6 @@ timestep. The following data is given:</p>
 			with hours12</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			year</p>
@@ -1783,7 +1781,6 @@ timestep. The following data is given:</p>
 			The year of the time, as an integer</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			month</p>
@@ -1792,7 +1789,6 @@ timestep. The following data is given:</p>
 			The month of the time, as an integer from 1 to 12</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			dayofweek</p>
@@ -1802,7 +1798,6 @@ timestep. The following data is given:</p>
 			representing Sunday.</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			dayofmonth</p>
@@ -1811,7 +1806,6 @@ timestep. The following data is given:</p>
 			The day of the month, as an integer from 1 to 31.</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="39%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			dayofyear</p>
@@ -1827,12 +1821,12 @@ timestep. The following data is given:</p>
 </p>
 <p class="example">print(&quot;the year is &quot; ..
 os.get_date(os.time()).year)</p>
-<h3 class="funcheader-western">get_time (<font color="#888888">table</font><font color="#888888">
+<h3 class="funcheader-western">get_time (<font color="#888888">table
 </font>date)</h3>
 <p>Returns an integer as epoch time, based upon the date table
 provided. The function uses the following keys, though does have
 fallback values:</p>
-<p>returns -1 on an error.  Behavior before the epoch (January 1<sup>st</sup>,
+<p>returns -1 on an error. Behavior before the epoch (January 1<sup>st</sup>,
 1970) is system dependent, and may fail.</p>
 <table width="100%" cellpadding="4" cellspacing="0" style="page-break-inside: avoid">
 	<col width="62*"/>
@@ -1852,7 +1846,6 @@ fallback values:</p>
 			<b>Default</b></p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			seconds</p>
@@ -1864,7 +1857,6 @@ fallback values:</p>
 			0</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			minutes</p>
@@ -1876,7 +1868,6 @@ fallback values:</p>
 			0</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			hours</p>
@@ -1888,7 +1879,6 @@ fallback values:</p>
 			1</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			dayofmonth</p>
@@ -1900,7 +1890,6 @@ fallback values:</p>
 			1</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			month</p>
@@ -1912,7 +1901,6 @@ fallback values:</p>
 			1</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			year</p>
@@ -1924,7 +1912,6 @@ fallback values:</p>
 			1900</p>
 		</td>
 	</tr>
-	<tr></tr>
 	<tr valign="top">
 		<td width="24%" style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
 			daylightsavings</p>
@@ -2074,6 +2061,27 @@ function=_ENV])</h3>
 the number of instructions, and each opcode and additional
 information. Returns no value. if no arg is given, instead uses the
 current state's bytecode. 
+</p>
+<h3 class="funcheader-western">dumprawbytecode ([<font color="#888888">function</font>
+function=_ENV])</h3>
+<p>logs information about the provided function to stdout, including
+the number of instructions, as well as a binary view of each,
+including raw data in the form of signed, unsigned, and char values.
+Returns no value. if no arg is given, instead uses the current
+state's bytecode. 
+</p>
+<h3 class="funcheader-western">showrefs (<font color="#888888">variable</font>
+var)</h3>
+<p>Shows how many refs the value has, printed to stdout. If a non
+ref-counted variable is provided, it will display an invalid message,
+but not error.</p>
+<h3 class="funcheader-western">dumpdebuginfo ([<font color="#888888">function</font>
+function=_ENV])</h3>
+<p>Displays the given function's (or current state's) debug tokens to
+stdout.</p>
+<p><br/>
+<br/>
+
 </p>
 </body>
 </html>
