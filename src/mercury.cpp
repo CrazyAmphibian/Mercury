@@ -572,11 +572,6 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 		}
 	}
 
-	if (M->bytecode.instructions) {
-		free(M->bytecode.instructions);
-		M->bytecode.instructions = nullptr;
-	}
-
 
 	for (mercury_uint i = 0; i < M->num_constants; i++) {
 		mercury_variable* v = M->constants[i];
@@ -605,6 +600,10 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 	free(M->unassignedstack);
 
 	if (M->enviroment)mercury_destroytable(M->enviroment);
+
+	if (M->bytecode.instructions) {
+		free(M->bytecode.instructions);
+	}
 
 	if (M->masterstate == M && M->registers) {
 		free(M->registers);

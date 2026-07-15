@@ -65,18 +65,17 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	}
 
 
-	mercury_state* SubM = mercury_newstate(M);
+	mercury_state* SubM = mercury_get_child_state(M);
+	if (!SubM) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	mercury_function previous = SubM->bytecode;
+
+	
+
 	if (function->type == M_TYPE_FUNCTION) {
-		mercury_function* func = (mercury_function*)function->data.p;
-		void* nbl = realloc(SubM->bytecode.instructions, func->numberofinstructions * sizeof(mercury_opcode));
-		if (!nbl) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_destroystate(SubM);
-			return;
-		}
-		SubM->bytecode.instructions = (mercury_opcode*)nbl;
-		SubM->bytecode.numberofinstructions = func->numberofinstructions;
-		memcpy(SubM->bytecode.instructions, func->instructions, func->numberofinstructions * sizeof(mercury_opcode));
+		SubM->bytecode = *((mercury_function*)function->data.p);
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
@@ -136,7 +135,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 #endif
 								}
 								mercury_free_var(o);
-								M_BYTECODE_CLS(SubM);
+								//M_BYTECODE_CLS(SubM);
+								mercury_clearstate(SubM);
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
 								mercury_pushstack_unrefed(SubM, mercury_clonevariable(listlike));
@@ -155,7 +155,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 								}
 								mercury_free_var(o);
 
-								M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
+								//M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
+								mercury_clearstate(SubM);
 							}
 						}
 
@@ -218,8 +219,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					}
 					mercury_free_var(o);
 				}
-				M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
-				
+				//M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
+				mercury_clearstate(SubM);
 			}
 		}
 		tab->refrences = srefs;
@@ -228,11 +229,11 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	else {
 		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_TABLE, (void*)listlike->type);
-		mercury_destroystate(SubM);
 		return;
 	}
 
-	mercury_destroystate(SubM);
+	SubM->bytecode= previous;
+	mercury_clearstate(SubM);
 
 	//listlike->constant = false;
 	mercury_unassign_var(M, function);
