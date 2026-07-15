@@ -79,7 +79,6 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	}
 
 	if (listlike->type == M_TYPE_ARRAY) {
-		//listlike->constant = true; //prevents the array being garbage collected when we mess with the substate.
 		mercury_array* arr = (mercury_array*)listlike->data.p;
 		mercury_int srefs = arr->refrences;
 
@@ -135,7 +134,6 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 #endif
 								}
 								mercury_free_var(o);
-								//M_BYTECODE_CLS(SubM);
 								mercury_clearstate(SubM);
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
@@ -155,7 +153,6 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 								}
 								mercury_free_var(o);
 
-								//M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
 								mercury_clearstate(SubM);
 							}
 						}
@@ -180,7 +177,6 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 	}
 	else if (listlike->type == M_TYPE_TABLE) {
-		//listlike->constant = true;
 		mercury_table* tab = (mercury_table*)listlike->data.p;
 		mercury_int srefs = tab->refrences;
 
@@ -219,7 +215,6 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					}
 					mercury_free_var(o);
 				}
-				//M_BYTECODE_CLS(SubM); //clear the stack to clean stuff up.
 				mercury_clearstate(SubM);
 			}
 		}
@@ -235,7 +230,6 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	SubM->bytecode= previous;
 	mercury_clearstate(SubM);
 
-	//listlike->constant = false;
 	mercury_unassign_var(M, function);
 	mercury_unassign_var(M, listlike);
 
