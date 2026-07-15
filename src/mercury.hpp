@@ -285,7 +285,7 @@ MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_equal(const mercury_stringliteral*
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
 MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mercury_int start, mercury_int end);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_tostring(const mercury_variable* const M_CPP_restrict var);
+MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_tostring(const mercury_variable* const M_CPP_restrict var);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_append(mercury_stringliteral* const basestr, const mercury_stringliteral* const appstr);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, const mercury_int len=1);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_CPP_restrict str);
@@ -340,3 +340,49 @@ MERCURY_DYNAMIC_LIBRARY void mercury_populate_enviroment_with_libs(mercury_state
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_rawbinary_debug(mercury_function* F);
 MERCURY_DYNAMIC_LIBRARY void mercury_debugdumptable(mercury_table* tab, int level = 0);
+
+//inlines, for SPEED
+inline void mercury_increment_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
+	switch (var->type) {
+	case M_TYPE_TABLE:
+		((mercury_table*)var->data.p)->refrences++;
+		return;
+	case M_TYPE_ARRAY:
+		((mercury_array*)var->data.p)->refrences++;
+		return;
+	case M_TYPE_FUNCTION:
+		((mercury_function*)var->data.p)->refrences++;
+		return;
+	case M_TYPE_FILE:
+		((mercury_filewrapper*)var->data.p)->refrences++;
+		return;
+	case M_TYPE_THREAD:
+		((mercury_threadholder*)var->data.p)->refrences++;
+		return;
+	}
+}
+inline void mercury_decrement_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
+	switch (var->type) {
+	case M_TYPE_TABLE:
+		((mercury_table*)var->data.p)->refrences--;
+		return;
+	case M_TYPE_ARRAY:
+		((mercury_array*)var->data.p)->refrences--;
+		return;
+	case M_TYPE_FUNCTION:
+		((mercury_function*)var->data.p)->refrences--;
+		return;
+	case M_TYPE_FILE:
+		((mercury_filewrapper*)var->data.p)->refrences--;
+		return;
+	case M_TYPE_THREAD:
+		((mercury_threadholder*)var->data.p)->refrences--;
+		return;
+	}
+}
+
+//returns the top stack without removing it. do not free the returned pointer. will return nullptr if stack is 0.
+inline mercury_variable* const mercury_peek_stack(const mercury_state* const M_CPP_restrict M) {
+	if (!M->sizeofstack)return nullptr;
+	return M->stack[M->sizeofstack - 1];
+}

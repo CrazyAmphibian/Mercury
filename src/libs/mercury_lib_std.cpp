@@ -29,22 +29,21 @@ void mercury_lib_std_print(mercury_state* const M_CPP_restrict M, const mercury_
 
 	for (mercury_int a = 0; a < args_in; a++) {
 
-		mercury_variable* mstrv = mercury_tostring(vartable[a]);
+		mercury_stringliteral* mstrv = mercury_tostring(vartable[a]);
 		mercury_unassign_var(M, vartable[a]);
-		if (mstrv->type == M_TYPE_STRING) {
-			mercury_stringliteral* str = (mercury_stringliteral*)mstrv->data.p;
-
-			
-
-			for (mercury_int c = 0; c < str->size; c++) {
-				putchar(str->ptr[c]);
+		if (mstrv) {
+			for (mercury_int c = 0; c < mstrv->size; c++) {
+				putchar(mstrv->ptr[c]);
 			}
 			putchar('\t');
 			fflush(stdout);
 
+			mercury_mstring_delete(mstrv);
 		}
-		mercury_free_var(mstrv);
+		
+		
 	}
+	free(vartable);
 	putchar('\n');
 	fflush(stdout);
 
@@ -603,9 +602,12 @@ void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercu
 	}
 
 	mercury_variable* i = mercury_popstack(M);
-	mercury_variable* o=mercury_tostring(i);
-	mercury_pushstack(M, o);
-	mercury_unassign_var(M,i);
+	mercury_stringliteral* l = mercury_tostring(i);
+	mercury_free_var(i, true); //we can just re-use the variable struct. saves time, probly
+	i->type = M_TYPE_STRING;
+	i->constant = 0;
+	i->data.p = l;
+	mercury_pushstack(M, i);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 1, 1);
 }

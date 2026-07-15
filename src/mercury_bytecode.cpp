@@ -1810,39 +1810,21 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 
 
 
-	mercury_variable* s2;
-	mercury_variable* s1;
+	mercury_stringliteral* s1 = mercury_tostring(v1);
+	mercury_stringliteral* s2 = mercury_tostring(v2);
 
-	if (v2->type == M_TYPE_STRING) {
-		s2 = v2;
+	mercury_unassign_var(M,v1);
+	mercury_unassign_var(M,v2);
+
+	mercury_variable* v = mercury_assign_var(M);
+	if (!v) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
 	}
-	else {
-		s2 = mercury_tostring(v2);
-		mercury_unassign_var(M, v2);
-	}
-	if (v1->type == M_TYPE_STRING) {
-		s1 = v1;
-	}
-	else {
-		s1 = mercury_tostring(v1);
-		mercury_unassign_var(M, v1);
-	}
-
-
-	//mercury_stringliteral* nstr =mercury_mstrings_concat((mercury_stringliteral*)s1->data.p,(mercury_stringliteral*)s2->data.p);
-	const mercury_stringliteral* const string1 = (mercury_stringliteral*)s1->data.p;
-	const mercury_stringliteral* const string2 = (mercury_stringliteral*)s2->data.p;
-
-	mercury_stringliteral* const nstr = mercury_mstrings_concat(string1, string2); //mercury_cstring_to_mstring(string1->ptr, string1->size);
-	//mercury_mstring_addchars(nstr, string2->ptr, string2->size);
-	mercury_variable* out = mercury_assign_var(M);
-	out->type = M_TYPE_STRING;
-	out->data.p =nstr;
-
-	mercury_unassign_var(M, s1);
-	mercury_unassign_var(M, s2);
-
-	mercury_pushstack(M, out);
+	v->type = M_TYPE_STRING;
+	v->constant = false;
+	v->data.p=mercury_mstrings_concat(s1, s2);
+	mercury_pushstack(M, v);
 }
 
 

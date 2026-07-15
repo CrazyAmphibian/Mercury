@@ -704,7 +704,7 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 	for (mercury_int i = 0; i < limit; i++) {
 		mercury_variable* var=mercury_getarray((mercury_array*)var_array->data.p, i, M);
 		if (var) {
-			mercury_mstrings_append(out_str, (mercury_stringliteral*)mercury_tostring(var)->data.p);
+			mercury_mstrings_append(out_str, mercury_tostring(var));
 		}
 		else {
 			mercury_mstring_addchars(out_str,(char*)"nil",3);

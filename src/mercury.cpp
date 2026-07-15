@@ -173,7 +173,7 @@ bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, c
 }
 
 void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str) {
-	if (str) {
+	if (str && !str->constant) {
 		free(str->ptr);
 		free(str);
 	}
@@ -1068,14 +1068,8 @@ mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
 
 
 
-mercury_variable* mercury_tostring(const mercury_variable* const M_CPP_restrict var) {
-	mercury_variable* const newvar = (mercury_variable*)malloc(sizeof(mercury_variable));
-	if (newvar == nullptr) return nullptr;
-	newvar->type = M_TYPE_STRING;
-	newvar->data.p = nullptr;
-	newvar->constant = false;
-
-	mercury_stringliteral* tstr;
+mercury_stringliteral* mercury_tostring(const mercury_variable* const M_CPP_restrict var) {
+	mercury_stringliteral* tstr=nullptr;
 
 	char tout[256];
 	for (int i = 0; i < 256; i++) {
@@ -1085,25 +1079,14 @@ mercury_variable* mercury_tostring(const mercury_variable* const M_CPP_restrict 
 
 	switch (var->type) {
 	case M_TYPE_NIL:
-		tstr = mercury_cstring_to_mstring((char*)"nil", 3);
-			if(tstr == nullptr) {
-				free(newvar);
-				return nullptr; 
-			}
-			newvar->data.p = tstr;
+		tstr = mercury_cstring_const_to_mstring((char*)"nil", 3);
 		break;
 	case M_TYPE_INT:
 		tint=snprintf( tout,sizeof(tout),"%zi",var->data.i);
 		if (tint==-1) {
-			free(newvar);
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout) );
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_FLOAT:
 		#ifdef MERCURY_64BIT
@@ -1113,112 +1096,60 @@ mercury_variable* mercury_tostring(const mercury_variable* const M_CPP_restrict 
 		#endif
 		
 		if (tint==-1) {
-			free(newvar);
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_BOOL:
 		if (var->data.i) {
-			tstr = mercury_cstring_to_mstring((char*)"true", 4);
+			tstr = mercury_cstring_const_to_mstring((char*)"true", 4);
 		}
 		else {
-			tstr = mercury_cstring_to_mstring((char*)"false", 5);
+			tstr = mercury_cstring_const_to_mstring((char*)"false", 5);
 		}
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_TABLE:
 		tint = snprintf(tout, sizeof(tout), "table 0x%p", var->data.p);
-		if (!tint) {
-			free(newvar);
+		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_STRING:
 		tstr = mercury_copystring((mercury_stringliteral*)var->data.p);
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_CFUNC:
 		tint = snprintf(tout, sizeof(tout), "c function 0x%p", var->data.p);
-		if (!tint) {
-			free(newvar);
+		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_FUNCTION:
 		tint = snprintf(tout, sizeof(tout), "function 0x%p", var->data.p);
-		if (!tint) {
-			free(newvar);
+		if (tint==-1) {
 			return nullptr;
 		}
-		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_ARRAY:
 		tint = snprintf(tout, sizeof(tout), "array 0x%p", var->data.p);
-		if (!tint) {
-			free(newvar);
+		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	case M_TYPE_FILE:
 		tint = snprintf(tout, sizeof(tout), "file 0x%p", var->data.p);
-		if (!tint) {
-			free(newvar);
+		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
 		break;
 	default:
-		tstr = mercury_cstring_to_mstring((char*)"unknown", 7);
-		if (tstr == nullptr) {
-			free(newvar);
-			return nullptr;
-		}
-		newvar->data.p = tstr;
+		tstr = mercury_cstring_const_to_mstring((char*)"unknown", 7);
 	}
 	
-	return newvar;
+	return tstr;
 }
 
 bool mercury_checkbool(const mercury_variable* const M_CPP_restrict var) {

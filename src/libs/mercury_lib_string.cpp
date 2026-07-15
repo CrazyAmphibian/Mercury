@@ -910,9 +910,7 @@ mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury
 			if (*num_vars) {
 				(*num_vars)--;
 				mercury_variable* var = v_arr[*num_vars];
-				mercury_variable* sv=mercury_tostring(var);
-				v = (mercury_stringliteral*)sv->data.p;
-				free(sv);
+				v =mercury_tostring(var);
 
 			}
 			if (v) {
