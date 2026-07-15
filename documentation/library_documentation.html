@@ -305,7 +305,7 @@ rcall(a,{}) //this will result in an error being thrown,
 because a is trying to call a nil value (print). 
 </p>
 <h3 class="funcheader-western">dump (<font color="#888888">serializable</font>
-variable</h3>
+variable)</h3>
 <p>takes a variable, and returns a string containing data which
 represents that variable. this string, when compiled back, will be
 read as that variable. 
@@ -318,7 +318,7 @@ dump(a)
 code)</h3>
 <p>attempts to compile a string as if it were mercury code. if
 successful, it will return a function which does that code.
-otherwise, returns nil. 
+otherwise, returns a string containing the error encountered when compiling. 
 </p>
 <p class="example">a=compile(&quot;print(\&quot;hello, world!\&quot;)&quot;)
 <br/>
@@ -598,12 +598,12 @@ math.cos(1.2) //returns 0.36... <br/>
 math.tan(1.2)
 //returns 2.57... 
 </p>
-<p class="example" style="margin-bottom: 0in"><font face="monospace">asin
-(<font color="#888888">number</font> ratio)</font></p>
-<p class="example" style="margin-bottom: 0in"><font face="monospace">acos
-(<font color="#888888">number</font> ratio)</font></p>
-<p class="example"><font face="monospace">atan (<font color="#888888">number</font>
-ratio)</font></p>
+<h3 class="funcheader-western" style="margin-bottom: 0in"><font face="monospace">asin
+(<font color="#888888">number</font> ratio)</font></h3>
+<h3 class="funcheader-western" style="margin-bottom: 0in"><font face="monospace">acos
+(<font color="#888888">number</font> ratio)</font></h3>
+<h3 class="funcheader-western"><font face="monospace">atan (<font color="#888888">number</font>
+ratio)</font></h3>
 <p>returns the arcsine, arccosine, or arctangent of a given length
 ratio as a float. the result is in radians. 
 </p>
@@ -613,8 +613,8 @@ math.acos(0.36) //returns 1.2...
 <br/>
 math.atan(2.57) //returns 1.2... 
 </p>
-<p class="example"><font face="monospace">atan2 (<font color="#888888">number</font>
-y, <font color="#888888">number</font> x)</font></p>
+<h3 class="example"><font face="monospace">atan2 (<font color="#888888">number</font>
+y, <font color="#888888">number</font> x)</font></h3>
 <p>returns an angle as a float in radians to reach another point at
 the relative coordinates x,y 
 </p>
@@ -650,7 +650,7 @@ return 4.671...
 <h3 class="funcheader-western">randomint (<font color="#888888">int</font>
 minimum, <font color="#888888">int</font> maximum)</h3>
 <p>returns a random number as an int. the random number will be
-between minimum and maximum, inclusive. 
+between minimum and maximum, inclusive of the high and low bounds. 
 </p>
 <p class="example" style="margin-bottom: 0in">math.randomint(1,5)
 //may return 4 
@@ -1160,7 +1160,7 @@ and for clarity.</p>
 <h3 class="funcheader-western">pfind (<font color="#888888">string</font>
 string,<font color="#888888">string</font> pattern match,[<font color="#888888">int</font>
 start=0])</h3>
-<p>The same principal as string.find, put uses pattern matching on
+<p>The same principal as string.find, but uses pattern matching on
 the match string. 
 </p>
 <p class="example" style="margin-bottom: 0in">string.pfind(&quot;result:
