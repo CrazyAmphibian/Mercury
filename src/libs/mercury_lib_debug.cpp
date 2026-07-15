@@ -256,3 +256,51 @@ void mercury_lib_debug_refcount_dbg(mercury_state* const M_CPP_restrict M, const
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
+
+
+
+void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0, 1);
+
+	if (args_in == 1) { //read from function
+		mercury_variable* in = mercury_popstack(M);
+		if (in->type == M_TYPE_FUNCTION) {
+			mercury_debug_token* toks = M->bytecode.debug_info;
+			printf("variable %p function %p debug info:\n", in, in->data.p);
+
+			if (toks) {
+				for (mercury_uint i = 0; i < (*((mercury_function*)in->data.p)).numberofinstructions; i++) {
+					printf("%zu] ln:%zi col:%zi ", i,toks[i].line,toks[i].col);
+					for (mercury_int c = 0; c < toks[i].num_chars; c++) {
+						putchar(toks[i].chars[c]);
+					}
+					putchar('\n');
+				}
+
+			}
+
+		}
+		else {
+			printf("variable %p (type %hhu) is not a function (type %hhu). failed to dump bytecode.", in, in->type, M_TYPE_FUNCTION);
+		}
+		mercury_unassign_var(M, in);
+	}
+	else {
+
+		mercury_debug_token* toks = M->bytecode.debug_info;
+		printf("state %p debug info:\n", M);
+		if (toks) {
+			for (mercury_uint i = 0; i < M->bytecode.numberofinstructions; i++) {
+				printf("%zu] ln:%zi col:%zi ",i,toks[i].line, toks[i].col);
+				for (mercury_int c = 0; c < toks[i].num_chars; c++) {
+					putchar(toks[i].chars[c]);
+				}
+				putchar('\n');
+			}
+			
+		}
+		
+	}
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+}

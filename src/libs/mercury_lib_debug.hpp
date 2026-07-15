@@ -13,3 +13,4 @@ void mercury_lib_debug_constants_dbg(mercury_state* const M_CPP_restrict M, cons
 void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_debug_refcount_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
