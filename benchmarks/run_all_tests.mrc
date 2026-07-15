@@ -5,7 +5,7 @@ iterate(io.getfiles(""),function(i,v,a)
 	local f=io.open(v,"r")
 	local c=io.read(f)
 	local r=compile(c)
-	if type(r)==TYPE_FUNCTION then r() else print(r) end
+	if type(r)==TYPE_FUNCTION then r() else print("error while compiling: "..r) end
 	io.close(f)
 end)
 io.post("====================\npress any key to end...")

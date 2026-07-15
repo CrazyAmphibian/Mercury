@@ -1737,10 +1737,17 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 	{
 	case M_TYPE_FUNCTION:
 		{
-		mercury_state* const FM=mercury_newstate(M);
+		mercury_state* const FM= mercury_get_child_state(M);
+		if (!FM) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		mercury_function previous = FM->bytecode;
+
 		//FM->bytecode.instructions = func->instructions;
 		//FM->bytecode.numberofinstructions = func->numberofinstructions;
-		memcpy(&FM->bytecode, ck->data.p, sizeof(mercury_function));
+		//memcpy(&FM->bytecode, ck->data.p, sizeof(mercury_function));
+		FM->bytecode = *((mercury_function*)ck->data.p);
 		for (mercury_int i = 0; i < args_in;i++) {
 			mercury_pushstack_unrefed(FM, mercury_popstack(M));
 		}
@@ -1749,8 +1756,9 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 			mercury_pushstack_unrefed(M, mercury_pullstack(FM));
 			
 		}
-		FM->bytecode.instructions = nullptr; //so the bytecode isn't freed
-		mercury_destroystate(FM);
+		//FM->bytecode.instructions = nullptr; //so the bytecode isn't freed
+		FM->bytecode = previous;
+		mercury_clearstate(FM);
 
 
 		}

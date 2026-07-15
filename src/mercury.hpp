@@ -208,6 +208,7 @@ struct mercury_filewrapper {
 struct mercury_state {
 	mercury_state* parentstate = nullptr; //the parent of this state. nullptr if there is no parent
 	mercury_state* masterstate = nullptr; // the parent of the parent of the... this can also be itself.
+	mercury_state* childstate = nullptr; // the designated substate used for function calls. ensures we don't have to allocate a bunch of states we don't need. only allocated if needed.
 
 	mercury_uint sizeofstack = 0;  // number of elements on the stack
 	mercury_variable** stack = nullptr;
@@ -299,9 +300,11 @@ MERCURY_DYNAMIC_LIBRARY mercury_int mercury_setkey(mercury_table* const table, m
 MERCURY_DYNAMIC_LIBRARY bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_destroytable(mercury_table* const table);
+MERCURY_DYNAMIC_LIBRARY void mercury_cleartable(const mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_state* const M_CPP_restrict M);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_has_cstring_key(const mercury_table* const table, const char* const key);
+MERCURY_DYNAMIC_LIBRARY void mercury_prepare_table_for_state(mercury_table* table, mercury_state* M);
 
 //array
 MERCURY_DYNAMIC_LIBRARY mercury_array* mercury_newarray();
@@ -311,8 +314,9 @@ MERCURY_DYNAMIC_LIBRARY mercury_int mercury_array_len(const mercury_array* const
 
 
 //state
-MERCURY_DYNAMIC_LIBRARY mercury_state* mercury_newstate(mercury_state* const parent=nullptr);
+MERCURY_DYNAMIC_LIBRARY mercury_state* mercury_newstate(const mercury_state* const parent=nullptr);
 MERCURY_DYNAMIC_LIBRARY bool mercury_stepstate(mercury_state* const M_CPP_restrict M);
+MERCURY_DYNAMIC_LIBRARY void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion=false);
 MERCURY_DYNAMIC_LIBRARY void mercury_destroystate(mercury_state* const M_CPP_restrict M);
 
 //stack
@@ -385,4 +389,10 @@ inline void mercury_decrement_variable_refrence_count(const mercury_variable* co
 inline mercury_variable* const mercury_peek_stack(const mercury_state* const M_CPP_restrict M) {
 	if (!M->sizeofstack)return nullptr;
 	return M->stack[M->sizeofstack - 1];
+}
+
+inline mercury_state* mercury_get_child_state(mercury_state* const M_CPP_restrict M) {
+	if (M->childstate)return M->childstate;
+	M->childstate=mercury_newstate(M);
+	return M->childstate;
 }

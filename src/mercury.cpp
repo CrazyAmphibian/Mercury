@@ -248,6 +248,17 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 	free(table);
 }
 
+void mercury_cleartable(const mercury_table* const table) {
+	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
+		mercury_subtable* st = table->data[i];
+		for (mercury_int i2 = 0; i2 < st->size; i2++) {
+			mercury_free_var(st->keys[i2]);
+			mercury_free_var(st->values[i2]);
+		}
+		st->size = 0;
+	}
+}
+
 
 bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
 	const mercury_subtable* const subt = table->data[key->type];
@@ -375,7 +386,7 @@ bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* 
 	}
 	kv->constant = 0;
 	kv->type = M_TYPE_STRING;
-	kv->data.p = mercury_cstring_to_mstring(key,strlen(key));
+	kv->data.p = mercury_cstring_const_to_mstring(key,strlen(key));
 	subt->keys[subt->size] = kv;
 	subt->values[subt->size] = (mercury_variable*)value;
 
@@ -393,8 +404,19 @@ bool mercury_table_has_cstring_key(const mercury_table* const table, const char*
 }
 
 
+void mercury_prepare_table_for_state(mercury_table* table,mercury_state* M) {
+	mercury_variable* v = mercury_assign_var(M);
+	v->type = M_TYPE_TABLE;
+	v->data.p = table;
+	mercury_table_set_cstring_keyvalue(table, "_ENV", v, M);
+	v = mercury_assign_var(M);
+	v->type = M_TYPE_TABLE;
+	v->data.p = M->masterstate ? M->masterstate->enviroment : table;
+	mercury_table_set_cstring_keyvalue(table, "_G", v, M);
+	table->enviromental = true;
+}
 
-mercury_state* mercury_newstate(mercury_state* const parent) {
+mercury_state* mercury_newstate(const mercury_state* const parent) {
 	mercury_state* newstate=(mercury_state*)malloc(sizeof(mercury_state));
 	if (newstate == nullptr) return nullptr;
 
@@ -406,7 +428,7 @@ mercury_state* mercury_newstate(mercury_state* const parent) {
 	newstate->enviroment->enviromental = true;
 	newstate->enviroment->refrences = 0xFFFF;
 
-
+	/*
 	mercury_variable* envvarkey = (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (!envvarkey)return nullptr;
 	envvarkey->type = M_TYPE_STRING;
@@ -416,7 +438,7 @@ mercury_state* mercury_newstate(mercury_state* const parent) {
 	envvarval->type = M_TYPE_TABLE;
 	envvarval->data.p = newstate->enviroment;
 	mercury_setkey(newstate->enviroment, envvarkey, envvarval);
-
+	*/
 
 
 	if (!parent) {
@@ -439,10 +461,12 @@ mercury_state* mercury_newstate(mercury_state* const parent) {
 		parent->enviroment->refrences+=1;
 		parent->masterstate->enviroment->refrences += 1;
 	}
+	newstate->childstate = nullptr;
 
 	newstate->constants = nullptr;
 	newstate->num_constants = 0;
 
+	/*
 	mercury_variable* globvarkey = (mercury_variable*)malloc(sizeof(mercury_variable));
 	if (!globvarkey)return nullptr;
 	globvarkey->type = M_TYPE_STRING;
@@ -452,7 +476,9 @@ mercury_state* mercury_newstate(mercury_state* const parent) {
 	globvarval->type = M_TYPE_TABLE;
 	globvarval->data.p = newstate->masterstate->enviroment;
 	mercury_setkey(newstate->enviroment, globvarkey, globvarval);
+	*/
 
+	
 
 	newstate->sizeofstack = 0;
 	newstate->allocatedstacksize = 0;
@@ -468,13 +494,18 @@ mercury_state* mercury_newstate(mercury_state* const parent) {
 	newstate->bytecode.instructions = nullptr;
 	newstate->bytecode.numberofinstructions = 0;
 	newstate->bytecode.refrences = 0xFFFF;
+
+	newstate->enviroment = mercury_newtable();
+	if (!newstate->enviroment)return nullptr;
+	mercury_prepare_table_for_state(newstate->enviroment,newstate);
+	
+
 	//newstate->numberofinstructions = 0;
 	//newstate->instructions = nullptr;
 
 
 	return newstate;
 }
-
 
 
 bool mercury_stepstate(mercury_state* const M_CPP_restrict M) {
@@ -497,32 +528,86 @@ bool mercury_stepstate(mercury_state* const M_CPP_restrict M) {
 	return true;
 }
 
-void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
-	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
-		mercury_free_var(M->stack[i]);
+void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion) {
+	if (M->childstate) {
+		if (for_deletion) {
+			mercury_destroystate(M->childstate);
+			M->childstate = nullptr;
+		}
+		else {
+			mercury_clearstate(M->childstate, for_deletion);
+		}
 	}
-	free(M->stack);
-	for (mercury_uint i = 0; i < M->numunassignedstack; i++) {
-		free(M->unassignedstack[i]); //do not use mercury_free_var or i will beat the shit out of you (and the memory will corrupt)
-	}
-	free(M->unassignedstack);
 
+	if (for_deletion) {
+		for (mercury_uint i = 0; i < M->sizeofstack; i++) {
+			mercury_free_var(M->stack[i]);
+		}
+	}else{
+		for (mercury_uint i = 0; i < M->sizeofstack; i++) {
+			mercury_unassign_var(M,M->stack[i]);
+		}
+		M->sizeofstack = 0;
+	}
+
+	
+	
 	if (M->masterstate == M && M->registers) {
 		for (mercury_uint i = 0; i < register_max; i++) {
-			if(M->registers[i])mercury_free_var(M->registers[i]);
+			if (M->registers[i]) {
+				mercury_free_var(M->registers[i]);
+				M->registers[i] = nullptr;
+			}
 		}
-		free(M->registers);
 	}
 
-	//if (M->parentstate)M->parentstate->enviroment->refrences--;
+	if (M->enviroment) {
+		if (!for_deletion) {
+			mercury_cleartable(M->enviroment);
+			mercury_prepare_table_for_state(M->enviroment, M);
+		}
+		else {
+			mercury_destroytable(M->enviroment);
+			M->enviroment = nullptr;
+		}
+	}
 
-	if(M->enviroment)mercury_destroytable(M->enviroment);
-	if(M->bytecode.instructions)free(M->bytecode.instructions);
+	if (M->bytecode.instructions) {
+		free(M->bytecode.instructions);
+		M->bytecode.instructions = nullptr;
+	}
+
 
 	for (mercury_uint i = 0; i < M->num_constants; i++) {
 		mercury_variable* v = M->constants[i];
 		v->constant = 0;
 		mercury_free_var(v);
+	}
+	M->num_constants = 0;
+
+	M->programcounter = 0;
+}
+
+void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
+	mercury_clearstate(M,true);
+
+	if (M->parentstate) {
+		M->parentstate->enviroment->refrences -= 1;
+		M->parentstate->masterstate->enviroment->refrences -= 1;
+	}
+
+
+	free(M->stack);
+	for (mercury_uint i = 0; i < M->numunassignedstack; i++) {
+		free(M->unassignedstack[i]); //do not use mercury_free_var or i will beat the shit out of you (and the memory will corrupt)
+	}
+	M->numunassignedstack = 0;
+	free(M->unassignedstack);
+
+	if (M->enviroment)mercury_destroytable(M->enviroment);
+
+	if (M->masterstate == M && M->registers) {
+		free(M->registers);
 	}
 
 	free(M);
@@ -1130,6 +1215,7 @@ mercury_stringliteral* mercury_tostring(const mercury_variable* const M_CPP_rest
 		if (tint==-1) {
 			return nullptr;
 		}
+		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
 		break;
 	case M_TYPE_ARRAY:
 		tint = snprintf(tout, sizeof(tout), "array 0x%p", var->data.p);
