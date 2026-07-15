@@ -1183,6 +1183,32 @@ inline void m_init_pattern_filter_whitespace(M_PATTERN* P) {
 	P->allowed_chars['\r'] = true;
 }
 
+inline void m_init_pattern_filter_hexadecimal(M_PATTERN* P) {
+	if (!P)return;
+	P->allowed_chars['a'] = true;
+	P->allowed_chars['b'] = true;
+	P->allowed_chars['c'] = true;
+	P->allowed_chars['d'] = true;
+	P->allowed_chars['e'] = true;
+	P->allowed_chars['f'] = true;
+	P->allowed_chars['A'] = true;
+	P->allowed_chars['B'] = true;
+	P->allowed_chars['C'] = true;
+	P->allowed_chars['D'] = true;
+	P->allowed_chars['E'] = true;
+	P->allowed_chars['F'] = true;
+	P->allowed_chars['0'] = true;
+	P->allowed_chars['1'] = true;
+	P->allowed_chars['2'] = true;
+	P->allowed_chars['3'] = true;
+	P->allowed_chars['4'] = true;
+	P->allowed_chars['5'] = true;
+	P->allowed_chars['6'] = true;
+	P->allowed_chars['7'] = true;
+	P->allowed_chars['8'] = true;
+	P->allowed_chars['9'] = true;
+}
+
 inline void m_init_mattern_invert_filter_chars(M_PATTERN* P) {
 	if (!P)return;
 	int i = '\x00';
@@ -1238,6 +1264,9 @@ M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) 
 				break;
 			case '.':
 				m_init_pattern_filter_wildcard(p);
+				break;
+			case 'x':
+				m_init_pattern_filter_hexadecimal(p);
 				break;
 			case '%': //explicitly define this as intented behavior. if you're not escaping %, then you're just asking for trouble later down the line.
 			default:
