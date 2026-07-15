@@ -270,9 +270,10 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 
 			if (toks) {
 				for (mercury_uint i = 0; i < (*((mercury_function*)in->data.p)).numberofinstructions; i++) {
-					printf("%zu] ln:%zi col:%zi ", i,toks[i].line,toks[i].col);
-					for (mercury_int c = 0; c < toks[i].num_chars; c++) {
-						putchar(toks[i].chars[c]);
+					mercury_debug_token t = toks[i];
+					printf("%zu] ln:%zi col:%zi ", i,t.line,t.col);
+					for (mercury_int c = 0; c < t.num_chars; c++) {
+						putchar(t.chars[c]);
 					}
 					putchar('\n');
 				}
@@ -291,9 +292,10 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 		printf("state %p debug info:\n", M);
 		if (toks) {
 			for (mercury_uint i = 0; i < M->bytecode.numberofinstructions; i++) {
-				printf("%zu] ln:%zi col:%zi ",i,toks[i].line, toks[i].col);
-				for (mercury_int c = 0; c < toks[i].num_chars; c++) {
-					putchar(toks[i].chars[c]);
+				mercury_debug_token t = toks[i];
+				printf("%zu] ln:%zi col:%zi ", i, t.line, t.col);
+				for (mercury_int c = 0; c < t.num_chars; c++) {
+					putchar(t.chars[c]);
 				}
 				putchar('\n');
 			}

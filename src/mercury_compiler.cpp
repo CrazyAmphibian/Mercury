@@ -2389,14 +2389,16 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str, bool remov
 #endif
 					toknum = num_tokens - 1;
 				}
+				
 
 				compiler_token* t = tokens[toknum];
+				//printf("%zi %zi %zi %zi\n", i, toknum, t->line_col, t->line_num);
 				mercury_debug_token d;
 				d.col = t->line_col;
 				d.line = t->line_num;
 				d.chars = t->chars;
 				d.num_chars = t->num_chars;
-				*(dts + toknum) = d;
+				dts[i] = d;
 			}
 
 			for (mercury_int i = 0; i < num_tokens; i++) {
