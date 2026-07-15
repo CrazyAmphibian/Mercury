@@ -1608,14 +1608,14 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 		return 0;
 	}
 	compiler_function* func_var = new_compiler_function();
-	compiler_function* func_index = new_compiler_function();
-	compiler_function* func_call = new_compiler_function();
+	compiler_function* func_index=nullptr;
+	compiler_function* func_call= nullptr;
 	compiler_function* func_unary = new_compiler_function();
 	compiler_function* func_binary = new_compiler_function();
 	
 	token_offset+=m_compile_read_unary_op(func_unary,tokens,num_tokens,token_offset);
 	if(func_unary->errorcode){
-		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		delete_compiler_function(func_var); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
 		f->errorcode=func_unary->errorcode;
 		f->token_error_num=func_unary->token_error_num;
 		return 0;
@@ -1625,54 +1625,74 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 	if(func_var->errorcode){
 		f->errorcode = func_var->errorcode;
 		f->token_error_num = func_var->token_error_num;
-		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		delete_compiler_function(func_var); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
 		return 0;
 	}else if(!func_var->number_instructions){
-		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+		delete_compiler_function(func_var); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
 		f->errorcode=M_COMPERR_NO_VARIABLE;
 		f->token_error_num=token_offset;
 		return 0;
 	}
 	
-	token_offset+= m_compile_read_var_indexing(func_index,tokens,num_tokens,token_offset,i);
-	if(func_index->errorcode){
-		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
-		f->errorcode=func_index->errorcode;
-		f->token_error_num=func_index->token_error_num;
-		return 0;
+	compiler_function* func_complete=nullptr;
+	
+	while (true) {
+		func_complete = new_compiler_function();
+		func_index = new_compiler_function();
+		func_call = new_compiler_function();
+
+		mercury_int vitokc = m_compile_read_var_indexing(func_index, tokens, num_tokens, token_offset, i);
+		token_offset += vitokc;
+		if (func_index->errorcode) {
+			delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+			f->errorcode = func_index->errorcode;
+			f->token_error_num = func_index->token_error_num;
+			return 0;
+		}
+
+		mercury_int f_args_in = 0;
+		mercury_int fctokc = m_compile_read_call_func(func_call, tokens, num_tokens, token_offset, &f_args_in, i);
+		token_offset += fctokc;
+		if (func_call->errorcode) {
+			delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+			f->errorcode = func_call->errorcode;
+			f->token_error_num = func_call->token_error_num;
+			return 0;
+		}
+
+
+
+
+
+		if (fctokc) {
+			merge_compiler_functions(func_complete, func_call);
+
+			merge_compiler_functions(func_complete, func_var);
+			merge_compiler_functions(func_complete, func_index);
+
+			add_instruction(func_complete, M_OPCODE_CALL, token_offset - 1);
+			add_rawdata_bitwidth_size(func_complete, f_args_in, token_offset - 1);
+			add_rawdata_bitwidth_size(func_complete, 1, token_offset - 1); //args out
+		}
+		else {
+			delete_compiler_function(func_call);
+
+			merge_compiler_functions(func_complete, func_var);
+			merge_compiler_functions(func_complete, func_index);
+		}
+		//after reading a function call, read ahead a bit more to check for a chained function call, or further indexing. do this here because function calls are looked at last, and the compiler will throw and error trying to read a call as its own statment. for example, a()() (call the result of calling a), or a()[1] (index the result of calling a)
+		if (!(vitokc+fctokc)) { //if we didn't consume any tokens, then we can just exit
+			break;
+		}
+		else { //otherwise, go back around and do it agian.
+			func_var = func_complete;
+			continue;
+		}
 	}
-	
-	mercury_int f_args_in=0;
-	mercury_int fctokc=m_compile_read_call_func(func_call,tokens,num_tokens,token_offset,&f_args_in,i);
-	token_offset+=fctokc;
-	if(func_call->errorcode){
-		delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
-		f->errorcode=func_call->errorcode;
-		f->token_error_num=func_call->token_error_num;
-		return 0;
-	}
 
-	
-	compiler_function* func_complete = new_compiler_function();
-	
-	
-	if(fctokc){
-		merge_compiler_functions(func_complete,func_call);
+	merge_compiler_functions(func_complete, func_unary);
 
-		merge_compiler_functions(func_complete, func_var);
-		merge_compiler_functions(func_complete, func_index);
 
-		add_instruction(func_complete,M_OPCODE_CALL, token_offset-1);
-		add_rawdata_bitwidth_size(func_complete, f_args_in,token_offset-1);
-		add_rawdata_bitwidth_size(func_complete,1,token_offset-1); //args out
-	}else{
-		delete_compiler_function(func_call);
-
-		merge_compiler_functions(func_complete, func_var);
-		merge_compiler_functions(func_complete, func_index);
-	}
-	merge_compiler_functions(func_complete,func_unary);
-	
 	if(postfix_function)merge_compiler_functions(func_complete,postfix_function);
 	
 	
