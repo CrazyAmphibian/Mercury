@@ -1869,6 +1869,7 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library((void*)&m_os_isposix, "IS_POSIX", "os", M_TYPE_BOOL);
 	mercury_register_library((void*)&m_os_isposix, "IS_UNIX", "os", M_TYPE_BOOL);
 	mercury_register_library((void*)&m_os_is64bit, "IS_64BIT", "os", M_TYPE_BOOL);
+	mercury_register_library(mercury_lib_os_exit, "exit", "os");
 #endif
 #ifdef MERCURY_LIB_IO
 	mercury_register_library(mercury_lib_io_open, "open", "io");

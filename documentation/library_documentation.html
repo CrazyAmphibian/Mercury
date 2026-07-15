@@ -5,7 +5,8 @@
 	<title>Mercury: libraries</title>
 	<meta name="generator" content="LibreOffice 7.5.1.2 (Windows)"/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2026-07-15T13:26:27.987000000"/>
+	<meta name="changed" content="2026-07-15T16:30:35.160000000"/>
+	<meta name="created" content="00:00:00">
 	<meta name="created" content="00:00:00">
 	<meta name="created" content="00:00:00">
 	<style type="text/css">
@@ -1927,8 +1928,20 @@ fallback values:</p>
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<p style="margin-bottom: 0in">print(&quot;the time during january
-3rd, 2143 is &quot;..get_time({&quot;year&quot;=2143,&quot;month&quot;=1,&quot;dayofmonth&quot;=3}))</p>
+<p class="example">print(&quot;the time during january 3rd, 2143 is
+&quot;..get_time({&quot;year&quot;=2143,&quot;month&quot;=1,&quot;dayofmonth&quot;=3}))</p>
+<p style="margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="funcheader-western">exit ([<font color="#888888">int</font>
+exitcode=0])</h3>
+<p>Closes the executable immediately, and returns an exit code to the
+operating system. By default this is 0. on 64 bit systems, integers
+will be downgraded to 32 bit before being passed. If a non-integer
+type is provided, exits with code 0.</p>
+<p class="example" style="margin-bottom: 0in">if something_wrong then</p>
+<p class="example" style="margin-bottom: 0in"> os.exit(1)</p>
+<p class="example" style="margin-bottom: 0in">end</p>
 <h1>Thread library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader-western">new (<font color="#888888">function</font>

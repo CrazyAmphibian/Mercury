@@ -364,3 +364,24 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
+
+
+
+void mercury_lib_os_exit(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,1)) {
+		return;
+	}
+
+	int exitcode = 0;
+	if (args_in) {
+		mercury_variable* v=mercury_popstack(M);
+		if (v->type == M_TYPE_INT) {
+			exitcode = (int)v->data.i;
+		}
+
+		mercury_unassign_var(M,v);
+	}
+
+	exit(exitcode);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+}
