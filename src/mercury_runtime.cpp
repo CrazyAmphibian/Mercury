@@ -13,6 +13,14 @@
 #endif
 
 
+inline int search_arglist_for_parameter(const int argc, char** argv,const char* searchfor) {
+	for (int i = 0; i < argc; i++) {
+		if (!strncmp(argv[i], searchfor, strlen(searchfor))) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 
 int main(int argc, char** argv) {
@@ -32,8 +40,26 @@ int main(int argc, char** argv) {
 	
 	char* code=nullptr;// = (char*)"";
 
+	if ( (-1 != search_arglist_for_parameter(argc, argv, "--help")) || (-1 != search_arglist_for_parameter(argc, argv, "-?"))) {
+		printf("usage: mercury [options] <source file>\n");
+		printf("%-20s Display this text, then exits\n", "-?, --help");
+		printf("%-20s Displays the program version, then exits\n", "-v, --version");
+		printf("%-20s Enables interactive mode. Autiomatically on if no file is provided\n", "-i");
+		return 0;
+	}
+
+	if ((-1 != search_arglist_for_parameter(argc, argv, "--version")) || (-1 != search_arglist_for_parameter(argc, argv, "-v")) ) {
+		printf("Merecury version %i.%i, %u bit\n", MERCURY_VERSION, MERCURY_VERSION_PATCH,(unsigned int)(sizeof(mercury_int)<<3) );
+		return 0;
+	}
+
+	if (-1 != search_arglist_for_parameter(argc, argv, "-i")) {
+		interactivemode = true;
+	}
+	
+
 	if (argc>=2) {
-		const char* fpath = argv[1];
+		const char* fpath = argv[argc-1];
 		FILE* f=fopen(fpath,"rb");
 		if (!f) {
 			printf("error opening file %s\n",fpath);
@@ -75,7 +101,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (interactivemode) {
-		printf("Mercury Alpha %i (c)2025 interactive mode\n",MERCURY_VERSION_PATCH);
+		printf("Mercury Alpha %i (c)2026 interactive mode\n",MERCURY_VERSION_PATCH);
 		//printf("Mercury %i.%i (c)2025 interactive mode\n",MERCURY_VERSION,MERCURY_VERSION_PATCH); uncomment for later when this gets out of alpha (yeah right)
 	}
 
