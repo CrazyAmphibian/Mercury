@@ -278,7 +278,6 @@ extern mercury_int M_NUM_LIBS;
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
 MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(const mercury_stringliteral* const M_CPP_restrict str);
-MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
 MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mercury_int start, mercury_int end);
@@ -286,18 +285,17 @@ MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_tostring(const mercury_va
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_append(mercury_stringliteral* const basestr, const mercury_stringliteral* const appstr);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, const mercury_int len=1);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_CPP_restrict str);
-MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_equal_cstring(const mercury_stringliteral* const mstr, const char* const cstr);
 
 //table
 MERCURY_DYNAMIC_LIBRARY mercury_table* mercury_newtable();
 MERCURY_DYNAMIC_LIBRARY void mercury_destroyarray(mercury_array* const M_CPP_restrict arr);
-MERCURY_DYNAMIC_LIBRARY void mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out);
+MERCURY_DYNAMIC_LIBRARY bool mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out);
 MERCURY_DYNAMIC_LIBRARY mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_destroytable(mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY void mercury_cleartable(const mercury_table* const table);
-MERCURY_DYNAMIC_LIBRARY void mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out);
+MERCURY_DYNAMIC_LIBRARY bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_has_cstring_key(const mercury_table* const table, const char* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_prepare_table_for_state(mercury_table* table, mercury_state* M);
@@ -397,4 +395,30 @@ inline mercury_state* mercury_get_child_state(mercury_state* const M_CPP_restric
 	if (M->childstate)return M->childstate;
 	M->childstate=mercury_newstate(M);
 	return M->childstate;
+}
+
+
+inline bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
+
+	if (str1->size != str2->size) {
+		return false;
+	}
+	if (str1->ptr == str2->ptr)return true;
+
+	for (mercury_int c = 0; c < str1->size; c++) {
+		if (str1->ptr[c] != str2->ptr[c]) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+inline bool mercury_mstring_equal_cstring(const mercury_stringliteral* const mstr, const char* const cstr) {
+	if (mstr->ptr == cstr)return true;
+	if (strlen(cstr) != mstr->size)return false;
+	for (mercury_int i = 0; i < mstr->size; i++) {
+		if (mstr->ptr[i] != cstr[i])return false;
+	}
+	return true;
 }

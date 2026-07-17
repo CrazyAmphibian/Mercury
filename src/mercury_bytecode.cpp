@@ -1146,10 +1146,12 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 
 	mercury_state* check_state = M;
 	while (check_state) {
+		
 		if (mercury_tablehaskey(check_state->enviroment,&key)) {
 			mercury_setkey(check_state->enviroment, &key, &value);
 			return;
 		}
+		
 		check_state = check_state->parentstate;
 	}
 	mercury_setkey(M->enviroment, &key, &value);
@@ -1162,8 +1164,14 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 
 	mercury_state* check_state = M;
 	while (check_state) {
+		/*
 		if (mercury_tablehaskey(check_state->enviroment, &key)) {
 			mercury_getkey(check_state->enviroment, &key, &value);
+			mercury_pushstack_unrefed(M, &value);
+			return;
+		}
+		*/
+		if (mercury_getkey(check_state->enviroment, &key,&value)) {
 			mercury_pushstack_unrefed(M, &value);
 			return;
 		}

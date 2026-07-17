@@ -87,32 +87,6 @@ mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_C
 	}
 }
 
-
-bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
-
-	if (str1->size != str2->size) {
-		return false;
-	}
-	if ( str1->ptr == str2->ptr)return true;
-
-	for (mercury_int c = 0; c < str1->size; c++) {
-		if (str1->ptr[c] != str2->ptr[c]) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool mercury_mstring_equal_cstring(const mercury_stringliteral* const mstr,const char* const cstr) {
-	if (mstr->ptr == cstr)return true;
-	if (strlen(cstr) != mstr->size)return false;
-	for (mercury_int i = 0; i < mstr->size; i++) {
-		if (mstr->ptr[i] != cstr[i])return false;
-	}
-	return true;
-}
-
 mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
 	mercury_stringliteral* nstr=(mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (nstr == nullptr) return nullptr;
@@ -268,19 +242,20 @@ bool mercury_tablehaskey(const mercury_table* const table, const mercury_variabl
 	return false;
 }
 
-void mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out) {
+bool mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out) {
 	const mercury_subtable* const subt=table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
 		if (mercury_vars_equal(subt->keys+i, key)) {
 			mercury_free_var(key);
 			mercury_clonevariable(subt->values+i, out);
-			return;
+			return true;
 		}
 	}
 	mercury_free_var(key);
 	out->constant = false;
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
+	return false;
 }
 
 mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value) {
@@ -333,17 +308,18 @@ bool mercury_tables_equal(const mercury_table* const table1, const mercury_table
 }
 
 
-void mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out) {
+bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out) {
 	const mercury_subtable* const subt = table->data[M_TYPE_STRING];
 	for (mercury_int i = 0; i < subt->size; i++) {
 		if(mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i].data.p,key)){
 			mercury_clonevariable(subt->values+i, out);
-			return;
+			return true;
 		}
 	}
 	out->constant = false;
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
+	return false;
 }
 
 
@@ -905,7 +881,7 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	current_subindex = get_array_index_from_mint_5(pos);
 	mercury_variable* sa5 = sa4[current_subindex];
 	if (!sa5) {
-		sa5 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_6, sizeof(void*));
+		sa5 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_6, sizeof(mercury_variable));
 		if (!sa5) {
 			return false;
 		}
@@ -939,7 +915,7 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	current_subindex = get_array_index_from_mint_2(pos);
 	mercury_variable* sa2 = sa1[current_subindex];
 	if (!sa2) {
-		sa2 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
+		sa2 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(mercury_variable));
 		if (!sa2) {
 			return false;
 		}
@@ -1024,7 +1000,7 @@ mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
 					for (int i5 = (MERCURY_SIZE_SUBARRAY_5 - 1); i5 >= 0; i5--) {
 						mercury_variable* const st5 = st4[i5];
 						if (!st5)continue;
-						for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 > 0; i6--) {
+						for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 >= 0; i6--) {
 							const mercury_variable* const var = st5+i6;
 							if (var->type)return mercury_reconstruct_array_index(i1,i2,i3,i4,i5,i6);
 						}
@@ -1281,7 +1257,7 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 					printf("ARRAY 0x%p", var->data.p);
 					{
 						mercury_array* arr = (mercury_array*)var->data.p;
-						mercury_int l=mercury_array_len(arr);
+						mercury_int l=mercury_array_len(arr)+1;
 						for (mercury_int q = 0; q < l; q++) {
 							putchar('\n');
 							mercury_variable v;
