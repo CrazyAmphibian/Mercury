@@ -42,11 +42,11 @@ inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(mercury_state* co
 //pretty simple will output any args that haven't been outputted. is nil.
 inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(mercury_state* const M_CPP_restrict M, const mercury_int args_out, const mercury_int sent_args=0) {
 	for (mercury_int a = sent_args; a < args_out; a++) {
-		mercury_variable* mv;
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mv->constant = false;
-		mercury_pushstack(M, mv);
+		mercury_variable mv;
+		mv.type = M_TYPE_NIL;
+		mv.data.i = 0;
+		mv.constant = false;
+		mercury_pushstack(M, &mv);
 	}
 	return false;
 }

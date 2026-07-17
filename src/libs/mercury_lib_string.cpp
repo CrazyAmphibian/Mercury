@@ -139,19 +139,19 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 		{}
 	}
 
-	mercury_variable* out;
-	out->constant = false;
+	mercury_variable out;
+	out.constant = false;
 
 	if (located_at != -1) {
-		out->type = M_TYPE_INT;
-		out->data.i = located_at;
+		out.type = M_TYPE_INT;
+		out.data.i = located_at;
 	}
 	else {
-		out->type = M_TYPE_NIL;
-		out->data.i = 0;
+		out.type = M_TYPE_NIL;
+		out.data.i = 0;
 	}
 
-	mercury_pushstack(M, out);
+	mercury_pushstack(M, &out);
 	
 	//second one is end char.
 	if (args_out > 1) {

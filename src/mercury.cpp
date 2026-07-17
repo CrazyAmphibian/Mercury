@@ -390,10 +390,10 @@ void mercury_prepare_table_for_state(mercury_table* table,mercury_state* M) {
 
 	v.type = M_TYPE_TABLE;
 	v.data.p = table;
-	mercury_table_set_cstring_keyvalue(table, "_ENV", &v, M);
+	mercury_table_set_cstring_keyvalue(table, "_ENV", &v);
 
 	v.data.p = M->masterstate ? M->masterstate->enviroment : table;
-	mercury_table_set_cstring_keyvalue(table, "_G", &v, M);
+	mercury_table_set_cstring_keyvalue(table, "_G", &v);
 	table->enviromental = true;
 }
 
