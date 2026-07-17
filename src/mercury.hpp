@@ -298,7 +298,7 @@ MERCURY_DYNAMIC_LIBRARY bool mercury_tablehaskey(const mercury_table* const tabl
 MERCURY_DYNAMIC_LIBRARY void mercury_destroytable(mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY void mercury_cleartable(const mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY void mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out);
-MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M);
+MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_has_cstring_key(const mercury_table* const table, const char* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_prepare_table_for_state(mercury_table* table, mercury_state* M);
 

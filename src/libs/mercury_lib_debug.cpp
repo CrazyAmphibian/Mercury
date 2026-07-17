@@ -9,11 +9,11 @@
 void mercury_lib_debug_stack_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
-	printf("current state: 0x%p size of stack: %zi (allocated: %zi) [unassigned: %zi allocated: %zi]\n",M,M->sizeofstack,M->allocatedstacksize,M->numunassignedstack,M->allocatedunassignedstack);
+	printf("current state: 0x%p size of stack: %zi (allocated: %zi)\n",M,M->sizeofstack,M->allocatedstacksize);
 	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
-		mercury_variable* v = M->stack[i];
+		mercury_variable v = M->stack[i];
 		const char* typestr = "unknown";
-		switch (v->type) {
+		switch (v.type) {
 		case M_TYPE_NIL:
 			typestr = "nil";
 			break;
@@ -48,7 +48,7 @@ void mercury_lib_debug_stack_dbg(mercury_state* const M_CPP_restrict M, const me
 			typestr = "thread";
 			break;
 		}
-		printf("\t[%zu] 0x%p = (%s%s %hhu) = i:%zi f:%f p:%p \n",i,v,v->constant ? "<CONSTANT> " : " ", typestr, v->type, v->data.i,v->data.f,v->data.p);
+		printf("\t[%zu] = (%s%s %hhu) = i:%zi f:%f p:%p \n",i,v.constant ? "<CONSTANT> " : " ", typestr, v.type, v.data.i,v.data.f,v.data.p);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -138,7 +138,7 @@ void mercury_lib_debug_enviroment_dbg(mercury_state* const M_CPP_restrict M, con
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* st = e->data[t];
 			for (mercury_int i = 0; i < st->size; i++) {
-				printf("\t%s = %s\n", m_var_to_string(t, st->keys[i]->data), m_var_to_string(st->values[i]->type, st->values[i]->data));
+				printf("\t%s = %s\n", m_var_to_string(t, st->keys[i].data), m_var_to_string(st->values[i].type, st->values[i].data));
 			}
 
 		}
@@ -155,8 +155,8 @@ void mercury_lib_debug_constants_dbg(mercury_state* const M_CPP_restrict M, cons
 	printf("state 0x%p has %zu constants\n", M,M->num_constants);
 
 	for (mercury_uint i = 0; i < M->num_constants; i++) {
-		mercury_variable* c=M->constants[i];
-		printf("\t%zu : %s\n", i, m_var_to_string(c->type, c->data));
+		mercury_variable c=M->constants[i];
+		printf("\t%zu : %s\n", i, m_var_to_string(c.type, c.data));
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -167,20 +167,21 @@ void mercury_lib_debug_constants_dbg(mercury_state* const M_CPP_restrict M, cons
 void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,1);
 
-	if (args_in == 1) { //read bytecode from function
-		mercury_variable* in = mercury_popstack(M);
-		if (in->type == M_TYPE_FUNCTION) {
-			printf("variable %p function %p bytecode (%zu)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions );
-			mercury_stringliteral* l = mercury_get_bytecode_debug( ((mercury_function*)in->data.p) );
+	if (args_in) { //read bytecode from function
+		mercury_variable in;
+		mercury_popstack(M,&in);
+		if (in.type == M_TYPE_FUNCTION) {
+			printf("variable %p function %p bytecode (%zu)\n", in, in.data.p, ((mercury_function*)in.data.p)->numberofinstructions );
+			mercury_stringliteral* l = mercury_get_bytecode_debug( ((mercury_function*)in.data.p) );
 			for (mercury_int i = 0; i < l->size; i++) {
 				putchar(l->ptr[i]);
 			}
 			putchar('\n');
 		}
 		else {
-			printf("variable %p (type %hhu) is not a function (type %hhu). failed to dump bytecode.",in,in->type,M_TYPE_FUNCTION);
+			printf("variable (type %hhu) is not a function (type %hhu). failed to dump bytecode.",in.type,M_TYPE_FUNCTION);
 		}
-		mercury_unassign_var(M, in);
+		mercury_free_var(&in);
 	}
 	else {
 
@@ -200,19 +201,20 @@ void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restric
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0, 1);
 
 	if (args_in == 1) { //read bytecode from function
-		mercury_variable* in = mercury_popstack(M);
-		if (in->type == M_TYPE_FUNCTION) {
-			printf("variable %p function %p bytecode (%zu)\n", in, in->data.p, ((mercury_function*)in->data.p)->numberofinstructions);
-			mercury_stringliteral* l = mercury_get_bytecode_rawbinary_debug(((mercury_function*)in->data.p));
+		mercury_variable in;
+		mercury_popstack(M, &in);
+		if (in.type == M_TYPE_FUNCTION) {
+			printf("variable %p function %p bytecode (%zu)\n", in, in.data.p, ((mercury_function*)in.data.p)->numberofinstructions);
+			mercury_stringliteral* l = mercury_get_bytecode_rawbinary_debug(((mercury_function*)in.data.p));
 			for (mercury_int i = 0; i < l->size; i++) {
 				putchar(l->ptr[i]);
 			}
 			putchar('\n');
 		}
 		else {
-			printf("variable %p (type %hhu) is not a function (type %hhu). failed to dump bytecode.", in, in->type, M_TYPE_FUNCTION);
+			printf("variable (type %hhu) is not a function (type %hhu). failed to dump bytecode.", in.type, M_TYPE_FUNCTION);
 		}
-		mercury_unassign_var(M, in);
+		mercury_free_var(&in);
 	}
 	else {
 
@@ -230,28 +232,29 @@ void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restric
 
 void mercury_lib_debug_refcount_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
-	mercury_variable* in = mercury_popstack(M);
+	mercury_variable in;
+	mercury_popstack(M, &in);
 
-	switch (in->type) {
+	switch (in.type) {
 		case M_TYPE_TABLE:
-			printf("table has %zu refrences.\n", ((mercury_table*)in->data.p)->refrences);
+			printf("table has %zu refrences.\n", ((mercury_table*)in.data.p)->refrences);
 			break;
 		case M_TYPE_ARRAY:
-			printf("array has %zu refrences.\n", ((mercury_array*)in->data.p)->refrences);
+			printf("array has %zu refrences.\n", ((mercury_array*)in.data.p)->refrences);
 			break;
 		case M_TYPE_FUNCTION:
-			printf("function has %zu refrences.\n", ((mercury_function*)in->data.p)->refrences);
+			printf("function has %zu refrences.\n", ((mercury_function*)in.data.p)->refrences);
 			break;
 		case M_TYPE_THREAD:
-			printf("thread has %zu refrences.\n", ((mercury_threadholder*)in->data.p)->refrences);
+			printf("thread has %zu refrences.\n", ((mercury_threadholder*)in.data.p)->refrences);
 			break;
 		case M_TYPE_FILE:
-			printf("file has %zu refrences.\n", ((mercury_filewrapper*)in->data.p)->refrences);
+			printf("file has %zu refrences.\n", ((mercury_filewrapper*)in.data.p)->refrences);
 			break;
 		default:
 			printf("type is not refcounted.\n");
 	}
-	mercury_unassign_var(M, in);
+	mercury_free_var(&in);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -262,14 +265,15 @@ void mercury_lib_debug_refcount_dbg(mercury_state* const M_CPP_restrict M, const
 void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0, 1);
 
-	if (args_in == 1) { //read from function
-		mercury_variable* in = mercury_popstack(M);
-		if (in->type == M_TYPE_FUNCTION) {
+	if (args_in) { //read from function
+		mercury_variable in;
+		mercury_popstack(M, &in);
+		if (in.type == M_TYPE_FUNCTION) {
 			mercury_debug_token* toks = M->bytecode.debug_info;
-			printf("variable %p function %p debug info:\n", in, in->data.p);
+			printf("variable %p function %p debug info:\n", in, in.data.p);
 
 			if (toks) {
-				for (mercury_uint i = 0; i < (*((mercury_function*)in->data.p)).numberofinstructions; i++) {
+				for (mercury_uint i = 0; i < (*((mercury_function*)in.data.p)).numberofinstructions; i++) {
 					mercury_debug_token t = toks[i];
 					printf("%zu] ln:%zi col:%zi ", i,t.line,t.col);
 					for (mercury_int c = 0; c < t.num_chars; c++) {
@@ -282,9 +286,9 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 
 		}
 		else {
-			printf("variable %p (type %hhu) is not a function (type %hhu). failed to dump bytecode.", in, in->type, M_TYPE_FUNCTION);
+			printf("variable (type %hhu) is not a function (type %hhu). failed to dump bytecode.",in.type, M_TYPE_FUNCTION);
 		}
-		mercury_unassign_var(M, in);
+		mercury_free_var(&in);
 	}
 	else {
 
