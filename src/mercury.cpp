@@ -238,8 +238,8 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st->size; i2++) {
-			mercury_free_var(st->keys[i2]);
-			mercury_free_var(st->values[i2]);
+			mercury_free_var(st->keys+i2);
+			mercury_free_var(st->values+i2);
 		}
 		free(st->keys);
 		free(st->values);
@@ -252,8 +252,8 @@ void mercury_cleartable(const mercury_table* const table) {
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable* st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st->size; i2++) {
-			mercury_free_var(st->keys[i2]);
-			mercury_free_var(st->values[i2]);
+			mercury_free_var(st->keys+i2);
+			mercury_free_var(st->values+i2);
 		}
 		st->size = 0;
 	}
@@ -263,53 +263,46 @@ void mercury_cleartable(const mercury_table* const table) {
 bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
 	const mercury_subtable* const subt = table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (mercury_vars_equal(subt->keys[i],key))return true;
+		if (mercury_vars_equal(subt->keys+i,key))return true;
 	}
 	return false;
 }
 
-mercury_variable* mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_state* const M_CPP_restrict M) {
+void mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out) {
 	const mercury_subtable* const subt=table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (mercury_vars_equal(subt->keys[i], key)) {
-			if (M)mercury_unassign_var(M, key);
-			return mercury_clonevariable(subt->values[i], M);
+		if (mercury_vars_equal(subt->keys+i, key)) {
+			mercury_free_var(key);
+			mercury_clonevariable(subt->values+i, out);
+			return;
 		}
 	}
-	if (M)mercury_unassign_var(M, key);
-	mercury_variable* const outvar = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
-	if (outvar == nullptr) return nullptr;
-	outvar->type = M_TYPE_NIL;
-	outvar->data.i = 0;
-	return outvar;
+	mercury_free_var(key);
+	out->constant = false;
+	out->type = M_TYPE_NIL;
+	out->data.i = 0;
 }
 
-mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M) {
+mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value) {
 	mercury_subtable* subt = table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (mercury_vars_equal(subt->keys[i],key)) {
-			if (M) {
-				mercury_unassign_var(M, subt->values[i]);
-				mercury_unassign_var(M, key);
-			}
-			else {
-				mercury_free_var(subt->values[i]);
-				mercury_free_var(key);
-			}
-			subt->values[i] = (mercury_variable*)value;
+		if (mercury_vars_equal(subt->keys+i,key)) {
+			mercury_free_var(subt->values+i);
+			mercury_free_var(key);
+			subt->values[i] = *value;
 			return i;
 		}
 	}
 
-	void* nptr=realloc(subt->keys,sizeof(mercury_variable*)*(subt->size+1) );
+	void* nptr=realloc(subt->keys,sizeof(mercury_variable)*(subt->size+1) );
 	if (nptr == nullptr) return -1;
-	subt->keys = (mercury_variable**)nptr;
-	nptr = realloc(subt->values, sizeof(mercury_variable*) * (subt->size + 1));
+	subt->keys = (mercury_variable*)nptr;
+	nptr = realloc(subt->values, sizeof(mercury_variable) * (subt->size + 1));
 	if (nptr == nullptr) return -1;
-	subt->values = (mercury_variable**)nptr;
+	subt->values = (mercury_variable*)nptr;
 
-	subt->keys[subt->size] = key;
-	subt->values[subt->size] = (mercury_variable*)value;
+	subt->keys[subt->size] = *key;
+	subt->values[subt->size] = *value;
 
 	subt->size++;
 
@@ -327,7 +320,7 @@ bool mercury_tables_equal(const mercury_table* const table1, const mercury_table
 
 		for (mercury_int i1 = 0; i1 < subt1->size; i1++) { //not ideal. O(n^2)... this is what i get for not ordering anything.
 			for (mercury_int i2 = 0; i2 < subt2->size; i2++) {
-				if(mercury_vars_equal(subt1->keys[i1],subt2->keys[i2])) {
+				if(mercury_vars_equal(subt1->keys+i1,subt2->keys+i2)) {
 					goto found;
 				}
 			}
@@ -340,55 +333,42 @@ bool mercury_tables_equal(const mercury_table* const table1, const mercury_table
 }
 
 
-mercury_variable* mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_state* const M_CPP_restrict M) {
+void mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out) {
 	const mercury_subtable* const subt = table->data[M_TYPE_STRING];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if(mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i]->data.p,key)){
-			return mercury_clonevariable(subt->values[i], M);
+		if(mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i].data.p,key)){
+			mercury_clonevariable(subt->values+i, out);
+			return;
 		}
 	}
-	mercury_variable* const outvar = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
-	if (outvar == nullptr) return nullptr;
-	outvar->type = M_TYPE_NIL;
-	outvar->data.i = 0;
-	return outvar;
+	out->constant = false;
+	out->type = M_TYPE_NIL;
+	out->data.i = 0;
 }
 
 
-bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M) {
+bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value) {
 	mercury_subtable* subt = table->data[M_TYPE_STRING];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i]->data.p,key)) {
-			if (M) {
-				mercury_unassign_var(M, subt->values[i]);
-			}
-			else {
-				mercury_free_var(subt->values[i]);
-			}
-			subt->values[i] = (mercury_variable*)value;
+		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i].data.p,key)) {		
+			mercury_free_var(subt->values+i);
+			subt->values[i] = *value;
 		}
 	}
 
-	void* nptr = realloc(subt->keys, sizeof(mercury_variable*) * (subt->size + 1));
+	void* nptr = realloc(subt->keys, sizeof(mercury_variable) * (subt->size + 1));
 	if (nptr == nullptr) return -1;
-	subt->keys = (mercury_variable**)nptr;
-	nptr = realloc(subt->values, sizeof(mercury_variable*) * (subt->size + 1));
+	subt->keys = (mercury_variable*)nptr;
+	nptr = realloc(subt->values, sizeof(mercury_variable) * (subt->size + 1));
 	if (nptr == nullptr) return -1;
-	subt->values = (mercury_variable**)nptr;
+	subt->values = (mercury_variable*)nptr;
 
-	mercury_variable* kv;
-	if (M) {
-		kv = mercury_assign_var(M);
-	}
-	else {
-		kv = (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (!kv)return -1;
-	}
-	kv->constant = 0;
-	kv->type = M_TYPE_STRING;
-	kv->data.p = mercury_cstring_const_to_mstring(key,strlen(key));
+	mercury_variable kv;
+	kv.constant = 0;
+	kv.type = M_TYPE_STRING;
+	kv.data.p = mercury_cstring_const_to_mstring(key,strlen(key));
 	subt->keys[subt->size] = kv;
-	subt->values[subt->size] = (mercury_variable*)value;
+	subt->values[subt->size] = *value;
 
 	subt->size++;
 
@@ -398,21 +378,22 @@ bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* 
 bool mercury_table_has_cstring_key(const mercury_table* const table, const char* const key) {
 	const mercury_subtable* const subt = table->data[M_TYPE_STRING];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i]->data.p, key))return true;
+		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i].data.p, key))return true;
 	}
 	return false;
 }
 
 
 void mercury_prepare_table_for_state(mercury_table* table,mercury_state* M) {
-	mercury_variable* v = mercury_assign_var(M);
-	v->type = M_TYPE_TABLE;
-	v->data.p = table;
-	mercury_table_set_cstring_keyvalue(table, "_ENV", v, M);
-	v = mercury_assign_var(M);
-	v->type = M_TYPE_TABLE;
-	v->data.p = M->masterstate ? M->masterstate->enviroment : table;
-	mercury_table_set_cstring_keyvalue(table, "_G", v, M);
+	mercury_variable v;
+	v.constant = false;
+
+	v.type = M_TYPE_TABLE;
+	v.data.p = table;
+	mercury_table_set_cstring_keyvalue(table, "_ENV", &v, M);
+
+	v.data.p = M->masterstate ? M->masterstate->enviroment : table;
+	mercury_table_set_cstring_keyvalue(table, "_G", &v, M);
 	table->enviromental = true;
 }
 
@@ -442,7 +423,7 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 
 
 	if (!parent) {
-		newstate->registers = (mercury_variable**)malloc(sizeof(mercury_variable*) * (register_max + 1u));
+		newstate->registers = (mercury_variable*)malloc(sizeof(mercury_variable) * (register_max + 1u));
 		if (newstate->registers == nullptr) {
 			free(newstate);
 			return nullptr;
@@ -483,10 +464,6 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 	newstate->sizeofstack = 0;
 	newstate->allocatedstacksize = 0;
 	newstate->stack = nullptr;
-
-	newstate->unassignedstack = nullptr;
-	newstate->numunassignedstack = 0;
-	newstate->allocatedunassignedstack = 0;
 
 	newstate->programcounter = 0;
 
@@ -539,14 +516,10 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 		}
 	}
 
-	if (for_deletion) {
-		for (mercury_uint i = 0; i < M->sizeofstack; i++) {
-			mercury_free_var(M->stack[i]);
-		}
-	}else{
-		for (mercury_uint i = 0; i < M->sizeofstack; i++) {
-			mercury_unassign_var(M,M->stack[i]);
-		}
+	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
+		mercury_free_var(M->stack+i);
+	}
+	if (!for_deletion) {
 		M->sizeofstack = 0;
 	}
 
@@ -554,9 +527,9 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 	
 	if (M->masterstate == M && M->registers) {
 		for (mercury_uint i = 0; i < register_max; i++) {
-			if (M->registers[i]) {
-				mercury_free_var(M->registers[i]);
-				M->registers[i] = nullptr;
+			if (M->registers[i].type) {
+				mercury_free_var(M->registers+i);
+				M->registers[i].type = M_TYPE_NIL;
 			}
 		}
 	}
@@ -574,9 +547,9 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 
 
 	for (mercury_uint i = 0; i < M->num_constants; i++) {
-		mercury_variable* v = M->constants[i];
-		v->constant = 0;
-		mercury_free_var(v);
+		mercury_variable v = M->constants[i];
+		v.constant = 0;
+		mercury_free_var(&v);
 	}
 	M->num_constants = 0;
 
@@ -593,11 +566,6 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 
 
 	free(M->stack);
-	for (mercury_uint i = 0; i < M->numunassignedstack; i++) {
-		free(M->unassignedstack[i]); //do not use mercury_free_var or i will beat the shit out of you (and the memory will corrupt)
-	}
-	M->numunassignedstack = 0;
-	free(M->unassignedstack);
 
 	if (M->enviroment)mercury_destroytable(M->enviroment);
 
@@ -612,43 +580,8 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 	free(M);
 }
 
-bool mercury_unassign_var(mercury_state* const M_CPP_restrict M,mercury_variable* const var) {
-	if (var->constant)return false;
-	if (!(M->allocatedunassignedstack > M->numunassignedstack)) {
-		void* nptr=realloc(M->unassignedstack, sizeof(mercury_variable*) * (M->numunassignedstack + 1) );
-		if (nptr == nullptr) return false;
-		M->allocatedunassignedstack = M->numunassignedstack + 1;
-		M->unassignedstack = (mercury_variable**)nptr;
-	}
-	mercury_free_var(var, true);
-	M->unassignedstack[M->numunassignedstack] = var;
-	M->numunassignedstack++;
 
-	return true;
-}
-
-
-mercury_variable* mercury_assign_var(mercury_state* const M_CPP_restrict M) {
-	if (M->numunassignedstack) {
-		M->numunassignedstack--;
-		mercury_variable* nvar = M->unassignedstack[M->numunassignedstack];
-		nvar->data.i = 0;
-		nvar->constant = 0;
-		nvar->type = M_TYPE_NIL;
-		return nvar;
-	}
-	//printf("allocated\n");
-	mercury_variable* nvar=(mercury_variable*)malloc(sizeof(mercury_variable));
-	if (nvar == nullptr)return nullptr;
-	nvar->data.i = 0;
-	nvar->constant = 0;
-	nvar->type = M_TYPE_NIL;
-
-	return nvar;
-}
-
-void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep_struct) {
-	if (var == nullptr)return;
+void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 	if (var->constant)return;
 
 	switch (var->type)
@@ -733,56 +666,42 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var,const bool keep
 	default:
 		break;
 	}
-	if(!keep_struct)free(var);
 }
 
-mercury_variable* mercury_popstack(mercury_state* const M_CPP_restrict M) {
-
+void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* out) {
 	if (M->sizeofstack==0) {
-		mercury_variable* newvar = mercury_assign_var(M);
-		if (newvar == nullptr) return nullptr;
-
-		newvar->type = M_TYPE_NIL;
-		newvar->data.i = 0;
-
-		return newvar;
+		out->type = M_TYPE_NIL;
+		out->data.i = 0;
+		out->constant = false;
 	}
-
 	M->sizeofstack--;
-	return  M->stack[M->sizeofstack];
+	*out=  M->stack[M->sizeofstack];
 }
 
 //takes from the bottom instead of the top of stack
-mercury_variable* mercury_pullstack(mercury_state* const M_CPP_restrict M) {
-
+void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* out) {
 	if (M->sizeofstack == 0) {
-		mercury_variable* newvar = mercury_assign_var(M);
-		if (newvar == nullptr) return nullptr;
-
-		newvar->type = M_TYPE_NIL;
-		newvar->data.i = 0;
-
-		return newvar;
+		out->type = M_TYPE_NIL;
+		out->data.i = 0;
+		out->constant = false;
 	}
 
-	mercury_variable* o = M->stack[0];
+	*out = M->stack[0];
 	M->sizeofstack--;
 	memmove(M->stack, M->stack + 1, sizeof(mercury_variable*) * M->sizeofstack);
-	
-	return o;
 }
 
 
 bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
 	if (!(M->allocatedstacksize >M->sizeofstack)) {
-		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable*));
+		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable));
 		if (nstackptr == nullptr) return false;
-		M->stack = (mercury_variable**)nstackptr;
+		M->stack = (mercury_variable*)nstackptr;
 
 		M->allocatedstacksize = M->sizeofstack + 1;
 	}
 
-	M->stack[M->sizeofstack] = var;
+	M->stack[M->sizeofstack] = *var;
 	M->sizeofstack++;
 
 	switch (var->type) {
@@ -824,28 +743,19 @@ bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 //does not increment the refcounter of the variable.
 bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
 	if (!(M->allocatedstacksize > M->sizeofstack)) {
-		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable*));
+		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable));
 		if (nstackptr == nullptr) return false;
-		M->stack = (mercury_variable**)nstackptr;
+		M->stack = (mercury_variable*)nstackptr;
 
 		M->allocatedstacksize = M->sizeofstack + 1;
 	}
 
-	M->stack[M->sizeofstack] = var;
+	M->stack[M->sizeofstack] = *var;
 	M->sizeofstack++;
 	return true;
 }
 
-mercury_variable* mercury_clonevariable(const mercury_variable* const var,mercury_state* const M_CPP_restrict M) {
-	mercury_variable* out=nullptr;
-	if (M) {
-		out=mercury_assign_var(M);
-	}
-	else {
-		out = (mercury_variable*)malloc(sizeof(mercury_variable));
-	}
-	if (!out)return nullptr;
-
+void mercury_clonevariable(const mercury_variable* const var, mercury_variable* out) {
 	out->type = var->type;
 	out->constant = false;
 	switch (out->type) {
@@ -875,8 +785,6 @@ mercury_variable* mercury_clonevariable(const mercury_variable* const var,mercur
 		default:
 			out->data = var->data;
 	}
-	
-	return out;
 }
 
 
@@ -895,23 +803,23 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 #ifdef MERCURY_64BIT
 		//this can't be the best way to do it. i mean... just look at this piece of shit.
 		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 > 0; i1--) {
-			mercury_variable****** const st1 = arr->values[i1];
+			mercury_variable***** const st1 = arr->values[i1];
 			if (!st1)continue;
 			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
-				mercury_variable***** const st2 = st1[i2];
+				mercury_variable**** const st2 = st1[i2];
 				if (!st2)continue;
 				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
-					mercury_variable**** const st3 = st2[i3];
+					mercury_variable*** const st3 = st2[i3];
 					if (!st3)continue;
 					for (int i4 = (MERCURY_SIZE_SUBARRAY_4 - 1); i4 > 0; i4--) {
-						mercury_variable*** const st4 = st3[i4];
+						mercury_variable** const st4 = st3[i4];
 						if (!st4)continue;
 						for (int i5 = (MERCURY_SIZE_SUBARRAY_5 - 1); i5 > 0; i5--) {
-							mercury_variable** const st5 = st4[i5];
+							mercury_variable* const st5 = st4[i5];
 							if (!st5)continue;
 							for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 > 0; i6--) {
-								mercury_variable* const var = st5[i6];
-								if (var && var->type)return mercury_free_var(var);
+								mercury_variable* var = st5+i6;
+								if (var->type)mercury_free_var(var);
 							}
 							free(st5);
 						}
@@ -926,14 +834,14 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 #else
 		//it's less shit here but still not great.
 		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 > 0; i1--) {
-			mercury_variable*** const st1 = arr->values[i1];
+			mercury_variable** const st1 = arr->values[i1];
 			if (!st1)continue;
 			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
-				mercury_variable** const st2 = st1[i2];
+				mercury_variable* const st2 = st1[i2];
 				if (!st2)continue;
 				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
-					mercury_variable* const var = st2[i3];
-					if (var && var->type)return mercury_free_var(var);
+					mercury_variable* const var = st2+i3;
+					if (var->type)mercury_free_var(var);
 				}
 				free(st2);
 			}
@@ -945,19 +853,19 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 	free(arr);
 }
 
-bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos, mercury_state* const M_CPP_restrict M) {
+bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos) {
 #ifdef MERCURY_64BIT
 	if (!array->values) {
-		array->values = (mercury_variable*******)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
+		array->values = (mercury_variable******)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
 		if (!array->values) {
 			return false;
 		}
 	}
 
 	int current_subindex = get_array_index_from_mint_1(pos);
-	mercury_variable ******sa1 = array->values[current_subindex];
+	mercury_variable *****sa1 = array->values[current_subindex];
 	if (!sa1) {
-		sa1=(mercury_variable******)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
+		sa1=(mercury_variable*****)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
 		if (!sa1) {
 			return false;
 		}
@@ -965,9 +873,9 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	}
 	
 	current_subindex = get_array_index_from_mint_2(pos);
-	mercury_variable***** sa2 = sa1[current_subindex];
+	mercury_variable**** sa2 = sa1[current_subindex];
 	if (!sa2) {
-		sa2 = (mercury_variable*****)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
+		sa2 = (mercury_variable****)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
 		if (!sa2) {
 			return false;
 		}
@@ -975,9 +883,9 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	}
 
 	current_subindex = get_array_index_from_mint_3(pos);
-	mercury_variable**** sa3 = sa2[current_subindex];
+	mercury_variable*** sa3 = sa2[current_subindex];
 	if (!sa3) {
-		sa3 = (mercury_variable****)calloc(MERCURY_SIZE_SUBARRAY_4, sizeof(void*));
+		sa3 = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_4, sizeof(void*));
 		if (!sa3) {
 			return false;
 		}
@@ -985,9 +893,9 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	}
 
 	current_subindex = get_array_index_from_mint_4(pos);
-	mercury_variable*** sa4 = sa3[current_subindex];
+	mercury_variable** sa4 = sa3[current_subindex];
 	if (!sa4) {
-		sa4 = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_5, sizeof(void*));
+		sa4 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_5, sizeof(void*));
 		if (!sa4) {
 			return false;
 		}
@@ -995,9 +903,9 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	}
 
 	current_subindex = get_array_index_from_mint_5(pos);
-	mercury_variable** sa5 = sa4[current_subindex];
+	mercury_variable* sa5 = sa4[current_subindex];
 	if (!sa5) {
-		sa5 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_6, sizeof(void*));
+		sa5 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_6, sizeof(void*));
 		if (!sa5) {
 			return false;
 		}
@@ -1005,28 +913,23 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	}
 
 	current_subindex = get_array_index_from_mint_6(pos);
-	mercury_variable* arrvar = sa5[current_subindex];
-	if (arrvar) {
-		if (M) {
-			mercury_unassign_var(M, arrvar);
-		}
-		else {
-			mercury_free_var(arrvar);
-		}
+	mercury_variable* arrvar = sa5+current_subindex;
+	if (arrvar->type) {
+		mercury_free_var(arrvar);
 	}
-	sa5[current_subindex] = (mercury_variable*)var;
+	sa5[current_subindex] = *var;
 #else
 	if (!array->values) {
-		array->values = (mercury_variable****)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
+		array->values = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
 		if (!array->values) {
 			return false;
 		}
 	}
 
 	int current_subindex = get_array_index_from_mint_1(pos);
-	mercury_variable*** sa1 = array->values[current_subindex];
+	mercury_variable** sa1 = array->values[current_subindex];
 	if (!sa1) {
-		sa1 = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
+		sa1 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
 		if (!sa1) {
 			return false;
 		}
@@ -1034,9 +937,9 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	}
 
 	current_subindex = get_array_index_from_mint_2(pos);
-	mercury_variable** sa2 = sa1[current_subindex];
+	mercury_variable* sa2 = sa1[current_subindex];
 	if (!sa2) {
-		sa2 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
+		sa2 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
 		if (!sa2) {
 			return false;
 		}
@@ -1044,62 +947,61 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	}
 
 	current_subindex = get_array_index_from_mint_3(pos);
-	mercury_variable* arrvar = sa2[current_subindex];
-	if (arrvar) {
-		if (M) {
-			mercury_unassign_var(M, arrvar);
-		}
-		else {
-			mercury_free_var(arrvar);
-		}
+	mercury_variable* arrvar = sa2+current_subindex;
+	if (arrvar->type) {
+		mercury_free_var(arrvar);
 	}
-	sa2[current_subindex] = (mercury_variable*)var;
+	sa2[current_subindex] = *var;
 #endif
 	return true;
 }
 
-mercury_variable* mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_state* const M_CPP_restrict M) {
+void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_variable* out) {
 	if (!array->values)goto no_index;
 #ifdef MERCURY_64BIT
 	{
 		int current_subindex = get_array_index_from_mint_1(pos);
-		mercury_variable****** sa1 = array->values[current_subindex];
+		mercury_variable***** sa1 = array->values[current_subindex];
 		if (!sa1)goto no_index;
 		current_subindex = get_array_index_from_mint_2(pos);
-		mercury_variable***** sa2 = sa1[current_subindex];
+		mercury_variable**** sa2 = sa1[current_subindex];
 		if (!sa2)goto no_index;
 		current_subindex = get_array_index_from_mint_3(pos);
-		mercury_variable**** sa3 = sa2[current_subindex];
+		mercury_variable*** sa3 = sa2[current_subindex];
 		if (!sa3)goto no_index;
 		current_subindex = get_array_index_from_mint_4(pos);
-		mercury_variable*** sa4 = sa3[current_subindex];
+		mercury_variable** sa4 = sa3[current_subindex];
 		if (!sa4)goto no_index;
 		current_subindex = get_array_index_from_mint_5(pos);
-		mercury_variable** sa5 = sa4[current_subindex];
+		mercury_variable* sa5 = sa4[current_subindex];
 		if (!sa5)goto no_index;
 		current_subindex = get_array_index_from_mint_6(pos);
-		mercury_variable* var = sa5[current_subindex];
-		if (var)return mercury_clonevariable(var, M);
+		mercury_variable* var = sa5+current_subindex;
+		if (var->type) {
+			mercury_clonevariable(var, out);
+			return;
+		}
 	}
 #else
 	{
 		int current_subindex = get_array_index_from_mint_1(pos);
-		mercury_variable*** sa1 = array->values[current_subindex];
+		mercury_variable** sa1 = array->values[current_subindex];
 		if (!sa1)goto no_index;
 		current_subindex = get_array_index_from_mint_2(pos);
-		mercury_variable** sa2 = sa1[current_subindex];
+		mercury_variable* sa2 = sa1[current_subindex];
 		if (!sa2)goto no_index;
 		current_subindex = get_array_index_from_mint_3(pos);
-		mercury_variable* var = sa2[current_subindex];
-		if (var)return mercury_clonevariable(var, M);
+		mercury_variable* var = sa2+current_subindex;
+		if (var) { 
+			mercury_clonevariable(var, out); 
+			return; 
+		}
 	}
 #endif
 	no_index:
-	mercury_variable* out = M ? mercury_assign_var(M) : (mercury_variable*)malloc(sizeof(mercury_variable));
-	if (!out)return nullptr;
+	out->constant = false;
 	out->data.i = 0;
 	out->type = M_TYPE_NIL;
-	return out;
 }
 
 mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
@@ -1108,23 +1010,23 @@ mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
 #ifdef MERCURY_64BIT
 	//this can't be the best way to do it. i mean... just look at this piece of shit.
 	for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1>=0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
-		mercury_variable****** const st1 = arr->values[i1];
+		mercury_variable***** const st1 = arr->values[i1];
 		if (!st1)continue;
 		for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 >= 0; i2--) {
-			mercury_variable***** const st2 = st1[i2];
+			mercury_variable**** const st2 = st1[i2];
 			if (!st2)continue;
 			for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 >= 0; i3--) {
-				mercury_variable**** const st3 = st2[i3];
+				mercury_variable*** const st3 = st2[i3];
 				if (!st3)continue;
 				for (int i4 = (MERCURY_SIZE_SUBARRAY_4 - 1); i4 >= 0; i4--) {
-					mercury_variable*** const st4 = st3[i4];
+					mercury_variable** const st4 = st3[i4];
 					if (!st4)continue;
 					for (int i5 = (MERCURY_SIZE_SUBARRAY_5 - 1); i5 >= 0; i5--) {
-						mercury_variable** const st5 = st4[i5];
+						mercury_variable* const st5 = st4[i5];
 						if (!st5)continue;
 						for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 > 0; i6--) {
-							const mercury_variable* const var = st5[i6];
-							if (var && var->type)return mercury_reconstruct_array_index(i1,i2,i3,i4,i5,i6);
+							const mercury_variable* const var = st5+i6;
+							if (var->type)return mercury_reconstruct_array_index(i1,i2,i3,i4,i5,i6);
 						}
 					}
 				}
@@ -1134,14 +1036,14 @@ mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
 #else
 	//it's less shit here but still not great.
 	for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
-		mercury_variable*** const st1 = arr->values[i1];
+		mercury_variable** const st1 = arr->values[i1];
 		if (!st1)continue;
 		for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
-			mercury_variable** const st2 = st1[i2];
+			mercury_variable* const st2 = st1[i2];
 			if (!st2)continue;
 			for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
-				const mercury_variable* const var = st2[i3];
-				if (var && var->type)return mercury_reconstruct_array_index(i1, i2, i3);
+				const mercury_variable* const var = st2+i3;
+				if (var->type)return mercury_reconstruct_array_index(i1, i2, i3);
 			}
 		}
 	}
@@ -1330,7 +1232,7 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 			for (int n = 0; n < level; n++) {
 				putchar('\t');
 			}
-			mercury_rawdata keydat = subt->keys[i]->data;
+			mercury_rawdata keydat = subt->keys[i].data;
 			switch (t) {
 				case M_TYPE_NIL:
 					printf("nil_%zi", keydat.i);
@@ -1357,7 +1259,7 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 
 			printf(" - ");
 
-			mercury_variable* var = subt->values[i];
+			mercury_variable* var = subt->values+i;
 
 			switch (var->type) {
 				case M_TYPE_INT:
@@ -1382,24 +1284,25 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 						mercury_int l=mercury_array_len(arr);
 						for (mercury_int q = 0; q < l; q++) {
 							putchar('\n');
-							mercury_variable* v = mercury_getarray(arr,q);
+							mercury_variable v;
+							mercury_getarray(arr, q,&v);
 							for (int n = 0; n < level + 1; n++) {
 								putchar('\t');
 							}
-							switch (v->type)
+							switch (v.type)
 							{
 							case M_TYPE_NIL:
 								printf("%zi - nil", q);
 								break;
 							case M_TYPE_INT:
-								printf("%zi - %zi", q, var->data.i);
+								printf("%zi - %zi", q, v.data.i);
 								break;
 							case M_TYPE_FLOAT:
-								printf("%zi - %f", q, var->data.f);
+								printf("%zi - %f", q, v.data.f);
 								break;
 							case M_TYPE_STRING:
 							{
-								mercury_stringliteral* sp = (mercury_stringliteral*)v->data.p;
+								mercury_stringliteral* sp = (mercury_stringliteral*)v.data.p;
 							
 								printf("%zi - ", q);
 								putchar('\"');
@@ -1411,7 +1314,7 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 							}
 								break;
 							default:
-								printf("%zi - [%hhu] 0x%p",q,v->type ,v->data.p);
+								printf("%zi - [%hhu] 0x%p",q,v.type ,v.data.p);
 								break;
 							}
 						}
@@ -1672,75 +1575,67 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 	for (mercury_int i = 0; i < M_NUM_LIBS; i++) {
 		mercury_libdef* lib = M_LIBS[i];
 		
-		mercury_variable* v = (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (!v)continue;
-		v->type = lib->type;
+		mercury_variable v;
+		v.type = lib->type;
+		v.constant = false;
 		switch (lib->type)
 		{
 		case M_TYPE_FLOAT:
-			v->data.f = *(mercury_float*)lib->dataptr;
+			v.data.f = *(mercury_float*)lib->dataptr;
 			break;
 		case M_TYPE_INT:
 		case M_TYPE_BOOL:
-			v->data.i = *(mercury_int*)lib->dataptr;
+			v.data.i = *(mercury_int*)lib->dataptr;
 			break;
 		case M_TYPE_CFUNC:
-			v->data.p = (mercury_cfunc)lib->dataptr;
+			v.data.p = (mercury_cfunc)lib->dataptr;
 			break;
 		case M_TYPE_NIL:
-			v->data.p = lib->dataptr;
+			v.data.p = lib->dataptr;
 			break;
 		default:
-			free(v);
 			continue;
 		}
 
 		if (lib->table) {
-			mercury_variable* k = (mercury_variable*)malloc(sizeof(mercury_variable));
-			if (!k) { free(v); continue; }
-			k->type = M_TYPE_STRING;
-			k->data.p = mercury_cstring_to_mstring((char*)lib->key, strlen(lib->key));
+			mercury_variable k;
+			k.constant = false;
+			k.type = M_TYPE_STRING;
+			k.data.p = mercury_cstring_to_mstring((char*)lib->key, strlen(lib->key));
+			if (!k.data.p)continue;
 
-			mercury_stringliteral* sp= mercury_cstring_to_mstring((char*)lib->table, strlen(lib->table));
+			mercury_variable tidx;
+			tidx.type = M_TYPE_STRING;
+			tidx.constant = true;
+			tidx.data.p = mercury_cstring_to_mstring((char*)lib->table, strlen(lib->table));
+			mercury_variable t;
+			mercury_getkey(M->enviroment, &tidx,&t);
 
-			mercury_variable* tidx = (mercury_variable*)malloc(sizeof(mercury_variable));
-			if (!tidx) { free(k); free(v); continue; }
-			tidx->type = M_TYPE_STRING;
-			tidx->constant = true;
-			tidx->data.p = sp;
-			mercury_variable* t=mercury_getkey(M->enviroment, tidx);
-
-			if (t->type == M_TYPE_TABLE) {
-				mercury_setkey((mercury_table*)t->data.p,k,v);
-				free(tidx);
+			if (t.type == M_TYPE_TABLE) {
+				mercury_setkey((mercury_table*)t.data.p,&k,&v);
 			}
 			else {
 				mercury_table* nt=mercury_newtable();
 
-				mercury_setkey(nt, k, v);
+				mercury_setkey(nt, &k, &v);
 
-				mercury_variable* vv = (mercury_variable*)malloc(sizeof(mercury_variable));
-				if (!vv) {
+				mercury_variable vv;
+				vv.constant = false;
+				vv.type = M_TYPE_TABLE;
+				vv.data.p = nt;
 
-					continue;
-				}
-				vv->type = M_TYPE_TABLE;
-				vv->data.p = nt;
-
-				mercury_setkey(M->enviroment, tidx, vv);
+				mercury_setkey(M->enviroment, &tidx, &vv);
 			}
 
 
 		}
 		else {
+			mercury_variable k;
+			k.constant = false;
+			k.type = M_TYPE_STRING;
+			k.data.p = mercury_cstring_to_mstring((char*)lib->key,strlen(lib->key) );
 
-			mercury_variable* k= (mercury_variable*)malloc(sizeof(mercury_variable));
-			if (!k) { free(v); continue; }
-			k->type = M_TYPE_STRING;
-			k->data.p = mercury_cstring_to_mstring((char*)lib->key,strlen(lib->key) );
-
-			mercury_setkey(M->enviroment, k, v);
-
+			mercury_setkey(M->enviroment, &k, &v);
 		}
 
 

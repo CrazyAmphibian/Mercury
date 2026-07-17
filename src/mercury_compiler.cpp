@@ -2271,9 +2271,7 @@ compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens,me
 }
 
 
-mercury_variable* mercury_compile_mstring(mercury_stringliteral* str, bool remove_debug_info){
-	mercury_variable* out=(mercury_variable*)malloc(sizeof(mercury_variable));
-	if(!out)return nullptr;
+void mercury_compile_mstring(mercury_stringliteral* str, mercury_variable* out, bool remove_debug_info){
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
 	out->constant = 0;
@@ -2303,7 +2301,7 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str, bool remov
 
 		compiler_token* etok = tokens[func->token_error_num];
 		char* ts=(char*)malloc(etok->num_chars+1);
-		if (!ts)return nullptr;
+		if (!ts)return;
 		memcpy(ts, etok->chars, etok->num_chars);
 		ts[etok->num_chars]='\0';
 #ifdef MERCURY_64BIT
@@ -2364,21 +2362,21 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str, bool remov
 		buffer = (char*)malloc(req_chars);
 		snprintf(buffer, req_chars, "%s%s", pbuf, reason);
 
-		if (!buffer)return nullptr;
+		if (!buffer)return;
 
 		out->type = M_TYPE_STRING;
 		out->data.p = mercury_cstring_to_mstring(buffer,strlen(buffer));
 	}
 	else {
 		mercury_function* nmf = (mercury_function*)malloc(sizeof(mercury_function));
-		if (!nmf)return nullptr;
+		if (!nmf)return;
 
 
 		mercury_debug_token* dts=nullptr;
 
 		if (!remove_debug_info) {
 			dts = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * func->number_instructions);
-			if (!dts)return nullptr;
+			if (!dts)return;
 
 			for (mercury_int i = 0; i < func->number_instructions; i++) {
 				mercury_int toknum = func->instruction_tokens[i];
@@ -2427,6 +2425,4 @@ mercury_variable* mercury_compile_mstring(mercury_stringliteral* str, bool remov
 		out->data.p = nmf;
 		out->type = M_TYPE_FUNCTION;
 	}
-	
-	return out;
 }
