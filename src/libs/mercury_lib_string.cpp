@@ -648,6 +648,65 @@ char* getprintfstring(mercury_int* args, bool* args_def, const char* type) {
 	return str;
 }
 
+void printf_wrapper_takes_float(char* buffer, size_t buffer_size,mercury_stringliteral* str_out,double value,const char* type, mercury_int* args, bool* args_def) {
+	mercury_int l = 0;
+	mercury_int p = 0;
+	if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
+	if (args_def[ARG_PERCISION])p = args[ARG_PERCISION];
+
+	char* printf_fstr = getprintfstring(args, args_def, type);
+	if (!printf_fstr)return;
+
+	int chars_added = 0;
+	if (args_def[ARG_WIDTH]) {
+		if (args_def[ARG_PERCISION]) {
+			chars_added = snprintf(buffer, buffer_size, printf_fstr, l, p, value);
+		}
+		else {
+			chars_added = snprintf(buffer, buffer_size, printf_fstr, l, value);
+		}
+	}
+	else {
+		if (args_def[ARG_PERCISION]) {
+			chars_added = snprintf(buffer, buffer_size, printf_fstr, p, value);
+		}
+		else {
+			chars_added = snprintf(buffer, buffer_size, printf_fstr, value);
+		}
+	}
+	free(printf_fstr);
+	mercury_mstring_addchars(str_out, buffer, chars_added);
+}
+
+void printf_wrapper_takes_int(char* buffer, size_t buffer_size, mercury_stringliteral* str_out, mercury_int value, const char* type, mercury_int* args, bool* args_def) {
+	mercury_int l = 0;
+	mercury_int p = 0;
+	if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
+	if (args_def[ARG_PERCISION])p = args[ARG_PERCISION];
+
+	char* printf_fstr = getprintfstring(args, args_def, type);
+	if (!printf_fstr)return;
+
+	int chars_added = 0;
+	if (args_def[ARG_WIDTH]) {
+		if (args_def[ARG_PERCISION]) {
+			chars_added=snprintf(buffer, buffer_size, printf_fstr, l, p, value);
+		}
+		else {
+			chars_added = snprintf(buffer, buffer_size, printf_fstr, l, value);
+		}
+	}
+	else {
+		if (args_def[ARG_PERCISION]) {
+			chars_added = snprintf(buffer, buffer_size, printf_fstr, p, value);
+		}
+		else {
+			chars_added = snprintf(buffer, buffer_size, printf_fstr, value);
+		}
+	}
+	free(printf_fstr);
+	mercury_mstring_addchars(str_out, buffer, chars_added);
+}
 
 union m_rawdata_snowflake_printf { //because printf promotes floats to doubles for some fucking reason. why?
 	double f;
@@ -656,7 +715,7 @@ union m_rawdata_snowflake_printf { //because printf promotes floats to doubles f
 	void* p;
 };
 
-// TODO: add a, x, g, e, p, u, o
+// TODO: add u, o
 mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringliteral* str_out, mercury_variable* v_arr, mercury_int* num_vars) {
 	mercury_int add_off = 0;
 
@@ -665,7 +724,8 @@ mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury
 	mercury_int args[256] = {0}; // the value of that arg.
 	char mode = 0;
 
-	char printfbuffer[1024] = {'0'};
+	const size_t BUFFER_SIZE = 1024;
+	char printfbuffer[BUFFER_SIZE] = {'\0'};
 
 	const char* type=nullptr;
 	m_rawdata_snowflake_printf value;
@@ -682,162 +742,155 @@ mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury
 			goto exit;
 		case 'I':
 		case 'i': // integer
-			if (!type) {
-				type = "zi";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.i = mercury_checkint(v_arr+*num_vars);
-				}		
+			if (*num_vars) {
+				(*num_vars)--;
+				value.i = mercury_checkint(v_arr + *num_vars);
 			}
-			goto output;
+			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, value.i, "zi", args, args_def);
+			return add_off;
+		case 'U':
+		case 'u': // unsigned integer
+			if (*num_vars) {
+				(*num_vars)--;
+				value.i = mercury_checkint(v_arr + *num_vars);
+			}
+			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, value.i, "zu", args, args_def);
+			return add_off;
+		case 'O':
+		case 'o': // unsigned octal
+			if (*num_vars) {
+				(*num_vars)--;
+				value.i = mercury_checkint(v_arr + *num_vars);
+			}
+			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, value.i, "zo", args, args_def);
+			return add_off;
 		case 'x': // hex int
-			if (!type) {
-				type = "zx";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.i = mercury_checkint(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.i = mercury_checkint(v_arr + *num_vars);
 			}
-			goto output;
+			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, value.i, "zx", args, args_def);
+			return add_off;
 		case 'X': // hex int (capital)
-			if (!type) {
-				type = "zX";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.i = mercury_checkint(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.i = mercury_checkint(v_arr + *num_vars);
 			}
-			goto output;
+			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, value.i, "zX", args, args_def);
+return add_off;
 		case 'f':
-			if (!type) {
-				type = "f";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
 			}
-			
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "f", args, args_def);
+			return add_off;
 		case 'F':
-			if (!type) {
-				type = "F";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
+
 			}
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "F", args, args_def);
+			return add_off;
 		case 'e':
-			if (!type) {
-				type = "e";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
+
 			}
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "e", args, args_def);
+			return add_off;
 		case 'E':
-			if (!type) {
-				type = "E";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
+
 			}
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "E", args, args_def);
+			return add_off;
 		case 'g':
-			if (!type) {
-				type = "g";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
+
 			}
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "g", args, args_def);
+			return add_off;
 		case 'G':
-			if (!type) {
-				type = "G";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
+
 			}
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "G", args, args_def);
+			return add_off;
 		case 'a':
-			if (!type) {
-				type = "a";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
+
 			}
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "a", args, args_def);
+			return add_off;
 		case 'A':
-			if (!type) {
-				type = "A";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.f = mercury_checkfloat(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.f = mercury_checkfloat(v_arr + *num_vars);
+
 			}
-			goto output;
+			printf_wrapper_takes_float(printfbuffer, BUFFER_SIZE, str_out, value.f, "A", args, args_def);
+			return add_off;
 		case 'p':
 		case 'P':
-			if (!type) {
-				type = "p";
-				if (*num_vars) {
-					(*num_vars)--;
-					value.p = mercury_checkpointer(v_arr+*num_vars);
-				}
+			if (*num_vars) {
+				(*num_vars)--;
+				value.p = mercury_checkpointer(v_arr + *num_vars);
 			}
-			goto output;
-			output:
-			{
-
-			mercury_int l = 0;
-			mercury_int p = 0;
-			if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
-			if (args_def[ARG_PERCISION])p = args[ARG_PERCISION];
-
-			char* printf_fstr = getprintfstring(args,args_def,type);
-			if (!printf_fstr)break;
-
-			if (args_def[ARG_WIDTH]) {
-				if (args_def[ARG_PERCISION]) {
-					snprintf(printfbuffer, 1024, printf_fstr,l,p, value);
-				}
-				else {
-					snprintf(printfbuffer, 1024, printf_fstr, l, value);
-				}
-			}
-			else {
-				if(args_def[ARG_PERCISION]) {
-					snprintf(printfbuffer, 1024, printf_fstr, p, value);
-				}
-				else {
-					snprintf(printfbuffer, 1024, printf_fstr, value);
-				}
-			}
-			free(printf_fstr);
-			mercury_mstring_addchars(str_out, printfbuffer, strlen(printfbuffer));
-			goto exit;
-			}
-		
-
+			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, (mercury_int)value.p, "p", args, args_def);
+			return add_off;
 		case 'S':
 		case 's': // string
 		{
 			mercury_stringliteral* v = nullptr;
+			mercury_int addedlen = 0;
 			if (*num_vars) {
 				(*num_vars)--;
-				v =mercury_tostring(v_arr+ *num_vars);
+				v = mercury_tostring(v_arr + *num_vars);
 			}
 			if (v) {
-				mercury_mstrings_append(str_out, v);
-				free(v);
+				addedlen = v->size;
+				if (args_def[ARG_WIDTH] && addedlen < args[ARG_WIDTH]) {
+					mercury_mstring_addchars(v, "", 0); //in case the string provided in the args is constant, v will be constant, too, and this makes it not constant, and prevents trying to reallocate a const char*.
+					char* npt = (char*)realloc(v->ptr, sizeof(char) * args[ARG_WIDTH]);
+					if (!npt)return 0;
+					v->ptr = npt;
+					if (!args_def[ARG_LEFTALIGN]) {
+						memmove(v->ptr + args[ARG_WIDTH]- addedlen, v->ptr,addedlen);
+						memset(v->ptr, ' ', args[ARG_WIDTH] - addedlen);
+					}
+					else {
+						memset(v->ptr + addedlen, ' ', args[ARG_WIDTH] - addedlen);
+					}
+					v->size = args[ARG_WIDTH];
+					mercury_mstrings_append(str_out, v);
+					mercury_mstring_delete(v);
+				}
+				else {
+					mercury_mstrings_append(str_out, v);
+					mercury_mstring_delete(v);
+				}
 			}
-			add_off++;
-			goto exit;
+			else {
+				if (args_def[ARG_WIDTH] && args[ARG_WIDTH]){
+					char* p=(char*)malloc(args[ARG_WIDTH] * sizeof(char));
+					if (p) {
+						memset(p, ' ', sizeof(char));
+						mercury_mstring_addchars(str_out, p, args[ARG_WIDTH]);
+					}
+				}
+			}
+			return add_off;
 		}
 		case '-':
 			if (!mode) {
