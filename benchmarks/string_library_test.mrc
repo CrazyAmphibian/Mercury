@@ -40,7 +40,7 @@ elseif string.lower(string.upper(str2))!=str2 then
 	return 1
 end
 
-if string.format("%s: %02i:%02i %.2f","time",12,4,#str)!="time 12:04 7.00" then
+if string.format("%s: %02i:%02i %.2f","time",12,4,#str)!="time: 12:04 7.00" then
 	print("string.format test failed!")
 	return 1
 end
