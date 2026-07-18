@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-
+#include <string.h>
 #ifdef _WIN32
 #include <Windows.h>
 #else
@@ -82,8 +82,8 @@ struct mercury_stringrefrence {
 
 struct mercury_subtable {
 	mercury_int size = 0;
-	mercury_variable** keys = nullptr;
-	mercury_variable** values = nullptr;
+	mercury_variable* keys = nullptr;
+	mercury_variable* values = nullptr;
 };
 
 struct mercury_table {
@@ -105,9 +105,9 @@ struct mercury_debug_token {
 struct mercury_array { //gee bill, two storage types?
 	mercury_uint refrences = 0;
 #ifdef MERCURY_64BIT
-	mercury_variable******* values = nullptr; //array of arrays of arrays of arrays of arrays of arrays of pointers to structs.  array ->  array ->  array ->  array -> array -> array -> struct*. who needs efficency, anyways? hey look pal, you wanted 64 bit indexes, you're gonna get 64 bit indexes.
+	mercury_variable****** values = nullptr; //array of arrays of arrays of arrays of arrays of arrays of pointers to structs.  array ->  array ->  array ->  array -> array -> array -> struct*. who needs efficency, anyways? hey look pal, you wanted 64 bit indexes, you're gonna get 64 bit indexes.
 #else
-	mercury_variable**** values = nullptr; //array of arrays of arrays of pointers to structs. array -> array -> array -> struct*
+	mercury_variable*** values = nullptr; //array of arrays of arrays of pointers to structs. array -> array -> array -> struct*
 #endif
 };
 
@@ -211,15 +211,11 @@ struct mercury_state {
 	mercury_state* childstate = nullptr; // the designated substate used for function calls. ensures we don't have to allocate a bunch of states we don't need. only allocated if needed.
 
 	mercury_uint sizeofstack = 0;  // number of elements on the stack
-	mercury_variable** stack = nullptr;
+	mercury_variable* stack = nullptr;
 	mercury_uint allocatedstacksize = 0; // the size of the stack array
 
-	mercury_uint numunassignedstack = 0; // number of unused elements
-	mercury_variable** unassignedstack = nullptr;
-	mercury_uint allocatedunassignedstack = 0; // size of the unused element array.
-
-	mercury_variable** registers = nullptr;
-	mercury_variable** constants = nullptr;
+	mercury_variable* registers = nullptr;
+	mercury_variable* constants = nullptr;
 	mercury_uint num_constants = 0;
 
 	mercury_uint programcounter = 0;
@@ -282,7 +278,6 @@ extern mercury_int M_NUM_LIBS;
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
 MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(const mercury_stringliteral* const M_CPP_restrict str);
-MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
 MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mercury_int start, mercury_int end);
@@ -290,26 +285,25 @@ MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_tostring(const mercury_va
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_append(mercury_stringliteral* const basestr, const mercury_stringliteral* const appstr);
 MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, const mercury_int len=1);
 MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_CPP_restrict str);
-MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_equal_cstring(const mercury_stringliteral* const mstr, const char* const cstr);
 
 //table
 MERCURY_DYNAMIC_LIBRARY mercury_table* mercury_newtable();
 MERCURY_DYNAMIC_LIBRARY void mercury_destroyarray(mercury_array* const M_CPP_restrict arr);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_state* const M_CPP_restrict M=nullptr);
-MERCURY_DYNAMIC_LIBRARY mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M=nullptr);
+MERCURY_DYNAMIC_LIBRARY bool mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out);
+MERCURY_DYNAMIC_LIBRARY mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2);
 MERCURY_DYNAMIC_LIBRARY bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_destroytable(mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY void mercury_cleartable(const mercury_table* const table);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_state* const M_CPP_restrict M);
-MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value, mercury_state* const M_CPP_restrict M);
+MERCURY_DYNAMIC_LIBRARY bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out);
+MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_has_cstring_key(const mercury_table* const table, const char* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_prepare_table_for_state(mercury_table* table, mercury_state* M);
 
 //array
 MERCURY_DYNAMIC_LIBRARY mercury_array* mercury_newarray();
-MERCURY_DYNAMIC_LIBRARY bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos, mercury_state* const M_CPP_restrict M = nullptr);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_state* const M_CPP_restrict M =nullptr);
+MERCURY_DYNAMIC_LIBRARY bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos);
+MERCURY_DYNAMIC_LIBRARY void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_variable* out);
 MERCURY_DYNAMIC_LIBRARY mercury_int mercury_array_len(const mercury_array* const arr);
 
 
@@ -320,15 +314,13 @@ MERCURY_DYNAMIC_LIBRARY void mercury_clearstate(mercury_state* const M_CPP_restr
 MERCURY_DYNAMIC_LIBRARY void mercury_destroystate(mercury_state* const M_CPP_restrict M);
 
 //stack
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_popstack(mercury_state* const M_CPP_restrict M);
+MERCURY_DYNAMIC_LIBRARY void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* out);
 MERCURY_DYNAMIC_LIBRARY bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_pullstack(mercury_state* const M_CPP_restrict M);
+MERCURY_DYNAMIC_LIBRARY void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* out);
 MERCURY_DYNAMIC_LIBRARY bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
 
-MERCURY_DYNAMIC_LIBRARY bool mercury_unassign_var(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_assign_var(mercury_state* const M_CPP_restrict M);
-MERCURY_DYNAMIC_LIBRARY void mercury_free_var(mercury_variable* const M_CPP_restrict var, const bool keep_struct = false);
-MERCURY_DYNAMIC_LIBRARY mercury_variable* mercury_clonevariable(const mercury_variable* const var, mercury_state* const M_CPP_restrict M=nullptr);
+MERCURY_DYNAMIC_LIBRARY void mercury_free_var(mercury_variable* const M_CPP_restrict var);
+MERCURY_DYNAMIC_LIBRARY void mercury_clonevariable(const mercury_variable* const var, mercury_variable* out);
 
 //misc
 MERCURY_DYNAMIC_LIBRARY bool mercury_checkbool(const mercury_variable* const M_CPP_restrict var);
@@ -346,6 +338,12 @@ MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_rawbinary_de
 MERCURY_DYNAMIC_LIBRARY void mercury_debugdumptable(mercury_table* tab, int level = 0);
 
 //inlines, for SPEED
+inline void mercury_clear_variable(mercury_variable* var) {
+	var->constant = false;
+	var->data.i = 0;
+	var->type = M_TYPE_NIL;
+}
+
 inline void mercury_increment_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
 	case M_TYPE_TABLE:
@@ -386,13 +384,41 @@ inline void mercury_decrement_variable_refrence_count(const mercury_variable* co
 }
 
 //returns the top stack without removing it. do not free the returned pointer. will return nullptr if stack is 0.
-inline mercury_variable* const mercury_peek_stack(const mercury_state* const M_CPP_restrict M) {
-	if (!M->sizeofstack)return nullptr;
-	return M->stack[M->sizeofstack - 1];
+inline void mercury_peek_stack(const mercury_state* M_CPP_restrict M, mercury_variable* out) {
+	if (!M->sizeofstack) {
+		mercury_clear_variable(out);
+	};
+	*out= M->stack[M->sizeofstack - 1];
 }
 
 inline mercury_state* mercury_get_child_state(mercury_state* const M_CPP_restrict M) {
 	if (M->childstate)return M->childstate;
 	M->childstate=mercury_newstate(M);
 	return M->childstate;
+}
+
+
+inline bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
+
+	if (str1->size != str2->size) {
+		return false;
+	}
+	if (str1->ptr == str2->ptr)return true;
+
+	for (mercury_int c = 0; c < str1->size; c++) {
+		if (str1->ptr[c] != str2->ptr[c]) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+inline bool mercury_mstring_equal_cstring(const mercury_stringliteral* const mstr, const char* const cstr) {
+	if (mstr->ptr == cstr)return true;
+	if (strlen(cstr) != mstr->size)return false;
+	for (mercury_int i = 0; i < mstr->size; i++) {
+		if (mstr->ptr[i] != cstr[i])return false;
+	}
+	return true;
 }

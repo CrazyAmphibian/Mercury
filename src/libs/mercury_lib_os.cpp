@@ -10,44 +10,33 @@
 
 
 void mercury_lib_os_time(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //gets the current unix/epoch time.
-	for (mercury_int i = 0; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
-	}
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0))return;
 	if (!args_out) {
 		return;
 	}
 
-	mercury_variable* out = mercury_assign_var(M);
+	mercury_variable out;
 
 	mercury_int t=time(NULL);
-	out->type = M_TYPE_INT;
-	out->data.i = t;
+	out.type = M_TYPE_INT;
+	out.data.i = t;
+	out.constant = false;
 
-	mercury_pushstack(M, out);
+	mercury_pushstack(M, &out);
 
-	for (mercury_int a = 1; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
 void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //dangerous!
-	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
-		return;
-	};
-	for (mercury_int i = 1; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
-	}
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
-	mercury_variable* cvar = mercury_popstack(M);
-	if (cvar->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)cvar->type, (void*)M_TYPE_STRING);
+	mercury_variable cvar;
+	mercury_popstack(M,&cvar);
+	if (cvar.type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)cvar.type, (void*)M_TYPE_STRING);
 		return;
 	}
-	mercury_stringliteral* code = (mercury_stringliteral*)cvar->data.p;
+	mercury_stringliteral* code = (mercury_stringliteral*)cvar.data.p;
 
 	char* c_code = (char*)malloc(sizeof(char) * (code->size + 1));
 	if (!c_code) {
@@ -104,37 +93,26 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 		return;
 	}
 
+	mercury_free_var(&cvar);
+	cvar.type = M_TYPE_STRING;
+	cvar.constant = false;
+	cvar.data.p= mercury_cstring_const_to_mstring(out_c, size_c);
+	mercury_pushstack(M, &cvar);
 
-	mercury_variable* out = mercury_assign_var(M);
-	out->type = M_TYPE_STRING;
-	
-	out->data.p= mercury_cstring_const_to_mstring(out_c, size_c);
-	mercury_pushstack(M, out);
-
-	for (mercury_int a = 1; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
 
 void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //dangerous!
-	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
-		return;
-	};
-	for (mercury_int i = 1; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
-	}
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
-	mercury_variable* cvar = mercury_popstack(M);
-	if (cvar->type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)cvar->type, (void*)M_TYPE_STRING);
+	mercury_variable cvar;
+	mercury_popstack(M, &cvar);
+	if (cvar.type != M_TYPE_STRING) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)cvar.type, (void*)M_TYPE_STRING);
 		return;
 	}
-	mercury_stringliteral* code = (mercury_stringliteral*)cvar->data.p;
+	mercury_stringliteral* code = (mercury_stringliteral*)cvar.data.p;
 
 	char* c_code = (char*)malloc(sizeof(char) * (code->size + 1));
 	if (!c_code) {
@@ -155,64 +133,54 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 	}
 
 
-	mercury_variable* out = mercury_assign_var(M);
-	out->type = M_TYPE_INT;
-	out->data.i = r;
-	mercury_pushstack(M, out);
+	mercury_free_var(&cvar);
+	cvar.type = M_TYPE_INT;
+	cvar.data.i = r;
+	cvar.constant = false;
+	mercury_pushstack(M, &cvar);
 
-	for (mercury_int a = 1; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
 
 void mercury_lib_os_clock(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //gets the time since program startup.
-	for (mercury_int i = 0; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
-	}
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0))return;
 	if (!args_out) {
 		return;
 	}
 
-	mercury_variable* out = mercury_assign_var(M);
+	mercury_variable out;
 
 	mercury_float t = ((mercury_float)clock()) / CLOCKS_PER_SEC;
-	out->type = M_TYPE_FLOAT;
-	out->data.f = t;
+	out.type = M_TYPE_FLOAT;
+	out.data.f = t;
+	out.constant = false;
 
-	mercury_pushstack(M, out);
+	mercury_pushstack(M, &out);
 
-	for (mercury_int a = 1; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		mv->type = M_TYPE_NIL;
-		mv->data.i = 0;
-		mercury_pushstack(M, mv);
-	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
 
 void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //returns a date in table form, from epoch time.
-	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)){
-		return;
-	}
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out)return;
 
-	mercury_variable* tvar= mercury_popstack(M);
+	mercury_variable tvar;
+	mercury_popstack(M,&tvar);
 	time_t t;
-	switch (tvar->type) {
+	switch (tvar.type) {
 	case M_TYPE_INT:
-		t = tvar->data.i;
+		t = tvar.data.i;
 		break;
 	case M_TYPE_FLOAT:
-		t = tvar->data.f;
+		t = tvar.data.f;
 		break;
 	default:
-		mercury_raise_error(M,M_ERROR_WRONG_TYPE,(void*)tvar->type,(void*)M_TYPE_INT);
+		mercury_raise_error(M,M_ERROR_WRONG_TYPE,(void*)tvar.type,(void*)M_TYPE_INT);
 		return;
 	}
+	mercury_free_var(&tvar);
 
 	tm timedata;
 #ifdef WIN32
@@ -225,66 +193,65 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	mercury_variable* outv=mercury_assign_var(M);
-	if (!outv) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION);
-		mercury_destroytable(outt);
-		return;
-	}
+	
 
-	mercury_variable* kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_sec;
-	mercury_table_set_cstring_keyvalue(outt, "seconds", kvar, M);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_min;
-	mercury_table_set_cstring_keyvalue(outt, "minutes", kvar, M);
+	mercury_variable kvar;
+	kvar.constant = false;
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_sec;
+	mercury_table_set_cstring_keyvalue(outt, "seconds", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_hour+1;
-	mercury_table_set_cstring_keyvalue(outt, "hours", kvar, M);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_min;
+	mercury_table_set_cstring_keyvalue(outt, "minutes", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = (timedata.tm_hour%12)+1;
-	mercury_table_set_cstring_keyvalue(outt, "hours12", kvar, M);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_hour+1;
+	mercury_table_set_cstring_keyvalue(outt, "hours", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_BOOL;
-	kvar->data.i = timedata.tm_hour >= 11;
-	mercury_table_set_cstring_keyvalue(outt, "ispm", kvar, M);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = (timedata.tm_hour%12)+1;
+	mercury_table_set_cstring_keyvalue(outt, "hours12", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_year+1900;
-	mercury_table_set_cstring_keyvalue(outt, "year", kvar, M);
+	
+	kvar.type = M_TYPE_BOOL;
+	kvar.data.i = timedata.tm_hour >= 11;
+	mercury_table_set_cstring_keyvalue(outt, "ispm", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_mon + 1;
-	mercury_table_set_cstring_keyvalue(outt, "month", kvar, M);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_year+1900;
+	mercury_table_set_cstring_keyvalue(outt, "year", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_wday;
-	mercury_table_set_cstring_keyvalue(outt, "dayofweek", kvar, M);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_mon + 1;
+	mercury_table_set_cstring_keyvalue(outt, "month", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_mday;
-	mercury_table_set_cstring_keyvalue(outt, "dayofmonth", kvar, M);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_wday;
+	mercury_table_set_cstring_keyvalue(outt, "dayofweek", &kvar);
 
-	kvar = mercury_assign_var(M);
-	kvar->type = M_TYPE_INT;
-	kvar->data.i = timedata.tm_yday+1;
-	mercury_table_set_cstring_keyvalue(outt, "dayofyear", kvar, M);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_mday;
+	mercury_table_set_cstring_keyvalue(outt, "dayofmonth", &kvar);
 
-	outv->type = M_TYPE_TABLE;
-	outv->data.p = outt;
-	mercury_pushstack(M, outv);
+	
+	kvar.type = M_TYPE_INT;
+	kvar.data.i = timedata.tm_yday+1;
+	mercury_table_set_cstring_keyvalue(outt, "dayofyear", &kvar);
+
+	mercury_variable outv;
+	outv.constant = false;
+	outv.type = M_TYPE_TABLE;
+	outv.data.p = outt;
+	mercury_pushstack(M, &outv);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -295,72 +262,72 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	if (!args_out)return;
 
-	mercury_variable* tvar = mercury_popstack(M);
-	if(tvar->type!=M_TYPE_TABLE) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)tvar->type, (void*)M_TYPE_TABLE);
+	mercury_variable tvar;
+	mercury_popstack(M,&tvar);
+
+	if(tvar.type!=M_TYPE_TABLE) {
+		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)tvar.type, (void*)M_TYPE_TABLE);
 		return;
 	}
 	tm timedata;
 	memset(&timedata, 0, sizeof(tm));
 
-	mercury_table* tab = (mercury_table*)tvar->data.p;
-	mercury_variable* var;
+	mercury_table* tab = (mercury_table*)tvar.data.p;
 
-	var = mercury_table_get_cstring_keyvalue(tab, "seconds", M);
-	timedata.tm_sec= mercury_checkint(var);
-	mercury_unassign_var(M, var);
+	mercury_variable var;
 
-	var = mercury_table_get_cstring_keyvalue(tab, "minutes", M);
-	timedata.tm_min= mercury_checkint(var);
-	mercury_unassign_var(M, var);
+	mercury_table_get_cstring_keyvalue(tab, "seconds", &var);
+	timedata.tm_sec= mercury_checkint(&var);
+	mercury_free_var(&var);
+
+	mercury_table_get_cstring_keyvalue(tab, "minutes", &var);
+	timedata.tm_min= mercury_checkint(&var);
+	mercury_free_var(&var);
 	
-	var = mercury_table_get_cstring_keyvalue(tab, "hours", M);
-	if (var->type == M_TYPE_INT || var->type == M_TYPE_FLOAT) {
-		timedata.tm_hour = mercury_checkint(var) - 1;
+	mercury_table_get_cstring_keyvalue(tab, "hours", &var);
+	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
+		timedata.tm_hour = mercury_checkint(&var) - 1;
 	}
 	else {
 		timedata.tm_hour = 0;
 	}
-	mercury_unassign_var(M, var);
+	mercury_free_var(&var);
 
-	var=mercury_table_get_cstring_keyvalue(tab, "year", M);
-	if (var->type == M_TYPE_INT || var->type == M_TYPE_FLOAT) {
-		timedata.tm_year = mercury_checkint(var)- 1900;
+	mercury_table_get_cstring_keyvalue(tab, "year", &var);
+	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
+		timedata.tm_year = mercury_checkint(&var)- 1900;
 	}
 	else {
 		timedata.tm_year = 0;
 	}
-	mercury_unassign_var(M, var);
+	mercury_free_var(&var);
 
-	var = mercury_table_get_cstring_keyvalue(tab, "month", M);
-	if (var->type == M_TYPE_INT || var->type == M_TYPE_FLOAT) {
-		timedata.tm_mon = mercury_checkint(var) - 1;
+	mercury_table_get_cstring_keyvalue(tab, "month", &var);
+	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
+		timedata.tm_mon = mercury_checkint(&var) - 1;
 	}
 	else {
 		timedata.tm_mon = 0;
 	}
-	mercury_unassign_var(M, var);
+	mercury_free_var(&var);
 
-	var = mercury_table_get_cstring_keyvalue(tab, "dayofmonth", M);
-	timedata.tm_mday = mercury_checkint(var);
-	mercury_unassign_var(M, var);
+	mercury_table_get_cstring_keyvalue(tab, "dayofmonth", &var);
+	timedata.tm_mday = mercury_checkint(&var);
+	mercury_free_var(&var);
 	
-	mercury_table_get_cstring_keyvalue(tab, "daylightsavings", M);
-	timedata.tm_isdst = mercury_checkint(var);
-	mercury_unassign_var(M, var);
+	mercury_table_get_cstring_keyvalue(tab, "daylightsavings", &var);
+	timedata.tm_isdst = mercury_checkint(&var);
+	mercury_free_var(&var);
 
-	mercury_variable* out= mercury_assign_var(M);
-	if (!out) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION);
-		return;
-	}
-	out->type = M_TYPE_INT;
+	mercury_variable out;
+	out.constant = false;
+	out.type = M_TYPE_INT;
 #ifdef WIN32
-	out->data.i= _mkgmtime(&timedata); //why in the world does mktime use your local timezone? bad. stupid. uuuuuugh.
+	out.data.i= _mkgmtime(&timedata); //why in the world does mktime use your local timezone? bad. stupid. uuuuuugh.
 #else
-	out->data.i = timegm(&timedata);
+	out.data.i = timegm(&timedata);
 #endif
-	mercury_pushstack(M, out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -374,12 +341,13 @@ void mercury_lib_os_exit(mercury_state* const M_CPP_restrict M, const mercury_in
 
 	int exitcode = 0;
 	if (args_in) {
-		mercury_variable* v=mercury_popstack(M);
-		if (v->type == M_TYPE_INT) {
-			exitcode = (int)v->data.i;
+		mercury_variable v;
+		mercury_popstack(M,&v);
+		if (v.type == M_TYPE_INT) {
+			exitcode = (int)v.data.i;
 		}
 
-		mercury_unassign_var(M,v);
+		mercury_free_var(&v);
 	}
 
 	exit(exitcode);

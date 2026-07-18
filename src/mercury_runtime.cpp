@@ -29,12 +29,12 @@ int main(int argc, char** argv) {
 
 	//printf("arg count: %i\n", argc);
 	for (int i = 0; i < argc; i++) {
-		mercury_variable* av = (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (av) {
-			av->type = M_TYPE_STRING;
-			av->data.p = mercury_cstring_to_mstring(argv[i], strlen(argv[i]));
-			mercury_setarray(arg_arr, av, i);
-		}
+		mercury_variable av;
+		av.type = M_TYPE_STRING;
+		av.constant = false;
+		av.data.p = mercury_cstring_to_mstring(argv[i], strlen(argv[i]));
+		mercury_setarray(arg_arr, &av, i);
+		
 		//printf("\t%i %s\n",i, argv[i]);
 	}
 	
@@ -109,14 +109,12 @@ int main(int argc, char** argv) {
 
 	mercury_state* M=mercury_newstate();
 
-	mercury_variable* at_v =mercury_assign_var(M);
-	mercury_variable* atk_v = mercury_assign_var(M);
+	mercury_variable at_v;
+	at_v.constant = false;
+	at_v.type = M_TYPE_ARRAY;
+	at_v.data.p = arg_arr;
+	mercury_table_set_cstring_keyvalue(M->enviroment,"_ARGS",&at_v);
 
-	at_v->type = M_TYPE_ARRAY;
-	at_v->data.p = arg_arr;
-	atk_v->type = M_TYPE_STRING;
-	atk_v->data.p = mercury_cstring_const_to_mstring((char*)"_ARGS",5);
-	mercury_setkey(M->enviroment, atk_v, at_v);
 	mercury_populate_enviroment_with_libs(M);
 
 #ifdef MERCURY_DEBUG
@@ -153,15 +151,11 @@ int main(int argc, char** argv) {
 
 
 	mercury_stringliteral* tstr = mercury_cstring_const_to_mstring((char*)code, strlen(code));
-	mercury_variable* funcy = mercury_compile_mstring(tstr);
-	if (!funcy) {
-		printf("allocator error when compiling\n");
-		return -1;
-	}
-
-	if (funcy->type != M_TYPE_FUNCTION) {
-		if (funcy->type == M_TYPE_STRING) {
-			mercury_stringliteral* s = (mercury_stringliteral*)funcy->data.p;
+	mercury_variable funcy;
+	mercury_compile_mstring(tstr,&funcy);
+	if (funcy.type != M_TYPE_FUNCTION) {
+		if (funcy.type == M_TYPE_STRING) {
+			mercury_stringliteral* s = (mercury_stringliteral*)funcy.data.p;
 			for (mercury_int n = 0; n < s->size; n++) {
 				putchar(s->ptr[n]);
 			}
@@ -174,7 +168,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 
-		mercury_function* compiled = (mercury_function*)funcy->data.p;
+		mercury_function* compiled = (mercury_function*)funcy.data.p;
 
 #ifdef MERCURY_DEBUG
 		mercury_stringliteral* rs= mercury_get_bytecode_debug(compiled);
@@ -198,15 +192,18 @@ int main(int argc, char** argv) {
 	}
 
 	if (interactivemode) {
-		if (funcy->type == M_TYPE_FUNCTION) {
+		if (funcy.type == M_TYPE_FUNCTION) {
 			M->programcounter = 0;
 			free(code);
 			free(M->bytecode.instructions);
 			M->bytecode.numberofinstructions = 0;
 			free(M->bytecode.debug_info);
+			
 
 			for (mercury_uint i = 0; i < M->sizeofstack;i++) {
-				mercury_unassign_var(M,mercury_popstack(M)); //clean up the stack
+				mercury_variable v;
+				mercury_popstack(M, &v);
+				mercury_free_var(&v); //clean up the stack
 			}
 		}
 		goto start;

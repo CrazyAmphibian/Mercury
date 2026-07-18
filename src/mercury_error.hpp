@@ -32,7 +32,9 @@ inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(mercury_state* co
 		return true;
 	}
 	for (mercury_int i = (const mercury_int)max_args; i < args_in; i++) {
-		mercury_unassign_var(M, mercury_popstack(M));
+		mercury_variable v;
+		mercury_popstack(M, &v);
+		mercury_free_var(&v);
 	}
 	return false;
 }
@@ -40,17 +42,11 @@ inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(mercury_state* co
 //pretty simple will output any args that haven't been outputted. is nil.
 inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(mercury_state* const M_CPP_restrict M, const mercury_int args_out, const mercury_int sent_args=0) {
 	for (mercury_int a = sent_args; a < args_out; a++) {
-		mercury_variable* mv = mercury_assign_var(M);
-		if (mv) {
-			mv->type = M_TYPE_NIL;
-			mv->data.i = 0;
-			mv->constant = false;
-			mercury_pushstack(M, mv);
-		}
-		else {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			return true;
-		}
+		mercury_variable mv;
+		mv.type = M_TYPE_NIL;
+		mv.data.i = 0;
+		mv.constant = false;
+		mercury_pushstack(M, &mv);
 	}
 	return false;
 }
