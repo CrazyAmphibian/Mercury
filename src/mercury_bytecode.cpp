@@ -1662,7 +1662,7 @@ void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M) { // CoPY Top (of st
 	
 	mercury_clonevariable(&val,&out);
 
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 }
 
 

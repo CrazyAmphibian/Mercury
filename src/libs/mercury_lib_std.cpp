@@ -119,6 +119,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 						const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
 #endif
 						if (var.type) {
+							mercury_variable v;
+							mercury_clonevariable(&var,&v);
+
 							mercury_variable idxvar;
 							idxvar.constant = false;
 							idxvar.data.i = index;
@@ -126,7 +129,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 							if (function.type == M_TYPE_CFUNC) {
 								mercury_pushstack(SubM, &idxvar);
-								mercury_pushstack(SubM, &var);
+								mercury_pushstack_unrefed(SubM, &v);
 								mercury_pushstack(SubM, &listlike);
 								((mercury_cfunc)function.data.p)(SubM, 3, 1);
 
@@ -144,7 +147,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
 								mercury_pushstack(SubM, &listlike);
-								mercury_pushstack(SubM, &var);
+								mercury_pushstack_unrefed(SubM, &v);
 								mercury_pushstack(SubM, &idxvar);
 								while (mercury_stepstate(SubM));
 
@@ -188,12 +191,14 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable* subt = tab->data[t];
 			for (mercury_int i = 0; i < subt->size; i++) {
-				mercury_variable k= subt->keys[i];
-				mercury_variable v =subt->values[i];
+				mercury_variable k;
+				mercury_clonevariable(subt->keys+i,&k); //because strings are not refed, we need to copy them to avoid using a freed pointer.
+				mercury_variable v;
+				mercury_clonevariable(subt->values + i, &v);
 				
 				if (function.type == M_TYPE_CFUNC) {
-					mercury_pushstack(SubM, &k);
-					mercury_pushstack(SubM, &v);
+					mercury_pushstack_unrefed(SubM, &k);
+					mercury_pushstack_unrefed(SubM, &v);
 					mercury_pushstack(SubM, &listlike);
 					((mercury_cfunc)function.data.p)(SubM, 3, 1);
 					mercury_variable o;
@@ -206,8 +211,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					
 				}
 				else {
-					mercury_pushstack(SubM, &k);
-					mercury_pushstack(SubM, &v);
+					mercury_pushstack_unrefed(SubM, &k);
+					mercury_pushstack_unrefed(SubM, &v);
 					mercury_pushstack(SubM, &listlike);
 					
 					while (mercury_stepstate(SubM));

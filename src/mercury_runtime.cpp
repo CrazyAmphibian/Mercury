@@ -29,12 +29,12 @@ int main(int argc, char** argv) {
 
 	//printf("arg count: %i\n", argc);
 	for (int i = 0; i < argc; i++) {
-		mercury_variable* av = (mercury_variable*)malloc(sizeof(mercury_variable));
-		if (av) {
-			av->type = M_TYPE_STRING;
-			av->data.p = mercury_cstring_to_mstring(argv[i], strlen(argv[i]));
-			mercury_setarray(arg_arr, av, i);
-		}
+		mercury_variable av;
+		av.type = M_TYPE_STRING;
+		av.constant = false;
+		av.data.p = mercury_cstring_to_mstring(argv[i], strlen(argv[i]));
+		mercury_setarray(arg_arr, &av, i);
+		
 		//printf("\t%i %s\n",i, argv[i]);
 	}
 	
@@ -198,6 +198,7 @@ int main(int argc, char** argv) {
 			free(M->bytecode.instructions);
 			M->bytecode.numberofinstructions = 0;
 			free(M->bytecode.debug_info);
+			
 
 			for (mercury_uint i = 0; i < M->sizeofstack;i++) {
 				mercury_variable v;

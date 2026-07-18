@@ -660,6 +660,7 @@ void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 		out->type = M_TYPE_NIL;
 		out->data.i = 0;
 		out->constant = false;
+		return;
 	}
 
 	*out = M->stack[0];
@@ -733,7 +734,7 @@ bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_va
 
 void mercury_clonevariable(const mercury_variable* const var, mercury_variable* out) {
 	out->type = var->type;
-	out->constant = false;
+	out->constant = var->constant;
 	switch (out->type) {
 		case M_TYPE_STRING:
 			out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
