@@ -715,7 +715,7 @@ union m_rawdata_snowflake_printf { //because printf promotes floats to doubles f
 	void* p;
 };
 
-// TODO: add u, o
+
 mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringliteral* str_out, mercury_variable* v_arr, mercury_int* num_vars) {
 	mercury_int add_off = 0;
 
@@ -738,8 +738,7 @@ mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury
 		switch (c) {
 		case '%':
 			mercury_mstring_addchars(str_out,(char*)"%",1);
-			//add_off++;
-			goto exit;
+			return add_off;
 		case 'I':
 		case 'i': // integer
 			if (*num_vars) {
@@ -941,11 +940,9 @@ return add_off;
 			//add_off++;
 			break;
 		default:
-			//break;
-			goto exit;
+			return add_off;
 		}
 	}
-	exit:
 
 	return add_off;
 }
