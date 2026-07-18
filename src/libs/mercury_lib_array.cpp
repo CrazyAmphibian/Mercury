@@ -233,7 +233,7 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 			return;
 		}
 		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
-			mercury_variable** const st1_1 = arr1.values[i1];
+			mercury_variable** const st1_1 = arr1->values[i1];
 			if (!st1_1)continue;
 			mercury_variable** st1_2 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(mercury_variable*));
 			if (!st1_2) {
