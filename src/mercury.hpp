@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-
+#include <string.h>
 #ifdef _WIN32
 #include <Windows.h>
 #else

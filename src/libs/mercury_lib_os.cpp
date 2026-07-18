@@ -325,7 +325,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 #ifdef WIN32
 	out.data.i= _mkgmtime(&timedata); //why in the world does mktime use your local timezone? bad. stupid. uuuuuugh.
 #else
-	out->data.i = timegm(&timedata);
+	out.data.i = timegm(&timedata);
 #endif
 	mercury_pushstack(M, &out);
 
