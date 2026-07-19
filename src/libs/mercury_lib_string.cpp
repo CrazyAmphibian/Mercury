@@ -16,20 +16,20 @@ void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable var_end;
 	mercury_popstack(M, &var_end);
 	if (var_end.type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_end.type, (void*)M_TYPE_INT, (void*)3);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_end.type, M_TYPE_INT, 3);
 		return;
 	}
 	mercury_variable var_start;
 	mercury_popstack(M, &var_start);
 	if (var_start.type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_start.type, (void*)M_TYPE_INT, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_start.type, M_TYPE_INT, 2);
 		return;
 	}
 
 	mercury_variable var_string;
 	mercury_popstack(M,&var_string);
 	if (var_string.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_string.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_string.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -56,7 +56,7 @@ void mercury_lib_string_reverse(mercury_state* const M_CPP_restrict M, const mer
 	mercury_variable var_string;
 	mercury_popstack(M,&var_string);
 	if (var_string.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_string.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_string.type, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_stringliteral* str = (mercury_stringliteral*)var_string.data.p;
@@ -100,7 +100,7 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 	if (args_in > 2) {
 		mercury_popstack(M,&startat);
 		if (startat.type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)startat.type, (void*)M_TYPE_INT, (void*)3);
+			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, startat.type, M_TYPE_INT, 3);
 			return;
 		}
 	}
@@ -111,14 +111,14 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_variable searchforvar;
 	mercury_popstack(M,&searchforvar);
 	if (searchforvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)searchforvar.type, (void*)M_TYPE_STRING, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, searchforvar.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable strvar;
 	mercury_popstack(M,&strvar);
 	if (strvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, strvar.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -188,7 +188,7 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 	if (args_in > 3) {
 		mercury_popstack(M,&max_replacments);
 		if (max_replacments.type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)max_replacments.type, (void*)M_TYPE_INT, (void*)4);
+			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, max_replacments.type, M_TYPE_INT, 4);
 			return;
 		}
 	}
@@ -199,21 +199,21 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 	mercury_variable replace_var;
 	mercury_popstack(M,& replace_var);
 	if (replace_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)replace_var.type, (void*)M_TYPE_STRING, (void*)3);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, replace_var.type, M_TYPE_STRING, 3);
 		return;
 	}
 
 	mercury_variable search_var;
 	mercury_popstack(M, &search_var);
 	if (search_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)search_var.type, (void*)M_TYPE_STRING, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, search_var.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable str_var;
 	mercury_popstack(M, &str_var);
 	if (str_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)str_var.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, str_var.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -281,14 +281,14 @@ void mercury_lib_string_count(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable search_var;
 	mercury_popstack(M, &search_var);
 	if (search_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)search_var.type, (void*)M_TYPE_STRING, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, search_var.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable str_var;
 	mercury_popstack(M, &str_var);
 	if (str_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)str_var.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, str_var.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -332,7 +332,7 @@ void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mer
 	mercury_variable str_var;
 	mercury_popstack(M, &str_var);
 	if (str_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)str_var.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, str_var.type, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_stringliteral* str = (mercury_stringliteral*)str_var.data.p;
@@ -369,7 +369,7 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 	mercury_variable str_var;
 	mercury_popstack(M,&str_var);
 	if (str_var.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)str_var.type, (void*)M_TYPE_ARRAY, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, str_var.type, M_TYPE_ARRAY, 1);
 		return;
 	}
 	mercury_array* arr = (mercury_array*)str_var.data.p;
@@ -420,14 +420,14 @@ void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const me
 	mercury_variable sep_var;
 	mercury_popstack(M, &sep_var);
 	if (sep_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)sep_var.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, sep_var.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable str_var;
 	mercury_popstack(M, &str_var);
 	if (str_var.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)str_var.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, str_var.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -503,7 +503,7 @@ void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable var_string;
 	mercury_popstack(M,&var_string);
 	if (var_string.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_string.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_string.type, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_stringliteral* str = (mercury_stringliteral*)var_string.data.p;
@@ -552,7 +552,7 @@ void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable var_string;
 	mercury_popstack(M, &var_string);
 	if (var_string.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_string.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_string.type, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_stringliteral* str = (mercury_stringliteral*)var_string.data.p;
@@ -951,7 +951,7 @@ return add_off;
 
 void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //c-style printf formatting.
 	if (args_in < 1) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_NOT_ENOUGH_ARGS, args_in, 1);
 		return;
 	};
 	if (!args_out) {
@@ -972,7 +972,7 @@ void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const merc
 	mercury_variable strvar;
 	mercury_popstack(M,&strvar);
 	if (strvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, strvar.type, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_stringliteral* s = (mercury_stringliteral*)strvar.data.p;
@@ -1470,7 +1470,7 @@ void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const merc
 	if (args_in > 2) {
 		mercury_popstack(M, &startat);
 		if (startat.type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)startat.type, (void*)M_TYPE_INT, (void*)3);
+			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, startat.type, M_TYPE_STRING, 3);
 			return;
 		}
 	}
@@ -1481,14 +1481,14 @@ void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const merc
 	mercury_variable searchforvar;
 	mercury_popstack(M, &searchforvar);
 	if (searchforvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)searchforvar.type, (void*)M_TYPE_STRING, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, searchforvar.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable strvar;
 	mercury_popstack(M, &strvar);
 	if (strvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, strvar.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1544,14 +1544,14 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 	mercury_variable matchvar;
 	mercury_popstack(M, &matchvar);
 	if (matchvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)matchvar.type, (void*)M_TYPE_STRING, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, matchvar.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable strvar;
 	mercury_popstack(M, &strvar);
 	if (strvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, strvar.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1604,7 +1604,7 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 	if (args_in > 3) {
 		mercury_popstack(M, &max_replacments);
 		if (max_replacments.type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)max_replacments.type, (void*)M_TYPE_INT, (void*)4);
+			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, max_replacments.type, M_TYPE_INT, 4);
 			return;
 		}
 	}
@@ -1615,21 +1615,21 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 	mercury_variable repvar;
 	mercury_popstack(M, &repvar);
 	if (repvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)repvar.type, (void*)M_TYPE_STRING, (void*)3);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, repvar.type, M_TYPE_STRING, 3);
 		return;
 	}
 
 	mercury_variable matchvar;
 	mercury_popstack(M, &matchvar);
 	if (matchvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)matchvar.type, (void*)M_TYPE_STRING, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, matchvar.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable strvar;
 	mercury_popstack(M, &strvar);
 	if (strvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, strvar.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1690,14 +1690,14 @@ void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mer
 	mercury_variable matchvar;
 	mercury_popstack(M, &matchvar);
 	if (matchvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)matchvar.type, (void*)M_TYPE_STRING, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, matchvar.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable strvar;
 	mercury_popstack(M, &strvar);
 	if (strvar.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)strvar.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, strvar.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1739,7 +1739,7 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 	mercury_variable instr;
 	mercury_popstack(M,&instr);
 	if (instr.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, instr.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1789,7 +1789,7 @@ void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const 
 	mercury_variable instr;
 	mercury_popstack(M, &instr);
 	if (instr.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, instr.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1856,7 +1856,7 @@ void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const me
 	mercury_variable instr;
 	mercury_popstack(M, &instr);
 	if (instr.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, instr.type, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1938,7 +1938,7 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 	mercury_variable instr;
 	mercury_popstack(M, &instr);
 	if (instr.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)instr.type, (void*)M_TYPE_STRING, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, instr.type, M_TYPE_STRING, 1);
 		return;
 	}
 

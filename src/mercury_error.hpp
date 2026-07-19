@@ -7,18 +7,27 @@
 enum M_ERROR_TYPES:uint32_t {
 	M_ERROR_NONE = 0,			// args: 
 	M_ERROR_ALLOCATION = 1,		//args:
-	M_ERROR_WRONG_TYPE = 2,		//args: expected, provided, arg
+	M_ERROR_WRONG_TYPE = 2,		//args: provided, expected, arg number
 	M_ERROR_DIV_ZERO = 3,		//args:
 	M_ERROR_INVALID_INDEX = 4, // args: expected, provided
 	M_ERROR_INSTRUCTION_FAILIURE = 5, //args:
 	M_ERROR_CALL_NOT_FUNCTION = 6 ,// args: provided
 	M_ERROR_INDEX_INVALID_TYPE = 7, // args: provided
-	M_ERROR_NOT_ENOUGH_ARGS = 8, //args: expected, provided
-	M_ERROR_CUSTOM_STRING = 9 //args: string
+	M_ERROR_NOT_ENOUGH_ARGS = 8, //args: provided, expected
+	M_ERROR_CUSTOM_STRING = 9, //args: string
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, //args: provided, arg number. for functions that can take ints or floats
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, //args: provided, arg number. for functions that can take C and M functions
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE,//args: provided, arg number. for functions that can take arrays or tables.
 };
 
-mercury_stringliteral* mercury_generate_error_string(mercury_state* M, uint32_t errorcode, void* data1 = nullptr, void* data2 = nullptr, void* data3 = nullptr);
-void mercury_raise_error(mercury_state* M, uint32_t errorcode, void* data1 = nullptr, void* data2 = nullptr, void* data3 = nullptr);
+mercury_stringliteral* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1 = nullptr, const mercury_int* data2 = nullptr, const mercury_int* data3 = nullptr);
+void mercury_raise_error(mercury_state* M, const uint32_t errorcode, const mercury_int* data1 = nullptr, const mercury_int* data2 = nullptr, const mercury_int* data3 = nullptr);
+
+
+inline void mercury_raise_error_nonpointer(mercury_state* M, const uint32_t errorcode, const mercury_int data1 = 0, const mercury_int data2 = 0, const mercury_int data3 = 0) {
+	mercury_raise_error(M, errorcode, &data1, &data2, &data3);
+}
+
 
 //helper functions for making c functions. returns true if there's a problem, false if nothing went wrong. if()return;
 
@@ -28,7 +37,7 @@ inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(mercury_state* co
 		max_args = min_args; //by default, args are specific
 	}
 	if (args_in < min_args) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)min_args);
+		mercury_raise_error_nonpointer(M, M_ERROR_NOT_ENOUGH_ARGS, args_in, min_args);
 		return true;
 	}
 	for (mercury_int i = (const mercury_int)max_args; i < args_in; i++) {

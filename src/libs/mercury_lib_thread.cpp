@@ -42,7 +42,7 @@ void* threadfunction(void* param) {
 //creates a thread, given a function and input variable. optional table to act as the enviroment. defaults current env.
 void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_in) {
-		mercury_raise_error(M, M_ERROR_NOT_ENOUGH_ARGS, (void*)args_in, (void*)1);
+		mercury_raise_error_nonpointer(M, M_ERROR_NOT_ENOUGH_ARGS, args_in, 1);
 		return;
 	}
 	if (!args_out)return;
@@ -77,11 +77,11 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 
 	if ( func_var.type != M_TYPE_FUNCTION) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)func_var.type, (void*)M_TYPE_FUNCTION);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, func_var.type, M_TYPE_FUNCTION,1);
 		return;
 	}
 	if ((table_var.type && table_var.type != M_TYPE_TABLE)) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)table_var.type, (void*)M_TYPE_TABLE);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, table_var.type, M_TYPE_TABLE, 2);
 		return;
 	}
 
@@ -176,7 +176,7 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in.type, (void*)M_TYPE_THREAD);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -201,7 +201,7 @@ void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const me
 	mercury_variable in;
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in.type, (void*)M_TYPE_THREAD);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -232,7 +232,7 @@ void mercury_lib_thread_abort(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in.type, (void*)M_TYPE_THREAD);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -264,7 +264,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, cons
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in.type, (void*)M_TYPE_THREAD);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -295,7 +295,7 @@ void mercury_lib_thread_waitfor(mercury_state* const M_CPP_restrict M, const mer
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in.type, (void*)M_TYPE_THREAD);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -323,7 +323,7 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)in.type, (void*)M_TYPE_THREAD);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
 		return;
 	}
 

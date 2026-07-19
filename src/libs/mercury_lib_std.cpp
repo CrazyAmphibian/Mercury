@@ -62,11 +62,11 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 
 	if (function.type != M_TYPE_CFUNC && function.type != M_TYPE_FUNCTION) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_FUNCTION, (void*)function.type,(void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, function.type, M_TYPE_TABLE, 2);
 		return;
 	}
 	if (listlike.type != M_TYPE_TABLE && listlike.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_TABLE, (void*)listlike.type, (void*)2);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, listlike.type, M_TYPE_TABLE, 1);
 		return;
 	}
 
@@ -251,7 +251,7 @@ get return args
 */
 void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_in < 2) {
-		mercury_raise_error(M,M_ERROR_NOT_ENOUGH_ARGS, (void*)2, (void*)args_in);
+		mercury_raise_error_nonpointer(M,M_ERROR_NOT_ENOUGH_ARGS, args_in,2);
 		return;
 	}
 	mercury_variable* argt = (mercury_variable*)malloc(sizeof(mercury_variable) * (args_in - 2));
@@ -269,12 +269,12 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	mercury_popstack(M,&func);
 
 	if (tab.type != M_TYPE_TABLE) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_TABLE , (void*)tab.type );
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE,tab.type, M_TYPE_TABLE,2);
 		free(argt);
 		return;
 	}
 	if (func.type != M_TYPE_CFUNC && func.type != M_TYPE_FUNCTION) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)M_TYPE_FUNCTION, (void*)func.type);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, func.type, 1);
 		free(argt);
 		return;
 	}
@@ -569,7 +569,7 @@ void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_variable codestr;
 	mercury_popstack(M,&codestr);
 	if (codestr.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)codestr.type, (void*)M_TYPE_STRING);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, codestr.type,M_TYPE_STRING,1);
 		return;
 	}
 
@@ -690,7 +690,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 	mercury_popstack(M,&i);
 
 	if (i.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)i.type, (void*)M_TYPE_STRING);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, i.type, M_TYPE_STRING,1);
 		return;
 	}
 

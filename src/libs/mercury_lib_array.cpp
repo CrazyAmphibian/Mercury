@@ -16,7 +16,7 @@ void mercury_lib_array_flush(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_variable arr_var;
 	mercury_popstack(M,&arr_var);
 	if (arr_var.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var.type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE,arr_var.type, M_TYPE_ARRAY,1);
 		return;
 	}
 
@@ -153,7 +153,7 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable arr_var;
 	mercury_popstack(M,&arr_var);
 	if (arr_var.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var.type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, arr_var.type, M_TYPE_ARRAY, 1);
 		return;
 	}
 
@@ -280,7 +280,7 @@ void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercu
 	if (args_in > 2) {
 		mercury_popstack(M,&len_var);
 		if (len_var.type != M_TYPE_INT) {
-			mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)len_var.type, (void*)M_TYPE_INT);
+			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, len_var.type, M_TYPE_INT, 3);
 			return;
 		}
 	}
@@ -293,7 +293,7 @@ void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable arr_var;
 	mercury_popstack(M, &arr_var);
 	if (arr_var.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var.type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, arr_var.type, M_TYPE_ARRAY, 1);
 		return;
 	}
 
@@ -329,14 +329,14 @@ void mercury_lib_array_remove(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable len_var;
 	mercury_popstack(M, &len_var);
 	if (len_var.type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)len_var.type, (void*)M_TYPE_INT);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, len_var.type, M_TYPE_INT, 2);
 		return;
 	}
 
 	mercury_variable arr_var;
 	mercury_popstack(M, &arr_var);
 	if (arr_var.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var.type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, arr_var.type, M_TYPE_ARRAY, 1);
 		return;
 	}
 
@@ -366,21 +366,21 @@ void mercury_lib_array_swap(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable pos_var1;
 	mercury_popstack(M, &pos_var1);
 	if (pos_var1.type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)pos_var1.type, (void*)M_TYPE_INT);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, pos_var1.type, M_TYPE_INT, 3);
 		return;
 	}
 
 	mercury_variable pos_var2;
 	mercury_popstack(M, &pos_var2);
 	if (pos_var2.type != M_TYPE_INT) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)pos_var2.type, (void*)M_TYPE_INT);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, pos_var2.type, M_TYPE_INT, 2);
 		return;
 	}
 
 	mercury_variable arr_var;
 	mercury_popstack(M, &arr_var);
 	if (arr_var.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)arr_var.type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, arr_var.type, M_TYPE_ARRAY, 1);
 		return;
 	}
 
@@ -432,14 +432,14 @@ void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable var_func;
 	mercury_popstack(M,&var_func);
 	if (var_func.type != M_TYPE_FUNCTION && var_func.type != M_TYPE_CFUNC) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_func.type, (void*)M_TYPE_FUNCTION);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_func.type, M_TYPE_FUNCTION, 2);
 		return;
 	}
 
 	mercury_variable var_array;
 	mercury_popstack(M,&var_array);
 	if (var_array.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_array.type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_array.type, M_TYPE_ARRAY, 1);
 		return;
 	}
 
@@ -678,14 +678,14 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable var_str;
 	mercury_popstack(M,&var_str);
 	if (var_str.type != M_TYPE_STRING) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_str.type, (void*)M_TYPE_STRING);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_str.type, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable var_array;
 	mercury_popstack(M,&var_array);
 	if (var_array.type != M_TYPE_ARRAY) {
-		mercury_raise_error(M, M_ERROR_WRONG_TYPE, (void*)var_array.type, (void*)M_TYPE_ARRAY);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_array.type, M_TYPE_ARRAY, 1);
 		return;
 	}
 	if (!args_out)return;
