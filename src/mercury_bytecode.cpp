@@ -730,8 +730,8 @@ void M_BYTECODE_LAND(mercury_state* const M_CPP_restrict M) {
 		mercury_pushstack(M, &v2);
 		return;
 	}
-	mercury_free_var(&v2);
-	mercury_pushstack(M, &v1);
+	mercury_free_var(&v1);
+	mercury_pushstack(M, &v2);
 }
 
 void M_BYTECODE_LOR(mercury_state* const M_CPP_restrict M) {

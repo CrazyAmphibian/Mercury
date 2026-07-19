@@ -16,6 +16,9 @@
 		p.codeblock-ctl { margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
 		h4.cjk { font-family: "NSimSun" }
 		h4.ctl { font-family: "Arial" }
+		.borderedtable { border-collapse: collapse;}
+		.borderedtable th, td {border:1px solid black;padding:0.25em;}
+		.compressedlist li{margin-top:0px;margin-bottom:0px;}
 	</style>
 </head>
 <body lang="en-US" dir="ltr"><p align="center" style="margin-top: 0.17in; text-decoration: none; page-break-after: avoid">
@@ -119,161 +122,51 @@ a=5+(3/4)//returns 5.75</p>
 strings. Strings will run until they find another quote mark, even if
 that means spanning multiple lines. Strings accept escapes using
 backslash, and follow similar rules to C string escapes.</p>
-<table width="100%" cellpadding="4" cellspacing="1" style="page-break-inside: avoid">
-	<col width="128*"/>
-
-	<col width="128*"/>
-
-	<tr valign="top">
-		<td width="50%" style="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			Sequence</p>
-		</td>
-		<td width="50%" style="border: 1px double #808080; padding: 0.04in"><p>
-			Outcome</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\\</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			The character \</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\&quot;</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			Quote mark &quot;</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\'</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			Single quote '</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\t</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			tab</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\n</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			newline</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\r</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			Carriage return</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\?</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			Question mark ?</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\a</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			bell</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\b</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			backspace</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\e</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			escape</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\f</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			formfeed</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\v</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			Vertical tab</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\x00</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			Hexadecimal char input.</p>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p>
-			\123</p>
-		</td>
-		<td width="50%" style="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p>
-			Decimal character input.</p>
-		</td>
-	</tr>
+<table class="borderedtable">
+	<tr> <th>Sequence</th> <th>Outcome</th> <tr>
+	<tr> <td>\\</td> <td>The character \</td> </tr>
+	<tr> <td>\"</td> <td>The character "</td> </tr>
+	<tr> <td>\'</td> <td>The character '</td> </tr>
+	<tr> <td>\t</td> <td>Tab</td> </tr>
+	<tr> <td>\n</td> <td>Newline</td> </tr>
+	<tr> <td>\r</td> <td>Carriage return</td> </tr>
+	<tr> <td>\?</td> <td>Question mark</td> </tr>
+	<tr> <td>\a</td> <td>Bell</td> </tr>
+	<tr> <td>\b</td> <td>Backspace</td> </tr>
+	<tr> <td>\e</td> <td>Escape</td> </tr>
+	<tr> <td>\f</td> <td>Formfeed</td> </tr>
+	<tr> <td>\v</td> <td>Vertical tab</td> </tr>
+	<tr> <td>\x00</td> <td>Hexadecimal char input</td> </tr>
+	<tr> <td>\123</td> <td>Decimal char input</td> </tr>
 </table>
-<p><br/>
-<br/>
 
-</p>
+
+
 <h3 class="western">Keywords</h3>
 <p>Mercury has 17 reserved keywords. These cannot be used for
 variable names, as they either are part of the language syntax, are
 represent another variable.</p>
 <p>Keywords are case sensitive, so you can use capitalization to
 share a name with a keyword without any issues.</p>
-<ul>
-	<li><p style="margin-bottom: 0in">if 
-	</p>
-	<li><p style="margin-bottom: 0in">do</p>
-	<li><p style="margin-bottom: 0in">nil</p>
-	<li><p style="margin-bottom: 0in">inf</p>
-	<li><p style="margin-bottom: 0in">end</p>
-	<li><p style="margin-bottom: 0in">true</p>
-	<li><p style="margin-bottom: 0in">then</p>
-	<li><p style="margin-bottom: 0in">else</p>
-	<li><p style="margin-bottom: 0in">goto</p>
-	<li><p style="margin-bottom: 0in">while</p>
-	<li><p style="margin-bottom: 0in">false</p>
-	<li><p style="margin-bottom: 0in">local</p>
-	<li><p style="margin-bottom: 0in">global</p>
-	<li><p style="margin-bottom: 0in">elseif</p>
-	<li><p style="margin-bottom: 0in">return</p>
-	<li><p style="margin-bottom: 0in">continue</p>
-	<li><p style="margin-bottom: 0in">function</p>
+<ul class="compressedlist">
+	<li>if 
+	</li>
+	<li>do</li>
+	<li>nil</li>
+	<li>inf</li>
+	<li>end</li>
+	<li>true</li>
+	<li>then</li>
+	<li>else</li>
+	<li>goto</li>
+	<li>while</li>
+	<li>false</li>
+	<li>local</li>
+	<li>global</li>
+	<li>elseif</li>
+	<li>return</li>
+	<li>continue</li>
+	<li>function</li>
 </ul>
 <p style="margin-bottom: 0in"><br/>
 
@@ -281,92 +174,89 @@ share a name with a keyword without any issues.</p>
 <h4 class="western">keywords: Static variables</h4>
 <p>Static variable keywords represent a constant value, and can be
 used for assignment or comparison</p>
-<ul>
-	<li><p>nil</p>
+<ul class="compressedlist">
+	<li>nil</li>
 	<ul>
-		<li><p>represents the nil datatype, nothing.</p>
+		<li>represents the nil datatype, nothing.</li>
 	</ul>
-	<li><p>inf</p>
+	<li>inf</li>
 	<ul>
-		<li><p>represents infinity in as a float.</p>
+		<li>represents infinity as a float.</li>
 	</ul>
-	<li><p>true</p>
+	<li>true</li>
 	<ul>
-		<li><p>represents the boolean value of true</p>
+		<li>represents the boolean value of true</li>
 	</ul>
-	<li><p>false</p>
+	<li>false</li>
 	<ul>
-		<li><p>represents the boolean value of false</p>
+		<li>represents the boolean value of false</li>
 	</ul>
 </ul>
 <h4 class="western">keywords: flow control</h4>
 <p>These keywords form the structure of a program and are vital for
 complex behavior</p>
-<ul>
-	<li><p>end</p>
+<ul class="compressedlist">
+	<li>end</li>
 	<ul>
-		<li><p>the universal delimiter for statement bodies.</p>
+		<li>the universal delimiter for statement bodies.</li>
 	</ul>
-	<li><p>if, then, else, elseif</p>
+	<li>if, then, else, elseif</li>
 	<ul>
-		<li><p>forms the basis for if statements</p>
+		<li>forms the basis for if statements</li>
 	</ul>
-	<li><p>while, do</p>
+	<li>while, do</li>
 	<ul>
-		<li><p>forms the basis for while loops</p>
+		<li>forms the basis for while loops</li>
 	</ul>
-	<li><p>continue, break</p>
+	<li>continue, break</li>
 	<ul>
-		<li><p>modifies behavior of loops</p>
+		<li>modifies behavior of loops</li>
 	</ul>
-	<li><p>goto</p>
+	<li>goto</li>
 	<ul>
-		<li><p>unconditional jump to another section of code, use with
-		caution</p>
+		<li>unconditional jump to another section of code, use with
+		caution</li>
 	</ul>
-	<li><p>function</p>
+	<li>function</li>
 	<ul>
-		<li><p>self-explanitory</p>
+		<li>self-explanitory</li>
 	</ul>
-	<li><p>return</p>
+	<li>return</li>
 	<ul>
-		<li><p>can be used in function to abort execution and return values</p>
+		<li>can be used in function to abort execution and return values</li>
 	</ul>
 </ul>
 <h4 class="western">keywords: scope specifiers</h4>
 <p>These keywords are used for variable retrieval and assignment to
 fine tune scope.</p>
-<ul>
-	<li><p>global</p>
+<ul class="compressedlist">
+	<li>global</li>
 	<ul>
-		<li><p>specifies that a variable should belong to the top-level
-		state</p>
+		<li>specifies that a variable should belong to the top-level
+		state</li>
 	</ul>
-	<li><p>local</p>
+	<li>local</li>
 	<ul>
-		<li><p>specifies that a variable should belong to the bottom-most
-		state</p>
+		<li>specifies that a variable should belong to the bottom-most
+		state</li>
 	</ul>
 </ul>
 <h3 class="western">Variable types</h3>
 <p>Mercury has 11 unique datatypes</p>
-<ul>
-	<li><p style="margin-bottom: 0in">nil</p>
-	<li><p style="margin-bottom: 0in">int</p>
-	<li><p style="margin-bottom: 0in">float</p>
-	<li><p style="margin-bottom: 0in">bool</p>
-	<li><p style="margin-bottom: 0in">table</p>
-	<li><p style="margin-bottom: 0in">string</p>
-	<li><p style="margin-bottom: 0in">c function</p>
-	<li><p style="margin-bottom: 0in">array</p>
-	<li><p style="margin-bottom: 0in">function</p>
-	<li><p style="margin-bottom: 0in">file</p>
-	<li><p style="margin-bottom: 0in">thread</p>
+<ul class="compressedlist">
+	<li>nil</li>
+	<li>int</li>
+	<li>float</li>
+	<li>bool</li>
+	<li>table</li>
+	<li>string</li>
+	<li>c function</li>
+	<li>array</li>
+	<li>function</li>
+	<li>file</li>
+	<li>thread</li>
 </ul>
-<p><br/>
-<br/>
 
-</p>
 <h3 class="western">Operators</h3>
 <h4 class="western">Operators: Arithmetic</h4>
 <p style="margin-bottom: 0in">Arithmetic operators work only on
@@ -374,37 +264,37 @@ numbers (either floats or ints). In most cases, if an operator is
 provided with two ints, the result will always be an int, and if a
 float is provided, the result will be a float.</p>
 <ul>
-	<li><p style="margin-bottom: 0in">Addition +</p>
-	<li><p style="margin-bottom: 0in">Subtraction (and unary negation) -</p>
-	<li><p style="margin-bottom: 0in">Multiplication *</p>
-	<li><p style="margin-bottom: 0in">Division /</p>
+	<li>Addition +</li>
+	<li>Subtraction (and unary negation) -</li>
+	<li>Multiplication *</li>
+	<li>Division /</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">always returns a float</p>
+		<li>always returns a float</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">Exponentiation ^</p>
+	<li>Exponentiation ^</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">always returns a float</p>
+		<li>always returns a float</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">Modulo %</p>
+	<li>Modulo %</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">operates on C modulo rules
-		(truncation)</p>
+		<li>operates on C modulo rules
+		(truncation)</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">Integer Division \</p>
+	<li>Integer Division \</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">always returns an int.</p>
+		<li>always returns an int.</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">increment ++ 
-	</p>
+	<li>increment ++ 
+	</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">only on environmental variables
-		as a complete statement</p>
+		<li>only on environmental variables
+		as a complete statement</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">decrement -- 
-	</p>
+	<li>decrement -- 
+	</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">only on environmental variables
-		as a complete statement</p>
+		<li>only on environmental variables
+		as a complete statement</li>
 	</ul>
 </ul>
 <p style="margin-bottom: 0in"><br/>
@@ -416,12 +306,12 @@ operators, in being able to take both ints and floats. The returned
 type is always equal to the type of the first (left) operand. This
 can be used for casting floats to ints, or other niche tricks.</p>
 <ul>
-	<li><p style="margin-bottom: 0in">Bitwise not !</p>
-	<li><p style="margin-bottom: 0in">Bitwise and &amp;</p>
-	<li><p style="margin-bottom: 0in">Bitwise or |</p>
-	<li><p style="margin-bottom: 0in">bitwise xor ~</p>
-	<li><p style="margin-bottom: 0in">bitshift left &lt;&lt;</p>
-	<li><p style="margin-bottom: 0in">bitshift right &gt;&gt;</p>
+	<li>Bitwise not !</li>
+	<li>Bitwise and &amp;</li>
+	<li>Bitwise or |</li>
+	<li>bitwise xor ~</li>
+	<li>bitshift left &lt;&lt;</li>
+	<li>bitshift right &gt;&gt;</li>
 </ul>
 <h4 class="western">Operators: Logical</h4>
 <p style="margin-bottom: 0in">Short-circuit evaluation is not
@@ -429,64 +319,62 @@ provided. The returned value of logical operators is highly variable,
 dependent on each operator, but the boolean state will be maintained
 for the purpose of conditional checks.</p>
 <ul>
-	<li><p style="margin-bottom: 0in">Logical not !!</p>
+	<li>Logical not !!</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">will always return true or false</p>
+		<li>will always return true or false</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">Logical and &amp;&amp;</p>
+	<li>Logical and &amp;&amp;</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">if true, returns the second
-		value, otherwise returns false.</p>
+		<li>if true, returns the second
+		value, otherwise returns false.</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">Logical or ||</p>
+	<li>Logical or ||</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">if true, returns the first true
-		value, otherwise returns false.</p>
+		<li>if true, returns the first true
+		value, otherwise returns false.</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">Logical xor ~~</p>
+	<li>Logical xor ~~</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">if true, returns the value of the
-		single true operand. If false, returns the value false.</p>
+		<li>if true, returns the value of the
+		single true operand. If false, returns the value false.</li>
 	</ul>
 </ul>
 <h4 class="western">Operators: Comparison</h4>
 <ul>
-	<li><p style="margin-bottom: 0in">Greater than &gt;</p>
-	<li><p style="margin-bottom: 0in">Less than &lt;</p>
-	<li><p style="margin-bottom: 0in">Greater than or equal to &gt;=</p>
-	<li><p style="margin-bottom: 0in">Less than or equal to &lt;=</p>
-	<li><p style="margin-bottom: 0in">Equal ==</p>
-	<li><p style="margin-bottom: 0in">Not equal !=</p>
+	<li>Greater than &gt;</li>
+	<li>Less than &lt;</li>
+	<li>Greater than or equal to &gt;=</li>
+	<li>Less than or equal to &lt;=</li>
+	<li>Equal ==</li>
+	<li>Not equal !=</li>
 </ul>
 <h4 class="western">Operators: listlike</h4>
 <ul>
-	<li><p style="margin-bottom: 0in">Length #</p>
+	<li>Length #</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">strings and arrays will return
+		<li>strings and arrays will return
 		their length (highest index). Tables will return the number of
-		elements stored of all types.</p>
+		elements stored of all types.</li>
 	</ul>
-	<li><p style="margin-bottom: 0in">Index [ ]</p>
+	<li>Index [ ]</li>
 	<ul>
-		<li><p style="margin-bottom: 0in">strings can be indexed as read
-		only, attempting to assign to an index will result in an error.</p>
+		<li>strings can be indexed as read
+		only, attempting to assign to an index will result in an error.</li>
 	</ul>
 </ul>
 <h4 class="western">Operators: Other</h4>
 <ul>
-	<li><p style="margin-bottom: 0in">Concatenate ..</p>
-	<li><p style="margin-bottom: 0in">Call function ( )</p>
+	<li>Concatenate ..</li>
+	<li>Call function ( )</li>
 </ul>
 <h4 class="western">Operators: Creation</h4>
 <ul>
-	<li><p style="margin-bottom: 0in">New array [ ]</p>
-	<li><p style="margin-bottom: 0in">New table { }</p>
-	<li><p style="margin-bottom: 0in">New string &quot; &quot;</p>
+	<li>New array [ ]</li>
+	<li>New table { }</li>
+	<li>New string &quot; &quot;</li>
 </ul>
-<p><br/>
-<br/>
 
-</p>
+
 <h3 class="western">Control Flow</h3>
 <h4 class="western">If statements</h4>
 <p>If statements in Mercury operate in a very similar way to those in
