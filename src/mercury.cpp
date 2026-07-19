@@ -581,6 +581,9 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 	{
 		mercury_stringliteral* str = (mercury_stringliteral*)var->data.p;
 		if (!str->constant)free(str->ptr);
+		str->ptr = nullptr;
+		str->size = 0;
+		str->constant = true;
 		free(str);
 	}
 		break;
