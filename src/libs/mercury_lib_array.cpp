@@ -444,7 +444,7 @@ void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury
 	}
 
 	mercury_array* arr = (mercury_array*)var_array.data.p;
-	mercury_int arr_size=mercury_array_len(arr);
+	mercury_int arr_size=mercury_array_len(arr)+1;
 	mercury_variable* tlist=(mercury_variable*)malloc(sizeof(mercury_variable)*arr_size);
 	if (!tlist) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -460,7 +460,7 @@ void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury
 	else {
 		SORTING_M_FUNCTION = (mercury_function*)var_func.data.p;
 		SORTING_M_STATE = M;
-		qsort(tlist, arr_size, sizeof(mercury_variable*), mercury_sort_use_mercury_function); //surely this will work.
+		qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_use_mercury_function); //surely this will work.
 	}
 
 	for (mercury_int i = 0; i < arr_size; i++) { //see above.
@@ -484,8 +484,8 @@ int mercury_sort_greater_to_lesser(const void* a, const void* b) {
 		return 0;
 	}
 
-	if (var_a.type = M_TYPE_INT) {
-		if (var_b.type = M_TYPE_INT) {
+	if (var_a.type == M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (var_a.data.i < var_b.data.i) - (var_a.data.i > var_b.data.i);
 		}
 		else {
@@ -493,7 +493,7 @@ int mercury_sort_greater_to_lesser(const void* a, const void* b) {
 		}
 	}
 	else {
-		if (var_b.type = M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (var_a.data.f < var_b.data.i) - (var_a.data.f > var_b.data.i);
 		}
 		else {
@@ -514,8 +514,8 @@ int mercury_sort_lesser_to_greater(const void* a, const void* b) {
 		return 0;
 	}
 	
-	if (var_a.type = M_TYPE_INT) {
-		if (var_b.type = M_TYPE_INT) {
+	if (var_a.type == M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (var_a.data.i > var_b.data.i) - (var_a.data.i < var_b.data.i);
 		}
 		else {
@@ -523,7 +523,7 @@ int mercury_sort_lesser_to_greater(const void* a, const void* b) {
 		}
 	}
 	else {
-		if (var_b.type = M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (var_a.data.f > var_b.data.i) - (var_a.data.f < var_b.data.i);
 		}
 		else {
@@ -544,8 +544,8 @@ int mercury_sort_greater_to_lesser_absolute(const void* a, const void* b) {
 		return 0;
 	}
 
-	if (var_a.type = M_TYPE_INT) {
-		if (var_b.type = M_TYPE_INT) {
+	if (var_a.type == M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (abs(var_a.data.i) < abs(var_b.data.i)) - (abs(var_a.data.i) > abs(var_b.data.i));
 		}
 		else {
@@ -553,7 +553,7 @@ int mercury_sort_greater_to_lesser_absolute(const void* a, const void* b) {
 		}
 	}
 	else {
-		if (var_b.type = M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (fabs(var_a.data.f) < abs(var_b.data.i)) - (fabs(var_a.data.f) > abs(var_b.data.i));
 		}
 		else {
@@ -577,8 +577,8 @@ int mercury_sort_lesser_to_greater_absolute(const void* a, const void* b) {
 		return 0;
 	}
 
-	if (var_a.type = M_TYPE_INT) {
-		if (var_b.type = M_TYPE_INT) {
+	if (var_a.type == M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (abs(var_a.data.i) > abs(var_b.data.i)) - (abs(var_a.data.i) < abs(var_b.data.i));
 		}
 		else {
@@ -586,7 +586,7 @@ int mercury_sort_lesser_to_greater_absolute(const void* a, const void* b) {
 		}
 	}
 	else {
-		if (var_b.type = M_TYPE_INT) {
+		if (var_b.type == M_TYPE_INT) {
 			return (fabs(var_a.data.f) > abs(var_b.data.i)) - (fabs(var_a.data.f) < abs(var_b.data.i));
 		}
 		else {

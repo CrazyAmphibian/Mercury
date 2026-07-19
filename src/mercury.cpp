@@ -234,12 +234,12 @@ void mercury_cleartable(const mercury_table* const table) {
 }
 
 
-bool mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
+mercury_int mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
 	const mercury_subtable* const subt = table->data[key->type];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (mercury_vars_equal(subt->keys+i,key))return true;
+		if (mercury_vars_equal(subt->keys+i,key))return i;
 	}
-	return false;
+	return -1;
 }
 
 bool mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out) {
@@ -351,12 +351,12 @@ bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* 
 	return subt->size - 1;
 }
 
-bool mercury_table_has_cstring_key(const mercury_table* const table, const char* const key) {
+mercury_int mercury_table_has_cstring_key(const mercury_table* const table, const char* const key) {
 	const mercury_subtable* const subt = table->data[M_TYPE_STRING];
 	for (mercury_int i = 0; i < subt->size; i++) {
-		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i].data.p, key))return true;
+		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i].data.p, key))return i;
 	}
-	return false;
+	return -1;
 }
 
 
@@ -399,7 +399,7 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 
 
 	if (!parent) {
-		newstate->registers = (mercury_variable*)malloc(sizeof(mercury_variable) * (register_max + 1u));
+		newstate->registers = (mercury_variable*)malloc(sizeof(mercury_variable) * (1u+register_max));
 		if (newstate->registers == nullptr) {
 			free(newstate);
 			return nullptr;

@@ -1145,10 +1145,16 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 	mercury_popstack(M, &key);
 
 	mercury_state* check_state = M;
+	mercury_int pos;
 	while (check_state) {
 		
-		if (mercury_tablehaskey(check_state->enviroment,&key)) {
-			mercury_setkey(check_state->enviroment, &key, &value);
+		pos = mercury_tablehaskey(check_state->enviroment, &key);
+		if (pos!=-1) {
+			mercury_subtable* st=check_state->enviroment->data[key.type];
+			mercury_free_var(st->values+pos);
+			st->values[pos] = value;
+			mercury_free_var(&key);
+			//mercury_setkey(check_state->enviroment, &key, &value);
 			return;
 		}
 		
