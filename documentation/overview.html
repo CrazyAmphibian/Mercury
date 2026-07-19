@@ -384,44 +384,44 @@ of the body are executed. If statements start with if, followed by
 the condition. Next, the then keyword is used before the body, and is
 finished with end.</p>
 <p class="codeblock-western">if a&gt;20 then<br>
-print(&quot;a is kinda big&quot;)<br>
+&emsp;print(&quot;a is kinda big&quot;)<br>
 end</p>
 <p>the else keyword can be used to add more complexity to an if
 check, and is quite simple to use<br>
 <p class="codeblock-western">
 if a&gt;20 then<br>
-print(&quot;a is kinda big&quot;)<br>
+&emsp;print(&quot;a is kinda big&quot;)<br>
 else<br>
-print(&quot;a is not that big&quot;)<br>
+&emsp;print(&quot;a is not that big&quot;)<br>
 end</p>
 <p>the final layer is elseif, which combines else and another if
 statement together. Elseif can be used as many times as desired, but
 should go before else.</p>
 <p class="codeblock-western">if a&gt;20 then<br>
-print(&quot;a is kinda big&quot;)<br>
+&emsp;print(&quot;a is kinda big&quot;)<br>
 elseif a&lt;0 then<br>
-print(&quot;a is negative!&quot;)<br>
-else</p>
-<p class="codeblock-western">print(&quot;a is not that big&quot;)</p>
-<p class="codeblock-western">end</p>
+&emsp;print(&quot;a is negative!&quot;)<br>
+else<br>
+&emsp;print(&quot;a is not that big&quot;)<br>
+end</p>
 <h4 class="western">while loops</h4>
 <p>As with if statements, while loops are simple in operation</p>
 <p class="codeblock-western">n=0<br>
 while n&lt;10 do<br>
-do_stuff(n)<br>
-n++<br>
+&emsp;do_stuff(n)<br>
+&emsp;n++<br>
 end</p>
 <p>the continue and break keyword can add further complexity.</p>
 <p class="codeblock-western">n=0<br>
 while n&lt;10 do<br>
-if should_abort(n) then<br>
-break<br>
-end<br>
-n++<br>
-if n%2==0 then<br>
-continue<br>
-end<br>
-stuff(n)<br>
+&emsp;if should_abort(n) then<br>
+&emsp;&emsp;break<br>
+&emsp;end<br>
+&emsp;n++<br>
+&emsp;if n%2==0 then<br>
+&emsp;&emsp;continue<br>
+&emsp;end<br>
+&emsp;stuff(n)<br>
 end</p>
 <h4 class="western">functions and returns</h4>
 <p>Functions are designated with the keyword and parameters. Do note
@@ -433,7 +433,7 @@ all execution.</p>
 <p>Functions can either be assigned directly to a variable, or passed
 as an arg to another function.</p>
 <p class="codeblock-western">add=function(num1,num2)<br>
-return num1+num2<br>
+&emsp;return num1+num2<br>
 end</p>
 <h4 class="western">Goto</h4>
 <p>Goto can jump code execution to any location within the current
@@ -443,25 +443,24 @@ recommended to explicitly state global or local keywords to be safe.</p>
 <p class="codeblock-western">a=0<br>
 b=0<br>
 while a&lt;100 do<br>
-while b&lt;100 do<br>
-if something_wrong(a,b) then goto exit
-end<br>
-other_stuff()<br>
-end<br>
-stuff()<br>
-end<br>
+&emsp;while b&lt;100 do<br>
+&emsp;&emsp;if something_wrong(a,b) then goto exit end<br>
+&emsp;&emsp;other_stuff()<br>
+&emsp;end<br>
+&emsp;stuff()<br>
+&emsp;end<br>
 exit:</p>
 <p>for an example of incorrect usage of goto, this results in an
 error, since the label thing is not visible within the function state<br>
+</p>
+<p class="codeblock-western">
 stuff=function()<br>
-goto thing<br>
+&emsp;goto thing<br>
 end<br>
 thing:<br>
 stuff()</p>
-<p><br/>
-<br/>
 
-</p>
+
 <h3 class="western">Structure semantics</h3>
 <p>Strings are created by enclosing characters in quote marks.
 Strings span across any amount of characters until another quote mark
@@ -517,15 +516,17 @@ detect any code issues or inevitable runtime errors, requiring more
 careful programming.</p>
 <h3 class="western">Phase 0: source code</h3>
 <p>Consider the following program for the example:</p>
-<p class="codeblock-western"><span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;Hello,
+<p class="codeblock-western">
+<span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;Hello,
 world!&quot;</span><span style="background: #5983b0">)</span><br>
 <span style="background: #ffff00">a</span><span style="background: #5983b0">=</span><span style="background: #ff6d6d">5</span><br>
 <span style="background: #ff8000">if</span>
 <span style="background: #ffff00">a</span><span style="background: #5983b0">&gt;</span><span style="background: #ff6d6d">0</span>
 <span style="background: #ff8000">then</span><br>
-<span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;a
+&emsp;<span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;a
 is positive&quot;</span><span style="background: #5983b0">)</span><br>
-<span style="background: #ff8000">end</span></p>
+<span style="background: #ff8000">end</span>
+</p>
 <h3 class="western">Phase 1: tokenization</h3>
 <p>The first phase of the compiler is to convert the source code into
 tokens to make the rest of the compilation easier and simpler. The
@@ -565,129 +566,167 @@ compiler errors are raised and  the majority early exits will occur.</p>
 in 32 bit big endian space, and uninitialized memory set to NULL for
 simplicity. Some features such as constants have been removed for the
 sake of readability.</p>
-<p class="codeblock-western"><span style="background: #81d41a">0x00000023
+<p class="codeblock-western"><span style="background: #81d41a">0x0023
    NSTR (New STRing)</span><br>
-<span style="background: #81d41a">0x0000000D
-   13  </span>
+<span style="background: #81d41a">0x0000<br>0x000D  length=13</span>
 <br>
-<span style="background: #81d41a">0x48656C6C
-   Hell</span><br>
-<span style="background: #81d41a">0x6F2C2077
-   o, w</span><br>
-<span style="background: #81d41a">0x6F726C64
-   orld</span><br>
-<span style="background: #81d41a">0x21000000
-   !   </span>
+<span style="background: #81d41a">0x4865 He<br>0x6C6C ll</span><br>
+<span style="background: #81d41a">0x6F2C o,<br>0x2077 &nbsp;w</span><br>
+<span style="background: #81d41a">0x6F72 or<br>0x6C64 ld</span><br>
+<span style="background: #81d41a">0x2100 !</span>
 <br>
-<span style="background: #ffff00">0x00000023
-   NSTR (New STRing)</span><br>
-<span style="background: #ffff00">0x00000005
-   5   </span>
+<span style="background: #ffff00">0x0023 NSTR (New STRing)</span><br>
+<span style="background: #ffff00">0x0000 <br> 0x0005
+   length=5   </span>
 <br>
-<span style="background: #ffff00">0x7072696E
-   prin</span><br>
-<span style="background: #ffff00">0x74000000
+<span style="background: #ffff00">0x7072 pr<br>0x696E in</span><br>
+<span style="background: #ffff00">0x7400
    t   </span>
 <br>
-<span style="background: #5983b0">0x0000002D
+<span style="background: #ffff00">0x0019   GENV (Get ENVironmental variable)</span><br>
+<span style="background: #5983b0">0x002D
    CALL (CALL function)</span><br>
-<span style="background: #5983b0">0x00000001
-   1   </span>
+<span style="background: #5983b0">0x0000<br>0x0001   args in=1   </span><br>
+<span style="background: #5983b0">0x0000<br>0x0000   args out=0   </span><br>
+
+<span style="background: #ffff00">0x0023 NSTR (New STRing)</span><br>
+<span style="background: #ffff00">0x0000 <br>0x0001   length=1   </span>
 <br>
-<span style="background: #5983b0">0x00000000
-   0   </span>
+<span style="background: #ffff00">0x6100  a   </span>
 <br>
-<span style="background: #ffff00">0x00000023
-   NSTR (New STRing)</span><br>
-<span style="background: #ffff00">0x0000000D
-   1   </span>
-<br>
-<span style="background: #ffff00">0x61000000
-   a   </span>
-<br>
-<span style="background: #ff3838">0x0000001E
+<span style="background: #ff3838">0x001E
    NINT (New Integer)</span><br>
-<font color="#000000"><span style="background: #ff3838">0x00000005
+<font color="#000000"><span style="background: #ff3838">0x0000 <br>0x0005
    5   </span></font>
 <br>
-<span style="background: #5983b0">0x00000018
+<span style="background: #5983b0">0x0018
    SENV (Set ENVironmental variable)</span><br>
-<span style="background: #ffff00">0x00000023
+<span style="background: #ffff00">0x0023
    NSTR (New STRing)</span><br>
-<span style="background: #ffff00">0x0000000D
-   1   </span>
+<span style="background: #ffff00">0x0000 <br>0x0001
+   length=1   </span>
 <br>
-<span style="background: #ffff00">0x61000000
+<span style="background: #ffff00">0x6100
    a   </span>
 <br>
-<span style="background: #ffff00">0x00000019
-   GENV (Get ENVironmental variable)</span><br>
-<span style="background: #ff3838">0x0000001E
+<span style="background: #ffff00">0x0019   GENV (Get ENVironmental variable)</span><br>
+<span style="background: #ff3838">0x001E
    NINT (New Integer)</span><br>
-<span style="background: #ff3838">0x00000000
+<span style="background: #ff3838">0x0000 <br>0x0000
    0</span><br>
-<span style="background: #5983b0">0x0000001E
+<span style="background: #5983b0">0x001E
    GRT  (GReaTer than)</span><br>
-<span style="background: #ff8000">0x0000002C
+<span style="background: #ff8000">0x002C
    JRNI (Jump Relative Not If)</span><br>
-<span style="background: #ff8000">0x0000000F
-   15  </span>
+<span style="background: #ff8000">0x0000<br>0x000F
+   offset=15  </span>
 <br>
-<span style="background: #81d41a">0x00000023
+<span style="background: #81d41a">0x0023
    NSTR (New STRing)</span><br>
-<span style="background: #81d41a">0x0000000D
-   13  </span>
+<span style="background: #81d41a">0x0000<br>0x000D
+   length=13  </span>
 <br>
-<span style="background: #81d41a">0x61206973
-   a is</span><br>
-<span style="background: #81d41a">0x20706F73
-    pos</span><br>
-<span style="background: #81d41a">0x69746976
-   itiv</span><br>
-<span style="background: #81d41a">0x65000000
+<span style="background: #81d41a">0x6120 a&nbsp;<br>0x6973
+   is</span><br>
+<span style="background: #81d41a">0x2070 &nbsp;p<br>0x6F73
+    os</span><br>
+<span style="background: #81d41a">0x6974 it<br>0x6976
+   iv</span><br>
+<span style="background: #81d41a">0x6500
    e   </span>
 <br>
-<span style="background: #ffff00">0x00000023
-   NSTR (New STRing)</span><br>
-<span style="background: #ffff00">0x00000005
-   5   </span>
+<span style="background: #ffff00">0x0023 NSTR (New STRing)</span><br>
+<span style="background: #ffff00">0x0000 <br> 0x0005
+   length=5   </span>
 <br>
-<span style="background: #ffff00">0x7072696E
-   prin</span><br>
-<span style="background: #ffff00">0x74000000
+<span style="background: #ffff00">0x7072 pr<br>0x696E in</span><br>
+<span style="background: #ffff00">0x7400
    t   </span>
 <br>
-<span style="background: #5983b0">0x0000002D
+<span style="background: #ffff00">0x0019   GENV (Get ENVironmental variable)</span><br>
+<span style="background: #5983b0">0x002D
    CALL (CALL function)</span><br>
-<span style="background: #5983b0">0x00000001
-   1   </span>
-<br>
-<span style="background: #5983b0">0x00000000
-   0   </span>
-</p>
-<p><br/>
-<br/>
+<span style="background: #5983b0">0x0000<br>0x0001   args in=1   </span><br>
+<span style="background: #5983b0">0x0000<br>0x0000   args out=0   </span><br>
 
 </p>
-<p><br/>
-<br/>
+
+<h2>bytecode</h2>
+<p>
+Being an interpreted language, Mercury converts human readable source code into runtime usable bytecode. Bytecode itself is system dependent, and therefore not portable.<br>
+Bytecode is read in 16-bit opcode increments, with each opcode being a self-enclosed instruction. instructions can draw their arguments from 2 places, either the associated state's stack, or from bytecode space.<br>
+When drawing from bytecode, raw data is read and interpreted in intervals dependent on the bit width of the system's architecture. on a 32 bit system, 2 instructions are used to represent a compiled value, and on a 64 bit system, this number is 4.<br>
+When drawing from the stack, type checks will be done on the variable to determine if an invalid operation is attempting to be preformed, such as adding a number to a string. Care must be taken to not upset the stack, or else the runtime will quickly break down and error.<br>
 
 </p>
-<p><br/>
-<br/>
 
-</p>
-<p><br/>
-<br/>
+<h3>opcode list</h3>
+<table class="borderedtable" style="font-family:monospace;">
+	<tr> <th>Identifier</th> <th>Description</th> <th>stack elements</th> <th>bytecode elements</th> <tr>
+	<tr> <td>NOP</td> <td>No operation</td> <td>in:<br>out:</td> <td> </td> </tr>
+	<tr> <td>ADD</td> <td>Adds 2 numbers</td> <td>in: term, term<br>out: sum</td> <td> </td> </tr>
+	<tr> <td>SUB</td> <td>Subtracts 2 numbers</td> <td>in: subtrahend, term<br>out: difference</td> <td> </td> </tr>
+	<tr> <td>MUL</td> <td>Multiplies 2 numbers</td> <td>in: factor, factor<br>out: product</td> <td> </td> </tr>
+	<tr> <td>DIV</td> <td>Divides 2 numbers</td> <td>in: divisor, dividend<br>out: quotient</td> <td> </td> </tr>
+	<tr> <td>POW</td> <td>Exponentiates 2 numbers</td> <td>in: exponent, base<br>out: power</td> <td> </td> </tr>
+	<tr> <td>IDIV</td> <td>Divides 2 numbers as integers</td> <td>in: divisor, dividend<br>out: quotient</td> <td> </td> </tr>
+	<tr> <td>MOD</td> <td>Divides 2 numbers and returns the remainder via truncating modulo</td> <td>in: divisor, dividend<br>out: remainder</td> <td> </td> </tr>
+	<tr> <td>BAND</td> <td>Bitwise AND on 2 numbers</td> <td>in: term, term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BOR</td> <td>Bitwise OR on 2 numbers</td> <td>in: term, term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BXOR</td> <td>Bitwise XOR on 2 numbers</td> <td>in: term, term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BNOT</td> <td>Bitwise NOT on 1 number</td> <td>in: term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BSHL</td> <td>Bitshifts a number a specified number of times left</td> <td>in: shift,term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BSHR</td> <td>Bitshifts a number a specified number of times right</td> <td>in: shift,term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>LAND</td> <td>Evaluates boolean logic AND on 2 variables</td> <td>in: term,term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>LOR</td> <td>Evaluates boolean logic OR on 2 variables</td> <td>in: term,term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>LXOR</td> <td>Evaluates boolean logic XOR on 2 variables</td> <td>in: term,term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>LNOT</td> <td>Evaluates boolean logic NOT on 1 variable</td> <td>in: term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>EQL</td> <td>Evaluates if 2 variables are equal</td> <td>in: variable, variable<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>NEQ</td> <td>Evaluates if 2 variables are not equal</td> <td>in: variable, variable<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>GRT</td> <td>Evaluates if 1 number is greater than another</td> <td>in: lesser, greater<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>LET</td> <td>Evaluates if 1 number is less than another</td> <td>in: greater, lesser<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>GTE</td> <td>Evaluates if 1 number is greater than or equal to another</td> <td>in: lesser, greater<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>LTE</td> <td>Evaluates if 1 number is less than or equal to another</td> <td>in: greater, lesser<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>SENV</td> <td>Sets an environmental value</td> <td>in: value,key<br>out:</td> <td> </td> </tr>
+	<tr> <td>GENV</td> <td>Gets an environmental value</td> <td>in: key<br>out: value</td> <td> </td> </tr>
+	<tr> <td>SET</td> <td>Sets a structure value</td> <td>in: value,key,structure<br>out:</td> <td> </td> </tr>
+	<tr> <td>GET</td> <td>Gets a structure value</td> <td>in: key,structure<br>out: value</td> <td> </td> </tr>
+	<tr> <td>SREG</td> <td>Unused</td> <td>in: value<br>out:</td> <td>number </td> </tr>
+	<tr> <td>GREG</td> <td>Unused</td> <td>in: <br>out: value</td> <td>number </td> </tr>
+	<tr> <td>NINT</td> <td>Pushes an integer onto the stack</td> <td>in:<br>out: integer</td> <td>integer</td> </tr>
+	<tr> <td>NFLO</td> <td>Pushes a float onto the stack</td> <td>in:<br>out: float</td> <td>float</td> </tr>
+	<tr> <td>NTRU</td> <td>Pushes a true boolean onto the stack</td> <td>in:<br>out: bool</td> <td></td> </tr>
+	<tr> <td>NFAL</td> <td>Pushes a false boolean onto the stack</td> <td>in:<br>out: bool</td> <td></td> </tr>
+	<tr> <td>NNIL</td> <td>Pushes a nil value onto the stack</td> <td>in:<br>out: nil</td> <td></td> </tr>
+	<tr> <td>NSTR</td> <td>Pushes a string onto the stack</td> <td>in:<br>out: string</td> <td>length, chars</td> </tr>
+	<tr> <td>NFUN</td> <td>Pushes a function onto the stack</td> <td>in:<br>out: string</td> <td>length, instructions</td> </tr>
+	<tr> <td>NTAB</td> <td>Pushes an empty table onto the stack</td> <td>in:<br>out: table</td> <td> </td> </tr>
+	<tr> <td>NARR</td> <td>Pushes an empty array onto the stack</td> <td>in:<br>out: table</td> <td> </td> </tr>
+	<tr> <td>JMP</td> <td>Unused</td> <td>in:<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JMPR</td> <td>Moves the program counter by a specified amount</td> <td>in:<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JIF</td> <td>Unused</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JNIF</td> <td>Unused</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JRIF</td> <td>Moves the program counter by a specified amount if the value is true</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JRNI</td> <td>Moves the program counter by a specified amount if the value is false</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>CALL</td> <td>Calls a function</td> <td>in: function, ...<br>out: ...</td> <td>args in, args out</td> </tr>
+	<tr> <td>EXIT</td> <td>ends state execution</td> <td>in: <br>out: </td> <td></td> </tr>
+	<tr> <td>LEN</td> <td>gets the length of a variable</td> <td>in: variable <br>out: length</td> <td></td> </tr>
+	<tr> <td>CNCT</td> <td>concatenates 2 values, converting to strings if needed.</td> <td>in: variable, variable <br>out: string</td> <td></td> </tr>
+	<tr> <td>CLS</td> <td>clears the stack</td> <td>in:  <br>out: </td> <td></td> </tr>
+	<tr> <td>GETL</td> <td>gets a value of the bottom-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
+	<tr> <td>SETL</td> <td>gets a value of the bottom-most environment</td> <td>in: value,key  <br>out: </td> <td></td> </tr>
+	<tr> <td>GETG</td> <td>gets a value of the top-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
+	<tr> <td>SETG</td> <td>gets a value of the top-most environment</td> <td>in: value,key  <br>out: </td> <td></td> </tr>
+	<tr> <td>CPYT</td> <td>copies the topmost stack value</td> <td>in: <br>out: variable</td> <td></td> </tr>
+	<tr> <td>SWPT</td> <td>swaps the topmost stack value with the second topmost value</td> <td>in: <br>out: </td> <td></td> </tr>
+	<tr> <td>CPYX</td> <td>copies the top specified number of stack values</td> <td>in: <br>out: ...</td> <td>number to copy</td> </tr>
+	<tr> <td>UNM</td> <td>Unary minus (negation) on 1 number</td> <td>in: number<br>out: negated</td> <td> </td> </tr>
+	<tr> <td>INC</td> <td>increments 1 number</td> <td>in: number<br>out: number</td> <td> </td> </tr>
+	<tr> <td>DEC</td> <td>decrements 1 number</td> <td>in: number<br>out: number</td> <td> </td> </tr>
+	<tr> <td>SCON</td> <td>sets a state constant value</td> <td>in: value<br>out:</td> <td>constant number </td> </tr>
+	<tr> <td>GCON</td> <td>gets a state constant value</td> <td>in: <br>out: value</td> <td>constant number </td> </tr>
+</table>
 
-</p>
-<p><br/>
-<br/>
 
-</p>
-<p><br/>
-<br/>
-
-</p>
 </body>
 </html>
