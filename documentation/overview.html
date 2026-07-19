@@ -79,16 +79,16 @@ priority.</p>
 <p class="codeblock-western">print(&quot;Hello, world&quot;) //Quite
 important, do not remove!</p>
 <p>A multi-line comment is done as such</p>
-<p class="codeblock-western">/*</p>
-<p class="codeblock-western">this does some stuff.</p>
-<p class="codeblock-western">Pretty cool stuff.</p>
-<p class="codeblock-western">*/</p>
-<p class="codeblock-western">print(&quot;Hello, world&quot;)</p>
+<p class="codeblock-western">/*<br>
+this does some stuff.<br>
+Pretty cool stuff.<br>
+*/<br>
+print(&quot;Hello, world&quot;)</p>
 <p>if two comment styles overlap, the multi-line takes priority.</p>
-<p class="codeblock-western">// This does stuff /*</p>
-<p class="codeblock-western">now it doesn't</p>
-<p class="codeblock-western">*/</p>
-<h3 class="western">Order of operations</h3>
+<p class="codeblock-western">// This does stuff /*<br>
+now it doesn't<br>
+*/</p>
+<h3>Order of operations</h3>
 <p><br/>
 <br/>
 
@@ -111,9 +111,9 @@ is unary operations, which are read from right to left.</p>
 applied to it. Then, it is added with 1, and divided by 3. Finally,
 the variable 'b' is set to the result</p>
 <p>this example showcases how operations are applied in order</p>
-<p class="codeblock-western">a=5+3/4 //returns 2.0</p>
-<p class="codeblock-western">a=3/4+5 //returns 5.75</p>
-<p class="codeblock-western">a=5+(3/4)//returns 5.75</p>
+<p class="codeblock-western">a=5+3/4 //returns 2.0<br>
+a=3/4+5 //returns 5.75<br>
+a=5+(3/4)//returns 5.75</p>
 <h3 class="western">Strings</h3>
 <p>Strings are constructed with two quote marks and work like typical
 strings. Strings will run until they find another quote mark, even if
@@ -495,45 +495,46 @@ condition and the body. If the condition is true, then the contents
 of the body are executed. If statements start with if, followed by
 the condition. Next, the then keyword is used before the body, and is
 finished with end.</p>
-<p class="codeblock-western">if a&gt;20 then</p>
-<p class="codeblock-western">print(&quot;a is kinda big&quot;)</p>
-<p class="codeblock-western">end</p>
+<p class="codeblock-western">if a&gt;20 then<br>
+print(&quot;a is kinda big&quot;)<br>
+end</p>
 <p>the else keyword can be used to add more complexity to an if
-check, and is quite simple to use</p>
-<p class="codeblock-western">if a&gt;20 then</p>
-<p class="codeblock-western">print(&quot;a is kinda big&quot;)</p>
-<p class="codeblock-western">else</p>
-<p class="codeblock-western">print(&quot;a is not that big&quot;)</p>
-<p class="codeblock-western">end</p>
+check, and is quite simple to use<br>
+<p class="codeblock-western">
+if a&gt;20 then<br>
+print(&quot;a is kinda big&quot;)<br>
+else<br>
+print(&quot;a is not that big&quot;)<br>
+end</p>
 <p>the final layer is elseif, which combines else and another if
 statement together. Elseif can be used as many times as desired, but
 should go before else.</p>
-<p class="codeblock-western">if a&gt;20 then</p>
-<p class="codeblock-western">print(&quot;a is kinda big&quot;)</p>
-<p class="codeblock-western">elseif a&lt;0 then</p>
-<p class="codeblock-western">print(&quot;a is negative!&quot;)</p>
-<p class="codeblock-western">else</p>
+<p class="codeblock-western">if a&gt;20 then<br>
+print(&quot;a is kinda big&quot;)<br>
+elseif a&lt;0 then<br>
+print(&quot;a is negative!&quot;)<br>
+else</p>
 <p class="codeblock-western">print(&quot;a is not that big&quot;)</p>
 <p class="codeblock-western">end</p>
 <h4 class="western">while loops</h4>
 <p>As with if statements, while loops are simple in operation</p>
-<p class="codeblock-western">n=0</p>
-<p class="codeblock-western">while n&lt;10 do</p>
-<p class="codeblock-western">do_stuff(n)</p>
-<p class="codeblock-western">n++</p>
-<p class="codeblock-western">end</p>
+<p class="codeblock-western">n=0<br>
+while n&lt;10 do<br>
+do_stuff(n)<br>
+n++<br>
+end</p>
 <p>the continue and break keyword can add further complexity.</p>
-<p class="codeblock-western">n=0</p>
-<p class="codeblock-western">while n&lt;10 do</p>
-<p class="codeblock-western">if should_abort(n) then</p>
-<p class="codeblock-western">break</p>
-<p class="codeblock-western">end</p>
-<p class="codeblock-western">n++</p>
-<p class="codeblock-western">if n%2==0 then</p>
-<p class="codeblock-western">continue</p>
-<p class="codeblock-western">end</p>
-<p class="codeblock-western">stuff(n)</p>
-<p class="codeblock-western">end</p>
+<p class="codeblock-western">n=0<br>
+while n&lt;10 do<br>
+if should_abort(n) then<br>
+break<br>
+end<br>
+n++<br>
+if n%2==0 then<br>
+continue<br>
+end<br>
+stuff(n)<br>
+end</p>
 <h4 class="western">functions and returns</h4>
 <p>Functions are designated with the keyword and parameters. Do note
 that a function may receive less parameters than specified.</p>
@@ -543,32 +544,32 @@ calling state. Returning in the main body of the program will halt
 all execution.</p>
 <p>Functions can either be assigned directly to a variable, or passed
 as an arg to another function.</p>
-<p class="codeblock-western">add=function(num1,num2)</p>
-<p class="codeblock-western">return num1+num2</p>
-<p class="codeblock-western">end</p>
+<p class="codeblock-western">add=function(num1,num2)<br>
+return num1+num2<br>
+end</p>
 <h4 class="western">Goto</h4>
 <p>Goto can jump code execution to any location within the current
 state. Caution is advised when using goto, as it can potentially jump
 over variable declarations and cause bugs with scoping. It's
 recommended to explicitly state global or local keywords to be safe.</p>
-<p class="codeblock-western">a=0</p>
-<p class="codeblock-western">b=0</p>
-<p class="codeblock-western">while a&lt;100 do</p>
-<p class="codeblock-western">while b&lt;100 do</p>
-<p class="codeblock-western">if something_wrong(a,b) then goto exit
-end</p>
-<p class="codeblock-western">other_stuff()</p>
-<p class="codeblock-western">end</p>
-<p class="codeblock-western">stuff()</p>
-<p class="codeblock-western">end</p>
-<p class="codeblock-western">exit:</p>
+<p class="codeblock-western">a=0<br>
+b=0<br>
+while a&lt;100 do<br>
+while b&lt;100 do<br>
+if something_wrong(a,b) then goto exit
+end<br>
+other_stuff()<br>
+end<br>
+stuff()<br>
+end<br>
+exit:</p>
 <p>for an example of incorrect usage of goto, this results in an
-error, since the label thing is not visible within the function state</p>
-<p class="codeblock-western">stuff=function()</p>
-<p class="codeblock-western">goto thing</p>
-<p class="codeblock-western">end</p>
-<p class="codeblock-western">thing:</p>
-<p class="codeblock-western">stuff()</p>
+error, since the label thing is not visible within the function state<br>
+stuff=function()<br>
+goto thing<br>
+end<br>
+thing:<br>
+stuff()</p>
 <p><br/>
 <br/>
 
@@ -577,8 +578,8 @@ error, since the label thing is not visible within the function state</p>
 <p>Strings are created by enclosing characters in quote marks.
 Strings span across any amount of characters until another quote mark
 is hit, including newlines.</p>
-<p class="codeblock-western">msg=&quot;hello</p>
-<p class="codeblock-western">world!&quot;</p>
+<p class="codeblock-western">msg=&quot;hello<br>
+world!&quot;</p>
 <p>Strings are evaluated at tokenization, so longer strings do not
 add significantly more overhead, and escapes add no overhead.</p>
 <p><br/>
@@ -590,13 +591,13 @@ use [ and ], while tables use { and }. The compiler will not check if
 the index is valid when evaluating creation. There are 2 syntax modes
 to arrays and tables. Implicit indexing, and explicit indexing.</p>
 <p class="codeblock-western">my_array=[1,2,3] //implicit indexing.
-0=1, 1=2, 2=3</p>
-<p class="codeblock-western">my_array=[0=1,1=2,2=3] //explicit
+0=1, 1=2, 2=3<br>
+my_array=[0=1,1=2,2=3] //explicit
 indexing. Results in the same code and data as above.</p>
 <p>Explicit indexing can take named variables as well, which results
-in a get call.</p>
-<p class="codeblock-western">a=5</p>
-<p class="codeblock-western">my_array=[a=1] // 5=1</p>
+in a get call.<br></p>
+<p class="codeblock-western">a=5<br>
+my_array=[a=1] // 5=1</p>
 <p>This should not be confused with an explicit string index</p>
 <p class="codeblock-western">my_table={&quot;a&quot;=1} //doing this
 with an array would result in an error. 
@@ -607,13 +608,13 @@ with an array would result in an error.
 </p>
 <p>All structures can be indexed with brackets, with the variable you
 want in brackets</p>
-<p class="codeblock-western">my_array=[1,2,3]</p>
-<p class="codeblock-western">print(my_array[0]) // 1</p>
+<p class="codeblock-western">my_array=[1,2,3]<br>
+print(my_array[0]) // 1</p>
 <p>Tables can be indexed with period notation, allowing for a cleaner
 way to index with a string</p>
-<p class="codeblock-western">my_table={&quot;a&quot;=1}</p>
-<p class="codeblock-western">print(my_table[&quot;a&quot;]) // 1</p>
-<p class="codeblock-western">print(my_table.a) // 1. not to be
+<p class="codeblock-western">my_table={&quot;a&quot;=1}<br>
+print(my_table[&quot;a&quot;]) // 1<br>
+print(my_table.a) // 1. not to be
 confused with my_table[a]</p>
 <p><br/>
 <br/>
@@ -629,14 +630,14 @@ careful programming.</p>
 <h3 class="western">Phase 0: source code</h3>
 <p>Consider the following program for the example:</p>
 <p class="codeblock-western"><span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;Hello,
-world!&quot;</span><span style="background: #5983b0">)</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">a</span><span style="background: #5983b0">=</span><span style="background: #ff6d6d">5</span></p>
-<p class="codeblock-western"><span style="background: #ff8000">if</span>
+world!&quot;</span><span style="background: #5983b0">)</span><br>
+<span style="background: #ffff00">a</span><span style="background: #5983b0">=</span><span style="background: #ff6d6d">5</span><br>
+<span style="background: #ff8000">if</span>
 <span style="background: #ffff00">a</span><span style="background: #5983b0">&gt;</span><span style="background: #ff6d6d">0</span>
-<span style="background: #ff8000">then</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;a
-is positive&quot;</span><span style="background: #5983b0">)</span></p>
-<p class="codeblock-western"><span style="background: #ff8000">end</span></p>
+<span style="background: #ff8000">then</span><br>
+<span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;a
+is positive&quot;</span><span style="background: #5983b0">)</span><br>
+<span style="background: #ff8000">end</span></p>
 <h3 class="western">Phase 1: tokenization</h3>
 <p>The first phase of the compiler is to convert the source code into
 tokens to make the rest of the compilation easier and simpler. The
@@ -649,25 +650,25 @@ separating symbols and strings)</p>
 <p>Tokens themselves store the associated source code text, as well
 as position in the code, and the type of the token.</p>
 <p>The above source code, displayed as 1 token per line</p>
-<p class="codeblock-western"><span style="background: #ffff00">Print</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">(</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">Hello,
-world!</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">)</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">a</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">=</span></p>
-<p class="codeblock-western"><span style="background: #ff6d6d">5</span></p>
-<p class="codeblock-western"><span style="background: #ff8000">if</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">a</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">&gt;</span></p>
-<p class="codeblock-western"><span style="background: #ff6d6d">0</span></p>
-<p class="codeblock-western"><span style="background: #ff8000">then</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">print</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">(</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">a is
-positive</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">)</span></p>
-<p class="codeblock-western"><span style="background: #ff8000">end</span></p>
+<p class="codeblock-western"><span style="background: #ffff00">Print</span><br>
+<span style="background: #5983b0">(</span><br>
+<span style="background: #81d41a">Hello,
+world!</span><br>
+<span style="background: #5983b0">)</span><br>
+<span style="background: #ffff00">a</span><br>
+<span style="background: #5983b0">=</span><br>
+<span style="background: #ff6d6d">5</span><br>
+<span style="background: #ff8000">if</span><br>
+<span style="background: #ffff00">a</span><br>
+<span style="background: #5983b0">&gt;</span><br>
+<span style="background: #ff6d6d">0</span><br>
+<span style="background: #ff8000">then</span><br>
+<span style="background: #ffff00">print</span><br>
+<span style="background: #5983b0">(</span><br>
+<span style="background: #81d41a">a is
+positive</span><br>
+<span style="background: #5983b0">)</span><br>
+<span style="background: #ff8000">end</span></p>
 <h3 class="western">Phase 2: bytecode generation</h3>
 <p>Once the array of tokens is generated, the program converts them
 into usable bytecode. The generation stage of the compiler is where
@@ -677,103 +678,103 @@ in 32 bit big endian space, and uninitialized memory set to NULL for
 simplicity. Some features such as constants have been removed for the
 sake of readability.</p>
 <p class="codeblock-western"><span style="background: #81d41a">0x00000023
-   NSTR (New STRing)</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x0000000D
+   NSTR (New STRing)</span><br>
+<span style="background: #81d41a">0x0000000D
    13  </span>
-</p>
-<p class="codeblock-western"><span style="background: #81d41a">0x48656C6C
-   Hell</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x6F2C2077
-   o, w</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x6F726C64
-   orld</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x21000000
+<br>
+<span style="background: #81d41a">0x48656C6C
+   Hell</span><br>
+<span style="background: #81d41a">0x6F2C2077
+   o, w</span><br>
+<span style="background: #81d41a">0x6F726C64
+   orld</span><br>
+<span style="background: #81d41a">0x21000000
    !   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x00000023
-   NSTR (New STRing)</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">0x00000005
+<br>
+<span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span><br>
+<span style="background: #ffff00">0x00000005
    5   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x7072696E
-   prin</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">0x74000000
+<br>
+<span style="background: #ffff00">0x7072696E
+   prin</span><br>
+<span style="background: #ffff00">0x74000000
    t   </span>
-</p>
-<p class="codeblock-western"><span style="background: #5983b0">0x0000002D
-   CALL (CALL function)</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">0x00000001
+<br>
+<span style="background: #5983b0">0x0000002D
+   CALL (CALL function)</span><br>
+<span style="background: #5983b0">0x00000001
    1   </span>
-</p>
-<p class="codeblock-western"><span style="background: #5983b0">0x00000000
+<br>
+<span style="background: #5983b0">0x00000000
    0   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x00000023
-   NSTR (New STRing)</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">0x0000000D
+<br>
+<span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span><br>
+<span style="background: #ffff00">0x0000000D
    1   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x61000000
+<br>
+<span style="background: #ffff00">0x61000000
    a   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ff3838">0x0000001E
-   NINT (New Integer)</span></p>
-<p class="codeblock-western"><font color="#000000"><span style="background: #ff3838">0x00000005
+<br>
+<span style="background: #ff3838">0x0000001E
+   NINT (New Integer)</span><br>
+<font color="#000000"><span style="background: #ff3838">0x00000005
    5   </span></font>
-</p>
-<p class="codeblock-western"><span style="background: #5983b0">0x00000018
-   SENV (Set ENVironmental variable)</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">0x00000023
-   NSTR (New STRing)</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">0x0000000D
+<br>
+<span style="background: #5983b0">0x00000018
+   SENV (Set ENVironmental variable)</span><br>
+<span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span><br>
+<span style="background: #ffff00">0x0000000D
    1   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x61000000
+<br>
+<span style="background: #ffff00">0x61000000
    a   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x00000019
-   GENV (Get ENVironmental variable)</span></p>
-<p class="codeblock-western"><span style="background: #ff3838">0x0000001E
-   NINT (New Integer)</span></p>
-<p class="codeblock-western"><span style="background: #ff3838">0x00000000
-   0</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">0x0000001E
-   GRT  (GReaTer than)</span></p>
-<p class="codeblock-western"><span style="background: #ff8000">0x0000002C
-   JRNI (Jump Relative Not If)</span></p>
-<p class="codeblock-western"><span style="background: #ff8000">0x0000000F
+<br>
+<span style="background: #ffff00">0x00000019
+   GENV (Get ENVironmental variable)</span><br>
+<span style="background: #ff3838">0x0000001E
+   NINT (New Integer)</span><br>
+<span style="background: #ff3838">0x00000000
+   0</span><br>
+<span style="background: #5983b0">0x0000001E
+   GRT  (GReaTer than)</span><br>
+<span style="background: #ff8000">0x0000002C
+   JRNI (Jump Relative Not If)</span><br>
+<span style="background: #ff8000">0x0000000F
    15  </span>
-</p>
-<p class="codeblock-western"><span style="background: #81d41a">0x00000023
-   NSTR (New STRing)</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x0000000D
+<br>
+<span style="background: #81d41a">0x00000023
+   NSTR (New STRing)</span><br>
+<span style="background: #81d41a">0x0000000D
    13  </span>
-</p>
-<p class="codeblock-western"><span style="background: #81d41a">0x61206973
-   a is</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x20706F73
-    pos</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x69746976
-   itiv</span></p>
-<p class="codeblock-western"><span style="background: #81d41a">0x65000000
+<br>
+<span style="background: #81d41a">0x61206973
+   a is</span><br>
+<span style="background: #81d41a">0x20706F73
+    pos</span><br>
+<span style="background: #81d41a">0x69746976
+   itiv</span><br>
+<span style="background: #81d41a">0x65000000
    e   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x00000023
-   NSTR (New STRing)</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">0x00000005
+<br>
+<span style="background: #ffff00">0x00000023
+   NSTR (New STRing)</span><br>
+<span style="background: #ffff00">0x00000005
    5   </span>
-</p>
-<p class="codeblock-western"><span style="background: #ffff00">0x7072696E
-   prin</span></p>
-<p class="codeblock-western"><span style="background: #ffff00">0x74000000
+<br>
+<span style="background: #ffff00">0x7072696E
+   prin</span><br>
+<span style="background: #ffff00">0x74000000
    t   </span>
-</p>
-<p class="codeblock-western"><span style="background: #5983b0">0x0000002D
-   CALL (CALL function)</span></p>
-<p class="codeblock-western"><span style="background: #5983b0">0x00000001
+<br>
+<span style="background: #5983b0">0x0000002D
+   CALL (CALL function)</span><br>
+<span style="background: #5983b0">0x00000001
    1   </span>
-</p>
-<p class="codeblock-western"><span style="background: #5983b0">0x00000000
+<br>
+<span style="background: #5983b0">0x00000000
    0   </span>
 </p>
 <p><br/>
