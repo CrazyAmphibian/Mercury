@@ -1177,8 +1177,12 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 			return;
 		}
 		*/
-		if (mercury_getkey(check_state->enviroment, &key,&value)) {
-			mercury_pushstack_unrefed(M, &value);
+		mercury_int pos = mercury_tablehaskey(check_state->enviroment, &key);
+		if (pos != -1) {
+			mercury_subtable* st = check_state->enviroment->data[key.type];
+			mercury_free_var(&key);
+
+			mercury_pushstack(M, st->values+pos);
 			return;
 		}
 		check_state = check_state->parentstate;
