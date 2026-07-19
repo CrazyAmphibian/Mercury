@@ -3,12 +3,6 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 	<title>Mercury: libraries</title>
-	<meta name="generator" content="LibreOffice 7.5.1.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2026-07-15T16:30:35.160000000"/>
-	<meta name="created" content="00:00:00">
-	<meta name="created" content="00:00:00">
-	<meta name="created" content="00:00:00">
 	<style type="text/css">
 		h2.cjk { font-family: "NSimSun" }
 		h2.ctl { font-family: "Arial" }
@@ -20,7 +14,26 @@
 		h3.funcheader-ctl { font-family: "Arial" }
 	</style>
 </head>
-<body lang="en-US" bgcolor="#dddddd" dir="ltr"><h1>grouped types</h1>
+<body lang="en-US" bgcolor="#dddddd" dir="ltr" style="margin-left:210px;">
+
+<span style="position:fixed;left:0px;top:0px;width:200px;height:100%;background-color:#dddddd;border-right:2px solid black;">
+
+<ul style="padding-left:0px;">
+<li><a href="#lib_std">Standard library</a></li>
+<li><a href="#lib_math">Math library</a></li>
+<li><a href="#lib_string">String library</a></li>
+<li><a href="#lib_array">Array library</a></li>
+<li><a href="#lib_io">IO library</a></li>
+<li><a href="#lib_os">OS library</a></li>
+<li><a href="#lib_thread">Thread library</a></li>
+<li><a href="#lib_table">Table library</a></li>
+<li><a href="#lib_debug">Debug library</a></li>
+</ul>
+
+
+</span>
+
+<h1>grouped types</h1>
 <p>Some types can be grouped together, due to shared functionality,
 function usage, or internal semantics. 
 </p>
@@ -69,7 +82,7 @@ function usage, or internal semantics.
 </ul>
 <hr/>
 
-<h1>Standard library</h1>
+<h1 id="lib_std">Standard library</h1>
 <h2 class="western">constants</h2>
 <table width="564" cellpadding="2" cellspacing="0">
 	<col width="160"/>
@@ -393,7 +406,7 @@ correctly.
 <p class="example">s=loadlibrary(&quot;mylib.dll&quot;) //returns
 true if on windows and the file is present 
 </p>
-<h1>Math library</h1>
+<h1 id="lib_math">Math library</h1>
 <h2 class="western">constants</h2>
 <table cellpadding="2" cellspacing="0">
 	<tr>
@@ -674,7 +687,7 @@ math.isnan(10/0)
 //returns true <br/>
 math.isnan(0/10) //returns false 
 </p>
-<h1>String library</h1>
+<h1 id="lib_string">String library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader-western">sub (<font color="#888888">string</font>
 string, <font color="#888888">int</font> start, <font color="#888888">int</font>
@@ -1292,7 +1305,7 @@ escapes the following characters: &lt; &gt; &amp; &quot;
 class='thing'&gt;woah!&lt;/span&gt;&quot;) //returns &quot;&amp;lt;span
 class=&amp;#39;thing&amp;#39;&amp;gt;woah!&amp;lt;/span&amp;gt;&quot;
 </p>
-<h1>Array library</h1>
+<h1 id="lib_array">Array library</h1>
 <h2 class="western">constants</h2>
 <table cellpadding="2" cellspacing="0">
 	<tr>
@@ -1484,7 +1497,7 @@ automatically runs tostring on each element.
 array.concat(a,&quot;,&quot;)
 //returns &quot;hello,1,true&quot; 
 </p>
-<h1>IO library</h1>
+<h1 id="lib_io">IO library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader-western">open (<font color="#888888">string</font>
 path, <font color="#888888">string</font> mode)</h3>
@@ -1639,7 +1652,7 @@ successful, returns true, otherwise false.
 </p>
 <p class="example">io.createdir(&quot;data&quot;) 
 </p>
-<h1>OS library</h1>
+<h1 id="lib_os">OS library</h1>
 <h2 class="western">constants</h2>
 <table cellpadding="2" cellspacing="0">
 	<tr>
@@ -1966,7 +1979,7 @@ type is provided, exits with code 0.</p>
 <p class="example" style="margin-bottom: 0in">if something_wrong then</p>
 <p class="example" style="margin-bottom: 0in"> os.exit(1)</p>
 <p class="example" style="margin-bottom: 0in">end</p>
-<h1>Thread library</h1>
+<h1 id="lib_thread">Thread library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader-western">new (<font color="#888888">function</font>
 function, [<font color="#888888">table</font> enviroment=_ENV],
@@ -2055,7 +2068,7 @@ thread)</h3>
 </p>
 <p>thread.await(t) 
 </p>
-<h1>Table library</h1>
+<h1 id="lib_table">Table library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader-western">copy (<font color="#888888">table</font>
 table)</h3>
@@ -2067,7 +2080,7 @@ b=table.copy(a)
 <br/>
 print(a==b) //false 
 </p>
-<h1>Debug library</h1>
+<h1 id="lib_debug">Debug library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader-western">dumpstack ()</h3>
 <p>logs information about the current state's stack to stdout,
