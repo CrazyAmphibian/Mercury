@@ -1181,8 +1181,8 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 		if (pos != -1) {
 			mercury_subtable* st = check_state->enviroment->data[key.type];
 			mercury_free_var(&key);
-
-			mercury_pushstack(M, st->values+pos);
+			mercury_clonevariable(st->values+pos, &value);
+			mercury_pushstack_unrefed(M, &value);
 			return;
 		}
 		check_state = check_state->parentstate;
