@@ -1,5 +1,6 @@
 #pragma once
-#include "stdint.h"
+#include <stdint.h>
+#include <malloc.h>
 #include "mercury.hpp"
 #include "mercury_compiler.hpp"
 
@@ -41,21 +42,28 @@ inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(mercury_state* co
 		return true;
 	}
 	for (mercury_int i = (const mercury_int)max_args; i < args_in; i++) {
-		mercury_variable v;
-		mercury_popstack(M, &v);
-		mercury_free_var(&v);
+		mercury_discard_top_of_stack(M);
 	}
 	return false;
 }
 
 //pretty simple will output any args that haven't been outputted. is nil.
 inline bool MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(mercury_state* const M_CPP_restrict M, const mercury_int args_out, const mercury_int sent_args=0) {
-	for (mercury_int a = sent_args; a < args_out; a++) {
-		mercury_variable mv;
-		mv.type = M_TYPE_NIL;
-		mv.data.i = 0;
-		mv.constant = false;
-		mercury_pushstack(M, &mv);
+	mercury_int diff = args_out - sent_args;
+	if (diff > 0) {
+		if (M->allocatedstacksize < M->sizeofstack + diff) {
+			mercury_variable* nptr = (mercury_variable*)realloc(M->stack, sizeof(mercury_variable) * (M->sizeofstack + diff));
+			if (!nptr) {
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
+				return false;
+			}
+			M->stack = nptr;
+			M->allocatedstacksize = M->sizeofstack + diff;
+		}
+		memset(M->stack + M->sizeofstack, '\0', diff*sizeof(mercury_variable));
+		M->sizeofstack += diff;
+		
+		return true;
 	}
-	return false;
+	return true;
 }

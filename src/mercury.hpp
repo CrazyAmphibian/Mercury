@@ -344,6 +344,14 @@ inline void mercury_clear_variable(mercury_variable* var) {
 	var->type = M_TYPE_NIL;
 }
 
+//frees the top stack and decrements the stack size. analagous to popstack freevar, albeit a bit faster.
+inline void mercury_discard_top_of_stack(mercury_state* const M_CPP_restrict M) {
+	if (M->sizeofstack) {
+		M->sizeofstack--;
+		mercury_free_var(M->stack + M->sizeofstack);
+	}
+}
+
 inline void mercury_increment_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
 	case M_TYPE_TABLE:
