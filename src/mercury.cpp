@@ -54,14 +54,14 @@ mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const M_CPP_
 }
 
 char* mercury_mstring_to_cstring(const mercury_stringliteral* const M_CPP_restrict str) {
-	mercury_int sz = strlen(str->ptr); //use this mecause null terminator
+	//mercury_int sz = strlen(str->ptr); //use this mecause null terminator
 	//printf("%i/%i %s",str->size,sz,str->ptr);
-	if(sz > str->size)sz = str->size;
-	char* out = (char*)malloc(sizeof(char) * (sz+1)); 
+	//if(sz > str->size)sz = str->size;
+	char* out = (char*)malloc(sizeof(char) * (str->size+1)); 
 	if (!out)return nullptr;
 
-	memcpy(out, str->ptr, sz*sizeof(char));
-	out[sz] = '\0';
+	memcpy(out, str->ptr, str->size*sizeof(char));
+	out[str->size] = '\0';
 	return out;
 }
 
@@ -126,7 +126,7 @@ bool mercury_mstrings_append(mercury_stringliteral* const basestr, const mercury
 	return true;
 }
 
-bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, const mercury_int len) {
+bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, mercury_int len) {
 	if (str->constant) {
 		char* nptr = (char*)malloc(sizeof(char) * (str->size + len));
 		if (!nptr)return false;
@@ -140,7 +140,10 @@ bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, c
 		char* nptr = (char*)realloc(str->ptr, sizeof(char) * (str->size + len));
 		if (!nptr)return false;
 		str->ptr = nptr;
-		memcpy(str->ptr + str->size, chars, len);
+		for (mercury_int i=0;i<len;i++){
+			str->ptr[str->size + i]=chars[i];
+		}
+		//memcpy(str->ptr + str->size, chars, len);
 		str->size += len;
 	}
 	return true;

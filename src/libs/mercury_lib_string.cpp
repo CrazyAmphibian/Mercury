@@ -982,7 +982,15 @@ void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const merc
 	mercury_int sbuf = 200;
 	mercury_int cc = 0;
 
-	mercury_stringliteral* outstr = mercury_cstring_const_to_mstring((char*)"",0);
+	mercury_stringliteral* outstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	if (!outstr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	outstr->constant = false;
+	outstr->ptr = nullptr;
+	outstr->size = 0;
+		
 	
 	/*
 	ARG1 = 1

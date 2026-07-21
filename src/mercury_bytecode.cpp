@@ -1145,7 +1145,6 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 	mercury_popstack(M, &key);
 
 	mercury_state* check_state = M;
-	mercury_int pos;
 	while (check_state) {
 		mercury_subtable* st = check_state->enviroment->data[key.type];
 		mercury_int sz = st->size;
@@ -1432,6 +1431,8 @@ void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / N
 	fptr->refrences = 1;
 	fptr->numberofinstructions = function_size;
 	fptr->instructions = (mercury_opcode*)malloc(function_size * sizeof(mercury_opcode));
+	fptr->debug_info = nullptr;
+	fptr->enviromental = false;
 	
 	if (fptr->instructions == nullptr) {
 		free(fptr);
