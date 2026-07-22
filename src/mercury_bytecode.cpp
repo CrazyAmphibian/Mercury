@@ -1394,7 +1394,7 @@ void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M) { //New STRing
 		}
 		memcpy(str, M->bytecode.instructions + M->programcounter, string_size);
 		so->ptr = str;// (char*)(M->bytecode.instructions + M->programcounter);
-		//so->constant = true;
+		so->constant = false;
 	}
 	else so->ptr = nullptr;
 
@@ -1920,7 +1920,7 @@ void M_BYTECODE_SCON(mercury_state* const M_CPP_restrict M) { //Set CONstant
 	}
 	
 	mercury_variable v;
-	mercury_pullstack(M,&v);
+	mercury_popstack(M,&v);
 	//printf("added a new constant (num %i) at %p. type: %i data:%i\n",con_num ,v,v->type,v->data.i );
 	//v.constant = 1;
 	M->constants[con_num] = v;

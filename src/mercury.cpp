@@ -75,6 +75,7 @@ mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_C
 		nstr->size = str->size;
 		nstr->constant = true;
 		nstr->ptr = str->ptr;
+		nstr->refrences = 1;
 		return nstr;
 	}
 	else {
@@ -84,6 +85,7 @@ mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_C
 		if (nstr->ptr == nullptr) return nullptr;
 		nstr->size = str->size;
 		nstr->constant = false;
+		nstr->refrences = 1;
 		memcpy(nstr->ptr, str->ptr, str->size * sizeof(char));
 		return nstr;
 	}
@@ -175,6 +177,8 @@ mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mer
 
 	nstr->size = 1l+end - start;
 	nstr->ptr=(char*)malloc(sizeof(char)*nstr->size);
+	nstr->refrences = 0;
+	nstr->constant = false;
 	if (!nstr->ptr) {
 		nstr->size = 0;
 		return nstr;
@@ -587,7 +591,6 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 		mercury_stringliteral* str = (mercury_stringliteral*)var->data.p;
 		str->refrences--;
 		if (!str->refrences) {
-			printf("string being cleared!\n");
 			mercury_mstring_delete(str);
 		}
 	}
@@ -606,7 +609,10 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 		mercury_function* ffunction = (mercury_function*)var->data.p;
 		ffunction->refrences--;
 		if (!ffunction->refrences) {
-			//free(ffunction->instructions); //this causes a heap issue. dunno why.
+			free(ffunction->instructions); //this causes a heap issue. dunno why.
+			if (ffunction->debug_info) {
+				free(ffunction->debug_info);
+			}
 			free(ffunction);
 		}
 		}
