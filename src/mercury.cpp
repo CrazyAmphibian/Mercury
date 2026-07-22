@@ -41,6 +41,7 @@ mercury_stringliteral* mercury_cstring_to_mstring(const char* const M_CPP_restri
 	memcpy(nad,str,size*sizeof(char));
 	nstr->ptr = nad;
 	nstr->constant = false;
+	nstr->refrences = 1;
 	return nstr;
 }
 
@@ -50,6 +51,7 @@ mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const M_CPP_
 	nstr->size = size;
 	nstr->ptr = (char*)str;
 	nstr->constant = true;
+	nstr->refrences = 1;
 	return nstr;
 }
 
@@ -101,7 +103,7 @@ mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* cons
 	memcpy(nstr->ptr+str1->size, str2->ptr, str2->size * sizeof(char));
 	nstr->constant = false;
 	nstr->size = str1->size + str2->size;
-
+	nstr->refrences = 1;
 	return nstr;
 }
 
@@ -150,10 +152,10 @@ bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, c
 }
 
 void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str) {
-	if (str && !str->constant) {
+	if (!str->constant) {
 		free(str->ptr);
-		free(str);
 	}
+	free(str);
 }
 
 mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mercury_int start, mercury_int end) {
@@ -326,7 +328,7 @@ bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const 
 }
 
 
-bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value) {
+mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value) {
 	mercury_subtable* subt = table->data[M_TYPE_STRING];
 	for (mercury_int i = 0; i < subt->size; i++) {
 		if (mercury_mstring_equal_cstring((mercury_stringliteral*)subt->keys[i].data.p,key)) {		
@@ -583,11 +585,11 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 	case M_TYPE_STRING:
 	{
 		mercury_stringliteral* str = (mercury_stringliteral*)var->data.p;
-		if (!str->constant)free(str->ptr);
-		str->ptr = nullptr;
-		str->size = 0;
-		str->constant = true;
-		free(str);
+		str->refrences--;
+		if (!str->refrences) {
+			printf("string being cleared!\n");
+			mercury_mstring_delete(str);
+		}
 	}
 		break;
 	case M_TYPE_ARRAY:
@@ -688,6 +690,9 @@ bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 	M->sizeofstack++;
 
 	switch (var->type) {
+	case M_TYPE_STRING:
+		((mercury_stringliteral*)var->data.p)->refrences++;
+		break;
 	case M_TYPE_ARRAY:
 	{
 		mercury_array* a = (mercury_array*)var->data.p;
@@ -743,7 +748,9 @@ void mercury_clonevariable(const mercury_variable* const var, mercury_variable* 
 	out->constant = var->constant;
 	switch (out->type) {
 		case M_TYPE_STRING:
-			out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
+			//out->data.p = mercury_copystring((mercury_stringliteral*)var->data.p);
+			((mercury_stringliteral*)var->data.p)->refrences++;
+			out->data = var->data;
 			break;
 		case M_TYPE_TABLE:
 			((mercury_table*)var->data.p)->refrences++;
@@ -1200,7 +1207,7 @@ bool mercury_vars_equal(const mercury_variable* const var1, const mercury_variab
 	}
 
 	if (var1->type == M_TYPE_STRING) {
-		return mercury_mstrings_equal( (mercury_stringliteral*)var1->data.p, (mercury_stringliteral*)var2->data.p);
+		return var1->data.i==var2->data.i || mercury_mstrings_equal( (mercury_stringliteral*)var1->data.p, (mercury_stringliteral*)var2->data.p);
 	}
 	else {
 		return var1->data.i == var2->data.i;

@@ -577,7 +577,7 @@ void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_variable out;
 	mercury_compile_mstring((mercury_stringliteral*)codestr.data.p, &out);
 	mercury_free_var(&codestr);
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 1, 1);
 }

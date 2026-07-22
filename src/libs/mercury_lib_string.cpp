@@ -376,7 +376,7 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 
 	mercury_int len=mercury_array_len(arr)+1;
 
-	mercury_stringliteral* st = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral*));
+	mercury_stringliteral* st = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
 	if (!st) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;

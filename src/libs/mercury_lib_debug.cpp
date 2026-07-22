@@ -171,7 +171,7 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const
 		mercury_variable in;
 		mercury_popstack(M,&in);
 		if (in.type == M_TYPE_FUNCTION) {
-			printf("variable %p function %p bytecode (%zu)\n", in, in.data.p, ((mercury_function*)in.data.p)->numberofinstructions );
+			printf("variable function %p bytecode (%zu)\n", in.data.p, ((mercury_function*)in.data.p)->numberofinstructions );
 			mercury_stringliteral* l = mercury_get_bytecode_debug( ((mercury_function*)in.data.p) );
 			for (mercury_int i = 0; i < l->size; i++) {
 				putchar(l->ptr[i]);
@@ -204,7 +204,7 @@ void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restric
 		mercury_variable in;
 		mercury_popstack(M, &in);
 		if (in.type == M_TYPE_FUNCTION) {
-			printf("variable %p function %p bytecode (%zu)\n", in, in.data.p, ((mercury_function*)in.data.p)->numberofinstructions);
+			printf("variable function %p bytecode (%zu)\n", in.data.p, ((mercury_function*)in.data.p)->numberofinstructions);
 			mercury_stringliteral* l = mercury_get_bytecode_rawbinary_debug(((mercury_function*)in.data.p));
 			for (mercury_int i = 0; i < l->size; i++) {
 				putchar(l->ptr[i]);
@@ -236,6 +236,9 @@ void mercury_lib_debug_refcount_dbg(mercury_state* const M_CPP_restrict M, const
 	mercury_popstack(M, &in);
 
 	switch (in.type) {
+		case M_TYPE_STRING:
+			printf("string has %zu refrences.\n", ((mercury_stringliteral*)in.data.p)->refrences);
+			break;
 		case M_TYPE_TABLE:
 			printf("table has %zu refrences.\n", ((mercury_table*)in.data.p)->refrences);
 			break;
@@ -270,7 +273,7 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 		mercury_popstack(M, &in);
 		if (in.type == M_TYPE_FUNCTION) {
 			mercury_debug_token* toks = M->bytecode.debug_info;
-			printf("variable %p function %p debug info:\n", in, in.data.p);
+			printf("variable function %p debug info:\n", in.data.p);
 
 			if (toks) {
 				for (mercury_uint i = 0; i < (*((mercury_function*)in.data.p)).numberofinstructions; i++) {

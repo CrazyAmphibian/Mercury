@@ -1394,17 +1394,17 @@ void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M) { //New STRing
 		}
 		memcpy(str, M->bytecode.instructions + M->programcounter, string_size);
 		so->ptr = str;// (char*)(M->bytecode.instructions + M->programcounter);
-		so->constant = true;
+		//so->constant = true;
 	}
 	else so->ptr = nullptr;
 
 	so->size = string_size;
-
+	so->refrences = 1;
 	out.data.p = so;
 	out.type = M_TYPE_STRING;
 	M->programcounter += (string_size+ sizeof(mercury_opcode)-1)/sizeof(mercury_opcode);
 
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 }
 
 void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / No FUN
@@ -1638,7 +1638,7 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 	v.type = M_TYPE_STRING;
 	v.constant = false;
 	v.data.p=mercury_mstrings_concat(s1, s2);
-	mercury_pushstack(M, &v);
+	mercury_pushstack_unrefed(M, &v);
 }
 
 
@@ -1922,7 +1922,7 @@ void M_BYTECODE_SCON(mercury_state* const M_CPP_restrict M) { //Set CONstant
 	mercury_variable v;
 	mercury_pullstack(M,&v);
 	//printf("added a new constant (num %i) at %p. type: %i data:%i\n",con_num ,v,v->type,v->data.i );
-	v.constant = 1;
+	//v.constant = 1;
 	M->constants[con_num] = v;
 }
 
@@ -1936,7 +1936,7 @@ void M_BYTECODE_GCON(mercury_state* const M_CPP_restrict M) { //Get CONstant
 	//printf("got a new constant (num %i) at %p. type:%i data:%i\n", con_num, M->constants[con_num], M->constants[con_num]->type, M->constants[con_num]->data.i);
 	mercury_variable v;
 	//mercury_clonevariable(M->constants+con_num, &v);
-	//mercury_pushstack(M, &v);
+	//mercury_pushstack_unrefed(M, &v);
 	mercury_pushstack(M, M->constants + con_num);
 }
 

@@ -71,13 +71,9 @@ struct mercury_variable {
 
 struct mercury_stringliteral {
 	mercury_int size=0;
+	mercury_uint refrences = 0;
 	char* ptr = nullptr;
 	bool constant = false; //if true, ptr points to another char*, and so we should not free it. optimization to reduce malloc calls.
-};
-
-struct mercury_stringrefrence {
-	mercury_int refrencecount = 0;
-	mercury_stringliteral* string = nullptr;
 };
 
 struct mercury_subtable {
@@ -296,7 +292,7 @@ MERCURY_DYNAMIC_LIBRARY mercury_int mercury_tablehaskey(const mercury_table* con
 MERCURY_DYNAMIC_LIBRARY void mercury_destroytable(mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY void mercury_cleartable(const mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out);
-MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value);
+MERCURY_DYNAMIC_LIBRARY mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value);
 MERCURY_DYNAMIC_LIBRARY mercury_int mercury_table_has_cstring_key(const mercury_table* const table, const char* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_prepare_table_for_state(mercury_table* table, mercury_state* M);
 
@@ -354,6 +350,9 @@ inline void mercury_discard_top_of_stack(mercury_state* const M_CPP_restrict M) 
 
 inline void mercury_increment_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
+	case M_TYPE_STRING:
+		((mercury_stringliteral*)var->data.p)->refrences++;
+		return;
 	case M_TYPE_TABLE:
 		((mercury_table*)var->data.p)->refrences++;
 		return;
@@ -373,6 +372,9 @@ inline void mercury_increment_variable_refrence_count(const mercury_variable* co
 }
 inline void mercury_decrement_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
+	case M_TYPE_STRING:
+		((mercury_stringliteral*)var->data.p)->refrences--;
+		return;
 	case M_TYPE_TABLE:
 		((mercury_table*)var->data.p)->refrences--;
 		return;
