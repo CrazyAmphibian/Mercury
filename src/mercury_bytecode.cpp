@@ -909,21 +909,18 @@ void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M) {
 	mercury_free_var(&v);
 
 	v.constant = false;
+	v.type = M_TYPE_BOOL;
 	switch (argsfloat) {
 	case 0:
-		v.type = M_TYPE_INT;
 		v.data.i = i2 > i1;
 		break;
 	case 1:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = (mercury_float)i2 > f1;
 		break;
 	case 2:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 > (mercury_float)i1;
 		break;
 	case 3:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 > f1;
 		break;
 	}
@@ -978,21 +975,18 @@ void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M) {
 	mercury_free_var(&v);
 
 	v.constant = false;
+	v.type = M_TYPE_BOOL;
 	switch (argsfloat) {
 	case 0:
-		v.type = M_TYPE_INT;
 		v.data.i = i2 < i1;
 		break;
 	case 1:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = (mercury_float)i2 < f1;
 		break;
 	case 2:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 < (mercury_float)i1;
 		break;
 	case 3:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 < f1;
 		break;
 	}
@@ -1046,22 +1040,19 @@ void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M) {
 	}
 	mercury_free_var(&v);
 
+	v.type = M_TYPE_BOOL;
 	v.constant = false;
 	switch (argsfloat) {
 	case 0:
-		v.type = M_TYPE_INT;
 		v.data.i = i2 >= i1;
 		break;
 	case 1:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = (mercury_float)i2 >= f1;
 		break;
 	case 2:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 >= (mercury_float)i1;
 		break;
 	case 3:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 >= f1;
 		break;
 	}
@@ -1115,22 +1106,19 @@ void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 	}
 	mercury_free_var(&v);
 
+	v.type = M_TYPE_BOOL;
 	v.constant = false;
 	switch (argsfloat) {
 	case 0:
-		v.type = M_TYPE_INT;
 		v.data.i = i2 <= i1;
 		break;
 	case 1:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = (mercury_float)i2 <= f1;
 		break;
 	case 2:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 <= (mercury_float)i1;
 		break;
 	case 3:
-		v.type = M_TYPE_FLOAT;
 		v.data.f = f2 <= f1;
 		break;
 	}
@@ -1276,6 +1264,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 			return;
 		}
 		mercury_getarray((mercury_array*)table.data.p, key.data.i,&value);
+		mercury_free_var(&key);
 		break;
 	case M_TYPE_STRING:
 		if (key.type != M_TYPE_INT) {
@@ -1294,8 +1283,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		mercury_free_var(&table);
 		return;
 	}
-
-	mercury_free_var(&key);
+	
 	mercury_free_var(&table);
 	mercury_pushstack_unrefed(M, &value);
 }
@@ -1399,7 +1387,13 @@ void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M) { //New STRing
 		return;
 	}
 	if (string_size) {
-		so->ptr = (char*)(M->bytecode.instructions + M->programcounter);
+		char* str=(char*)malloc(sizeof(char) * string_size);
+		if (!str) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		memcpy(str, M->bytecode.instructions + M->programcounter, string_size);
+		so->ptr = str;// (char*)(M->bytecode.instructions + M->programcounter);
 		so->constant = true;
 	}
 	else so->ptr = nullptr;
@@ -1940,7 +1934,10 @@ void M_BYTECODE_GCON(mercury_state* const M_CPP_restrict M) { //Get CONstant
 		return;
 	}
 	//printf("got a new constant (num %i) at %p. type:%i data:%i\n", con_num, M->constants[con_num], M->constants[con_num]->type, M->constants[con_num]->data.i);
-	mercury_pushstack(M, M->constants+con_num);
+	mercury_variable v;
+	//mercury_clonevariable(M->constants+con_num, &v);
+	//mercury_pushstack(M, &v);
+	mercury_pushstack(M, M->constants + con_num);
 }
 
 
