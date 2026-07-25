@@ -616,8 +616,8 @@ int mercury_sort_alphabet_az(const void* a, const void* b) {
 
 	mercury_int size = s_a > s_b ? s_a : s_b;
 
-	const char* string_a = str_a->ptr;
-	const char* string_b = str_b->ptr;
+	const unsigned char* string_a = (unsigned char*)str_a->ptr;
+	const unsigned char* string_b = (unsigned char*)str_b->ptr;
 
 	for (mercury_int c = 0; c < size; c++) {
 		short a = c > s_a ? -1 : string_a[c];
@@ -651,8 +651,8 @@ int mercury_sort_alphabet_za(const void* a, const void* b) {
 
 	mercury_int size = s_a > s_b ? s_a : s_b;
 
-	const char* string_a = str_a->ptr;
-	const char* string_b = str_b->ptr;
+	const unsigned char* string_a = (unsigned char*)str_a->ptr;
+	const unsigned char* string_b = (unsigned char*)str_b->ptr;
 
 	for (mercury_int c = 0; c < size; c++) {
 		short a = c > s_a ? -1 : string_a[c];
