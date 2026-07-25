@@ -1994,3 +1994,46 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
+
+
+
+void mercury_lib_string_copy_string(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
+	if (!args_out) {
+		return;
+	}
+	mercury_variable in;
+	mercury_popstack(M, &in);
+	if (in.type != M_TYPE_STRING){
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_STRING, 1);
+		return;
+	}
+	mercury_string* instr = (mercury_string*)in.data.p;
+	mercury_string* nstr=(mercury_string*)malloc(sizeof(mercury_string));
+	if (!nstr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	if (instr->size) {
+		char* sp = (char*)malloc(instr->size);
+		if (!sp) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			free(nstr);
+			return;
+		}
+		nstr->ptr = sp;
+		memcpy(sp, instr->ptr, instr->size);
+	}
+	else {
+		nstr->ptr = nullptr;
+	}
+	nstr->constant = false;
+	nstr->refrences = 1;
+	nstr->size = instr->size;
+
+	mercury_free_var(&in);
+	in.data.p = nstr;
+	mercury_pushstack_unrefed(M, &in);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}

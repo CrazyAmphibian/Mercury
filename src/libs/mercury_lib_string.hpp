@@ -28,3 +28,4 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_string_copy_string(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);

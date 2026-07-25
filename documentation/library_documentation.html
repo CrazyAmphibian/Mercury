@@ -1305,6 +1305,16 @@ escapes the following characters: &lt; &gt; &amp; &quot;
 class='thing'&gt;woah!&lt;/span&gt;&quot;) //returns &quot;&amp;lt;span
 class=&amp;#39;thing&amp;#39;&amp;gt;woah!&amp;lt;/span&amp;gt;&quot;
 </p>
+
+<h3 class="funcheader-western">copy (<font color="#888888">string</font>
+string)</h3>
+<p>takes a string and creates a copy of it, as a distinct object with separate internal pointer and reference count. strings, unlike arrays or tables, will compare content to determine equality, so a copied string will be equal with the original. useful for sending string values over to a thread where refcounting can result in races.
+</p>
+<p class="example">a="hello"<br>
+b=string.copy(a)<br>
+print(a,b,a==b) //outputs "hello"&emsp;"hello"&emsp;true
+</p>
+
 <h1 id="lib_array">Array library</h1>
 <h2 class="western">constants</h2>
 <table cellpadding="2" cellspacing="0">

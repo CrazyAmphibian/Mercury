@@ -85,4 +85,9 @@ if string.escape_html("<p>hello there</p>")!="&lt;p&gt;hello there&lt;/p&gt;" th
 	return 1
 end
 
+if string.copy(str)!=str then
+	print("string.copy made a string that didn't match the original!")
+	return 1
+end
+
 print("string library test passed!")

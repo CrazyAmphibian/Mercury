@@ -1748,6 +1748,7 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_string_escape_url, "escape_url", "string");
 	mercury_register_library(mercury_lib_string_escape_c, "escape_c", "string");
 	mercury_register_library(mercury_lib_string_escape_html, "escape_html", "string");
+	mercury_register_library(mercury_lib_string_copy_string, "copy", "string");
 
 #endif
 #ifdef MERCURY_LIB_OS
