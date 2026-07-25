@@ -91,5 +91,3 @@ if (c[0]!="c") || (c[1]!="bb") || (c[2]!="ba") || (c[3]!="b") || (c[4]!="ab") ||
 	print("array.sort SORTING_ALPHABETICAL_Z_TO_A test failed!")
 	return 1
 end
-
-print("array library test passed!")

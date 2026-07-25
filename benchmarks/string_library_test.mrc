@@ -89,5 +89,3 @@ if string.copy(str)!=str then
 	print("string.copy made a string that didn't match the original!")
 	return 1
 end
-
-print("string library test passed!")

@@ -131,6 +131,3 @@ if math.randomseed()!=initial then
 	print("math.randomseed did not preserve seed state.")
 	return 1
 end
-
-
-print("math library test passed!")

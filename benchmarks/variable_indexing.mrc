@@ -15,12 +15,15 @@ sc=b[0]+b[1]+b[2]+b[3]
 
 if sa!=sb then
 	print("implicit and explicit table indexing failed parity!")
+	return 1
 else
 	if sc!=10 then
 		print("array indexing failed!")
+		return 1
 	elseif sa!=15 then
 		print("table indexing failed!")
+		return 1
 	else
-		print("indexing test passed!")
+		return
 	end
 end

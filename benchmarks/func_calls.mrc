@@ -22,4 +22,4 @@ while local i do
 	global N=local func_a(global N,global N)
 	local i--
 end
-global print(global string.format("%i iterations took %.5f seconds",global ITTERATION_COUNT,global os.clock()-local start ) )
+global print(global string.format("%i function call iterations took %.5f seconds",global ITTERATION_COUNT,global os.clock()-local start ) )

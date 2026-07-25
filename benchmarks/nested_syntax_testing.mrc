@@ -39,7 +39,8 @@ end
 
 
 if(count_1==125) && (count_2 ==3) then
-	print("syntax test passed!")
+	return
 else
 	print(string.format("syntax test failed! count_1 expected 125, was %i; count_2 expected 3, was %i",count_1,count_2))
+	return 1
 end

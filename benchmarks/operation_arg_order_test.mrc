@@ -18,6 +18,7 @@ a&=255
 
 if a!=33 then
 	print("operations test failed! we got "..a .." but expected 33.")
+	return 1
 else
-	print("operations test passed!")
+	return
 end

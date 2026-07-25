@@ -16,6 +16,3 @@ else
 	end
 end
 
-
-
-print("table library test passed!")
