@@ -24,7 +24,7 @@ const char* typetostring[256] = {
 };
 
 
-mercury_stringliteral* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1, const mercury_int* data2, const mercury_int* data3) {
+mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1, const mercury_int* data2, const mercury_int* data3) {
 	char* buffer = (char*)calloc(255,sizeof(char));
 	if (!buffer)return nullptr;
 	//char buffer[255] = {0};
@@ -95,7 +95,7 @@ mercury_stringliteral* mercury_generate_error_string(mercury_state* M, const uin
 
 void mercury_raise_error(mercury_state* M, const uint32_t errorcode, const mercury_int* data1, const mercury_int* data2, const mercury_int* data3) {
 
-	mercury_stringliteral* str = mercury_generate_error_string(M,errorcode, data1, data2, data3);
+	mercury_string* str = mercury_generate_error_string(M,errorcode, data1, data2, data3);
 
 
 	if (str != nullptr) {

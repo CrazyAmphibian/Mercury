@@ -608,8 +608,8 @@ int mercury_sort_alphabet_az(const void* a, const void* b) {
 		return 0;
 	}
 
-	mercury_stringliteral* str_a = (mercury_stringliteral*)var_a.data.p;
-	mercury_stringliteral* str_b = (mercury_stringliteral*)var_b.data.p;
+	mercury_string* str_a = (mercury_string*)var_a.data.p;
+	mercury_string* str_b = (mercury_string*)var_b.data.p;
 	
 	mercury_int s_a = str_a->size;
 	mercury_int s_b = str_b->size;
@@ -643,8 +643,8 @@ int mercury_sort_alphabet_za(const void* a, const void* b) {
 		return 0;
 	}
 
-	mercury_stringliteral* str_a = (mercury_stringliteral*)var_a.data.p;
-	mercury_stringliteral* str_b = (mercury_stringliteral*)var_b.data.p;
+	mercury_string* str_a = (mercury_string*)var_a.data.p;
+	mercury_string* str_b = (mercury_string*)var_b.data.p;
 
 	mercury_int s_a = str_a->size;
 	mercury_int s_b = str_b->size;
@@ -690,7 +690,7 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	if (!args_out)return;
 
-	mercury_stringliteral* out_str=mercury_cstring_to_mstring((char*)"",0);
+	mercury_string* out_str=mercury_cstring_to_mstring((char*)"",0);
 
 	mercury_int limit=mercury_array_len((mercury_array*)var_array.data.p);
 	for (mercury_int i = 0; i < limit; i++) {
@@ -701,7 +701,7 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 		}
 		
 
-		if(i!=limit-1)mercury_mstrings_append(out_str, (mercury_stringliteral*)var_str.data.p);
+		if(i!=limit-1)mercury_mstrings_append(out_str, (mercury_string*)var_str.data.p);
 	}
 
 

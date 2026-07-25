@@ -150,12 +150,12 @@ int main(int argc, char** argv) {
 	}
 
 
-	mercury_stringliteral* tstr = mercury_cstring_const_to_mstring((char*)code, strlen(code));
+	mercury_string* tstr = mercury_cstring_const_to_mstring((char*)code, strlen(code));
 	mercury_variable funcy;
 	mercury_compile_mstring(tstr,&funcy);
 	if (funcy.type != M_TYPE_FUNCTION) {
 		if (funcy.type == M_TYPE_STRING) {
-			mercury_stringliteral* s = (mercury_stringliteral*)funcy.data.p;
+			mercury_string* s = (mercury_string*)funcy.data.p;
 			for (mercury_int n = 0; n < s->size; n++) {
 				putchar(s->ptr[n]);
 			}
@@ -171,7 +171,7 @@ int main(int argc, char** argv) {
 		mercury_function* compiled = (mercury_function*)funcy.data.p;
 
 #ifdef MERCURY_DEBUG
-		mercury_stringliteral* rs= mercury_get_bytecode_debug(compiled);
+		mercury_string* rs= mercury_get_bytecode_debug(compiled);
 		if (rs) {
 			const char* str = rs->ptr;
 			for (mercury_int c = 0; c < (const mercury_int)rs->size; c++) {

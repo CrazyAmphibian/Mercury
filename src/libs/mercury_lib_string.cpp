@@ -33,7 +33,7 @@ void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury
 		return;
 	}
 
-	mercury_stringliteral* os=mercury_mstring_substring((mercury_stringliteral*)var_string.data.p, var_start.data.i, var_end.data.i);
+	mercury_string* os=mercury_mstring_substring((mercury_string*)var_string.data.p, var_start.data.i, var_end.data.i);
 	mercury_variable out;
 	out.constant = false;
 	out.type = M_TYPE_STRING;
@@ -59,9 +59,9 @@ void mercury_lib_string_reverse(mercury_state* const M_CPP_restrict M, const mer
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_string.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* str = (mercury_stringliteral*)var_string.data.p;
+	mercury_string* str = (mercury_string*)var_string.data.p;
 
-	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* os = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!os) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -122,8 +122,8 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 		return;
 	}
 
-	mercury_stringliteral* str = (mercury_stringliteral*)strvar.data.p;
-	mercury_stringliteral* search = (mercury_stringliteral*)searchforvar.data.p;
+	mercury_string* str = (mercury_string*)strvar.data.p;
+	mercury_string* search = (mercury_string*)searchforvar.data.p;
 
 	mercury_int located_at = -1;
 
@@ -217,7 +217,7 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 		return;
 	}
 
-	mercury_stringliteral* outstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* outstr = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!outstr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -225,9 +225,9 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 	outstr->size = 0;
 	outstr->ptr = nullptr;
 	
-	mercury_stringliteral* str = (mercury_stringliteral*)str_var.data.p;
-	mercury_stringliteral* search = (mercury_stringliteral*)search_var.data.p;
-	mercury_stringliteral* replace = (mercury_stringliteral*)replace_var.data.p;
+	mercury_string* str = (mercury_string*)str_var.data.p;
+	mercury_string* search = (mercury_string*)search_var.data.p;
+	mercury_string* replace = (mercury_string*)replace_var.data.p;
 
 	mercury_int replacments = 0;
 
@@ -292,8 +292,8 @@ void mercury_lib_string_count(mercury_state* const M_CPP_restrict M, const mercu
 		return;
 	}
 
-	mercury_stringliteral* str = (mercury_stringliteral*)str_var.data.p;
-	mercury_stringliteral* search = (mercury_stringliteral*)search_var.data.p;
+	mercury_string* str = (mercury_string*)str_var.data.p;
+	mercury_string* search = (mercury_string*)search_var.data.p;
 
 	mercury_int replacments = 0;
 
@@ -335,7 +335,7 @@ void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mer
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, str_var.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* str = (mercury_stringliteral*)str_var.data.p;
+	mercury_string* str = (mercury_string*)str_var.data.p;
 
 	mercury_array* arr = mercury_newarray();
 	if (!arr) {
@@ -376,7 +376,7 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 
 	mercury_int len=mercury_array_len(arr)+1;
 
-	mercury_stringliteral* st = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* st = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!st) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -438,8 +438,8 @@ void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const me
 		return;
 	}
 
-	mercury_stringliteral* str = (mercury_stringliteral*)str_var.data.p;
-	mercury_stringliteral* sep = (mercury_stringliteral*)sep_var.data.p;
+	mercury_string* str = (mercury_string*)str_var.data.p;
+	mercury_string* sep = (mercury_string*)sep_var.data.p;
 
 	mercury_int arr_elems = 0;
 	mercury_int last_find = 0;
@@ -453,7 +453,7 @@ void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const me
 		}
 		//string found
 		{
-			mercury_stringliteral* ns = mercury_cstring_to_mstring(str->ptr + last_find, c- last_find);
+			mercury_string* ns = mercury_cstring_to_mstring(str->ptr + last_find, c- last_find);
 			if (!ns)continue;
 			mercury_variable* v=(mercury_variable*)malloc(sizeof(mercury_variable));
 			if (!v)continue;
@@ -471,7 +471,7 @@ void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const me
 	}
 
 	{
-		mercury_stringliteral* ns = mercury_cstring_to_mstring(str->ptr + last_find, str->size - last_find);
+		mercury_string* ns = mercury_cstring_to_mstring(str->ptr + last_find, str->size - last_find);
 		if (!ns)return;
 		mercury_variable* v = (mercury_variable*)malloc(sizeof(mercury_variable));
 		if (!v)return;
@@ -506,9 +506,9 @@ void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_string.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* str = (mercury_stringliteral*)var_string.data.p;
+	mercury_string* str = (mercury_string*)var_string.data.p;
 
-	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* os = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!os) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -555,9 +555,9 @@ void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_string.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* str = (mercury_stringliteral*)var_string.data.p;
+	mercury_string* str = (mercury_string*)var_string.data.p;
 
-	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* os = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!os) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -648,7 +648,7 @@ char* getprintfstring(mercury_int* args, bool* args_def, const char* type) {
 	return str;
 }
 
-void printf_wrapper_takes_float(char* buffer, size_t buffer_size,mercury_stringliteral* str_out,double value,const char* type, mercury_int* args, bool* args_def) {
+void printf_wrapper_takes_float(char* buffer, size_t buffer_size,mercury_string* str_out,double value,const char* type, mercury_int* args, bool* args_def) {
 	mercury_int l = 0;
 	mercury_int p = 0;
 	if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
@@ -678,7 +678,7 @@ void printf_wrapper_takes_float(char* buffer, size_t buffer_size,mercury_stringl
 	mercury_mstring_addchars(str_out, buffer, chars_added);
 }
 
-void printf_wrapper_takes_int(char* buffer, size_t buffer_size, mercury_stringliteral* str_out, mercury_int value, const char* type, mercury_int* args, bool* args_def) {
+void printf_wrapper_takes_int(char* buffer, size_t buffer_size, mercury_string* str_out, mercury_int value, const char* type, mercury_int* args, bool* args_def) {
 	mercury_int l = 0;
 	mercury_int p = 0;
 	if (args_def[ARG_WIDTH])l = args[ARG_WIDTH];
@@ -716,7 +716,7 @@ union m_rawdata_snowflake_printf { //because printf promotes floats to doubles f
 };
 
 
-mercury_int m_readformat(mercury_stringliteral* str, mercury_int offset, mercury_stringliteral* str_out, mercury_variable* v_arr, mercury_int* num_vars) {
+mercury_int m_readformat(mercury_string* str, mercury_int offset, mercury_string* str_out, mercury_variable* v_arr, mercury_int* num_vars) {
 	mercury_int add_off = 0;
 
 	unsigned char nargs = 0;
@@ -851,7 +851,7 @@ return add_off;
 		case 'S':
 		case 's': // string
 		{
-			mercury_stringliteral* v = nullptr;
+			mercury_string* v = nullptr;
 			mercury_int addedlen = 0;
 			if (*num_vars) {
 				(*num_vars)--;
@@ -975,14 +975,14 @@ void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const merc
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, strvar.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* s = (mercury_stringliteral*)strvar.data.p;
+	mercury_string* s = (mercury_string*)strvar.data.p;
 
 	mercury_int pc = 0;
 	char* buffer = (char*)malloc(sizeof(char) * 200);
 	mercury_int sbuf = 200;
 	mercury_int cc = 0;
 
-	mercury_stringliteral* outstr = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* outstr = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!outstr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -1193,7 +1193,7 @@ inline void m_init_mattern_invert_filter_chars(M_PATTERN* P) {
 	}
 }
 
-M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) {
+M_PATTERN* m_patternize_string(mercury_string* str,mercury_int* num_out) {
 	mercury_int n = 0;
 	M_PATTERN* out = nullptr;
 
@@ -1318,7 +1318,7 @@ M_PATTERN* m_patternize_string(mercury_stringliteral* str,mercury_int* num_out) 
 }
 
 
-bool m_evaluate_patterns(mercury_stringliteral* str, M_PATTERN* patterns, mercury_int num_patterns, mercury_int str_start, mercury_int* pattern_str_start, mercury_int* pattern_str_end) {
+bool m_evaluate_patterns(mercury_string* str, M_PATTERN* patterns, mercury_int num_patterns, mercury_int str_start, mercury_int* pattern_str_start, mercury_int* pattern_str_end) {
 
 #if defined(DEBUG) || defined(_DEBUG)
 
@@ -1501,8 +1501,8 @@ void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const merc
 	}
 
 
-	mercury_stringliteral* str = (mercury_stringliteral*)strvar.data.p;
-	mercury_stringliteral* pat_str = (mercury_stringliteral*)searchforvar.data.p;
+	mercury_string* str = (mercury_string*)strvar.data.p;
+	mercury_string* pat_str = (mercury_string*)searchforvar.data.p;
 
 	mercury_int num_pats = 0;
 	M_PATTERN* P = m_patternize_string(pat_str,&num_pats);
@@ -1563,8 +1563,8 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 		return;
 	}
 
-	mercury_stringliteral* str = (mercury_stringliteral*)strvar.data.p;
-	mercury_stringliteral* match = (mercury_stringliteral*)matchvar.data.p;
+	mercury_string* str = (mercury_string*)strvar.data.p;
+	mercury_string* match = (mercury_string*)matchvar.data.p;
 
 	mercury_int num_pats = 0;
 	M_PATTERN* P = m_patternize_string(match, &num_pats);
@@ -1576,7 +1576,7 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 	mercury_int start = 0;
 	mercury_int end = 0;
 	while (m_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
-		mercury_stringliteral* ss=mercury_mstring_substring(str,start,end);
+		mercury_string* ss=mercury_mstring_substring(str,start,end);
 		if (!ss) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_free_var(&strvar);
@@ -1641,15 +1641,15 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 		return;
 	}
 
-	mercury_stringliteral* str = (mercury_stringliteral*)strvar.data.p;
-	mercury_stringliteral* match = (mercury_stringliteral*)matchvar.data.p;
-	mercury_stringliteral* rep = (mercury_stringliteral*)repvar.data.p;
+	mercury_string* str = (mercury_string*)strvar.data.p;
+	mercury_string* match = (mercury_string*)matchvar.data.p;
+	mercury_string* rep = (mercury_string*)repvar.data.p;
 
 	mercury_int num_pats = 0;
 	M_PATTERN* P = m_patternize_string(match, &num_pats);
 	
 
-	mercury_stringliteral* outstr = mercury_cstring_to_mstring((char*)"", 0);
+	mercury_string* outstr = mercury_cstring_to_mstring((char*)"", 0);
 	
 
 	mercury_int count = 0;
@@ -1662,7 +1662,7 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 
 		//printf("%i=%i\n", start, end);
 
-		mercury_stringliteral* app = mercury_mstring_substring(str, lastendmatch, start - 1);
+		mercury_string* app = mercury_mstring_substring(str, lastendmatch, start - 1);
 		if (!app) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
@@ -1709,8 +1709,8 @@ void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mer
 		return;
 	}
 
-	mercury_stringliteral* str = (mercury_stringliteral*)strvar.data.p;
-	mercury_stringliteral* match = (mercury_stringliteral*)matchvar.data.p;
+	mercury_string* str = (mercury_string*)strvar.data.p;
+	mercury_string* match = (mercury_string*)matchvar.data.p;
 
 	mercury_int num_pats = 0;
 	M_PATTERN* P = m_patternize_string(match, &num_pats);
@@ -1751,7 +1751,7 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 		return;
 	}
 
-	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* os = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!os) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -1760,7 +1760,7 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 	os->ptr = nullptr;
 	os->constant = false;
 
-	mercury_stringliteral* is = (mercury_stringliteral*)instr.data.p;
+	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
 	while (pos < is->size) {
 		char c = is->ptr[pos];
@@ -1801,7 +1801,7 @@ void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const 
 		return;
 	}
 
-	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* os = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!os) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -1810,7 +1810,7 @@ void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const 
 	os->ptr = nullptr;
 	os->constant = false;
 
-	mercury_stringliteral* is = (mercury_stringliteral*)instr.data.p;
+	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
 	while (pos < is->size) {
 		char c = is->ptr[pos];
@@ -1868,7 +1868,7 @@ void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const me
 		return;
 	}
 
-	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* os = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!os) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -1877,7 +1877,7 @@ void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const me
 	os->ptr = nullptr;
 	os->constant = false;
 
-	mercury_stringliteral* is = (mercury_stringliteral*)instr.data.p;
+	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
 	while (pos < is->size) {
 		char c = is->ptr[pos];
@@ -1950,7 +1950,7 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 		return;
 	}
 
-	mercury_stringliteral* os = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* os = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!os) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -1959,7 +1959,7 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 	os->ptr = nullptr;
 	os->constant = false;
 
-	mercury_stringliteral* is = (mercury_stringliteral*)instr.data.p;
+	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
 	while (pos < is->size) {
 		char c = is->ptr[pos];

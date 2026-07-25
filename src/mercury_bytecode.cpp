@@ -1275,7 +1275,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		}
 		value.constant = false;
 		value.type = M_TYPE_STRING;
-		value.data.p = mercury_mstring_substring((mercury_stringliteral*)table.data.p, key.data.i, key.data.i);
+		value.data.p = mercury_mstring_substring((mercury_string*)table.data.p, key.data.i, key.data.i);
 		break;
 	default:
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table.type, 1);
@@ -1381,7 +1381,7 @@ void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M) { //New STRing
 	mercury_variable out;
 	out.constant = false;
 
-	mercury_stringliteral* const so = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+	mercury_string* const so = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!so) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
@@ -1600,7 +1600,7 @@ void M_BYTECODE_LEN(mercury_state* const M_CPP_restrict M) { //LENgth
 	case M_TYPE_STRING:
 		out.constant = false;
 		out.type = M_TYPE_INT;
-		out.data.i = ((mercury_stringliteral*)var.data.p)->size;
+		out.data.i = ((mercury_string*)var.data.p)->size;
 		break;
 	case M_TYPE_TABLE:
 		out.constant = false;
@@ -1628,8 +1628,8 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 	mercury_variable v1;
 	mercury_popstack(M, &v1);
 
-	mercury_stringliteral* s1 = mercury_tostring(&v1);
-	mercury_stringliteral* s2 = mercury_tostring(&v2);
+	mercury_string* s1 = mercury_tostring(&v1);
+	mercury_string* s2 = mercury_tostring(&v2);
 
 	mercury_free_var(&v1);
 	mercury_free_var(&v2);
