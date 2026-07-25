@@ -692,7 +692,7 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 
 	mercury_string* out_str=mercury_cstring_to_mstring((char*)"",0);
 
-	mercury_int limit=mercury_array_len((mercury_array*)var_array.data.p);
+	mercury_int limit=mercury_array_len((mercury_array*)var_array.data.p)+1;
 	for (mercury_int i = 0; i < limit; i++) {
 		mercury_variable var;
 		mercury_getarray((mercury_array*)var_array.data.p, i, &var);
