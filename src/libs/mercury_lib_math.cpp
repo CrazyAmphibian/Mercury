@@ -256,7 +256,11 @@ void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_i
 	}
 	else {
 		mercury_popstack(M,&base);
-		if (base.type != M_TYPE_FLOAT) {
+		if (base.type == M_TYPE_INT) {
+			base.data.f = (mercury_float)base.data.i;
+			base.type = M_TYPE_FLOAT;
+		}
+		else if (base.type != M_TYPE_FLOAT) {
 			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, base.type, 2);
 			return;
 		}
@@ -300,7 +304,7 @@ void mercury_lib_math_to_absolute(mercury_state* const M_CPP_restrict M, const m
 	out.type = M_TYPE_FLOAT;
 
 	mercury_variable val;
-	val.constant = false;
+	mercury_popstack(M, &val);
 	if (val.type == M_TYPE_INT) {
 		out.type = M_TYPE_INT;
 		out.data.i =abs(val.data.i);
