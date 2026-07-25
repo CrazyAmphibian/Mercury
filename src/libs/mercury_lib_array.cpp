@@ -455,7 +455,7 @@ void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury
 	}
 
 	if (var_func.type == M_TYPE_CFUNC) {
-		qsort(tlist, arr_size, sizeof(mercury_variable*), (int (*)(const void*, const void*))(var_func.data.p) ); //be careful with C, dummy.
+		qsort(tlist, arr_size, sizeof(mercury_variable), (int (*)(const void*, const void*))(var_func.data.p) ); //be careful with C, dummy.
 	}
 	else {
 		SORTING_M_FUNCTION = (mercury_function*)var_func.data.p;
