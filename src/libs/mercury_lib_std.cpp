@@ -29,7 +29,7 @@ void mercury_lib_std_print(mercury_state* const M_CPP_restrict M, const mercury_
 
 	for (mercury_int a = 0; a < args_in; a++) {
 
-		mercury_stringliteral* mstrv = mercury_tostring(vartable+a);
+		mercury_string* mstrv = mercury_tostring(vartable+a);
 		mercury_free_var(vartable+a);
 		if (mstrv) {
 			for (mercury_int c = 0; c < mstrv->size; c++) {
@@ -327,12 +327,12 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 
 
 
-mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
-	mercury_stringliteral* str = nullptr;// mercury_cstring_to_mstring((char*)"", 0);
+mercury_string* m_stringify(mercury_rawdata data, uint8_t type) {
+	mercury_string* str = nullptr;// mercury_cstring_to_mstring((char*)"", 0);
 
 
-	mercury_stringliteral* temp = nullptr;
-	mercury_stringliteral* temp2 = nullptr;
+	mercury_string* temp = nullptr;
+	mercury_string* temp2 = nullptr;
 	char tout[256];
 	for (int i = 0; i < 256; i++) {
 		tout[i] = '\0';
@@ -371,9 +371,9 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 			for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 				mercury_subtable* st = t->data[i];
 				for (mercury_int n = 0; n < st->size; n++) {
-					mercury_stringliteral* key=m_stringify(st->keys[n].data,i);
+					mercury_string* key=m_stringify(st->keys[n].data,i);
 					mercury_variable v = st->values[n];
-					mercury_stringliteral* value=m_stringify(v.data, v.type);
+					mercury_string* value=m_stringify(v.data, v.type);
 
 					if (!key || !value) {
 						mercury_mstring_delete(key);
@@ -397,9 +397,9 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 		mercury_mstring_addchars(str, (char*)"}");
 		break;
 	case M_TYPE_STRING:
-		str = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+		str = (mercury_string*)malloc(sizeof(mercury_string));
 		if (str) {
-			mercury_stringliteral* cstr = (mercury_stringliteral*)data.p;
+			mercury_string* cstr = (mercury_string*)data.p;
 			mercury_int size_total_str = cstr->size;
 			for (mercury_int i = 0; i < cstr->size; i++) {
 				switch (cstr->ptr[i])
@@ -487,7 +487,7 @@ mercury_stringliteral* m_stringify(mercury_rawdata data, uint8_t type) {
 								temp = m_stringify(var.data, var.type);
 								if (!temp)continue;
 
-								mercury_stringliteral* temp2 = m_stringify({ index }, M_TYPE_INT);
+								mercury_string* temp2 = m_stringify({ index }, M_TYPE_INT);
 								mercury_mstrings_append(str, temp2);
 								mercury_mstring_delete(temp2);
 
@@ -539,9 +539,9 @@ void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_variable vartodump;
 	mercury_popstack(M,&vartodump);
 
-	mercury_stringliteral* dmp_str = m_stringify(vartodump.data, vartodump.type);
+	mercury_string* dmp_str = m_stringify(vartodump.data, vartodump.type);
 	if (!dmp_str) {
-		dmp_str = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+		dmp_str = (mercury_string*)malloc(sizeof(mercury_string));
 		if (!dmp_str) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
@@ -575,9 +575,9 @@ void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercur
 
 
 	mercury_variable out;
-	mercury_compile_mstring((mercury_stringliteral*)codestr.data.p, &out);
+	mercury_compile_mstring((mercury_string*)codestr.data.p, &out);
 	mercury_free_var(&codestr);
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 1, 1);
 }
@@ -611,7 +611,7 @@ void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercu
 
 	mercury_variable i;
 	mercury_popstack(M,&i);
-	mercury_stringliteral* l = mercury_tostring(&i);
+	mercury_string* l = mercury_tostring(&i);
 	mercury_free_var(&i); //we can just re-use the variable struct. saves time, probly
 	i.type = M_TYPE_STRING;
 	i.constant = 0;
@@ -645,7 +645,7 @@ void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercu
 		break;
 	case M_TYPE_STRING:
 		{
-		mercury_stringliteral* s = (mercury_stringliteral*)i.data.p;
+		mercury_string* s = (mercury_string*)i.data.p;
 		if (!s->size) {
 			o.type = M_TYPE_NIL;
 			o.data.i = 0;
@@ -694,7 +694,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 		return;
 	}
 
-	char* c=mercury_mstring_to_cstring((mercury_stringliteral*)i.data.p);
+	char* c=mercury_mstring_to_cstring((mercury_string*)i.data.p);
 
 	mercury_free_var(&i);
 

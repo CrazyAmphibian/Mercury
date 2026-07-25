@@ -243,7 +243,7 @@ inline unsigned char read_dec_string_as_num(char c1,char c2,char c3){
 	return out;
 }
 
-compiler_token** mercury_compile_tokenize_mstring(mercury_stringliteral* str,mercury_int* num_out){
+compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_int* num_out){
 	
 	*num_out = 0;
 
@@ -640,14 +640,14 @@ struct compiler_info {
 
 	//constant strings
 	mercury_int num_constants = 0;
-	mercury_stringliteral* constants = nullptr;
+	mercury_string* constants = nullptr;
 
 	//goto compiling. this is made difficult because we can have situations where we write goto before the label is defined. because the compiler is single pass, this is made a bit tricky, but not impossible. eg, goto a a:
 	mercury_int num_gotos = 0; //how many different goto labels are being used. eg, 2
 	mercury_int** goto_positions = nullptr; //where the goto keywords are in instruction space. eg, [1], [55,43,32]
 	mercury_int* goto_pos_count = nullptr; // how many gotos are present. eg, 1,3
 	bool* goto_defined = nullptr; //if the label is defined yet. eg, 0,1 
-	mercury_stringliteral* goto_alias = nullptr; //the string of the goto label. eg, "stuff","cancel"
+	mercury_string* goto_alias = nullptr; //the string of the goto label. eg, "stuff","cancel"
 	mercury_int* goto_labelpos = nullptr; //where the label is defined. eg, ?,50
 
 };
@@ -730,7 +730,7 @@ inline bool compiler_info_add_conditional_endjump(compiler_info* i,mercury_int i
 
 inline mercury_int compiler_info_add_constant_string_from_token(compiler_info* i,compiler_token* t){
 	for(mercury_int n=0;n<i->num_constants;n++){
-		mercury_stringliteral s=i->constants[n];
+		mercury_string s=i->constants[n];
 		if (s.size!=t->num_chars)continue;
 		for(mercury_int c=0;c<s.size;c++){
 			if(s.ptr[c]!=t->chars[c])goto exit;
@@ -739,10 +739,10 @@ inline mercury_int compiler_info_add_constant_string_from_token(compiler_info* i
 		exit:;
 	}
 	
-	mercury_stringliteral* nptr= (mercury_stringliteral*)realloc(i->constants,sizeof(mercury_stringliteral)*(i->num_constants+1) );
+	mercury_string* nptr= (mercury_string*)realloc(i->constants,sizeof(mercury_string)*(i->num_constants+1) );
 	if(!nptr)return -1; //surely nobody will use 4294967295 / 18446744073709551615 constants in their code, right?
 	i->constants=nptr;
-	mercury_stringliteral* nstr=i->constants+i->num_constants;
+	mercury_string* nstr=i->constants+i->num_constants;
 	nstr->size = t->num_chars;
 	nstr->ptr = t->chars;
 	i->num_constants++;
@@ -753,7 +753,7 @@ inline bool compiler_info_add_goto_jump(compiler_info* i,compiler_token* t,mercu
 	void* nptr;
 	
 	for(mercury_int n=0;n<i->num_gotos;n++){
-		mercury_stringliteral s=i->goto_alias[n];
+		mercury_string s=i->goto_alias[n];
 		if(s.size!=t->num_chars)continue;
 		for(mercury_int c=0;c<t->num_chars;c++){
 			if(t->chars[c]!=s.ptr[c])goto next;
@@ -781,9 +781,9 @@ inline bool compiler_info_add_goto_jump(compiler_info* i,compiler_token* t,mercu
 	if(!nptr)return false;
 	i->goto_defined=(bool*)nptr;	
 	
-	nptr=realloc(i->goto_alias, sizeof(mercury_stringliteral)*(i->num_gotos+1));
+	nptr=realloc(i->goto_alias, sizeof(mercury_string)*(i->num_gotos+1));
 	if(!nptr)return false;
-	i->goto_alias=(mercury_stringliteral*)nptr;
+	i->goto_alias=(mercury_string*)nptr;
 	
 	nptr=realloc(i->goto_labelpos, sizeof(mercury_int)*(i->num_gotos+1));
 	if(!nptr)return false;
@@ -795,7 +795,7 @@ inline bool compiler_info_add_goto_jump(compiler_info* i,compiler_token* t,mercu
 	i->goto_positions[i->num_gotos][0] = instruction_point;
 	i->goto_pos_count[i->num_gotos]=1;
 	i->goto_defined[i->num_gotos]=false;
-	mercury_stringliteral s;
+	mercury_string s;
 	s.ptr=t->chars;
 	s.size=t->num_chars;
 	i->goto_alias[i->num_gotos]=s;
@@ -810,7 +810,7 @@ inline bool compiler_info_add_goto_label(compiler_info* i,compiler_token* t,merc
 	void* nptr;
 
 	for(mercury_int n=0;n<i->num_gotos;n++){
-		mercury_stringliteral s=i->goto_alias[n];
+		mercury_string s=i->goto_alias[n];
 		if(s.size!=t->num_chars)continue;
 		for(mercury_int c=0;c<t->num_chars;c++){
 			if(t->chars[c]!=s.ptr[c])goto next;
@@ -835,9 +835,9 @@ inline bool compiler_info_add_goto_label(compiler_info* i,compiler_token* t,merc
 	if(!nptr)return false;
 	i->goto_defined=(bool*)nptr;	
 	
-	nptr=realloc(i->goto_alias, sizeof(mercury_stringliteral)*(i->num_gotos+1));
+	nptr=realloc(i->goto_alias, sizeof(mercury_string)*(i->num_gotos+1));
 	if(!nptr)return false;
-	i->goto_alias=(mercury_stringliteral*)nptr;
+	i->goto_alias=(mercury_string*)nptr;
 	
 	nptr=realloc(i->goto_labelpos, sizeof(mercury_int)*(i->num_gotos+1));
 	if(!nptr)return false;
@@ -846,7 +846,7 @@ inline bool compiler_info_add_goto_label(compiler_info* i,compiler_token* t,merc
 	i->goto_positions[i->num_gotos]=nullptr;
 	i->goto_pos_count[i->num_gotos]=0;
 	i->goto_defined[i->num_gotos]=true;
-	mercury_stringliteral s;
+	mercury_string s;
 	s.ptr=t->chars;
 	s.size=t->num_chars;
 	i->goto_alias[i->num_gotos]=s;
@@ -2258,7 +2258,7 @@ compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens,me
 		}
 		compiler_function* con_app = new_compiler_function();
 		for (mercury_int i = 0; i < ci->num_constants; i++) {
-			mercury_stringliteral s = ci->constants[i];
+			mercury_string s = ci->constants[i];
 			add_string_onto_stack(con_app, s.ptr, s.size, 0);
 			add_instruction(con_app, M_OPCODE_SCON, 0);
 			add_rawdata_bitwidth_size(con_app, i, 0);
@@ -2271,7 +2271,7 @@ compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens,me
 }
 
 
-void mercury_compile_mstring(mercury_stringliteral* str, mercury_variable* out, bool remove_debug_info){
+void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool remove_debug_info){
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
 	out->constant = 0;

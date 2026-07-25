@@ -69,15 +69,11 @@ struct mercury_variable {
 	mercury_rawdata data;
 };
 
-struct mercury_stringliteral {
+struct mercury_string {
 	mercury_int size=0;
+	mercury_uint refrences = 0;
 	char* ptr = nullptr;
 	bool constant = false; //if true, ptr points to another char*, and so we should not free it. optimization to reduce malloc calls.
-};
-
-struct mercury_stringrefrence {
-	mercury_int refrencecount = 0;
-	mercury_stringliteral* string = nullptr;
 };
 
 struct mercury_subtable {
@@ -275,16 +271,16 @@ extern mercury_int M_NUM_LIBS;
 //functions defined in the .cpp
 
 //string
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
-MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(const mercury_stringliteral* const M_CPP_restrict str);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstrings_concat(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2);
-MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_stringliteral* const M_CPP_restrict str);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_mstring_substring(mercury_stringliteral* str, mercury_int start, mercury_int end);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_tostring(const mercury_variable* const M_CPP_restrict var);
-MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_append(mercury_stringliteral* const basestr, const mercury_stringliteral* const appstr);
-MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_addchars(mercury_stringliteral* const M_CPP_restrict str, const char* const chars, const mercury_int len=1);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_copystring(const mercury_stringliteral* const M_CPP_restrict str);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_cstring_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
+MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(const mercury_string* const M_CPP_restrict str);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_mstrings_concat(const mercury_string* const str1, const mercury_string* const str2);
+MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_string* const M_CPP_restrict str);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_mstring_substring(mercury_string* str, mercury_int start, mercury_int end);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_tostring(const mercury_variable* const M_CPP_restrict var);
+MERCURY_DYNAMIC_LIBRARY bool mercury_mstrings_append(mercury_string* const basestr, const mercury_string* const appstr);
+MERCURY_DYNAMIC_LIBRARY bool mercury_mstring_addchars(mercury_string* const M_CPP_restrict str, const char* const chars, const mercury_int len=1);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_copystring(const mercury_string* const M_CPP_restrict str);
 
 //table
 MERCURY_DYNAMIC_LIBRARY mercury_table* mercury_newtable();
@@ -296,7 +292,7 @@ MERCURY_DYNAMIC_LIBRARY mercury_int mercury_tablehaskey(const mercury_table* con
 MERCURY_DYNAMIC_LIBRARY void mercury_destroytable(mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY void mercury_cleartable(const mercury_table* const table);
 MERCURY_DYNAMIC_LIBRARY bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out);
-MERCURY_DYNAMIC_LIBRARY bool mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value);
+MERCURY_DYNAMIC_LIBRARY mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value);
 MERCURY_DYNAMIC_LIBRARY mercury_int mercury_table_has_cstring_key(const mercury_table* const table, const char* const key);
 MERCURY_DYNAMIC_LIBRARY void mercury_prepare_table_for_state(mercury_table* table, mercury_state* M);
 
@@ -333,8 +329,8 @@ MERCURY_DYNAMIC_LIBRARY bool mercury_vars_equal(const mercury_variable* const va
 MERCURY_DYNAMIC_LIBRARY bool mercury_register_library(void* data, char* key, char* table, uint8_t type=M_TYPE_CFUNC);
 MERCURY_DYNAMIC_LIBRARY void mercury_populate_enviroment_with_libs(mercury_state* M);
 
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_debug(mercury_function* F);
-MERCURY_DYNAMIC_LIBRARY mercury_stringliteral* mercury_get_bytecode_rawbinary_debug(mercury_function* F);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_get_bytecode_debug(mercury_function* F);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_get_bytecode_rawbinary_debug(mercury_function* F);
 MERCURY_DYNAMIC_LIBRARY void mercury_debugdumptable(mercury_table* tab, int level = 0);
 
 //inlines, for SPEED
@@ -354,6 +350,9 @@ inline void mercury_discard_top_of_stack(mercury_state* const M_CPP_restrict M) 
 
 inline void mercury_increment_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
+	case M_TYPE_STRING:
+		((mercury_string*)var->data.p)->refrences++;
+		return;
 	case M_TYPE_TABLE:
 		((mercury_table*)var->data.p)->refrences++;
 		return;
@@ -373,6 +372,9 @@ inline void mercury_increment_variable_refrence_count(const mercury_variable* co
 }
 inline void mercury_decrement_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
+	case M_TYPE_STRING:
+		((mercury_string*)var->data.p)->refrences--;
+		return;
 	case M_TYPE_TABLE:
 		((mercury_table*)var->data.p)->refrences--;
 		return;
@@ -406,7 +408,7 @@ inline mercury_state* mercury_get_child_state(mercury_state* const M_CPP_restric
 }
 
 
-inline bool mercury_mstrings_equal(const mercury_stringliteral* const str1, const mercury_stringliteral* const str2) {
+inline bool mercury_mstrings_equal(const mercury_string* const str1, const mercury_string* const str2) {
 
 	if (str1->size != str2->size) {
 		return false;
@@ -422,7 +424,7 @@ inline bool mercury_mstrings_equal(const mercury_stringliteral* const str1, cons
 	return true;
 }
 
-inline bool mercury_mstring_equal_cstring(const mercury_stringliteral* const mstr, const char* const cstr) {
+inline bool mercury_mstring_equal_cstring(const mercury_string* const mstr, const char* const cstr) {
 	if (mstr->ptr == cstr)return true;
 	if (strlen(cstr) != mstr->size)return false;
 	for (mercury_int i = 0; i < mstr->size; i++) {

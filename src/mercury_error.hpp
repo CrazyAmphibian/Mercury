@@ -21,7 +21,7 @@ enum M_ERROR_TYPES:uint32_t {
 	M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE,//args: provided, arg number. for functions that can take arrays or tables.
 };
 
-mercury_stringliteral* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1 = nullptr, const mercury_int* data2 = nullptr, const mercury_int* data3 = nullptr);
+mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1 = nullptr, const mercury_int* data2 = nullptr, const mercury_int* data3 = nullptr);
 void mercury_raise_error(mercury_state* M, const uint32_t errorcode, const mercury_int* data1 = nullptr, const mercury_int* data2 = nullptr, const mercury_int* data3 = nullptr);
 
 

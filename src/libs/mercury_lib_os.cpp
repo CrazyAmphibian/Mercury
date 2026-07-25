@@ -36,7 +36,7 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, cvar.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* code = (mercury_stringliteral*)cvar.data.p;
+	mercury_string* code = (mercury_string*)cvar.data.p;
 
 	char* c_code = (char*)malloc(sizeof(char) * (code->size + 1));
 	if (!c_code) {
@@ -112,7 +112,7 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, cvar.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* code = (mercury_stringliteral*)cvar.data.p;
+	mercury_string* code = (mercury_string*)cvar.data.p;
 
 	char* c_code = (char*)malloc(sizeof(char) * (code->size + 1));
 	if (!c_code) {

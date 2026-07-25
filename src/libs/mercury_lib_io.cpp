@@ -52,8 +52,8 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_variable out;
 	out.constant = false;
 
-	char* file = mercury_mstring_to_cstring((mercury_stringliteral*)file_var.data.p);
-	const char* mode = mercury_mstring_to_cstring((mercury_stringliteral*)mode_var.data.p);
+	char* file = mercury_mstring_to_cstring((mercury_string*)file_var.data.p);
+	const char* mode = mercury_mstring_to_cstring((mercury_string*)mode_var.data.p);
 	int mode_l = (int)strlen(mode);
 
 	if (mode_l == 1) {
@@ -173,7 +173,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 				}
 				rewind(F);
 				fread(s, 1, len, F);
-				mercury_stringliteral* str = (mercury_stringliteral*)malloc(sizeof(mercury_stringliteral));
+				mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
 				if (!str) {
 					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
@@ -240,7 +240,7 @@ void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_i
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_FILE, 1);
 		return;
 	}
-	mercury_stringliteral* str = (mercury_stringliteral*)data_var.data.p;
+	mercury_string* str = (mercury_string*)data_var.data.p;
 	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;
 
 	if (fw->open) {
@@ -268,7 +268,7 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 		return;
 	}
 
-	mercury_stringliteral* mstr = (mercury_stringliteral*)dir_var.data.p;
+	mercury_string* mstr = (mercury_string*)dir_var.data.p;
 	if (mstr->size == 0) {
 		mercury_mstring_addchars(mstr, (char*)"*", 1);
 	}
@@ -291,7 +291,7 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 		while (true) {
 			if (!(FindFileData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DEVICE) )) {
 				char* fn = FindFileData.cFileName;
-				mercury_stringliteral* s = mercury_cstring_to_mstring(fn, strlen(fn));
+				mercury_string* s = mercury_cstring_to_mstring(fn, strlen(fn));
 				if (!s) {
 					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
@@ -316,7 +316,7 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 			ent = readdir(d);
 			if (!ent)break;
 			if (ent->d_type == DT_REG) {
-				mercury_stringliteral* s = mercury_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
+				mercury_string* s = mercury_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
 				if (!s) {
 					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
@@ -355,7 +355,7 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 		return;
 	}
 
-	mercury_stringliteral* mstr = (mercury_stringliteral*)dir_var.data.p;
+	mercury_string* mstr = (mercury_string*)dir_var.data.p;
 	if (mstr->size == 0) {
 		mercury_mstring_addchars(mstr, (char*)"*", 1);
 	}
@@ -379,7 +379,7 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 		while (true) {
 			if ((FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && strcmp(FindFileData.cFileName,".") && strcmp(FindFileData.cFileName, "..")) {
 				char* fn = FindFileData.cFileName;
-				mercury_stringliteral* s = mercury_cstring_to_mstring(fn, strlen(fn));
+				mercury_string* s = mercury_cstring_to_mstring(fn, strlen(fn));
 				if (!s) {
 					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
@@ -404,7 +404,7 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 			ent = readdir(d);
 			if (!ent)break;
 			if (ent->d_type == DT_DIR && strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")) {
-				mercury_stringliteral* s = mercury_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
+				mercury_string* s = mercury_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
 				if (!s) {
 					mercury_raise_error(M, M_ERROR_ALLOCATION);
 					return;
@@ -467,7 +467,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 			int c=fgetc(f);
 			if (c == '\n' || c == '\r' || c==EOF) {
 				if (cbuf) {
-					mercury_stringliteral* s= mercury_cstring_to_mstring(buf,cbuf);
+					mercury_string* s= mercury_cstring_to_mstring(buf,cbuf);
 					if (!s) {
 						mercury_raise_error(M, M_ERROR_ALLOCATION);
 						return;
@@ -524,7 +524,7 @@ void mercury_lib_io_post(mercury_state* const M_CPP_restrict M, const mercury_in
 		return;
 	}
 
-	mercury_stringliteral* s = (mercury_stringliteral*)str_var.data.p;
+	mercury_string* s = (mercury_string*)str_var.data.p;
 	for (mercury_int c = 0; c < s->size; c++) {
 		putchar(s->ptr[c]);
 	}
@@ -563,7 +563,7 @@ void mercury_lib_io_prompt(mercury_state* const M_CPP_restrict M, const mercury_
 	}
 
 	if (args_out) {
-		mercury_stringliteral* s=mercury_cstring_to_mstring(c, len);
+		mercury_string* s=mercury_cstring_to_mstring(c, len);
 		if (!s) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
@@ -593,7 +593,7 @@ void mercury_lib_io_remove(mercury_state* const M_CPP_restrict M, const mercury_
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* fst = (mercury_stringliteral*)dir_var.data.p;
+	mercury_string* fst = (mercury_string*)dir_var.data.p;
 
 	char* cfilestr=mercury_mstring_to_cstring(fst);
 
@@ -626,7 +626,7 @@ void mercury_lib_io_removedir(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* fst = (mercury_stringliteral*)dir_var.data.p;
+	mercury_string* fst = (mercury_string*)dir_var.data.p;
 
 	char* cfilestr = mercury_mstring_to_cstring(fst);
 
@@ -665,7 +665,7 @@ void mercury_lib_io_createdir(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
 		return;
 	}
-	mercury_stringliteral* fst = (mercury_stringliteral*)dir_var.data.p;
+	mercury_string* fst = (mercury_string*)dir_var.data.p;
 
 	char* cfilestr = mercury_mstring_to_cstring(fst);
 #if defined(_WIN32) || defined(_WIN64)
@@ -722,7 +722,7 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 	//mercury_free_var(ck);
 
 	if (args_out) {
-		mercury_stringliteral* s = mercury_cstring_to_mstring(&c, 1);
+		mercury_string* s = mercury_cstring_to_mstring(&c, 1);
 		if (!s) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
