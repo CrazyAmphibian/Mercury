@@ -620,8 +620,8 @@ int mercury_sort_alphabet_az(const void* a, const void* b) {
 	const char* string_b = str_b->ptr;
 
 	for (mercury_int c = 0; c < size; c++) {
-		char a = c > s_a ? -1: string_a[c];
-		char b = c > s_b ? -1 : string_b[c];
+		short a = c > s_a ? -1 : string_a[c];
+		short b = c > s_b ? -1 : string_b[c];
 		if (a > b) {
 			return 1;
 		} else if (b > a) {
@@ -655,8 +655,8 @@ int mercury_sort_alphabet_za(const void* a, const void* b) {
 	const char* string_b = str_b->ptr;
 
 	for (mercury_int c = 0; c < size; c++) {
-		char a = c > s_a ? -1 : string_a[c];
-		char b = c > s_b ? -1 : string_b[c];
+		short a = c > s_a ? -1 : string_a[c];
+		short b = c > s_b ? -1 : string_b[c];
 		if (a > b) {
 			return -1;
 		}
