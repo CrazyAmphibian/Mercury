@@ -211,9 +211,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					
 				}
 				else {
-					mercury_pushstack_unrefed(SubM, &k);
-					mercury_pushstack_unrefed(SubM, &v);
 					mercury_pushstack(SubM, &listlike);
+					mercury_pushstack_unrefed(SubM, &v);
+					mercury_pushstack_unrefed(SubM, &k);
 					
 					while (mercury_stepstate(SubM));
 					SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
