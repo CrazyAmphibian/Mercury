@@ -269,12 +269,18 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 	}
 
 	mercury_string* mstr = (mercury_string*)dir_var.data.p;
+#ifdef _WIN32
 	if (mstr->size == 0) {
 		mercury_mstring_addchars(mstr, (char*)"*", 1);
 	}
 	else {
 		mercury_mstring_addchars(mstr, (char*)"/*", 2);
 	}
+#else
+	if (mstr->size == 0) {
+		mercury_mstring_addchars(mstr, (char*)".", 1);
+	}
+#endif
 	char* dir = mercury_mstring_to_cstring(mstr);
 	
 	mercury_array* arr=mercury_newarray();
@@ -282,7 +288,7 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_int num_fs = 0;
 
 
-#if defined(_WIN32) || defined(_WIN64) //windows
+#ifdef _WIN32 //windows
 	WIN32_FIND_DATAA FindFileData;
 	HANDLE hFind;
 
@@ -356,12 +362,18 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 	}
 
 	mercury_string* mstr = (mercury_string*)dir_var.data.p;
+#ifdef _WIN32
 	if (mstr->size == 0) {
 		mercury_mstring_addchars(mstr, (char*)"*", 1);
 	}
 	else {
 		mercury_mstring_addchars(mstr, (char*)"/*", 2);
 	}
+#else
+	if (mstr->size == 0) {
+		mercury_mstring_addchars(mstr, (char*)".", 1);
+	}
+#endif
 	char* dir = mercury_mstring_to_cstring(mstr);
 
 	
@@ -370,7 +382,7 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_int num_fs = 0;
 
 
-#if defined(_WIN32) || defined(_WIN64) //windows
+#ifdef _WIN32 //windows
 	WIN32_FIND_DATAA FindFileData;
 	HANDLE hFind;
 
