@@ -48,7 +48,7 @@ void mercury_lib_debug_stack_dbg(mercury_state* const M_CPP_restrict M, const me
 			typestr = "thread";
 			break;
 		}
-		printf("\t[%zu] = (%s%s %hhu) = i:%zi f:%f p:%p \n",i,v.constant ? "<CONSTANT> " : " ", typestr, v.type, v.data.i,v.data.f,v.data.p);
+		printf("\t[%zu] = (%s %hhu) = i:%zi f:%f p:%p \n",i, typestr, v.type, v.data.i,v.data.f,v.data.p);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);

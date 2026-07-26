@@ -31,7 +31,6 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < argc; i++) {
 		mercury_variable av;
 		av.type = M_TYPE_STRING;
-		av.constant = false;
 		av.data.p = mercury_cstring_to_mstring(argv[i], strlen(argv[i]));
 		mercury_setarray(arg_arr, &av, i);
 		
@@ -110,7 +109,6 @@ int main(int argc, char** argv) {
 	mercury_state* M=mercury_newstate();
 
 	mercury_variable at_v;
-	at_v.constant = false;
 	at_v.type = M_TYPE_ARRAY;
 	at_v.data.p = arg_arr;
 	mercury_table_set_cstring_keyvalue(M->enviroment,"_ARGS",&at_v);

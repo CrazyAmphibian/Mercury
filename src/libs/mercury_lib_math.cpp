@@ -10,7 +10,7 @@
 void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (!args_out)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = INFINITY;
 	out.type = M_TYPE_FLOAT;	
 
@@ -60,7 +60,7 @@ void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_i
 void mercury_lib_math_max(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = -INFINITY;
 	out.type = M_TYPE_FLOAT;
 
@@ -112,7 +112,7 @@ void mercury_lib_math_floor(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.i = 0;
 	out.type = M_TYPE_INT;
 
@@ -143,7 +143,7 @@ void mercury_lib_math_ceil(mercury_state* const M_CPP_restrict M, const mercury_
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0;
 	out.type = M_TYPE_INT;
 
@@ -175,7 +175,7 @@ void mercury_lib_math_to_radians(mercury_state* const M_CPP_restrict M, const me
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -208,7 +208,7 @@ void mercury_lib_math_to_degrees(mercury_state* const M_CPP_restrict M, const me
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -242,7 +242,7 @@ void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_i
 	if (!args_out)return;
 
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -299,7 +299,7 @@ void mercury_lib_math_to_absolute(mercury_state* const M_CPP_restrict M, const m
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -337,7 +337,7 @@ void mercury_lib_math_to_sin(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -369,7 +369,7 @@ void mercury_lib_math_to_cos(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -402,7 +402,7 @@ void mercury_lib_math_to_tan(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -434,7 +434,7 @@ void mercury_lib_math_to_asin(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -466,7 +466,7 @@ void mercury_lib_math_to_acos(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -499,7 +499,7 @@ void mercury_lib_math_to_atan(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -531,7 +531,7 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 	}
 	if (args_out < 1)return;
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.f = 0.0;
 	out.type = M_TYPE_FLOAT;
 
@@ -642,7 +642,7 @@ void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercur
 
 
 	mercury_variable out;
-	out.constant = false;
+	
 	out.type = M_TYPE_FLOAT;
 	if (!args_in) {
 		out.data.f = f;
@@ -702,7 +702,7 @@ void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mer
 
 
 	mercury_variable out;
-	out.constant = false;
+	
 	out.type = M_TYPE_INT;
 
 	mercury_int min = v1.data.i;
@@ -729,7 +729,6 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 	if (!args_in) {
 		if (args_out) {
 			mercury_variable o;
-			o.constant = false;
 			o.type = M_TYPE_INT;
 			o.data.u = M_RANDOM_STATE;
 			mercury_pushstack(M,&o);
@@ -763,9 +762,9 @@ void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury
 	if (args_out < 1)return;
 
 	mercury_variable out;
-	out.constant = false;
+	
 	out.data.i = 0;
-	out.constant = false;
+	
 	out.type = M_TYPE_BOOL;
 
 	mercury_variable val;

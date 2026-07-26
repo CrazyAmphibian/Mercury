@@ -261,7 +261,6 @@ bool mercury_getkey(const mercury_table* const table, mercury_variable* const ke
 		}
 	}
 	mercury_free_var(key);
-	out->constant = false;
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
 	return false;
@@ -325,7 +324,6 @@ bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const 
 			return true;
 		}
 	}
-	out->constant = false;
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
 	return false;
@@ -349,7 +347,6 @@ mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const
 	subt->values = (mercury_variable*)nptr;
 
 	mercury_variable kv;
-	kv.constant = 0;
 	kv.type = M_TYPE_STRING;
 	kv.data.p = mercury_cstring_const_to_mstring(key,strlen(key));
 	subt->keys[subt->size] = kv;
@@ -371,7 +368,6 @@ mercury_int mercury_table_has_cstring_key(const mercury_table* const table, cons
 
 void mercury_prepare_table_for_state(mercury_table* table,mercury_state* M) {
 	mercury_variable v;
-	v.constant = false;
 
 	v.type = M_TYPE_TABLE;
 	v.data.p = table;
@@ -533,7 +529,6 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 
 	for (mercury_uint i = 0; i < M->num_constants; i++) {
 		mercury_variable v = M->constants[i];
-		v.constant = 0;
 		mercury_free_var(&v);
 	}
 	M->num_constants = 0;
@@ -567,8 +562,6 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 
 
 void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
-	if (var->constant)return;
-
 	switch (var->type)
 	{
 	case M_TYPE_TABLE:
@@ -662,7 +655,6 @@ void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* o
 	if (M->sizeofstack==0) {
 		out->type = M_TYPE_NIL;
 		out->data.i = 0;
-		out->constant = false;
 	}
 	M->sizeofstack--;
 	*out=  M->stack[M->sizeofstack];
@@ -673,7 +665,6 @@ void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 	if (M->sizeofstack == 0) {
 		out->type = M_TYPE_NIL;
 		out->data.i = 0;
-		out->constant = false;
 		return;
 	}
 
@@ -751,7 +742,6 @@ bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_va
 
 void mercury_clonevariable(const mercury_variable* const var, mercury_variable* out) {
 	out->type = var->type;
-	out->constant = var->constant;
 	switch (out->type) {
 		case M_TYPE_STRING:
 			//out->data.p = mercury_copystring((mercury_string*)var->data.p);
@@ -995,7 +985,6 @@ void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury
 	}
 #endif
 	no_index:
-	out->constant = false;
 	out->data.i = 0;
 	out->type = M_TYPE_NIL;
 }
@@ -1590,7 +1579,6 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 		
 		mercury_variable v;
 		v.type = lib->type;
-		v.constant = false;
 		switch (lib->type)
 		{
 		case M_TYPE_FLOAT:
@@ -1612,19 +1600,20 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 
 		if (lib->table) {
 			mercury_variable k;
-			k.constant = false;
 			k.type = M_TYPE_STRING;
-			k.data.p = mercury_cstring_to_mstring((char*)lib->key, strlen(lib->key));
+			k.data.p = mercury_cstring_to_mstring(lib->key, strlen(lib->key));
 			if (!k.data.p)continue;
 
 			mercury_variable tidx;
 			tidx.type = M_TYPE_STRING;
-			tidx.constant = true;
-			tidx.data.p = mercury_cstring_to_mstring((char*)lib->table, strlen(lib->table));
+			mercury_string* tidxstr= mercury_cstring_to_mstring(lib->table, strlen(lib->table));
+			tidxstr->refrences++;
+			tidx.data.p = tidxstr;
 			mercury_variable t;
 			mercury_getkey(M->enviroment, &tidx,&t);
 
 			if (t.type == M_TYPE_TABLE) {
+				mercury_free_var(&tidx);
 				mercury_setkey((mercury_table*)t.data.p,&k,&v);
 			}
 			else {
@@ -1633,7 +1622,6 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 				mercury_setkey(nt, &k, &v);
 
 				mercury_variable vv;
-				vv.constant = false;
 				vv.type = M_TYPE_TABLE;
 				vv.data.p = nt;
 
@@ -1644,7 +1632,6 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 		}
 		else {
 			mercury_variable k;
-			k.constant = false;
 			k.type = M_TYPE_STRING;
 			k.data.p = mercury_cstring_to_mstring((char*)lib->key,strlen(lib->key) );
 

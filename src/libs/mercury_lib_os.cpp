@@ -20,7 +20,7 @@ void mercury_lib_os_time(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_int t=time(NULL);
 	out.type = M_TYPE_INT;
 	out.data.i = t;
-	out.constant = false;
+	
 
 	mercury_pushstack(M, &out);
 
@@ -95,7 +95,6 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 
 	mercury_free_var(&cvar);
 	cvar.type = M_TYPE_STRING;
-	cvar.constant = false;
 	cvar.data.p= mercury_cstring_const_to_mstring(out_c, size_c);
 	mercury_pushstack(M, &cvar);
 
@@ -136,7 +135,6 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_free_var(&cvar);
 	cvar.type = M_TYPE_INT;
 	cvar.data.i = r;
-	cvar.constant = false;
 	mercury_pushstack(M, &cvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -154,7 +152,7 @@ void mercury_lib_os_clock(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_float t = ((mercury_float)clock()) / CLOCKS_PER_SEC;
 	out.type = M_TYPE_FLOAT;
 	out.data.f = t;
-	out.constant = false;
+	
 
 	mercury_pushstack(M, &out);
 
@@ -197,7 +195,6 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 
 
 	mercury_variable kvar;
-	kvar.constant = false;
 	kvar.type = M_TYPE_INT;
 	kvar.data.i = timedata.tm_sec;
 	mercury_table_set_cstring_keyvalue(outt, "seconds", &kvar);
@@ -248,7 +245,6 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_table_set_cstring_keyvalue(outt, "dayofyear", &kvar);
 
 	mercury_variable outv;
-	outv.constant = false;
 	outv.type = M_TYPE_TABLE;
 	outv.data.p = outt;
 	mercury_pushstack(M, &outv);
@@ -320,7 +316,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_free_var(&var);
 
 	mercury_variable out;
-	out.constant = false;
+	
 	out.type = M_TYPE_INT;
 #ifdef WIN32
 	out.data.i= _mkgmtime(&timedata); //why in the world does mktime use your local timezone? bad. stupid. uuuuuugh.

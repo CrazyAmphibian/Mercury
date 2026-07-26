@@ -2274,7 +2274,6 @@ compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens,me
 void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool remove_debug_info){
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
-	out->constant = 0;
 	
 	mercury_int num_tokens;
 	compiler_token** tokens = mercury_compile_tokenize_mstring(str,&num_tokens);

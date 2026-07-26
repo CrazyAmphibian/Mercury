@@ -35,7 +35,7 @@ void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury
 
 	mercury_string* os=mercury_mstring_substring((mercury_string*)var_string.data.p, var_start.data.i, var_end.data.i);
 	mercury_variable out;
-	out.constant = false;
+	
 	out.type = M_TYPE_STRING;
 	out.data.p = os;
 
@@ -79,7 +79,7 @@ void mercury_lib_string_reverse(mercury_state* const M_CPP_restrict M, const mer
 	os->size = str->size;
 
 	mercury_variable out;
-	out.constant = false;
+	
 	out.type = M_TYPE_STRING;
 	out.data.p = os;
 
@@ -140,7 +140,7 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 	}
 
 	mercury_variable out;
-	out.constant = false;
+	
 
 	if (located_at != -1) {
 		out.type = M_TYPE_INT;
@@ -156,7 +156,7 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 	//second one is end char.
 	if (args_out > 1) {
 		mercury_variable out2;
-		out2.constant = false;
+		
 
 		if (located_at != -1) {
 			out2.type = M_TYPE_INT;
@@ -255,7 +255,7 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 	mercury_free_var(&replace_var);
 
 	mercury_variable out;
-	out.constant = false;
+	
 	out.type = M_TYPE_STRING;
 	out.data.p = outstr;
 
@@ -263,7 +263,7 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 
 	if (args_out > 1) {
 		mercury_variable out2;
-		out2.constant = false;
+		
 		out2.type = M_TYPE_INT;
 		out2.data.i = replacments;
 		mercury_pushstack(M, &out2);
@@ -314,7 +314,7 @@ void mercury_lib_string_count(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_free_var(&str_var);
 	mercury_free_var(&search_var);
 
-	search_var.constant = false;
+	
 	search_var.type = M_TYPE_INT;
 	search_var.data.i = replacments;
 
@@ -352,7 +352,7 @@ void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mer
 	}
 
 	mercury_free_var(&str_var); //re use
-	str_var.constant = false;
+	
 	str_var.type = M_TYPE_ARRAY;
 	str_var.data.p = arr;
 	mercury_pushstack(M, &str_var);
@@ -401,7 +401,7 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 	}
 
 	mercury_free_var(&str_var);
-	str_var.constant = false;
+	
 	str_var.type = M_TYPE_STRING;
 	str_var.data.p = st;
 	mercury_pushstack(M, &str_var);
@@ -484,7 +484,7 @@ void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const me
 	mercury_free_var(&sep_var);
 	mercury_free_var(&str_var);
 	
-	sep_var.constant = false;
+	
 	sep_var.type = M_TYPE_ARRAY;
 	sep_var.data.p = arr;
 	mercury_pushstack(M, &sep_var);
@@ -533,7 +533,7 @@ void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercu
 	os->size = str->size;
 
 	mercury_free_var(&var_string);
-	var_string.constant = false;
+	
 	var_string.type = M_TYPE_STRING;
 	var_string.data.p = os;
 
@@ -582,7 +582,7 @@ void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercu
 	os->size = str->size;
 
 	mercury_free_var(&var_string);
-	var_string.constant = false;
+	
 	var_string.type = M_TYPE_STRING;
 	var_string.data.p = os;
 
@@ -1022,7 +1022,7 @@ void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const merc
 	free(var_t);
 
 	mercury_free_var(&strvar);
-	strvar.constant = false;
+	
 	strvar.type = M_TYPE_STRING;
 	strvar.data.p = outstr; //mercury_cstring_to_mstring(buffer, cc);
 	mercury_pushstack(M, &strvar);
@@ -1518,8 +1518,8 @@ void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const merc
 	
 	mercury_free_var(&searchforvar);
 	mercury_free_var(&strvar);
-	searchforvar.constant = false;
-	strvar.constant = false;
+	
+	
 
 
 	if (found) {
@@ -1594,7 +1594,7 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 	mercury_free_var(&strvar);
 	mercury_free_var(&matchvar);
 
-	matchvar.constant = false;
+	
 	matchvar.type = M_TYPE_ARRAY;
 	matchvar.data.p = arr;
 	mercury_pushstack(M,&matchvar);
@@ -1680,7 +1680,7 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 	mercury_free_var(&matchvar);
 	mercury_free_var(&repvar);
 	mercury_free_var(&strvar);
-	matchvar.constant = false;
+	
 	matchvar.type = M_TYPE_STRING;
 	matchvar.data.p = outstr;
 	mercury_pushstack(M, &matchvar);
@@ -1729,7 +1729,7 @@ void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mer
 
 	mercury_free_var(&strvar);
 	mercury_free_var(&matchvar);
-	matchvar.constant = false;
+	
 	matchvar.type = M_TYPE_INT;
 	matchvar.data.i = count;
 	mercury_pushstack(M, &matchvar);
@@ -1779,7 +1779,7 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 	}
 
 	mercury_free_var(&instr);
-	instr.constant = false;
+	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
 	mercury_pushstack(M, &instr);
@@ -1846,7 +1846,7 @@ void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const 
 	}
 
 	mercury_free_var(&instr);
-	instr.constant = false;
+	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
 	mercury_pushstack(M, &instr);
@@ -1929,7 +1929,7 @@ void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const me
 	}
 
 	mercury_free_var(&instr);
-	instr.constant = false;
+	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
 	mercury_pushstack(M, &instr);
@@ -1987,7 +1987,7 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 	}
 
 	mercury_free_var(&instr);
-	instr.constant = false;
+	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
 	mercury_pushstack(M, &instr);

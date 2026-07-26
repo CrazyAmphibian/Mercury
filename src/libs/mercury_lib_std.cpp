@@ -123,7 +123,6 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 							mercury_clonevariable(&var,&v);
 
 							mercury_variable idxvar;
-							idxvar.constant = false;
 							idxvar.data.i = index;
 							idxvar.type = M_TYPE_INT;
 
@@ -551,7 +550,6 @@ void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_i
 	}
 
 	mercury_free_var(&vartodump);
-	vartodump.constant = false;
 	vartodump.type = M_TYPE_STRING;
 	vartodump.data.p = dmp_str;
 	mercury_pushstack(M, &vartodump);
@@ -594,7 +592,6 @@ void mercury_lib_std_type(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_free_var(&var);
 	var.data.i = var.type;
 	var.type = M_TYPE_INT;
-	var.constant = false;
 	mercury_pushstack(M, &var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -614,7 +611,6 @@ void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_string* l = mercury_tostring(&i);
 	mercury_free_var(&i); //we can just re-use the variable struct. saves time, probly
 	i.type = M_TYPE_STRING;
-	i.constant = 0;
 	i.data.p = l;
 	mercury_pushstack(M, &i);
 
@@ -631,7 +627,6 @@ void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable i;
 	mercury_popstack(M,&i);
 	mercury_variable o;
-	o.constant = false;
 
 	switch (i.type) {
 	case M_TYPE_INT:
@@ -699,7 +694,6 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 	mercury_free_var(&i);
 
 	mercury_variable o;
-	o.constant = false;
 	o.type = M_TYPE_BOOL;
 	
 

@@ -110,7 +110,6 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	
 	mercury_variable out;
-	out.constant = false;
 	out.data.i = 0;
 	out.type = M_TYPE_NIL;
 	
@@ -182,7 +181,6 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 	}
 
 	mercury_variable out;
-	out.constant = false;
 	out.type = M_TYPE_BOOL;
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 1 : 0;
 
@@ -272,7 +270,6 @@ void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, cons
 	mercury_threadholder* t = (mercury_threadholder*)in.data.p;
 
 	mercury_variable out;
-	out.constant = false;
 	out.type = M_TYPE_INT;
 	out.data.i = 0;
 
@@ -329,7 +326,6 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 	}
 
 	mercury_variable out;
-	out.constant=false;
 	out.type = M_TYPE_BOOL;
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 0 : 1;
 

@@ -65,7 +65,6 @@ union mercury_rawdata { //to represent stored binary data of almost any type.
 
 struct mercury_variable {
 	uint8_t type = 0;
-	uint8_t constant = 0;
 	mercury_rawdata data;
 };
 
@@ -337,7 +336,6 @@ MERCURY_DYNAMIC_LIBRARY void mercury_clone_function(mercury_function* in, mercur
 
 //inlines, for SPEED
 inline void mercury_clear_variable(mercury_variable* var) {
-	var->constant = false;
 	var->data.i = 0;
 	var->type = M_TYPE_NIL;
 }
