@@ -11,7 +11,7 @@ iterate(io.getfiles(""),function(i,v,a)
 	if type(r)==TYPE_FUNCTION then
 		local fr=r()
 		if fr then
-			io.post(string.format("script %s encountered an error while running and returned %s",v,fr) )
+			io.post(string.format("script %s encountered an error while running and returned %s\n",v,fr) )
 		else
 			passes++
 		end
