@@ -645,7 +645,7 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 			if (t->customenv) {
 				t->state->enviroment = nullptr;
 			}
-			t->state->bytecode.instructions = nullptr;
+			//t->state->bytecode.instructions = nullptr;
 			mercury_destroystate(t->state);
 			free(t);
 		}
@@ -1338,6 +1338,23 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 	}
 
 
+}
+
+void mercury_clone_function(mercury_function* in, mercury_function* out) {
+	out->refrences = 1;
+	if (in->debug_info) {
+		out->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * in->numberofinstructions);
+		if (!out->debug_info)return;
+		memcpy(out->debug_info, in->debug_info, sizeof(mercury_debug_token) * in->numberofinstructions);
+	}
+	else {
+		out->debug_info = nullptr;
+	}
+	out->instructions = (mercury_opcode*)malloc(sizeof(mercury_opcode) * in->numberofinstructions);
+	if (!out->instructions)return;
+	memcpy(out->instructions, in->instructions, sizeof(mercury_opcode) * in->numberofinstructions);
+	out->numberofinstructions = in->numberofinstructions;
+	out->enviromental = false;
 }
 
 inline const char* m_get_opcode_str(mercury_opcode instruction) {

@@ -333,6 +333,8 @@ MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_get_bytecode_debug(mercury_funct
 MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_get_bytecode_rawbinary_debug(mercury_function* F);
 MERCURY_DYNAMIC_LIBRARY void mercury_debugdumptable(mercury_table* tab, int level = 0);
 
+MERCURY_DYNAMIC_LIBRARY void mercury_clone_function(mercury_function* in, mercury_function* out);
+
 //inlines, for SPEED
 inline void mercury_clear_variable(mercury_variable* var) {
 	var->constant = false;

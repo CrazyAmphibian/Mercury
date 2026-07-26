@@ -15,7 +15,7 @@ local var=nil
 if thread.getcount(t1) then
 	var=thread.fetch(t1)
 	if var!=460 then
-		print("thread 1 returned an incorrect value")
+		print("thread 1 returned an incorrect value "..var)
 		return 1
 	end
 else
@@ -26,7 +26,7 @@ var=nil
 if thread.getcount(t2) then
 	var=thread.fetch(t2)
 	if var!=414 then
-		print("thread 2 returned an incorrect value")
+		print("thread 2 returned an incorrect value "..var)
 		return 1
 	end
 else

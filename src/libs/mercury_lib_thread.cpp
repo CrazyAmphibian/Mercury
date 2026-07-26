@@ -115,8 +115,9 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 	out.type = M_TYPE_NIL;
 	
 	if (t->state) {
-		t->state->bytecode.numberofinstructions = ((mercury_function*)func_var.data.p)->numberofinstructions;
-		t->state->bytecode.instructions = ((mercury_function*)func_var.data.p)->instructions;
+		//t->state->bytecode.numberofinstructions = ((mercury_function*)func_var.data.p)->numberofinstructions;
+		//t->state->bytecode.instructions = ((mercury_function*)func_var.data.p)->instructions;
+		mercury_clone_function((mercury_function*)func_var.data.p,&(t->state->bytecode));
 
 		if (vart) {
 			for (mercury_int i = 0; i < args_in - 2; i++) {
@@ -126,7 +127,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 			vart = nullptr;
 		}
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 
 		HANDLE h = CreateThread(NULL, 0, threadfunction, (LPVOID)t, 0, NULL);
 		if (h) {
@@ -136,7 +137,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		}
 		else {
 			if (table_var.type)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
-			t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
+			//t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
 			mercury_destroystate(t->state);
 			free(t);
 		}
@@ -150,7 +151,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		}
 		else {
 			if (table_var.type)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
-			t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
+			//t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
 			mercury_destroystate(t->state);
 			free(t);
 		}
