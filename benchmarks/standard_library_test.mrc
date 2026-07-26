@@ -1,4 +1,3 @@
-
 func=function(n) a=n b=n end
 env={"a"=5}
 rcall(func,env,1)
@@ -16,7 +15,7 @@ if dump(arrt)!="[0=1,1=7,6=11,]" then
 end 
 
 local w=nil
-f=compile("w=10")
+local f=compile("w=10")
 if type(f)!=TYPE_FUNCTION then
 	print("compile failed to compile code")
 	return 1
