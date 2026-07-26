@@ -145,7 +145,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 #else
 
 		int c=pthread_create(&(t->threadobject), NULL, threadfunction, t);
-		if (c) {
+		if (!c) {
 			out.type = M_TYPE_THREAD;
 			out.data.p = t;
 		}
