@@ -1,5 +1,5 @@
 # Mercury
-**current version: Alpha 5**
+**current version: Alpha 6**
 
 is an interpreted programming language
 
