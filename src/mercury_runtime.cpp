@@ -12,52 +12,58 @@
 #include <dlfcn.h>
 #endif
 
-
-inline int search_arglist_for_parameter(const int argc, char** argv,const char* searchfor) {
-	for (int i = 0; i < argc; i++) {
-		if (!strncmp(argv[i], searchfor, strlen(searchfor))) {
-			return i;
-		}
-	}
-	return -1;
+inline bool arg_is_string(const char* arg, const char* check) {
+	return !strncmp(arg, check, strlen(check));
 }
-
 
 int main(int argc, char** argv) {
 	bool interactivemode = false;
 	mercury_array* arg_arr=mercury_newarray();
+	
+	char* code=nullptr;// = (char*)"";
+	const char* fpath = nullptr;
 
-	//printf("arg count: %i\n", argc);
+	int arg_offset = 1;
+	bool fileread = false;
+	for (int i = 1; i < argc; i++) { //start at 1 because 0 is the executable path.
+		//printf("\t%i %s\n", i, argv[i]);
+		arg_offset++;
+		if (arg_is_string(argv[i],"--help") || arg_is_string(argv[i], "-?") || arg_is_string(argv[i], "-h") || arg_is_string(argv[i], "/?")) {
+			printf("\nusage: mercury [options] <source file> [arguments]\n");
+			printf("\nMercury will load the first argument listed that is not in the [options] list as the input file. All arguments after will be passed to the runtime under the _ARGS global array starting at index 0.\n");
+			printf("\n[options]\n");
+			printf("%-20s Display this text, then exits\n", "-?, -h, --help, /?");
+			printf("%-20s Displays the program version, then exits\n", "-v, --version, /v");
+			printf("%-20s Enables interactive mode. Implied if no file is provided\n", "-i, /i");
+			printf("%-20s Starts Mercury with no input file, treating all following args as input args. Implies interactive mode.\n", "--no-file, -n, /n");
+			return 0;
+		}
+		else if(arg_is_string(argv[i], "--version") || arg_is_string(argv[i], "-v") || arg_is_string(argv[i], "/v")){
+			printf("Merecury version %i.%i, %u bit\n", MERCURY_VERSION, MERCURY_VERSION_PATCH, (unsigned int)(sizeof(mercury_int) << 3));
+			return 0;
+		}
+		else if (arg_is_string(argv[i], "-i") || arg_is_string(argv[i], "/i")) {
+			interactivemode = true;
+		}
+		else if (arg_is_string(argv[i],"--no-file") || arg_is_string(argv[i], "-n") || arg_is_string(argv[i], "/n")) {
+			interactivemode = true;
+			break;
+		}
+		else {
+			fpath = argv[i];
+			break;
+		}
+		
+	}
+
 	for (int i = 0; i < argc; i++) {
 		mercury_variable av;
 		av.type = M_TYPE_STRING;
 		av.data.p = mercury_cstring_to_mstring(argv[i], strlen(argv[i]));
-		mercury_setarray(arg_arr, &av, i);
-		
-		//printf("\t%i %s\n",i, argv[i]);
-	}
-	
-	char* code=nullptr;// = (char*)"";
-
-	if ( (-1 != search_arglist_for_parameter(argc, argv, "--help")) || (-1 != search_arglist_for_parameter(argc, argv, "-?"))) {
-		printf("usage: mercury [options] <source file>\n");
-		printf("%-20s Display this text, then exits\n", "-?, --help");
-		printf("%-20s Displays the program version, then exits\n", "-v, --version");
-		printf("%-20s Enables interactive mode. Autiomatically on if no file is provided\n", "-i");
-		return 0;
+		mercury_setarray(arg_arr, &av, (i- arg_offset) );
 	}
 
-	if ((-1 != search_arglist_for_parameter(argc, argv, "--version")) || (-1 != search_arglist_for_parameter(argc, argv, "-v")) ) {
-		printf("Merecury version %i.%i, %u bit\n", MERCURY_VERSION, MERCURY_VERSION_PATCH,(unsigned int)(sizeof(mercury_int)<<3) );
-		return 0;
-	}
-
-	if (-1 != search_arglist_for_parameter(argc, argv, "-i")) {
-		interactivemode = true;
-	}
-	
-
-	if (argc>=2) {
+	if (fpath) {
 		const char* fpath = argv[argc-1];
 		FILE* f=fopen(fpath,"rb");
 		if (!f) {
