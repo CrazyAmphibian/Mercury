@@ -1810,15 +1810,22 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 	//*/
 
 	//check if we're indexing something about it.
+	bool should_set = true;
+	mercury_uint* function_output_args_point = nullptr;
 	while(true){
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
+			if (!should_set)break;
 			f->token_error_num=token_offset;
 			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
 			delete_compiler_function(getvarfunc);
 			return 0;
 		}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && (cur_tok->chars[0]=='[' || cur_tok->chars[0]=='.') ){
-			
+			if (function_output_args_point) {
+				*function_output_args_point = 1;
+				function_output_args_point = nullptr;
+			}
+			should_set = true;
 			add_instruction(getvarfunc, get_instruction, token_offset);
 			
 			get_instruction=M_OPCODE_GET;
@@ -1851,79 +1858,106 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 				getvarfunc->number_instructions--; //remove the last instruction, which would be GENV. hacky, i know.
 			}
 			
-		}else{
+		}
+		else if (token_matches_chars(cur_tok, "(")) { //function call
+			if (function_output_args_point) {
+				*function_output_args_point = 1;
+				function_output_args_point = nullptr;
+			}
+			mercury_int ito = token_offset;
+			mercury_int ain = 0;
+			if(should_set)add_instruction(getvarfunc, get_instruction, token_offset);
+			compiler_function* prepend=new_compiler_function();
+			token_offset += m_compile_read_call_func(prepend, tokens, num_tokens, token_offset, &ain, i); //append to f because function args come before the function.
+			if (f->errorcode) {
+				return 0;
+			}
+			add_instruction(getvarfunc, M_OPCODE_CALL, ito); //offset back by 1 to account for the closing symbol being used.
+			add_rawdata_bitwidth_size(getvarfunc, ain, ito);
+			add_rawdata_bitwidth_size(getvarfunc, 0, ito);
+
+			merge_compiler_functions(prepend, getvarfunc);
+			getvarfunc = prepend;
+
+			//merge_compiler_functions(f, getvarfunc);
+			//getvarfunc = new_compiler_function();
+			function_output_args_point = (mercury_uint*)((getvarfunc->instructions) + (getvarfunc->number_instructions) - sizeof(mercury_uint)/sizeof(mercury_opcode) );
+			//function_output_args_point = (mercury_uint*)((f->instructions) + (f->number_instructions) - sizeof(mercury_uint)/sizeof(mercury_opcode) );
+			get_instruction = M_OPCODE_GET;
+			set_instruction = M_OPCODE_SET;
+			should_set = false;
+		}else
+		{
 			break;
 		}
 		
 		
 	}
-	//then check what we're doing with this. this is either a set operation, void function call, or a self-modifying set operation
+	//then check what we're doing with this. this is either a set operation, or a self-modifying set operation
 	
- 	cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
-	if(!cur_tok){
-		f->token_error_num=token_offset;
-		f->errorcode = M_COMPERR_NO_MORE_TOKENS;
-		delete_compiler_function(getvarfunc);
-		return 0;
-	}else if( !(cur_tok->token_flags & (TOKEN_MISC_OP | TOKEN_SELFMODIFY_OP)) ){
-		f->token_error_num=token_offset;
-		f->errorcode = M_COMPERR_WRONG_SYMBOL;
-		delete_compiler_function(getvarfunc);
-		return 0;
-	}
-	
-	mercury_int ito = token_offset;
-	if(token_matches_chars(cur_tok,"(")){ //function call
-		mercury_int ain=0;
-		add_instruction(getvarfunc, get_instruction, token_offset);
-		token_offset+=m_compile_read_call_func(f,tokens,num_tokens,token_offset,&ain,i);
-		merge_compiler_functions(f, getvarfunc);
-		if(f->errorcode){
+	if (should_set) {
+
+		cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+		if (!cur_tok) {
+			f->token_error_num = token_offset;
+			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			delete_compiler_function(getvarfunc);
 			return 0;
 		}
-		add_instruction(f,M_OPCODE_CALL, ito); //offset back by 1 to account for the closing symbol being used.
-		add_rawdata_bitwidth_size(f,ain, ito);
-		add_rawdata_bitwidth_size(f,0, ito);
-	}else if(token_matches_chars(cur_tok,"=")){ //assignment
-		token_offset++;
-		merge_compiler_functions(f, getvarfunc);
-		token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
-		if(f->errorcode){
+		else if (!(cur_tok->token_flags & (TOKEN_MISC_OP | TOKEN_SELFMODIFY_OP))) {
+			f->token_error_num = token_offset;
+			f->errorcode = M_COMPERR_WRONG_SYMBOL;
+			delete_compiler_function(getvarfunc);
 			return 0;
 		}
-		add_instruction(f,set_instruction, ito);
-	}else if(cur_tok->token_flags & TOKEN_SELFMODIFY_OP){ //assignment & modification
-		merge_compiler_functions(f, getvarfunc);
-		// stack: table, key
-		// we of course need to do both get and set in one line, so we have to get a bit tricky about the stack variables, so...
-		if (get_instruction == M_OPCODE_GET) {
-			add_instruction(f, M_OPCODE_CPYX, ito);
-			add_rawdata_bitwidth_size(f, 2, ito); 
-		}
-		else { //for enviromental vars, we only have the key on the stack, since the table is implicit
-			add_instruction(f, M_OPCODE_CPYT, ito);
-		}	
-		//stack: table, key, table, key
-		add_instruction(f,get_instruction, ito);
-		//stack: table, key, value
-		//horray, we did it. well, actually no, we still need to read the rest of the statment.
-		mercury_opcode insop=m_compile_get_operator_opcode_from_token(cur_tok);
-		token_offset++;
-		
-		if(cur_tok->token_flags & TOKEN_BINARY_OP){
-			token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
-			if(f->errorcode){
+
+		mercury_int ito = token_offset;
+		if (token_matches_chars(cur_tok, "=")) { //assignment
+			token_offset++;
+			merge_compiler_functions(f, getvarfunc);
+			token_offset += m_compile_read_var_statment(f, tokens, num_tokens, token_offset, i);
+			if (f->errorcode) {
 				return 0;
 			}
+			add_instruction(f, set_instruction, ito);
 		}
-		
-		add_instruction(f,insop, ito);
-		add_instruction(f, set_instruction, ito);
-	}else{
-		delete_compiler_function(getvarfunc);
-		f->token_error_num=token_offset;
-		f->errorcode = M_COMPERR_NO_OPERATION_FOUND;
-		return 0;
+		else if (cur_tok->token_flags & TOKEN_SELFMODIFY_OP) { //assignment & modification
+			merge_compiler_functions(f, getvarfunc);
+			// stack: table, key
+			// we of course need to do both get and set in one line, so we have to get a bit tricky about the stack variables, so...
+			if (get_instruction == M_OPCODE_GET) {
+				add_instruction(f, M_OPCODE_CPYX, ito);
+				add_rawdata_bitwidth_size(f, 2, ito);
+			}
+			else { //for enviromental vars, we only have the key on the stack, since the table is implicit
+				add_instruction(f, M_OPCODE_CPYT, ito);
+			}
+			//stack: table, key, table, key
+			add_instruction(f, get_instruction, ito);
+			//stack: table, key, value
+			//horray, we did it. well, actually no, we still need to read the rest of the statment.
+			mercury_opcode insop = m_compile_get_operator_opcode_from_token(cur_tok);
+			token_offset++;
+
+			if (cur_tok->token_flags & TOKEN_BINARY_OP) {
+				token_offset += m_compile_read_var_statment(f, tokens, num_tokens, token_offset, i);
+				if (f->errorcode) {
+					return 0;
+				}
+			}
+
+			add_instruction(f, insop, ito);
+			add_instruction(f, set_instruction, ito);
+		}
+		else {
+			delete_compiler_function(getvarfunc);
+			f->token_error_num = token_offset;
+			f->errorcode = M_COMPERR_NO_OPERATION_FOUND;
+			return 0;
+		}
+	}
+	else { // !should_set
+		merge_compiler_functions(f, getvarfunc);
 	}
 	
 	return token_offset-initial_offset;
