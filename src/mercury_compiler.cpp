@@ -1872,17 +1872,14 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			if (f->errorcode) {
 				return 0;
 			}
-			add_instruction(getvarfunc, M_OPCODE_CALL, ito); //offset back by 1 to account for the closing symbol being used.
+			add_instruction(getvarfunc, M_OPCODE_CALL, ito);
 			add_rawdata_bitwidth_size(getvarfunc, ain, ito);
 			add_rawdata_bitwidth_size(getvarfunc, 0, ito);
 
 			merge_compiler_functions(prepend, getvarfunc);
 			getvarfunc = prepend;
 
-			//merge_compiler_functions(f, getvarfunc);
-			//getvarfunc = new_compiler_function();
-			function_output_args_point = (mercury_uint*)((getvarfunc->instructions) + (getvarfunc->number_instructions) - sizeof(mercury_uint)/sizeof(mercury_opcode) );
-			//function_output_args_point = (mercury_uint*)((f->instructions) + (f->number_instructions) - sizeof(mercury_uint)/sizeof(mercury_opcode) );
+			function_output_args_point = (mercury_uint*)((getvarfunc->instructions) + (getvarfunc->number_instructions) - sizeof(mercury_uint)/sizeof(mercury_opcode) ); //put this here because the instructions pointer will move around during the earlier code.
 			get_instruction = M_OPCODE_GET;
 			set_instruction = M_OPCODE_SET;
 			should_set = false;
