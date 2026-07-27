@@ -655,6 +655,7 @@ void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* o
 	if (M->sizeofstack==0) {
 		out->type = M_TYPE_NIL;
 		out->data.i = 0;
+		return;
 	}
 	M->sizeofstack--;
 	*out=  M->stack[M->sizeofstack];
