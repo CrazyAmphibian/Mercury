@@ -1750,7 +1750,7 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			compiler_function* n=new_compiler_function();
 			mercury_int o=m_compile_read_var_statment(n,tokens,num_tokens,token_offset,i);
 			cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset + o);
-			if(!cur_tok || (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[1]=='=')){
+			if(!cur_tok || (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='=')){
 				delete_compiler_function(n);
 				break;
 			}
@@ -1762,7 +1762,7 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			}
 			merge_compiler_functions(f,n);
 			token_offset+=o;
-			if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[1]==',')){
+			if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==',')){
 				break;
 			}
 		}
