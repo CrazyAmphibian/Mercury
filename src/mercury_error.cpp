@@ -62,7 +62,7 @@ start:
 
 	M = M->parentstate;
 	if (M) {
-		if (used_space < buffer_size + 10) {
+		if (used_space < buffer_size - 10) {
 			header[used_space++] = ' ';
 			header[used_space++] = 'i';
 			header[used_space++] = 'n';
