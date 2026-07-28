@@ -166,6 +166,7 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 			out2.type = M_TYPE_NIL;
 			out2.data.i = 0;
 		}
+		mercury_pushstack(M, &out2);
 	}
 
 	if (startat.type)mercury_free_var(&startat);
