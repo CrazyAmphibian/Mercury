@@ -9,9 +9,11 @@
 		h3.cjk { font-family: "NSimSun" }
 		h3.ctl { font-family: "Arial" }
 		p.example { font-family: monospace }
-		h3.funcheader-western { font-family: Monospace }
+		h3.funcheader { font-family: Monospace;font-size:150%; }
 		h3.funcheader-cjk { font-family: "NSimSun" }
 		h3.funcheader-ctl { font-family: "Arial" }
+		.returntype {font-size:75%;}
+		.vartpe {color:#888888;}
 	</style>
 </head>
 <body lang="en-US" bgcolor="#dddddd" dir="ltr" style="margin-left:210px;">
@@ -263,7 +265,7 @@ function usage, or internal semantics.
 	</tr>
 </table>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">print (<font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> print (<font class="vartpe">variable</font>
 ...)</h3>
 <p>takes any number of arguments, converts them into a string, then
 adds them to stdout.<br/>
@@ -278,8 +280,8 @@ a=5<br/>
 b=12<br/>
 print(a,b,a+b) //5 12 17 
 </p>
-<h3 class="funcheader-western">iterate (<font color="#888888">structure</font>
-data, <font color="#888888">callable</font> executor)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> iterate (<font class="vartpe">structure</font>
+data, <font class="vartpe">callable</font> executor)</h3>
 <p>takes a structure and a callable. for each element, the index,
 associated data, and structure will be sent to the callable. The key
 will be the first argument, the value will be the second, and the
@@ -301,8 +303,8 @@ output: <br/>
 0x01234567 <br/>
 */ 
 </p>
-<h3 class="funcheader-western">rcall (<font color="#888888">callable</font>
-function, <font color="#888888">table</font> enviroment, <font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> rcall (<font class="vartpe">callable</font>
+function, <font class="vartpe">table</font> enviroment, <font class="vartpe">variable</font>
 ...)</h3>
 <p>takes a function and calls it with a restricted environment given
 by a table.<br/>
@@ -319,7 +321,7 @@ end
 rcall(a,{}) //this will result in an error being thrown,
 because a is trying to call a nil value (print). 
 </p>
-<h3 class="funcheader-western">dump (<font color="#888888">serializable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> dump (<font class="vartpe">serializable</font>
 variable)</h3>
 <p>takes a variable, and returns a string containing data which
 represents that variable. this string, when compiled back, will be
@@ -329,7 +331,7 @@ read as that variable.
 dump(a)
 //returns as a string [[0]=&quot;hello&quot;,[1]=1,[3]=true] 
 </p>
-<h3 class="funcheader-western">compile (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">function </span>|<span class="vartpe">string </span></span> compile (<font class="vartpe">string</font>
 code)</h3>
 <p>attempts to compile a string as if it were mercury code. if
 successful, it will return a function which does that code.
@@ -340,7 +342,7 @@ compiling.
 <br/>
 a() //hello, world! 
 </p>
-<h3 class="funcheader-western">type (<font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> type (<font class="vartpe">variable</font>
 variable)</h3>
 <p>returns the type of a variable as an integer 
 </p>
@@ -350,7 +352,7 @@ a=0
 print(&quot;something went wrong!&quot;) <br/>
 end 
 </p>
-<h3 class="funcheader-western">tostring (<font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> tostring (<font class="vartpe">variable</font>
 variable)</h3>
 <p>returns a string representing a variable 
 </p>
@@ -361,7 +363,7 @@ a={} <br/>
 s=tostring(a) //returns &quot;table 0x00000000&quot;.
 the pointer will differ with each program launch. 
 </p>
-<h3 class="funcheader-western">tonumber (<font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">number</span>|<span class="vartpe">nil</span></span> tonumber (<font class="vartpe">variable</font>
 variable)</h3>
 <p>returns a number which represents another variable. attempts to
 return an integer first, then a float. otherwise, returns nil. 
@@ -372,7 +374,7 @@ s=tonumber(true) //returns 1 <br/>
 s=tonumber({1,2}) //returns
 nil 
 </p>
-<h3 class="funcheader-western">toint (<font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span>|<span class="vartpe">nil</span></span> toint (<font class="vartpe">variable</font>
 variable)</h3>
 <p>returns an integer which represents another variable. Operates in
 the same manner as tonumber, but will type convert a float result
@@ -383,7 +385,7 @@ into an int. may return nil.
 s=toint(true) //returns 1 <br/>
 s=toint({1,2}) //returns nil 
 </p>
-<h3 class="funcheader-western">tofloat (<font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span>|<span class="vartpe">nil</span></span> tofloat (<font class="vartpe">variable</font>
 variable)</h3>
 <p>returns a float which represents another variable. Operates in the
 same manner as tonumber, but will type convert an int result into a
@@ -395,7 +397,7 @@ s=tofloat(true) //returns 1.0 <br/>
 s=tofloat({1,2}) //returns
 nil 
 </p>
-<h3 class="funcheader-western">loadlibrary (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> loadlibrary (<font class="vartpe">string</font>
 path)</h3>
 <p>attempts to load a dynamic library at the specified location. The
 library it looks for is a precompiled C/C++ file. The file is
@@ -522,7 +524,7 @@ true if on windows and the file is present
 	</tr>
 </table>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">min (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">number</span></span> min (<font class="vartpe">number</font>
 ...)</h3>
 <p>returns the lowest number provided 
 </p>
@@ -530,7 +532,7 @@ true if on windows and the file is present
 <br/>
 math.min(-7,1,0.4) //returns -7 
 </p>
-<h3 class="funcheader-western">max (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">number</span></span> max (<font class="vartpe">number</font>
 ...)</h3>
 <p>returns the highest number provided 
 </p>
@@ -538,7 +540,7 @@ math.min(-7,1,0.4) //returns -7
 <br/>
 math.max(-7,1,0.4) //returns 1 
 </p>
-<h3 class="funcheader-western">floor (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> floor (<font class="vartpe">number</font>
 number)</h3>
 <p>returns the next smallest integer of a number 
 </p>
@@ -546,7 +548,7 @@ number)</h3>
 math.floor(-3.1)
 //returns -4 
 </p>
-<h3 class="funcheader-western">ceil (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> ceil (<font class="vartpe">number</font>
 number)</h3>
 <p>returns the next highest integer of a number 
 </p>
@@ -554,7 +556,7 @@ number)</h3>
 math.ceil(-3.1)
 //returns -3 
 </p>
-<h3 class="funcheader-western">radians (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> radians (<font class="vartpe">number</font>
 angle)</h3>
 <p>returns a float converting the supplied angle from degrees into
 radians 
@@ -565,7 +567,7 @@ radians
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">degrees (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> degrees (<font class="vartpe">number</font>
 angle)</h3>
 <p>returns a float converting the supplied angle from radians into
 degrees 
@@ -576,8 +578,8 @@ degrees
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">log (<font color="#888888">number</font>
-number, [<font color="#888888">number</font> base=math.e])</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> log (<font class="vartpe">number</font>
+number, [<font class="vartpe">number</font> base=math.e])</h3>
 <p>returns the logarithm of a number given a base. if a base is not
 provided, e will be used instead. 
 </p>
@@ -588,7 +590,7 @@ math.log(105) //returns 2.02...
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">abs (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">number</span></span> abs (<font class="vartpe">number</font>
 number)</h3>
 <p>returns the absolute value of a number 
 </p>
@@ -599,11 +601,11 @@ math.abs(-3.7) //returns 3.7
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">sin (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> sin (<font class="vartpe">number</font>
 angle)</h3>
-<h3 class="funcheader-western">cos (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> cos (<font class="vartpe">number</font>
 angle)</h3>
-<h3 class="funcheader-western">tan (<font color="#888888">number</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> tan (<font class="vartpe">number</font>
 angle)</h3>
 <p>returns the sine, cosine, or tangent of a given angle as a float.
 the angle is assumed to be in radians. 
@@ -614,13 +616,13 @@ math.cos(1.2) //returns 0.36... <br/>
 math.tan(1.2)
 //returns 2.57... 
 </p>
-<h3 class="funcheader-western" style="margin-top: 0in; margin-bottom: 0in">
-<font face="monospace">asin (<font color="#888888">number</font>
+<h3 class="funcheader" style="margin-top: 0in; margin-bottom: 0in">
+<font face="monospace"> <span class="returntype"><span class="vartpe">float</span></span> asin (<font class="vartpe">number</font>
 ratio)</font></h3>
-<h3 class="funcheader-western" style="margin-top: 0in; margin-bottom: 0in">
-<font face="monospace">acos (<font color="#888888">number</font>
+<h3 class="funcheader" style="margin-top: 0in; margin-bottom: 0in">
+<font face="monospace"> <span class="returntype"><span class="vartpe">float</span></span> acos (<font class="vartpe">number</font>
 ratio)</font></h3>
-<h3 class="funcheader-western"><font face="monospace">atan (<font color="#888888">number</font>
+<h3 class="funcheader"><font face="monospace"> <span class="returntype"><span class="vartpe">float</span></span> atan (<font class="vartpe">number</font>
 ratio)</font></h3>
 <p>returns the arcsine, arccosine, or arctangent of a given length
 ratio as a float. the result is in radians. 
@@ -631,8 +633,8 @@ math.acos(0.36) //returns 1.2...
 <br/>
 math.atan(2.57) //returns 1.2... 
 </p>
-<h3 class="western"><font face="monospace">atan2 (<font color="#888888">number</font>
-y, <font color="#888888">number</font> x)</font></h3>
+<h3 class="western"><font face="monospace"> <span class="returntype"><span class="vartpe">float</span></span> atan2 (<font class="vartpe">number</font>
+y, <font class="vartpe">number</font> x)</font></h3>
 <p>returns an angle as a float in radians to reach another point at
 the relative coordinates x,y 
 </p>
@@ -642,7 +644,7 @@ the relative coordinates x,y
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">randomseed ([<font color="#888888">int</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span>|<span class="vartpe">void</span></span> randomseed ([<font class="vartpe">int</font>
 seed])</h3>
 <p>If no parameter is given, returns the current random seed state as
 an int. otherwise, if an integer is provided, it sets the random seed
@@ -653,8 +655,8 @@ state.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">random ([<font color="#888888">number</font>
-minimum, <font color="#888888">number</font> maximum])</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> random ([<font class="vartpe">number</font>
+minimum, <font class="vartpe">number</font> maximum])</h3>
 <p>returns a random number as a float. if no arguments are provided,
 the number will be between 0 and 1, otherwise, it will be between
 minimum and maximum. 
@@ -665,8 +667,8 @@ return 4.671...
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">randomint (<font color="#888888">int</font>
-minimum, <font color="#888888">int</font> maximum)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> randomint (<font class="vartpe">int</font>
+minimum, <font class="vartpe">int</font> maximum)</h3>
 <p>returns a random number as an int. the random number will be
 between minimum and maximum, inclusive of the high and low bounds. 
 </p>
@@ -676,7 +678,7 @@ between minimum and maximum, inclusive of the high and low bounds.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">isnan (<font color="#888888">float</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> isnan (<font class="vartpe">float</font>
 number)</h3>
 <p>returns a bool if the supplied float is a non-number value. this
 includes all types of NaN, as well as infinity. If a non-float value
@@ -689,8 +691,8 @@ math.isnan(0/10) //returns false
 </p>
 <h1 id="lib_string">String library</h1>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">sub (<font color="#888888">string</font>
-string, <font color="#888888">int</font> start, <font color="#888888">int</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> sub (<font class="vartpe">string</font>
+string, <font class="vartpe">int</font> start, <font class="vartpe">int</font>
 end)</h3>
 <p>returns a sub string of a given string with a specified offset. 
 </p>
@@ -700,7 +702,7 @@ world!&quot;,0,4) //returns &quot;hello&quot;
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">reverse (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> reverse (<font class="vartpe">string</font>
 string)</h3>
 <p>returns a string which contains the reverse copy of the input
 string 
@@ -711,8 +713,8 @@ string
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">find (<font color="#888888">string</font>
-string, <font color="#888888">string</font> match, [<font color="#888888">int</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span>|<span class="vartpe">nil</span>, <span class="vartpe">int</span>|<span class="vartpe">nil</span></span> find (<font class="vartpe">string</font>
+string, <font class="vartpe">string</font> match, [<font class="vartpe">int</font>
 start=0])</h3>
 <p>attempts to find the string match inside of the provided string.
 if found, returns the position in the string where it occurs.
@@ -726,9 +728,9 @@ world!&quot;,&quot;ll&quot;,3) //returns nil
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">replace (<font color="#888888">string</font>
-string, <font color="#888888">string</font> match, <font color="#888888">string</font>
-replacement, [<font color="#888888">int</font> max
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span>, <span class="vartpe">int</span></span> replace (<font class="vartpe">string</font>
+string, <font class="vartpe">string</font> match, <font class="vartpe">string</font>
+replacement, [<font class="vartpe">int</font> max
 replacements=infinity])</h3>
 <p>searches a string for all occurrences of a match, and replaces
 them with another string. if the max replacements argument is
@@ -741,8 +743,8 @@ world!&quot;
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">count (<font color="#888888">string</font>
-string, <font color="#888888">string</font> match)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> count (<font class="vartpe">string</font>
+string, <font class="vartpe">string</font> match)</h3>
 <p>returns the number of times the match is found in the string. 
 </p>
 <p class="example" style="margin-bottom: 0in">string.count(&quot;hello,
@@ -751,7 +753,7 @@ world!&quot;,&quot;l&quot;) //returns 3
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">toarray (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> toarray (<font class="vartpe">string</font>
 string)</h3>
 <p>returns an array representing the characters in a string. 
 </p>
@@ -761,7 +763,7 @@ string)</h3>
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">fromarray (<font color="#888888">array</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> fromarray (<font class="vartpe">array</font>
 array)</h3>
 <p>converts an array into a string. integers will have their lower 8
 bits turned into a character. all other types will be ignored, and
@@ -773,7 +775,7 @@ replaced with the null character (\x00).
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">upper (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> upper (<font class="vartpe">string</font>
 string)</h3>
 <p>takes a string and returns it with all uppercase characters. 
 </p>
@@ -783,7 +785,7 @@ World!&quot;) //returns &quot;HELLO, WORLD!&quot;
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">lower (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> lower (<font class="vartpe">string</font>
 string)</h3>
 <p>takes a string and returns it with all lowercase characters. 
 </p>
@@ -793,8 +795,8 @@ World!&quot;) //returns &quot;hello, world!&quot;
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">format (<font color="#888888">string</font>
-formatstring, <font color="#888888">variable, </font>...)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> format (<font class="vartpe">string</font>
+formatstring, <font class="vartpe">variable, </font>...)</h3>
 <p style="margin-bottom: 0in">takes a formatted string and adds in
 received values. works with similar syntax to C's printf.<br/>
 formats
@@ -929,7 +931,7 @@ variadic arguments.<br/>
 			p, P</p>
 		</td>
 		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
-			a pointer value for complex datatypes. other datatypes will be 0. display format depends on the system.</p>
+			a pointer value for complex datatypes. other datatypes will be interpreted as nullptr (0).<br><b>NOTE:</b> format behavior is platform-dependent</p>
 		</td>
 		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
 			flags, width</p>
@@ -1207,8 +1209,8 @@ and for clarity.</p>
 <br/>
 
 </p>
-<h3 class="funcheader-western">pfind (<font color="#888888">string</font>
-string,<font color="#888888">string</font> pattern match,[<font color="#888888">int</font>
+<h3 class="funcheader"><span class="returntype"><span class="vartpe">int</span>|<span class="vartpe">nil</span>, <span class="vartpe">int</span>|<span class="vartpe">nil</span></span> pfind (<font class="vartpe">string</font>
+string,<font class="vartpe">string</font> pattern match,[<font class="vartpe">int</font>
 start=0])</h3>
 <p>The same principal as string.find, but uses pattern matching on
 the match string. 
@@ -1219,8 +1221,8 @@ the match string.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">pextract (<font color="#888888">string</font>
-string,<font color="#888888">string</font> pattern match)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> pextract (<font class="vartpe">string</font>
+string,<font class="vartpe">string</font> pattern match)</h3>
 <p>Takes a string and a pattern match, and returns all matches as an
 array. if none were found, an empty array will be returned. 
 </p>
@@ -1230,9 +1232,9 @@ array. if none were found, an empty array will be returned.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">preplace (<font color="#888888">string</font>
-string, <font color="#888888">string</font> match, <font color="#888888">string</font>
-replacement, [<font color="#888888">int</font> max
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span>, <span class="vartpe">int</span></span> preplace (<font class="vartpe">string</font>
+string, <font class="vartpe">string</font> match, <font class="vartpe">string</font>
+replacement, [<font class="vartpe">int</font> max
 replacments=infinity])</h3>
 <p>same function as string.replace, but works with pattern matching
 for finding occurances. 
@@ -1244,8 +1246,8 @@ world!&quot;
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">pcount (<font color="#888888">string</font>
-string, <font color="#888888">string</font> match)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> pcount (<font class="vartpe">string</font>
+string, <font class="vartpe">string</font> match)</h3>
 <p>same as string.count, but uses pattern matches. 
 </p>
 <p class="example" style="margin-bottom: 0in">string.pcount(&quot;hello,
@@ -1254,7 +1256,7 @@ world!&quot;,&quot;l%+&quot;) //returns 2
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">escape (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> escape (<font class="vartpe">string</font>
 string)</h3>
 <p>takes a string, and substitutes characters so that it could be
 interpreted properly as a string in mercury. replaces quote mark (&quot;)
@@ -1267,7 +1269,7 @@ is a \&quot;cool\&quot; test!&quot;) //returns &quot;this is a
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">escape_url (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> escape_url (<font class="vartpe">string</font>
 string)</h3>
 <p>takes a string, and substitutes characters so that it could be
 interpreted properly as a URL location. this does not create a URL
@@ -1281,7 +1283,7 @@ cool file/thing.odt&quot;) //returns
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">escape_c (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> escape_c (<font class="vartpe">string</font>
 string)</h3>
 <p>takes a string, and substitutes characters that conform to the C
 escape sequence standards. does not escape hex characters, but will
@@ -1293,7 +1295,7 @@ escape null.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">escape_html (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> escape_html (<font class="vartpe">string</font>
 string)</h3>
 <p>takes a string, and substitutes characters so that the text may be
 used in HTML or XML without causing any special formatting
@@ -1306,7 +1308,7 @@ class='thing'&gt;woah!&lt;/span&gt;&quot;) //returns &quot;&amp;lt;span
 class=&amp;#39;thing&amp;#39;&amp;gt;woah!&amp;lt;/span&amp;gt;&quot;
 </p>
 
-<h3 class="funcheader-western">copy (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> copy (<font class="vartpe">string</font>
 string)</h3>
 <p>takes a string and creates a copy of it, as a distinct object with separate internal pointer and reference count. strings, unlike arrays or tables, will compare content to determine equality, so a copied string will be equal with the original. useful for sending string values over to a thread where refcounting can result in races.
 </p>
@@ -1417,7 +1419,7 @@ print(a,b,a==b) //outputs "hello"&emsp;"hello"&emsp;true
 	</tr>
 </table>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">flush (<font color="#888888">array</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> flush (<font class="vartpe">array</font>
 array)</h3>
 <p>removes all nil entries from an array, so that all values spanning
 0 to the maximum have a value 
@@ -1429,7 +1431,7 @@ array.flush(a) //a is now [&quot;hello&quot;,1,true]
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">copy (<font color="#888888">array</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> copy (<font class="vartpe">array</font>
 array)</h3>
 <p>returns a new array containing the same values as the old one, but
 as a seperate object. 
@@ -1439,13 +1441,13 @@ b=array.copy(a)
 <br/>
 print(a==b) //false 
 </p>
-<h3 class="funcheader-western">insert (<font color="#888888">array</font>
-array, <font color="#888888">variable</font> element, [<font color="#888888">int</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> insert (<font class="vartpe">array</font>
+array, <font class="vartpe">variable</font> element, [<font class="vartpe">int</font>
 index=end])</h3>
 <p>adds element to array. if index is specified, the new element will
 be at that location, shifting all other elements forward to make
 space. if not provided, it will instead add the element to the end of
-the array. 
+the array. Returns the index that the variable was placed at.
 </p>
 <p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,true]
 <br/>
@@ -1454,8 +1456,8 @@ array.insert(a,4,1) //array is now [&quot;hello&quot;,4,1,true]
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">remove (<font color="#888888">array</font>
-array, <font color="#888888">int</font> index)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> remove (<font class="vartpe">array</font>
+array, <font class="vartpe">int</font> index)</h3>
 <p>removes an element from an array. shifts all other elements
 backwards to fill in the removed element's space. 
 </p>
@@ -1466,8 +1468,8 @@ array.remove(a,1) //array is now [&quot;hello&quot;,true]
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">swap (<font color="#888888">array</font>
-array, <font color="#888888">int</font> index1, <font color="#888888">int</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> swap (<font class="vartpe">array</font>
+array, <font class="vartpe">int</font> index1, <font class="vartpe">int</font>
 index2)</h3>
 <p>swaps the positions of 2 variables in an array. if a position does
 not exist, nil will be used instead. 
@@ -1479,8 +1481,8 @@ array.swap(a,0,2) //array is now [true,1,&quot;hello&quot;]
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">sort (<font color="#888888">array</font>
-array, <font color="#888888">callable</font> sorting function)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> sort (<font class="vartpe">array</font>
+array, <font class="vartpe">callable</font> sorting function)</h3>
 <p>takes an array, and runs a storting function through it.<br/>
 mercury
 functions take 2 values and should return 1, 0, or -1.<br/>
@@ -1497,8 +1499,8 @@ array.sort(a,array.SORTING_GREATER_TO_LESSER) //array is now
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">concat (<font color="#888888">array</font>
-array, <font color="#888888">string</font> separator)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> concat (<font class="vartpe">array</font>
+array, <font class="vartpe">string</font> separator)</h3>
 <p>returns a string formed from each element in an array, from 0 to
 the end, and adds the separator string between each element.
 automatically runs tostring on each element. 
@@ -1509,8 +1511,8 @@ array.concat(a,&quot;,&quot;)
 </p>
 <h1 id="lib_io">IO library</h1>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">open (<font color="#888888">string</font>
-path, <font color="#888888">string</font> mode)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">file</span>|<span class="vartpe">nil</span></span> open (<font class="vartpe">string</font>
+path, <font class="vartpe">string</font> mode)</h3>
 <p>attempts to open a file at the specified path. if succesful,
 returns a file, otherwise, returns nil.<br/>
 mode specifies how the
@@ -1524,7 +1526,7 @@ and &quot;w+&quot; will open in &quot;wb+&quot;</p>
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">close (<font color="#888888">file</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> close (<font class="vartpe">file</font>
 file)</h3>
 <p>closes an open file. this is needed to allow other programs to
 modify the files. 
@@ -1536,7 +1538,7 @@ io.close(a)
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">read (<font color="#888888">file</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> read (<font class="vartpe">file</font>
 file)</h3>
 <p>returns a string containing a file's entire contents. returns nil
 if a file was unable to be read. 
@@ -1548,8 +1550,8 @@ io.read(a) //returns the contents of the file.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">write (<font color="#888888">file</font>
-file, <font color="#888888">string</font> data)</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> write (<font class="vartpe">file</font>
+file, <font class="vartpe">string</font> data)</h3>
 <p>attempts to write data to a file. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;w&quot;)
@@ -1559,7 +1561,7 @@ io.write(a,&quot;hello!&quot;)
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">getfiles (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> getfiles (<font class="vartpe">string</font>
 path)</h3>
 <p>returns an array of strings containing the files in a specified
 directory. if the directory could not be located, returns an empty
@@ -1573,7 +1575,7 @@ current working directory. Does not include implicit paths . or ..
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">getdirs (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> getdirs (<font class="vartpe">string</font>
 path)</h3>
 <p>returns an array of strings containing the directories in another
 specified directory. if the directory could not be located, returns
@@ -1587,7 +1589,7 @@ implicit paths . or ..
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">lines (<font color="#888888">file</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> lines (<font class="vartpe">file</font>
 file)</h3>
 <p>returns an array of strings containing each line in a file. The
 file must be in read mode for any results to return. Does not include
@@ -1601,7 +1603,7 @@ test&quot;]
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">post (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> post (<font class="vartpe">string</font>
 text)</h3>
 <p>writes a string to stdout. unlike print, the input must be a
 string. additionally, this function is not variadic, and will not add
@@ -1612,7 +1614,7 @@ any terminating newlines.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">prompt ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> prompt ()</h3>
 <p>awaits input from stdin. input will be accepted after the user
 hits enter. returns a string containing the text, minus newlines. 
 </p>
@@ -1621,7 +1623,7 @@ hits enter. returns a string containing the text, minus newlines.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">input ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> input ()</h3>
 <p>awaits a single keypress from stdin. does not require pressing
 enter. returns the input as a single character.<br/>
 use caution if
@@ -1634,7 +1636,7 @@ you should check for the sequence 0x03
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">remove (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> remove (<font class="vartpe">string</font>
 path)</h3>
 <p>attempts to remove a file with the given path. if successful,
 returns true, otherwise false. 
@@ -1644,7 +1646,7 @@ returns true, otherwise false.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">removedir (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> removedir (<font class="vartpe">string</font>
 path)</h3>
 <p>attempts to remove a directory with the given name/path. if
 successful, returns true, otherwise false. can only remove empty
@@ -1655,7 +1657,7 @@ directories.
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">createdir (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> createdir (<font class="vartpe">string</font>
 path)</h3>
 <p>attempts to create a directory with the given name/path. if
 successful, returns true, otherwise false. 
@@ -1723,7 +1725,7 @@ successful, returns true, otherwise false.
 	</tr>
 </table>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">time ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> time ()</h3>
 <p>returns an integer of the current time in seconds since the epoch
 (unix time) 
 </p>
@@ -1733,7 +1735,7 @@ varies when program is executed
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">clock ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span></span> clock ()</h3>
 <p>returns a float of how long the program has been running 
 </p>
 <p class="example" style="margin-bottom: 0in">os.clock() 
@@ -1741,7 +1743,7 @@ varies when program is executed
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">execute (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> execute (<font class="vartpe">string</font>
 command)</h3>
 <p>executes a string as if it were a shell command. input is
 platform-dependent. returns any text the command writes. This
@@ -1753,7 +1755,7 @@ www.test-site.com&quot;) //returns a web request result
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">call (<font color="#888888">string</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> call (<font class="vartpe">string</font>
 command)</h3>
 <p>executes a string as if it were a shell command. input is
 platform-dependent. returns a code from the command. This function
@@ -1763,7 +1765,7 @@ function compared to execute.
 <p class="example">os.call(&quot;curl www.test-site.com&quot;)
 //returns 0 
 </p>
-<h3 class="funcheader-western">get_date (<font color="#888888">int
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">table</span></span> get_date (<font class="vartpe">int
 </font>epoch_time)</h3>
 <p>Returns a table containing data about the date given an epoch
 timestep. The following data is given:</p>
@@ -1869,7 +1871,7 @@ timestep. The following data is given:</p>
 </p>
 <p class="example">print(&quot;the year is &quot; ..
 os.get_date(os.time()).year)</p>
-<h3 class="funcheader-western">get_time (<font color="#888888">table
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> get_time (<font class="vartpe">table
 </font>date)</h3>
 <p>Returns an integer as epoch time, based upon the date table
 provided. The function uses the following keys, though does have
@@ -1980,7 +1982,7 @@ fallback values:</p>
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">exit ([<font color="#888888">int</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> exit ([<font class="vartpe">int</font>
 exitcode=0])</h3>
 <p>Closes the executable immediately, and returns an exit code to the
 operating system. By default this is 0. on 64 bit systems, integers
@@ -1991,9 +1993,9 @@ type is provided, exits with code 0.</p>
 <p class="example" style="margin-bottom: 0in">end</p>
 <h1 id="lib_thread">Thread library</h1>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">new (<font color="#888888">function</font>
-function, [<font color="#888888">table</font> enviroment=_ENV],
-<font color="#888888">variable</font> ...)</h3>
+<h3 class="funcheader"><span class="returntype"><span class="vartpe">thread</span>|<span class="vartpe">nil</span></span> new (<font class="vartpe">function</font>
+function, [<font class="vartpe">table</font> enviroment=_ENV],
+<font class="vartpe">variable</font> ...)</h3>
 <p>creates a new thread with a given function, and immedietly begins
 execution. caution is advised when multithreading, as no safeguards
 are put in place to prevent data races. Some datatypes are unsafe to
@@ -2004,8 +2006,8 @@ data. can be supplied with nil to ignore it.<br/>
 accepts any number
 of further arguments, which will be supplied to the thread function
 as parameters.<br/>
-returns a thread object. if no return value is
-specified, the thread will not be created. 
+returns a thread object on successful thread start, or nil if the thread failed to start.<br>
+<b>if no return value is specified, the thread will not be created.</b>
 </p>
 <p class="example" style="margin-bottom: 0in">function a() <br/>
  return
@@ -2016,7 +2018,7 @@ t=thread.new(a)
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">isfinished (<font color="#888888">thread</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> isfinished (<font class="vartpe">thread</font>
 thread)</h3>
 <p>returns a bool if a thread has finished execution. 
 </p>
@@ -2025,7 +2027,7 @@ thread)</h3>
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">isrunning (<font color="#888888">thread</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> isrunning (<font class="vartpe">thread</font>
 thread)</h3>
 <p>returns a bool if a thread is executing code. will always returns
 the inverse result of isfinished. 
@@ -2035,7 +2037,7 @@ the inverse result of isfinished.
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">fetch (<font color="#888888">thread</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">variable</span>|<span class="vartpe">nil</span></span> fetch (<font class="vartpe">thread</font>
 thread)</h3>
 <p>returns the next variable from a finished thread. if there are no
 more variables returned by the thread, nil will be given instead.
@@ -2048,7 +2050,7 @@ the above example.
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">abort (<font color="#888888">thread</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> abort (<font class="vartpe">thread</font>
 thread)</h3>
 <p>kills a thread. This should only be used in dire circumstances
 where a thread is held up indefinitely, as resources will not
@@ -2059,7 +2061,7 @@ properly be freed.
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">getcount (<font color="#888888">thread</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> getcount (<font class="vartpe">thread</font>
 thread)</h3>
 <p>returns the next number of results that a thread has in the form
 of an integer, or 0, if the thread is still running. 
@@ -2072,7 +2074,7 @@ end
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h3 class="funcheader-western">await (<font color="#888888">thread</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> await (<font class="vartpe">thread</font>
 thread)</h3>
 <p>halts the main thread until the supplied thread is finished. 
 </p>
@@ -2080,7 +2082,7 @@ thread)</h3>
 </p>
 <h1 id="lib_table">Table library</h1>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">copy (<font color="#888888">table</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">table</span></span> copy (<font class="vartpe">table</font>
 table)</h3>
 <p>creates a new table which contains the same values as the supplied
 table. 
@@ -2092,37 +2094,37 @@ print(a==b) //false
 </p>
 <h1 id="lib_debug">Debug library</h1>
 <h2 class="western">functions</h2>
-<h3 class="funcheader-western">dumpstack ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumpstack ()</h3>
 <p>logs information about the current state's stack to stdout,
 including how many variables are on the stack, what the variables's
 values are, and unallocated variables, as well as the allocated size
 of the stack array. Returns no value. 
 </p>
-<h3 class="funcheader-western">dumpstate ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumpstate ()</h3>
 <p>logs information about the current state structure to stdout,
 including how far the each state is into execution, the instruction
 address, and which state is the parent state recursively, until the
 master state is reached. Returns no value. 
 </p>
-<h3 class="funcheader-western">dumpenv ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumpenv ()</h3>
 <p>logs information about the environment to stdout, including
 associated state, and all values stored inside the environment table,
 and does so for each parent state until the master state. Returns no
 value. 
 </p>
-<h3 class="funcheader-western">dumpconstants ()</h3>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumpconstants ()</h3>
 <p>logs information about the state's constants to stdout, including
 how many constants the state has, and what the values of the
 constants are. Returns no value. 
 </p>
-<h3 class="funcheader-western">dumpbytecode ([<font color="#888888">function</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumpbytecode ([<font class="vartpe">function</font>
 function=_ENV])</h3>
 <p>logs information about the provided function to stdout, including
 the number of instructions, and each opcode and additional
 information. Returns no value. if no arg is given, instead uses the
 current state's bytecode. 
 </p>
-<h3 class="funcheader-western">dumprawbytecode ([<font color="#888888">function</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumprawbytecode ([<font class="vartpe">function</font>
 function=_ENV])</h3>
 <p>logs information about the provided function to stdout, including
 the number of instructions, as well as a binary view of each,
@@ -2130,12 +2132,12 @@ including raw data in the form of signed, unsigned, and char values.
 Returns no value. if no arg is given, instead uses the current
 state's bytecode. 
 </p>
-<h3 class="funcheader-western">showrefs (<font color="#888888">variable</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> showrefs (<font class="vartpe">variable</font>
 var)</h3>
 <p>Shows how many refs the value has, printed to stdout. If a non
 ref-counted variable is provided, it will display an invalid message,
 but not error.</p>
-<h3 class="funcheader-western">dumpdebuginfo ([<font color="#888888">function</font>
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumpdebuginfo ([<font class="vartpe">function</font>
 function=_ENV])</h3>
 <p>Displays the given function's (or current state's) debug tokens to
 stdout.</p>
