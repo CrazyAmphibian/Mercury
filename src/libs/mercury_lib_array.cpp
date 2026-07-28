@@ -297,8 +297,8 @@ void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercu
 	}
 
 	mercury_array* arr = (mercury_array*)arr_var.data.p;
-	mercury_int cur_len=mercury_array_len(arr);
-
+	mercury_int cur_len=mercury_array_len(arr)+1;
+	mercury_int placed_at = -1;
 	if (len_var.type) { //if len, shift values ahead to make space.
 		mercury_int target = len_var.data.i;
 		for (mercury_int i = cur_len; i >= target; i--) {
@@ -307,16 +307,24 @@ void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercu
 			mercury_setarray(arr, &v, i + 1);
 		}
 		mercury_setarray(arr, &var_to_ins, target);
+		placed_at = target;
 	}
 	else { //if len is not specified, add to the end.
 		mercury_setarray(arr, &var_to_ins, cur_len);
+		placed_at = cur_len;
 	}
 
 	mercury_free_var(&arr_var);
 	mercury_free_var(&var_to_ins);
 	if(len_var.type)mercury_free_var(&len_var);
 
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+	if (args_out) {
+		arr_var.data.i = placed_at;
+		arr_var.type = M_TYPE_INT;
+		mercury_pushstack(M, &arr_var);
+	}
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
 void mercury_lib_array_remove(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //gets rid of a value and shifts ones after down.
