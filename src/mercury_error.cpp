@@ -130,6 +130,7 @@ void mercury_raise_error(mercury_state* M, const uint32_t errorcode, const mercu
 	free(str);
 
 	while (M) {
+		M->errorcode = errorcode;
 		M->programcounter = M->bytecode.numberofinstructions; //push to end to stop execution
 		M = M->parentstate;
 	}

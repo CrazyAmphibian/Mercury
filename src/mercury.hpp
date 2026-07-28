@@ -215,7 +215,7 @@ struct mercury_state {
 
 	mercury_uint programcounter = 0;
 	mercury_function bytecode;
-
+	uint32_t errorcode;
 
 	mercury_table* enviroment;
 

@@ -447,6 +447,7 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 	newstate->stack = nullptr;
 
 	newstate->programcounter = 0;
+	newstate->errorcode = 0;
 
 	newstate->bytecode.enviromental = true;
 	newstate->bytecode.instructions = nullptr;
