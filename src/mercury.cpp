@@ -1076,7 +1076,7 @@ mercury_string* mercury_tostring(const mercury_variable* const M_CPP_restrict va
 		}
 		break;
 	case M_TYPE_TABLE:
-		tint = snprintf(tout, sizeof(tout), "table 0x%p", var->data.p);
+		tint = snprintf(tout, sizeof(tout), "table %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
@@ -1086,28 +1086,28 @@ mercury_string* mercury_tostring(const mercury_variable* const M_CPP_restrict va
 		tstr = mercury_copystring((mercury_string*)var->data.p);
 		break;
 	case M_TYPE_CFUNC:
-		tint = snprintf(tout, sizeof(tout), "c function 0x%p", var->data.p);
+		tint = snprintf(tout, sizeof(tout), "c function %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
 		break;
 	case M_TYPE_FUNCTION:
-		tint = snprintf(tout, sizeof(tout), "function 0x%p", var->data.p);
+		tint = snprintf(tout, sizeof(tout), "function %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
 		break;
 	case M_TYPE_ARRAY:
-		tint = snprintf(tout, sizeof(tout), "array 0x%p", var->data.p);
+		tint = snprintf(tout, sizeof(tout), "array %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout));
 		break;
 	case M_TYPE_FILE:
-		tint = snprintf(tout, sizeof(tout), "file 0x%p", var->data.p);
+		tint = snprintf(tout, sizeof(tout), "file %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
