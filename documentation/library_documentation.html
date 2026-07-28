@@ -717,7 +717,7 @@ string
 string, <font class="vartpe">string</font> match, [<font class="vartpe">int</font>
 start=0])</h3>
 <p>attempts to find the string match inside of the provided string.
-if found, returns the position in the string where it occurs.
+if found, returns the position in the string where it occurs, as well as where it ends.
 otherwise, returns nil. 
 </p>
 <p class="example" style="margin-bottom: 0in">string.find(&quot;hello,
@@ -734,7 +734,8 @@ replacement, [<font class="vartpe">int</font> max
 replacements=infinity])</h3>
 <p>searches a string for all occurrences of a match, and replaces
 them with another string. if the max replacements argument is
-provided, it can be used to limit the number of replacements done. 
+provided, it can be used to limit the number of replacements done. <Br>
+returns the new string, as well as how many replacements were done.
 </p>
 <p class="example" style="margin-bottom: 0in">string.replace(&quot;hello,
 world!&quot;,&quot;l&quot;,&quot;t&quot;,2) //returns &quot;hetto,
