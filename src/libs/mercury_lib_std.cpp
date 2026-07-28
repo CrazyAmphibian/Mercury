@@ -305,12 +305,29 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(mercury_opcode));
 	}
 
-
+	mercury_variable out;
+	out.type = M_TYPE_BOOL;
+	out.data.i = 1;
 	if (func.type == M_TYPE_CFUNC) {
-		((mercury_cfunc)func.data.p)(iso_M, args_in-2, 0);
+		((mercury_cfunc)func.data.p)(iso_M, args_in-2, args_out ? args_out-1 : 0);
 	}
 	else {
 		while (mercury_stepstate(iso_M));
+	}
+	if (iso_M->errorcode)out.data.i = 0;
+
+	if (args_out) {
+		mercury_pushstack(M, &out);
+	}
+
+	if (out.data.i) {
+		for (mercury_int i = 1; i < args_out; i++) {
+			mercury_pullstack(iso_M, &out);
+			mercury_pushstack_unrefed(M, &out);
+		}
+	}
+	else {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 	}
 
 
@@ -321,7 +338,7 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	mercury_free_var(&func);
 	mercury_free_var(&tab);
 
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 0);
+	//MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M,args_out, 1);
 }
 
 

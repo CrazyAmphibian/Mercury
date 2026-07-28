@@ -21,6 +21,14 @@ DWORD WINAPI threadfunction(LPVOID param) {
 
 	while(mercury_stepstate(threadvar->state));
 
+	if (threadvar->state->errorcode) { //clear stack on error to prevent drawing of args that shouldn't be drawn.
+		while (threadvar->state->sizeofstack) {
+			mercury_variable v;
+			mercury_popstack(threadvar->state, &v);
+			mercury_free_var(&v);
+		}
+	}
+
 	threadvar->finished = true;
 	return 0;
 }
@@ -30,6 +38,14 @@ void* threadfunction(void* param) {
 	mercury_threadholder* threadvar = (mercury_threadholder*)param;
 
 	while (mercury_stepstate(threadvar->state));
+
+	if (threadvar->state->errorcode) {
+		while (threadvar->state->sizeofstack) {
+			mercury_variable v;
+			mercury_popstack(threadvar->state, &v);
+			mercury_free_var(&v);
+}
+	}
 
 	threadvar->finished = true;
 	return nullptr;
