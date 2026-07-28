@@ -1061,12 +1061,7 @@ mercury_string* mercury_tostring(const mercury_variable* const M_CPP_restrict va
 		tstr = mercury_cstring_to_mstring(tout, strlen(tout) );
 		break;
 	case M_TYPE_FLOAT:
-		#ifdef MERCURY_64BIT
-		tint = snprintf(tout, sizeof(tout), "%#.30g", var->data.f);
-		#else
-		tint = snprintf(tout, sizeof(tout), "%#.5g", var->data.f);
-		#endif
-		
+		tint = snprintf(tout, sizeof(tout), "%#.10g", var->data.f);	
 		if (tint==-1) {
 			return nullptr;
 		}
