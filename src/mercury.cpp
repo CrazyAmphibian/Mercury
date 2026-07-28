@@ -671,7 +671,7 @@ void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 
 	*out = M->stack[0];
 	M->sizeofstack--;
-	memmove(M->stack, M->stack + 1, sizeof(mercury_variable*) * M->sizeofstack);
+	memmove(M->stack, M->stack + 1, sizeof(mercury_variable) * M->sizeofstack);
 }
 
 

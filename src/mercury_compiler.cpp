@@ -1788,6 +1788,7 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==',')){
 				break;
 			}
+			token_offset++;
 		}
 		add_instruction(f, M_OPCODE_EXIT, token_offset);
 		return token_offset-initial_offset;
@@ -2044,7 +2045,9 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 				mercury_int starting_args_out = i->args_out;
 
 				token_offset += m_compile_read_var_statment(argfunc, tokens, num_tokens, token_offset, i);
-				if (f->errorcode) {
+				if (argfunc->errorcode) {
+					f->errorcode = argfunc->errorcode;
+					f->token_error_num = argfunc->token_error_num;
 					return 0;
 				}
 
