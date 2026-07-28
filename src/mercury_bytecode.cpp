@@ -1127,10 +1127,11 @@ void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 }
 
 void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
-	mercury_variable value;
-	mercury_popstack(M,&value);
 	mercury_variable key;
 	mercury_popstack(M, &key);
+	mercury_variable value;
+	mercury_popstack(M,&value);
+
 
 	mercury_state* check_state = M;
 	while (check_state) {
@@ -1211,12 +1212,12 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 
 
 void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
-	mercury_variable value;
-	mercury_popstack(M, &value);
 	mercury_variable key;
 	mercury_popstack(M, &key);
 	mercury_variable table;
 	mercury_popstack(M, &table);
+	mercury_variable value;
+	mercury_popstack(M, &value);
 
 	switch (table.type) {
 	case M_TYPE_TABLE:
@@ -1675,10 +1676,11 @@ void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 
 void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	//ditto.
+	mercury_variable key;
+	mercury_popstack(M, &key);
 	mercury_variable value;
 	mercury_popstack(M, &value);
-	mercury_variable key;
-	mercury_popstack(M,&key);
+
 
 	mercury_subtable* st = M->enviroment->data[key.type];
 	mercury_int sz = st->size;
@@ -1735,10 +1737,11 @@ void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
 
 void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 		//ditto.
-	mercury_variable value;
-	mercury_popstack(M, &value);
 	mercury_variable key;
 	mercury_popstack(M, &key);
+	mercury_variable value;
+	mercury_popstack(M, &value);
+
 
 	mercury_subtable* st = M->masterstate->enviroment->data[key.type];
 	mercury_int sz = st->size;
@@ -1938,6 +1941,24 @@ void M_BYTECODE_GCON(mercury_state* const M_CPP_restrict M) { //Get CONstant
 	mercury_pushstack(M, M->constants + con_num);
 }
 
+void M_BYTECODE_SWXY(mercury_state* const M_CPP_restrict M) { //SWap stack X and Y
+	mercury_uint X = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	mercury_uint Y = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+
+	if (X >= M->sizeofstack || Y >= M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_INSTRUCTION_FAILIURE);
+		return;
+	}
+
+	X = M->sizeofstack - X - 1;
+	Y = M->sizeofstack - Y - 1;
+
+	mercury_variable v_X = M->stack[X];
+	M->stack[X] = M->stack[Y];
+	M->stack[Y] = v_X;
+}
 
 mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_NOP, //0
@@ -2014,5 +2035,7 @@ mercury_instruction mercury_bytecode_list[] = {
 
 	M_BYTECODE_SCON, //60
 	M_BYTECODE_GCON, //61
+
+	M_BYTECODE_SWXY, //62
 };
 

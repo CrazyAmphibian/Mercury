@@ -49,6 +49,7 @@ enum compiler_error_codes {
 	M_COMPERR_NESTEDSTATMENT_NOT_CLOSED, // ()
 	M_COMPERR_NO_VARIABLE, //for any variable of any type with any syntax, including variable statments such as a>5
 	M_COMPERR_NO_NAMED_VARIABLE, //this is for implicit variable names, under TOKEN_ENV_VAR.
+	M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT, // for multi-set statments, eg a,b=
 };
 
 
@@ -650,6 +651,8 @@ struct compiler_info {
 	mercury_string* goto_alias = nullptr; //the string of the goto label. eg, "stuff","cancel"
 	mercury_int* goto_labelpos = nullptr; //where the label is defined. eg, ?,50
 
+	//multiarg out support
+	mercury_int args_out = 1;
 };
 
 inline compiler_info* new_compiler_info(){ //this exists to be used in m_compile_read_keyword_block and mercury_compile_tokens_to_bytecode, and whatnot to dictate keywords and control flow. doesn't need to be propagated to low-end functions like m_compile_read_variable or m_compile_read_statment.
@@ -681,6 +684,8 @@ inline compiler_info* new_compiler_info(){ //this exists to be used in m_compile
 	out->goto_alias=nullptr;
 	out->goto_labelpos=nullptr;
 	
+	out->args_out = 1;
+
 	return out;
 }
 
@@ -1208,7 +1213,10 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 				
 			//read a variable. this could be implicit index value or an index.
 			compiler_function* idxfunc=new_compiler_function();
+			mercury_int oao = i->args_out;
+			i->args_out = 1;
 			token_offset+= m_compile_read_var_statment(idxfunc,tokens,num_tokens,token_offset,i);
+			i->args_out = oao;
 			if(idxfunc->errorcode){
 				f->errorcode = idxfunc->errorcode;
 				f->token_error_num = idxfunc->token_error_num;
@@ -1226,12 +1234,21 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 			if(cur_tok->token_flags & TOKEN_OPERATOR && cur_tok->num_chars==1){
 				if(cur_tok->chars[0]=='='){ //explicit index
 					add_instruction(f,M_OPCODE_CPYT,token_offset);
-						
-					merge_compiler_functions(f,idxfunc);
-					idxfunc=nullptr;
+					
+					
+
+					
 					token_offset++;
+					mercury_int oao = i->args_out;
+					i->args_out = 1;
 					mercury_int o= m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
-						
+					i->args_out = oao;
+					
+					add_instruction(f, M_OPCODE_SWPT, token_offset);
+
+					merge_compiler_functions(f, idxfunc);
+					idxfunc = nullptr;
+
 					if(f->errorcode){
 						return 0;
 					}else if(!o){
@@ -1258,14 +1275,16 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 					if(cur_tok->chars[0] == ',')token_offset++;
 				}else if(cur_tok->chars[0]==',' || is_array ? ']' : '}'){ //implicit index
 					add_instruction(f,M_OPCODE_CPYT,token_offset);
-						
+					
+					merge_compiler_functions(f, idxfunc);
+					idxfunc = nullptr;
+
+					add_instruction(f, M_OPCODE_SWPT, token_offset);
+
 					add_instruction(f,M_OPCODE_NINT,token_offset);
 					add_rawdata_bitwidth_size(f,*(binarydata*)&implicit_position,token_offset);
 					implicit_position++;
-						
-					merge_compiler_functions(f,idxfunc);
-					idxfunc=nullptr;
-						
+
 					add_instruction(f,M_OPCODE_SET,token_offset);
 					if(cur_tok->chars[0] == ',')token_offset++;
 				}else{
@@ -1319,7 +1338,10 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 	}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='('){ //parenthesis statement reading. we read (b+c) as a variable because it makes things easier on the compiler, and helps further segment the code to be more clean. after all, a+(b+c) is functionally equivalent to computing (b+c) then doing a+.
 		token_offset++;
 
+		mercury_int oao = i->args_out;
+		i->args_out = 1;
 		token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
+		i->args_out = oao;
 		if(f->errorcode){
 			return 0;
 		}
@@ -1376,7 +1398,7 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 
 				add_string_onto_stack(funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
 				//token_offset+=m_compile_read_variable(funcargreadf,tokens,num_tokens,token_offset, nullptr); //load the var name onto the stack
-				add_instruction(funcargreadf,M_OPCODE_SWPT,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key
+				//add_instruction(funcargreadf,M_OPCODE_SWPT,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key
 				add_instruction(funcargreadf,M_OPCODE_SETL,token_offset);
 				token_offset++;
 			}else{
@@ -1497,7 +1519,10 @@ mercury_int m_compile_read_var_indexing(compiler_function* f, compiler_token** t
 			}
 		}else if(cur_tok->chars[0]=='['){ //specific indexing
 			token_offset++;
+			mercury_int oao = i->args_out;
+			i->args_out = 1;
 			mercury_int o=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
+			i->args_out = oao;
 			if(f->errorcode){
 				return 0;
 			}else if(!o){
@@ -1541,8 +1566,10 @@ mercury_int m_compile_read_call_func(compiler_function* f, compiler_token** toke
 	}
 	token_offset++;
 
+	mercury_int orig_args_out = i->args_out;
 
 	while(true){
+		i->args_out = 1;
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
 			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
@@ -1578,6 +1605,7 @@ mercury_int m_compile_read_call_func(compiler_function* f, compiler_token** toke
 		}
 		
 	}
+	i->args_out= orig_args_out;
 
 
 	return token_offset-initial_offset;
@@ -1636,6 +1664,7 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 	
 	compiler_function* func_complete=nullptr;
 	
+	bool firstpass = true;
 	while (true) {
 		func_complete = new_compiler_function();
 		func_index = new_compiler_function();
@@ -1672,16 +1701,22 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 
 			add_instruction(func_complete, M_OPCODE_CALL, token_offset - 1);
 			add_rawdata_bitwidth_size(func_complete, f_args_in, token_offset - 1);
-			add_rawdata_bitwidth_size(func_complete, 1, token_offset - 1); //args out
+			add_rawdata_bitwidth_size(func_complete, i->args_out, token_offset - 1); //args out
+			i->args_out=0;
 		}
-		else {
+		else if(vitokc){
 			delete_compiler_function(func_call);
-
+			i->args_out--;
 			merge_compiler_functions(func_complete, func_var);
 			merge_compiler_functions(func_complete, func_index);
 		}
+		else if(firstpass){
+			i->args_out--;
+		}
+		firstpass = false;
 		//after reading a function call, read ahead a bit more to check for a chained function call, or further indexing. do this here because function calls are looked at last, and the compiler will throw and error trying to read a call as its own statment. for example, a()() (call the result of calling a), or a()[1] (index the result of calling a)
 		if (!(vitokc+fctokc)) { //if we didn't consume any tokens, then we can just exit
+			func_complete = func_var;
 			break;
 		}
 		else { //otherwise, go back around and do it agian.
@@ -1704,7 +1739,10 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 		return 0;
 	}
 	if(func_binary->number_instructions){ //if we registered a binary operator, then we need to read ahead to get the other statement, which means we get to do this whole thing again.
+		mercury_int oao = i->args_out;
+		i->args_out = 1;
 		token_offset+=m_compile_read_var_statment(func_complete,tokens,num_tokens,token_offset,i,func_binary);
+		i->args_out = oao;
 	}else{
 		delete_compiler_function(func_binary);
 	}
@@ -1718,37 +1756,22 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 //a statement is something like a=5, a[1]=5, a(5), or a[1](5)
 mercury_int m_compile_read_statment(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
 	mercury_int initial_offset=token_offset;
-	mercury_opcode get_instruction=M_OPCODE_GENV;
-	mercury_opcode set_instruction=M_OPCODE_SENV;
 	
-	//find local/global keyword first
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	if(!cur_tok){
 		return 0;
-	}else if(cur_tok->token_flags & TOKEN_SCOPESPECIFIER){
-		
-		if(token_matches_chars(cur_tok,"local")){
-			get_instruction = M_OPCODE_GETL;
-			set_instruction = M_OPCODE_SETL;
-		}else{
-			get_instruction = M_OPCODE_GETG;
-			set_instruction = M_OPCODE_SETG;
-		}
-		
-		token_offset++;
-		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
-		if(!cur_tok){
-			f->token_error_num=token_offset;
-			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
-			return 0;
-		}
-	}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"return") ){
+	}
+
+	if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"return") ){
 		//this is tricky, since we have to discern return a=5 and return a. one of these is a statement, while the other is a variable. why even compile code after return? well, goto exists, for one, and the cursed code that this will inevitably cause will be more than worth it. but why even allow that, you may ask. well, the compiler's job is to make code run, not pass judgments about how shitty your code is, so pass judgments we will not.
 		//well actually, having said that, i've used jump after return in this code so uh... you go get that 1% speed improvment, king!
 		token_offset++;
 		while(true){
 			compiler_function* n=new_compiler_function();
+			mercury_int oao = i->args_out;
+			i->args_out = 1;
 			mercury_int o=m_compile_read_var_statment(n,tokens,num_tokens,token_offset,i);
+			i->args_out = oao;
 			cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset + o);
 			if(!cur_tok || (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='=')){
 				delete_compiler_function(n);
@@ -1772,154 +1795,315 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		return 0;
 	}
 	
-	//then find the variable we'll be interfacing with
-	if(!(cur_tok->token_flags & TOKEN_ENV_VAR)){
-		f->token_error_num=token_offset;
-		f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
-		return 0;
-	}
-	
-	compiler_token* nt=m_compile_get_next_token(tokens,num_tokens,token_offset+1); //goto labels
-	if(get_instruction==M_OPCODE_GENV && nt && nt->token_flags & TOKEN_MISC_OP && nt->num_chars==1 && nt->chars[0]==':'){
-		if(!compiler_info_add_goto_label(i,cur_tok,f->number_instructions+i->additional_instructions)){
-			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
-			f->token_error_num=token_offset;
+	i->args_out = 0;
+	mercury_opcode* set_instructs = nullptr;
+	mercury_opcode get_instruction = M_OPCODE_GENV;
+	mercury_opcode set_instruction = M_OPCODE_SENV;
+	compiler_function** varfuncs = nullptr;
+	while (true) {
+		void* nptr=realloc(set_instructs, sizeof(mercury_opcode) * (i->args_out + 1));
+		if (!nptr) {
+			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num = token_offset;
 			return 0;
 		}
-		return 2;
-	}
-	
-	compiler_function* getvarfunc=new_compiler_function();
-	if (!getvarfunc) {
-		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-		f->token_error_num = token_offset;
-		return 0;
-	}
+		set_instructs = (mercury_opcode*)nptr;
 
-	//token_offset+=m_compile_read_variable(f,tokens,num_tokens,token_offset,i);
-	//*
-	mercury_int ci = compiler_info_add_constant_string_from_token(i, cur_tok);
-	if (ci == -1) {
-		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-		f->token_error_num = token_offset;
-		return 0;
-	}
-	add_instruction(getvarfunc, M_OPCODE_GCON, token_offset);
-	add_rawdata_bitwidth_size(getvarfunc, ci, token_offset);
-	token_offset++;
-	//*/
-
-	//check if we're indexing something about it.
-	bool should_set = true;
-	mercury_uint* function_output_args_point = nullptr;
-	while(true){
-		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
-		if(!cur_tok){
-			if (!should_set)break;
-			f->token_error_num=token_offset;
-			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
-			delete_compiler_function(getvarfunc);
+		nptr = realloc(varfuncs, sizeof(compiler_function*) * (i->args_out + 1));
+		if (!nptr) {
+			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num = token_offset;
 			return 0;
-		}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && (cur_tok->chars[0]=='[' || cur_tok->chars[0]=='.') ){
-			if (function_output_args_point) {
-				*function_output_args_point = 1;
-				function_output_args_point = nullptr;
+		}
+		varfuncs = (compiler_function**)nptr;
+		varfuncs[i->args_out] = nullptr;
+
+		get_instruction = M_OPCODE_GENV;
+		set_instruction = M_OPCODE_SENV;
+
+		cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+		if (cur_tok->token_flags & TOKEN_SCOPESPECIFIER) { //find local/global keyword first
+
+			if (token_matches_chars(cur_tok, "local")) {
+				get_instruction = M_OPCODE_GETL;
+				set_instruction = M_OPCODE_SETL;
 			}
-			should_set = true;
-			add_instruction(getvarfunc, get_instruction, token_offset);
-			
-			get_instruction=M_OPCODE_GET;
-			set_instruction=M_OPCODE_SET;
+			else {
+				get_instruction = M_OPCODE_GETG;
+				set_instruction = M_OPCODE_SETG;
+			}
+
 			token_offset++;
-			if(cur_tok->chars[0]=='['){ //explicit index
-				token_offset+=m_compile_read_var_statment(getvarfunc,tokens,num_tokens,token_offset,i);
-				cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
-				if(!(cur_tok && cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==']' ) ){
-					f->token_error_num=token_offset;
-					f->errorcode = M_COMPERR_WRONG_SYMBOL;
-					delete_compiler_function(getvarfunc);
-					return 0;
-				}
-				token_offset++;
-			}else{ //implicit index
-				cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
-				if( !(cur_tok) ){
-					f->token_error_num=token_offset;
-					f->errorcode = M_COMPERR_NO_MORE_TOKENS;
-					delete_compiler_function(getvarfunc);
-					return 0;
-				}else if( !(cur_tok->token_flags & TOKEN_ENV_VAR) ){
-					f->token_error_num=token_offset;
-					f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
-					delete_compiler_function(getvarfunc);
-					return 0;
-				}
-				token_offset+=m_compile_read_variable(getvarfunc,tokens,num_tokens,token_offset,i);
-				getvarfunc->number_instructions--; //remove the last instruction, which would be GENV. hacky, i know.
-			}
-			
-		}
-		else if (token_matches_chars(cur_tok, "(")) { //function call
-			if (function_output_args_point) {
-				*function_output_args_point = 1;
-				function_output_args_point = nullptr;
-			}
-			mercury_int ito = token_offset;
-			mercury_int ain = 0;
-			if(should_set)add_instruction(getvarfunc, get_instruction, token_offset);
-			compiler_function* prepend=new_compiler_function();
-			token_offset += m_compile_read_call_func(prepend, tokens, num_tokens, token_offset, &ain, i); //append to f because function args come before the function.
-			if (f->errorcode) {
+			cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+			if (!cur_tok) {
+				f->token_error_num = token_offset;
+				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
 				return 0;
 			}
-			add_instruction(getvarfunc, M_OPCODE_CALL, ito);
-			add_rawdata_bitwidth_size(getvarfunc, ain, ito);
-			add_rawdata_bitwidth_size(getvarfunc, 0, ito);
+		}
 
-			merge_compiler_functions(prepend, getvarfunc);
-			getvarfunc = prepend;
+		//then find the variable we'll be interfacing with
+		if (!(cur_tok->token_flags & TOKEN_ENV_VAR)) {
+			f->token_error_num = token_offset;
+			f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+			return 0;
+		}
 
-			function_output_args_point = (mercury_uint*)((getvarfunc->instructions) + (getvarfunc->number_instructions) - sizeof(mercury_uint)/sizeof(mercury_opcode) ); //put this here because the instructions pointer will move around during the earlier code.
-			get_instruction = M_OPCODE_GET;
-			set_instruction = M_OPCODE_SET;
-			should_set = false;
-		}else
-		{
+		compiler_token* nt = m_compile_get_next_token(tokens, num_tokens, token_offset + 1); //goto labels
+		if (get_instruction == M_OPCODE_GENV && nt && nt->token_flags & TOKEN_MISC_OP && nt->num_chars == 1 && nt->chars[0] == ':') {
+			if (i->args_out) {
+				f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
+				f->token_error_num = token_offset;
+				return 0;
+			}
+			if (!compiler_info_add_goto_label(i, cur_tok, f->number_instructions + i->additional_instructions)) {
+				f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+				f->token_error_num = token_offset;
+				return 0;
+			}
+			return 2;
+		}
+
+		compiler_function* getvarfunc = new_compiler_function();
+		if (!getvarfunc) {
+			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num = token_offset;
+			return 0;
+		}
+
+		//token_offset+=m_compile_read_variable(f,tokens,num_tokens,token_offset,i);
+		//*
+		mercury_int ci = compiler_info_add_constant_string_from_token(i, cur_tok);
+		if (ci == -1) {
+			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num = token_offset;
+			return 0;
+		}
+		add_instruction(getvarfunc, M_OPCODE_GCON, token_offset);
+		add_rawdata_bitwidth_size(getvarfunc, ci, token_offset);
+		token_offset++;
+		//*/
+
+		//check if we're indexing something about it.
+		bool should_set = true;
+		mercury_uint* function_output_args_point = nullptr;
+		while (true) {
+			cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+			if (!cur_tok) {
+				if (!should_set)break;
+				f->token_error_num = token_offset;
+				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+				delete_compiler_function(getvarfunc);
+				return 0;
+			}
+			else if (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars == 1 && (cur_tok->chars[0] == '[' || cur_tok->chars[0] == '.')) {
+				if (function_output_args_point) {
+					*function_output_args_point = 1;
+					function_output_args_point = nullptr;
+				}
+				should_set = true;
+				add_instruction(getvarfunc, get_instruction, token_offset);
+
+				get_instruction = M_OPCODE_GET;
+				set_instruction = M_OPCODE_SET;
+				token_offset++;
+				if (cur_tok->chars[0] == '[') { //explicit index
+					mercury_int oao = i->args_out;
+					i->args_out = 1;
+					token_offset += m_compile_read_var_statment(getvarfunc, tokens, num_tokens, token_offset, i);
+					i->args_out = oao;
+					cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+					if (!(cur_tok && cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars == 1 && cur_tok->chars[0] == ']')) {
+						f->token_error_num = token_offset;
+						f->errorcode = M_COMPERR_WRONG_SYMBOL;
+						delete_compiler_function(getvarfunc);
+						return 0;
+					}
+					token_offset++;
+				}
+				else { //implicit index
+					cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+					if (!(cur_tok)) {
+						f->token_error_num = token_offset;
+						f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+						delete_compiler_function(getvarfunc);
+						return 0;
+					}
+					else if (!(cur_tok->token_flags & TOKEN_ENV_VAR)) {
+						f->token_error_num = token_offset;
+						f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+						delete_compiler_function(getvarfunc);
+						return 0;
+					}
+					token_offset += m_compile_read_variable(getvarfunc, tokens, num_tokens, token_offset, i);
+					getvarfunc->number_instructions--; //remove the last instruction, which would be GENV. hacky, i know.
+				}
+
+			}
+			else if (token_matches_chars(cur_tok, "(")) { //function call
+				if (function_output_args_point) {
+					*function_output_args_point = 1;
+					function_output_args_point = nullptr;
+				}
+				mercury_int ito = token_offset;
+				mercury_int ain = 0;
+				if (should_set)add_instruction(getvarfunc, get_instruction, token_offset);
+				compiler_function* prepend = new_compiler_function();
+				token_offset += m_compile_read_call_func(prepend, tokens, num_tokens, token_offset, &ain, i); //append to f because function args come before the function.
+				if (prepend->errorcode) {
+					f->errorcode = prepend->errorcode;
+					f->token_error_num = prepend->token_error_num;
+					return 0;
+				}
+				add_instruction(getvarfunc, M_OPCODE_CALL, ito);
+				add_rawdata_bitwidth_size(getvarfunc, ain, ito);
+				add_rawdata_bitwidth_size(getvarfunc, 0, ito);
+
+				merge_compiler_functions(prepend, getvarfunc);
+				getvarfunc = prepend;
+
+				function_output_args_point = (mercury_uint*)((getvarfunc->instructions) + (getvarfunc->number_instructions) - sizeof(mercury_uint) / sizeof(mercury_opcode)); //put this here because the instructions pointer will move around during the earlier code.
+				get_instruction = M_OPCODE_GET;
+				set_instruction = M_OPCODE_SET;
+				should_set = false;
+			}
+			else
+			{
+				break;
+			}
+
+
+		}
+
+		varfuncs[i->args_out] = getvarfunc;
+
+
+		if (should_set) {
+			set_instructs[i->args_out] = set_instruction;
+			i->args_out++;
+		}
+		else if (i->args_out) {
+			f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
+			f->token_error_num = token_offset;
+			return 0;
+		}
+
+		cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+		if (!cur_tok) {
+			if (i->args_out) {
+				f->token_error_num = token_offset;
+				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+				return 0;
+			}
+			else {
+				break;
+			}
+		}
+		else if (cur_tok->num_chars==1 && cur_tok->chars[0]==',' && (cur_tok->token_flags&TOKEN_MISC_OP) ) {
+			token_offset++;
+			continue;
+		}
+		else {
 			break;
 		}
-		
-		
-	}
-	//then check what we're doing with this. this is either a set operation, or a self-modifying set operation
-	
-	if (should_set) {
 
+	}
+
+
+	//then check what we're doing with this. this is either a set operation, or a self-modifying set operation
+	if(i->args_out){
 		cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
 		if (!cur_tok) {
 			f->token_error_num = token_offset;
 			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
-			delete_compiler_function(getvarfunc);
+			//delete_compiler_function(getvarfunc);
 			return 0;
 		}
 		else if (!(cur_tok->token_flags & (TOKEN_MISC_OP | TOKEN_SELFMODIFY_OP))) {
 			f->token_error_num = token_offset;
 			f->errorcode = M_COMPERR_WRONG_SYMBOL;
-			delete_compiler_function(getvarfunc);
+			//delete_compiler_function(getvarfunc);
 			return 0;
 		}
 
 		mercury_int ito = token_offset;
 		if (token_matches_chars(cur_tok, "=")) { //assignment
 			token_offset++;
-			merge_compiler_functions(f, getvarfunc);
-			token_offset += m_compile_read_var_statment(f, tokens, num_tokens, token_offset, i);
-			if (f->errorcode) {
-				return 0;
+			//merge_compiler_functions(f, getvarfunc);
+			
+
+			compiler_function* assfunc=new_compiler_function();
+			mercury_int total_args_out = i->args_out;
+			while (i->args_out) {
+				//i->args_out--; //decrement args out in the m_compile_read_var_statment function call.
+
+				compiler_function* argfunc = new_compiler_function();
+
+				
+
+				mercury_int starting_args_out = i->args_out;
+
+				token_offset += m_compile_read_var_statment(argfunc, tokens, num_tokens, token_offset, i);
+				if (f->errorcode) {
+					return 0;
+				}
+
+				
+
+				mercury_int args_processed = starting_args_out - i->args_out;
+				if (args_processed > 1) {
+					
+					for (mercury_int n = i->args_out; n < starting_args_out; n++) {
+						merge_compiler_functions(argfunc, varfuncs[total_args_out -n-1]);
+						add_instruction(argfunc, set_instructs[n], ito);
+					}
+				}
+				else {
+					merge_compiler_functions(argfunc, varfuncs[total_args_out -i->args_out-1]);
+					add_instruction(argfunc, set_instructs[i->args_out], ito);
+				}
+
+				cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
+				if (i->args_out) { //if we need another arg...
+					if (!cur_tok) { //we need tokens
+						f->token_error_num = token_offset;
+						f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+						return 0;
+					}
+					else if (cur_tok->num_chars == 1 && cur_tok->chars[0] == ',' && (cur_tok->token_flags & TOKEN_MISC_OP)) { //and need a comma seperator
+						token_offset++;
+
+						//merge_compiler_functions(assfunc, argfunc);
+						merge_compiler_functions(argfunc, assfunc);
+						assfunc = argfunc;
+
+						continue;
+					}
+					else {
+						f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
+						f->token_error_num = token_offset;
+						return 0;
+					}
+				}
+
+				//merge_compiler_functions(assfunc, argfunc);
+				merge_compiler_functions(argfunc, assfunc);
+				assfunc = argfunc;
+				
+
 			}
-			add_instruction(f, set_instruction, ito);
+
+			merge_compiler_functions(f, assfunc);
+
 		}
 		else if (cur_tok->token_flags & TOKEN_SELFMODIFY_OP) { //assignment & modification
-			merge_compiler_functions(f, getvarfunc);
+			if (i->args_out>1) { //self-modification can only work on 1 var.
+				f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
+				f->token_error_num = token_offset;
+				return 0;
+			}
+
+			merge_compiler_functions(f, varfuncs[0] );
 			// stack: table, key
 			// we of course need to do both get and set in one line, so we have to get a bit tricky about the stack variables, so...
 			if (get_instruction == M_OPCODE_GET) {
@@ -1937,24 +2121,40 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			token_offset++;
 
 			if (cur_tok->token_flags & TOKEN_BINARY_OP) {
+				mercury_int oao= i->args_out;
+				i->args_out = 1;
 				token_offset += m_compile_read_var_statment(f, tokens, num_tokens, token_offset, i);
+				i->args_out = oao;
 				if (f->errorcode) {
 					return 0;
 				}
 			}
 
 			add_instruction(f, insop, ito);
+
+			if (get_instruction == M_OPCODE_GET){ //this is a bit annoying, TBH. we need to go from 1,2,3 to 3,1,2
+				add_instruction(f, M_OPCODE_SWXY, ito);
+				add_rawdata_bitwidth_size(f, 0, ito);
+				add_rawdata_bitwidth_size(f, 2, ito);
+				add_instruction(f, M_OPCODE_SWXY, ito);
+				add_rawdata_bitwidth_size(f, 0, ito);
+				add_rawdata_bitwidth_size(f, 1, ito);
+			}
+			else {
+				add_instruction(f, M_OPCODE_SWPT, ito);
+			}
+
 			add_instruction(f, set_instruction, ito);
 		}
 		else {
-			delete_compiler_function(getvarfunc);
+			//delete_compiler_function(getvarfunc);
 			f->token_error_num = token_offset;
 			f->errorcode = M_COMPERR_NO_OPERATION_FOUND;
 			return 0;
 		}
 	}
 	else { // !should_set
-		merge_compiler_functions(f, getvarfunc);
+		merge_compiler_functions(f, varfuncs[0]);
 	}
 	
 	return token_offset-initial_offset;
@@ -1980,7 +2180,10 @@ mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token** to
 	ci->loop_endpoint_ref_count=0;
 	ci->loop_endpoint_ref_pos=nullptr;
 	
+	mercury_int oao = ci->args_out;
+	ci->args_out = 1;
 	token_offset+=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,ci);
+	ci->args_out = oao;
 	if(f->errorcode)return 0;
 	
 	add_instruction(f, M_OPCODE_JRNI, token_offset);
@@ -2064,8 +2267,10 @@ mercury_int m_compile_parse_if_statement(compiler_function* f, compiler_token** 
 	ci->conditional_jumptoend_points=nullptr;
 	ci->conditional_defaultcase=false;
 	
-	
+	mercury_int oao = ci->args_out;
+	ci->args_out = 1;
 	mercury_int o=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,ci);
+	ci->args_out = oao;
 	if(f->errorcode){
 		return 0;
 	}else if(!o){
@@ -2114,7 +2319,10 @@ mercury_int m_compile_parse_if_statement(compiler_function* f, compiler_token** 
 
 			*(mercury_int*)(f->instructions + ci->conditional_jumppoint_init) = f->number_instructions - ci->conditional_jumppoint_init;
 			
+			mercury_int oao = ci->args_out;
+			ci->args_out = 1;
 			o=m_compile_read_var_statment(f,tokens,num_tokens,token_offset,ci);
+			ci->args_out = oao;
 			if(f->errorcode){
 				return 0;
 			}else if(!o){
@@ -2383,6 +2591,9 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 				break;
 			case M_COMPERR_NO_NAMED_VARIABLE:
 				reason = "unable to find named variable";
+				break;
+			case M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT:
+				reason = "explicit variable assignment required";
 				break;
 			default:
 				reason = "unspecified error.";

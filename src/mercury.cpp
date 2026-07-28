@@ -1349,7 +1349,7 @@ void mercury_clone_function(mercury_function* in, mercury_function* out) {
 
 inline const char* m_get_opcode_str(mercury_opcode instruction) {
 
-	if (instruction > M_OPCODE_GCON) {
+	if (instruction > M_OPCODE_SWXY) {
 		return "????";
 	}
 	static const char* lookup[0xFFFF] = {
@@ -1426,6 +1426,8 @@ inline const char* m_get_opcode_str(mercury_opcode instruction) {
 
 		"SCON", //60
 		"GCON", //61
+
+		"SWXY", //62
 	};
 	return lookup[instruction];
 }
@@ -1506,6 +1508,14 @@ mercury_string* mercury_get_bytecode_debug(mercury_function* F) {
 			case M_OPCODE_SCON:
 			case M_OPCODE_GCON:
 				snprintf(buffer, 0x2FFF, " %zi ", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+			case M_OPCODE_SWXY:
+				snprintf(buffer, 0x2FFF, " %zu ", *(mercury_int*)(F->instructions + offset));
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				snprintf(buffer, 0x2FFF, " %zu ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;

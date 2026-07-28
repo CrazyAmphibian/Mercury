@@ -84,6 +84,8 @@ void M_BYTECODE_DEC(mercury_state* const M_CPP_restrict M);
 void M_BYTECODE_SCON(mercury_state* const M_CPP_restrict M);
 void M_BYTECODE_GCON(mercury_state* const M_CPP_restrict M);
 
+void M_BYTECODE_SWXY(mercury_state* const M_CPP_restrict M);
+
 extern mercury_instruction mercury_bytecode_list[];
 
 
@@ -161,4 +163,6 @@ enum mercury_opcodes:mercury_opcode {
 
 	M_OPCODE_SCON = 60,
 	M_OPCODE_GCON = 61,
+
+	M_OPCODE_SWXY = 62,
 };
