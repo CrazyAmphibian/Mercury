@@ -554,6 +554,10 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 		free(M->bytecode.instructions);
 	}
 
+	if (M->bytecode.debug_info) {
+		free(M->bytecode.debug_info);
+	}
+
 	if (M->masterstate == M && M->registers) {
 		free(M->registers);
 	}
