@@ -1426,7 +1426,6 @@ void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / N
 	fptr->refrences = 1;
 	fptr->numberofinstructions = function_size;
 	fptr->instructions = (mercury_opcode*)malloc(function_size * sizeof(mercury_opcode));
-	fptr->debug_info = nullptr;
 	fptr->enviromental = false;
 	
 	if (fptr->instructions == nullptr) {
@@ -1435,7 +1434,23 @@ void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / N
 		return;
 	}
 
+
 	memcpy(fptr->instructions, M->bytecode.instructions + M->programcounter, function_size * sizeof(mercury_opcode));
+
+	if (M->bytecode.debug_info) {
+		fptr->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * function_size);
+		if (fptr->debug_info == nullptr) {
+			free(fptr->instructions);
+			free(fptr);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		memcpy(fptr->debug_info, M->bytecode.debug_info + M->programcounter, function_size * sizeof(mercury_debug_token));
+	}
+	else {
+		fptr->debug_info = nullptr;
+	}
+
 
 	mercury_variable out;
 	out.type = M_TYPE_FUNCTION;
