@@ -302,6 +302,7 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 		}
 		iso_M->bytecode.instructions = (mercury_opcode*)nbl;
 		iso_M->bytecode.numberofinstructions = func2->numberofinstructions;
+		iso_M->bytecode.debug_info = nullptr;
 		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(mercury_opcode));
 	}
 
