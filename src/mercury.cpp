@@ -1799,6 +1799,8 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_thread_abort, "abort", "thread");
 	mercury_register_library(mercury_lib_thread_getnumvalues, "getcount", "thread");
 	mercury_register_library(mercury_lib_thread_waitfor, "await", "thread");
+	mercury_register_library(mercury_lib_thread_break, "break", "thread");
+	mercury_register_library(mercury_lib_thread_check_error, "checkerror", "thread");
 #endif
 #ifdef MERCURY_LIB_TABLE
 	mercury_register_library(mercury_lib_table_copy, "copy", "table");

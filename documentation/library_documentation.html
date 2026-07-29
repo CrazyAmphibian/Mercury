@@ -2023,7 +2023,7 @@ t=thread.new(a)
 thread)</h3>
 <p>returns a bool if a thread has finished execution. 
 </p>
-<p style="margin-bottom: 0in">b=thread.isfinished(t) 
+<p style="margin-bottom: 0in" class="example">b=thread.isfinished(t) 
 </p>
 <p style="margin-bottom: 0in"><br/>
 
@@ -2033,7 +2033,7 @@ thread)</h3>
 <p>returns a bool if a thread is executing code. will always returns
 the inverse result of isfinished. 
 </p>
-<p style="margin-bottom: 0in">b=thread.isrunning(t) 
+<p style="margin-bottom: 0in" class="example">b=thread.isrunning(t) 
 </p>
 <p style="margin-bottom: 0in"><br/>
 
@@ -2045,7 +2045,7 @@ more variables returned by the thread, nil will be given instead.
 Will halt execution of the main thread to wait for the thread to
 finish. 
 </p>
-<p style="margin-bottom: 0in">b=thread.fetch(t) //would return 20 in
+<p style="margin-bottom: 0in" class="example">b=thread.fetch(t) //would return 20 in
 the above example. 
 </p>
 <p style="margin-bottom: 0in"><br/>
@@ -2057,7 +2057,7 @@ thread)</h3>
 where a thread is held up indefinitely, as resources will not
 properly be freed. 
 </p>
-<p style="margin-bottom: 0in">thread.abort(t) 
+<p style="margin-bottom: 0in" class="example">thread.abort(t) 
 </p>
 <p style="margin-bottom: 0in"><br/>
 
@@ -2067,20 +2067,40 @@ thread)</h3>
 <p>returns the next number of results that a thread has in the form
 of an integer, or 0, if the thread is still running. 
 </p>
-<p style="margin-bottom: 0in">while thread.getcount(t) do
+<p style="margin-bottom: 0in" class="example">while thread.getcount(t) do
 <br/>
  thread.fetch(t) <br/>
 end 
 </p>
+
 <p style="margin-bottom: 0in"><br/>
 
 </p>
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> await (<font class="vartpe">thread</font>
 thread)</h3>
 <p>halts the main thread until the supplied thread is finished. 
 </p>
-<p>thread.await(t) 
+<p class="example">thread.await(t) 
 </p>
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> break (<font class="vartpe">thread</font>
+thread)</h3>
+<p>attempts to stop a running thread by forcing it to stop bytecode execution. preferable to thread.abort, as it allows for variables to be properly freed. does nothing on a thread that has finished executing.
+</p>
+<p class="example">
+thread.break(t) 
+</p>
+
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> checkerror (<font class="vartpe">thread</font>
+thread)</h3>
+<p>returns a boolean if a thread encountered an error.
+</p>
+<p class="example">
+thread.checkerror(t) 
+</p>
+
 <h1 id="lib_table">Table library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">table</span></span> copy (<font class="vartpe">table</font>
@@ -2093,6 +2113,7 @@ b=table.copy(a)
 <br/>
 print(a==b) //false 
 </p>
+
 <h1 id="lib_debug">Debug library</h1>
 <h2 class="western">functions</h2>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> dumpstack ()</h3>

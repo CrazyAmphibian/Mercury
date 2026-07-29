@@ -257,6 +257,67 @@ fine tune scope.</p>
 	<li>thread</li>
 </ul>
 
+<h4>nil</h4>
+nil is a primitive datatype that has a lot of special behavior regarding it that other types do not.<br>
+nil is the fallback value for all unset variables, and is used as the result of a function giving a soft error.<br>
+nil also has no runtime guarantees about visibility in functions. this means that, if a variable is nil, the runtime environment is not required to treat the variable as if it exists. For example, standard library's iterate function is not guaranteed to process variables whose values are nil.<br>
+Regardless, nil, like any other variable type, is first class, and can be freely passed to functions or be assigned in tables as either the key or value.<br>
+Additionally, nil is always treated as false in boolean operations.<br>
+
+<h4>int</h4>
+int represents a signed integer. on 32 bit platforms this is a 32 bit int (int32_t), and on 64 bit platforms, this as a 64 bit int (int64_t).<br>
+ints can be freely used with other ints or floats for math operations.<br>
+for boolean operations, ints follow C rules, where 0 is false, and any other value is true.<br>
+integer division by 0 will throw an error, if done in int-int parameter modulo or integer division<br>
+
+<h4>float</h4>
+float represents a floating point number. on 32 bit platforms this is a standard 32 bit float, and on 64 bit platforms, this as a double precision float.<br>
+floats can be freely used with other floats or ints for math operations.<br>
+for boolean operations, floats will always be treated as true<br>
+
+<h4>table</h4>
+tables are a storage type, which use a key-value system of indexing, where each value is associated with a key, and each key is associated with a value.<br>
+any variable can be used as a key or value.<br>
+the length operator can be used on tables, where it will return the total number of variables stored in all keys.<br>
+for boolean operations, tables will always be treated as true<br>
+tables are reference-counted objects, and are not safe to access or modify across multiple threads<br>
+
+<h4>string</h4>
+strings store text as an array of characters, in ASCII format.<br>
+the index operator with an integer can be used on strings to get a specific character. if reading out of bounds, an empty string is returned instead.<br>
+the length operator can be used on strings, where it will return the number of characters stored.<br>
+for boolean operations, strings will always be treated as true<br>
+strings are reference-counted objects, and are not safe to access or modify across multiple threads<br>
+
+<h4>c function</h4>
+c functions are a pointer to memory that a function written in C++ is assigned to.<br>
+c functions can be called with any number of variables in or out, however may raise an error if arguments are not properly fulfilled.<br>
+for boolean operations, c functions will always be treated as true<br>
+
+<h4>array</h4>
+arrays are a storage type, which use a fixed numeric system of indexing, where each value is stored at a specific location depending on its integer index.<br>
+any variable can be used as a value, but only integers can be used to index.<br>
+the length operator can be used on arrays, where it will return the highest positive index assigned to a variable, plus one. for empty arrays, or arrays with no positive elements, the operator returns 0.<br>
+for boolean operations, arrays will always be treated as true<br>
+arrays are reference-counted objects, and are not safe to access or modify across multiple threads<br>
+
+<h4>function</h4>
+functions represent code written in mercury, either compiled before or during runtime<br>
+functions can be called with any number of variables in or out, however may raise an error if arguments are given wrong values<br>
+for boolean operations, functions will always be treated as true<br>
+functions are reference-counted objects, and are not safe to access or modify across multiple threads<br>
+
+<h4>file</h4>
+files represent a file object, and are used and created by the IO library to either read or write to.<br>
+for boolean operations, files will always be treated as true<br>
+files are reference-counted objects, and are not safe to access or modify across multiple threads<br>
+
+<h4>thread</h4>
+threads represent a thread object, and are used and created by the thread library<br>
+causing a thread to be deleted early will cause a memory leak, as the runtime will force the thread to stop, and not properly free resources.<br>
+for boolean operations, threads will always be treated as true<br>
+threads are reference-counted objects, and are not safe to access or modify across multiple threads<br>
+
 <h3 class="western">Operators</h3>
 <h4 class="western">Operators: Arithmetic</h4>
 <p style="margin-bottom: 0in">Arithmetic operators work only on

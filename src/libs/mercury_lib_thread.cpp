@@ -352,5 +352,47 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 }
 
 
+//tries to abort execution on a thread without leaking as much.
+void mercury_lib_thread_break(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
+
+	mercury_variable in;
+	mercury_popstack(M, &in);
+	if (in.type != M_TYPE_THREAD) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		return;
+	}
+
+	mercury_threadholder* t = (mercury_threadholder*)in.data.p;
+	if (!t->finished) {
+		t->state->errorcode = M_ERROR_EXECUTION_ABORT;
+		t->state->programcounter = t->state->bytecode.numberofinstructions;
+	}
+
+	mercury_free_var(&in);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+}
 
 
+void mercury_lib_thread_check_error(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
+
+	mercury_variable in;
+	mercury_popstack(M, &in);
+	if (in.type != M_TYPE_THREAD) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		return;
+	}
+	mercury_threadholder* t = (mercury_threadholder*)in.data.p;
+	uint32_t ec = t->state->errorcode;
+	mercury_free_var(&in);
+	if (!args_out)return;
+
+	in.type = M_TYPE_BOOL;
+	in.data.i = ec != 0;
+	mercury_pushstack(M,&in);
+
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
+}

@@ -12,7 +12,10 @@ thread.await(t2)
 
 
 local var=nil
-if thread.getcount(t1) then
+if thread.checkerror(t1) then
+	print("thread 1 encountered an error while running")
+	return 1
+elseif thread.getcount(t1) then
 	var=thread.fetch(t1)
 	if var!=460 then
 		print("thread 1 returned an incorrect value "..var)
@@ -23,7 +26,10 @@ else
 	return 1
 end
 var=nil
-if thread.getcount(t2) then
+if thread.checkerror(t2) then
+	print("thread 2 encountered an error while running")
+	return 1
+elseif thread.getcount(t2) then
 	var=thread.fetch(t2)
 	if var!=414 then
 		print("thread 2 returned an incorrect value "..var)
