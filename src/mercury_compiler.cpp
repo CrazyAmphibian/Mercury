@@ -1806,6 +1806,8 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		if (!nptr) {
 			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
+			free(varfuncs);
+			free(set_instructs);
 			return 0;
 		}
 		set_instructs = (mercury_opcode*)nptr;
@@ -1814,6 +1816,8 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		if (!nptr) {
 			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
+			free(varfuncs);
+			free(set_instructs);
 			return 0;
 		}
 		varfuncs = (compiler_function**)nptr;
@@ -1839,6 +1843,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			if (!cur_tok) {
 				f->token_error_num = token_offset;
 				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+				for (mercury_int n = 0; n < i->args_out; n++) {
+					delete_compiler_function(varfuncs[n]);
+				}
+				free(varfuncs);
+				free(set_instructs);
 				return 0;
 			}
 		}
@@ -1847,6 +1856,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		if (!(cur_tok->token_flags & TOKEN_ENV_VAR)) {
 			f->token_error_num = token_offset;
 			f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+			for (mercury_int n = 0; n < i->args_out; n++) {
+				delete_compiler_function(varfuncs[n]);
+			}
+			free(varfuncs);
+			free(set_instructs);
 			return 0;
 		}
 
@@ -1855,11 +1869,21 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			if (i->args_out) {
 				f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
 				f->token_error_num = token_offset;
+				for (mercury_int n = 0; n < i->args_out; n++) {
+					delete_compiler_function(varfuncs[n]);
+				}
+				free(varfuncs);
+				free(set_instructs);
 				return 0;
 			}
 			if (!compiler_info_add_goto_label(i, cur_tok, f->number_instructions + i->additional_instructions)) {
 				f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
 				f->token_error_num = token_offset;
+				for (mercury_int n = 0; n < i->args_out; n++) {
+					delete_compiler_function(varfuncs[n]);
+				}
+				free(varfuncs);
+				free(set_instructs);
 				return 0;
 			}
 			return 2;
@@ -1878,6 +1902,12 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		if (ci == -1) {
 			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
+			delete_compiler_function(getvarfunc);
+			for (mercury_int n = 0; n < i->args_out; n++) {
+				delete_compiler_function(varfuncs[n]);
+			}
+			free(varfuncs);
+			free(set_instructs);
 			return 0;
 		}
 		add_instruction(getvarfunc, M_OPCODE_GCON, token_offset);
@@ -1895,6 +1925,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 				f->token_error_num = token_offset;
 				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
 				delete_compiler_function(getvarfunc);
+				for (mercury_int n = 0; n < i->args_out; n++) {
+					delete_compiler_function(varfuncs[n]);
+				}
+				free(varfuncs);
+				free(set_instructs);
 				return 0;
 			}
 			else if (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars == 1 && (cur_tok->chars[0] == '[' || cur_tok->chars[0] == '.')) {
@@ -1918,6 +1953,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 						f->token_error_num = token_offset;
 						f->errorcode = M_COMPERR_WRONG_SYMBOL;
 						delete_compiler_function(getvarfunc);
+						for (mercury_int n = 0; n < i->args_out; n++) {
+							delete_compiler_function(varfuncs[n]);
+						}
+						free(varfuncs);
+						free(set_instructs);
 						return 0;
 					}
 					token_offset++;
@@ -1928,12 +1968,22 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 						f->token_error_num = token_offset;
 						f->errorcode = M_COMPERR_NO_MORE_TOKENS;
 						delete_compiler_function(getvarfunc);
+						for (mercury_int n = 0; n < i->args_out; n++) {
+							delete_compiler_function(varfuncs[n]);
+						}
+						free(varfuncs);
+						free(set_instructs);
 						return 0;
 					}
 					else if (!(cur_tok->token_flags & TOKEN_ENV_VAR)) {
 						f->token_error_num = token_offset;
 						f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
 						delete_compiler_function(getvarfunc);
+						for (mercury_int n = 0; n < i->args_out; n++) {
+							delete_compiler_function(varfuncs[n]);
+						}
+						free(varfuncs);
+						free(set_instructs);
 						return 0;
 					}
 					token_offset += m_compile_read_variable(getvarfunc, tokens, num_tokens, token_offset, i);
@@ -1954,6 +2004,13 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 				if (prepend->errorcode) {
 					f->errorcode = prepend->errorcode;
 					f->token_error_num = prepend->token_error_num;
+					for (mercury_int n = 0; n < i->args_out; n++) {
+						delete_compiler_function(varfuncs[n]);
+					}
+					delete_compiler_function(prepend);
+					delete_compiler_function(getvarfunc);
+					free(varfuncs);
+					free(set_instructs);
 					return 0;
 				}
 				add_instruction(getvarfunc, M_OPCODE_CALL, ito);
@@ -1994,6 +2051,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			if (i->args_out) {
 				f->token_error_num = token_offset;
 				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+				for (mercury_int n = 0; n < i->args_out; n++) {
+					delete_compiler_function(varfuncs[n]);
+				}
+				free(varfuncs);
+				free(set_instructs);
 				return 0;
 			}
 			else {
@@ -2017,13 +2079,21 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		if (!cur_tok) {
 			f->token_error_num = token_offset;
 			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
-			//delete_compiler_function(getvarfunc);
+			for (mercury_int n = 0; n < i->args_out; n++) {
+				delete_compiler_function(varfuncs[n]);
+			}
+			free(varfuncs);
+			free(set_instructs);
 			return 0;
 		}
 		else if (!(cur_tok->token_flags & (TOKEN_MISC_OP | TOKEN_SELFMODIFY_OP))) {
 			f->token_error_num = token_offset;
 			f->errorcode = M_COMPERR_WRONG_SYMBOL;
-			//delete_compiler_function(getvarfunc);
+			for (mercury_int n = 0; n < i->args_out; n++) {
+				delete_compiler_function(varfuncs[n]);
+			}
+			free(varfuncs);
+			free(set_instructs);
 			return 0;
 		}
 
@@ -2048,6 +2118,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 				if (argfunc->errorcode) {
 					f->errorcode = argfunc->errorcode;
 					f->token_error_num = argfunc->token_error_num;
+					for (mercury_int n = 0; n < i->args_out; n++) {
+						delete_compiler_function(varfuncs[n]);
+					}
+					free(varfuncs);
+					free(set_instructs);
 					return 0;
 				}
 
@@ -2085,6 +2160,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 					else {
 						f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
 						f->token_error_num = token_offset;
+						for (mercury_int n = 0; n < i->args_out; n++) {
+							delete_compiler_function(varfuncs[n]);
+						}
+						free(varfuncs);
+						free(set_instructs);
 						return 0;
 					}
 				}
@@ -2103,6 +2183,11 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			if (i->args_out>1) { //self-modification can only work on 1 var.
 				f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
 				f->token_error_num = token_offset;
+				for (mercury_int n = 0; n < i->args_out; n++) {
+					delete_compiler_function(varfuncs[n]);
+				}
+				free(varfuncs);
+				free(set_instructs);
 				return 0;
 			}
 
@@ -2129,6 +2214,8 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 				token_offset += m_compile_read_var_statment(f, tokens, num_tokens, token_offset, i);
 				i->args_out = oao;
 				if (f->errorcode) {
+					free(varfuncs);
+					free(set_instructs);
 					return 0;
 				}
 			}
@@ -2153,12 +2240,20 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 			//delete_compiler_function(getvarfunc);
 			f->token_error_num = token_offset;
 			f->errorcode = M_COMPERR_NO_OPERATION_FOUND;
+			for (mercury_int n = 0; n < i->args_out; n++) {
+				delete_compiler_function(varfuncs[n]);
+			}
+			free(varfuncs);
+			free(set_instructs);
 			return 0;
 		}
 	}
 	else { // !should_set
 		merge_compiler_functions(f, varfuncs[0]);
 	}
+
+	free(varfuncs);
+	free(set_instructs);
 	
 	return token_offset-initial_offset;
 }
