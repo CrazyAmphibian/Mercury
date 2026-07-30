@@ -11,7 +11,11 @@ void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_i
 	if (!args_out)return;
 	mercury_variable out;
 	
-	out.data.f = INFINITY;
+#ifdef MERCURY_64BIT
+	out.data.i = 0x7ff0000000000000;
+#else
+	out.data.i = 0x7f800000;
+#endif
 	out.type = M_TYPE_FLOAT;	
 
 	//we can do a backwards stack loop with no issue because the order doesn't matter here
@@ -61,7 +65,11 @@ void mercury_lib_math_max(mercury_state* const M_CPP_restrict M, const mercury_i
 	if (args_out < 1)return;
 	mercury_variable out;
 	
-	out.data.f = -INFINITY;
+#ifdef MERCURY_64BIT
+	out.data.i = 0xfff0000000000000;
+#else
+	out.data.i = 0xff800000;
+#endif
 	out.type = M_TYPE_FLOAT;
 
 	//we can do a backwards stack loop with no issue because the order doesn't matter here
