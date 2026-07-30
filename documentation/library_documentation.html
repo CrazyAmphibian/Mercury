@@ -267,10 +267,9 @@ function usage, or internal semantics.
 <h2 class="western">functions</h2>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> print (<font class="vartpe">variable</font>
 ...)</h3>
-<p>takes any number of arguments, converts them into a string, then
-adds them to stdout.<br/>
-arguments are separated by tab characters,
-and a newline (\n) will be added at the end.<br/>
+<p>
+takes any number of arguments, converts them into a string, then adds them to stdout.<br/>
+arguments are separated by tab characters, and a newline (\n) will be added at the end.<br/>
 <br/>
 for more
 refined control, use io.post.</p>
@@ -296,18 +295,16 @@ iterate(a,print)
 /* <br/>
 output: <br/>
 0 1 array 0x01234567 <br/>
-1 2 array
-0x01234567 <br/>
+1 2 array 0x01234567 <br/>
 2 hello array 0x01234567 <br/>
-3 4 array
-0x01234567 <br/>
+3 4 array 0x01234567 <br/>
 */ 
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span>, <span class="vartpe">...</span></span> rcall (<font class="vartpe">callable</font>
 function, <font class="vartpe">table</font> enviroment, <font class="vartpe">variable</font>
 ...)</h3>
-<p>takes a function and calls it with a restricted environment given
-by a table.<br/>
+<p>
+takes a function and calls it with a restricted environment given by a table.<br/>
 the function will run its code as normal, but will not have access to any variables that were not supplied in the table.<br/>
 additionally, any errors thrown in the restricted environment will not propagate to the calling state.<br>
 any number of args can be sent to the function. <br>
@@ -318,14 +315,11 @@ print(&quot;hello&quot;) <br/>
 end
 <br/>
 <br/>
-rcall(a,{}) //this will result in an error being thrown,
-because a is trying to call a nil value (print). 
+rcall(a,{}) //this will result in an error being thrown, because a is trying to call a nil value (print). 
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> dump (<font class="vartpe">serializable</font>
 variable)</h3>
-<p>takes a variable, and returns a string containing data which
-represents that variable. this string, when compiled back, will be
-read as that variable. 
+<p>takes a variable, and returns a string containing data which represents that variable. this string, when compiled back, will be read as that variable. 
 </p>
 <p class="example">a=[&quot;hello&quot;,1,nil,true] <br/>
 dump(a)
@@ -333,10 +327,7 @@ dump(a)
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">function </span>|<span class="vartpe">string </span></span> compile (<font class="vartpe">string</font>
 code)</h3>
-<p>attempts to compile a string as if it were mercury code. if
-successful, it will return a function which does that code.
-otherwise, returns a string containing the error encountered when
-compiling. 
+<p>attempts to compile a string as if it were mercury code. if successful, it will return a function which does that code. otherwise, returns a string containing the error encountered when compiling. 
 </p>
 <p class="example">a=compile(&quot;print(\&quot;hello, world!\&quot;)&quot;)
 <br/>
@@ -371,14 +362,11 @@ return an integer first, then a float. otherwise, returns nil.
 <p class="example">s=tonumber(&quot;12.47&quot;) //returns 12.47
 <br/>
 s=tonumber(true) //returns 1 <br/>
-s=tonumber({1,2}) //returns
-nil 
+s=tonumber({1,2}) //returns nil 
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span>|<span class="vartpe">nil</span></span> toint (<font class="vartpe">variable</font>
 variable)</h3>
-<p>returns an integer which represents another variable. Operates in
-the same manner as tonumber, but will type convert a float result
-into an int. may return nil. 
+<p>returns an integer which represents another variable. Operates in the same manner as tonumber, but will type convert a float result into an int. may return nil. 
 </p>
 <p class="example">s=toint(&quot;12.47&quot;) //returns 12
 <br/>
@@ -387,15 +375,12 @@ s=toint({1,2}) //returns nil
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">float</span>|<span class="vartpe">nil</span></span> tofloat (<font class="vartpe">variable</font>
 variable)</h3>
-<p>returns a float which represents another variable. Operates in the
-same manner as tonumber, but will type convert an int result into a
-float. may return nil. 
+<p>returns a float which represents another variable. Operates in the same manner as tonumber, but will type convert an int result into a float. may return nil. 
 </p>
 <p class="example">s=tofloat(&quot;12.47&quot;) //returns 12.47
 <br/>
 s=tofloat(true) //returns 1.0 <br/>
-s=tofloat({1,2}) //returns
-nil 
+s=tofloat({1,2}) //returns nil 
 </p>
 
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> loadlibrary (<font class="vartpe">string</font>
@@ -1453,8 +1438,8 @@ array.flush(a) //a is now [&quot;hello&quot;,1,true]
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> copy (<font class="vartpe">array</font>
 array)</h3>
-<p>returns a new array containing the same values as the old one, but
-as a seperate object. 
+<p>
+returns a new array containing the same values as the old one, but as a seperate object. 
 </p>
 <p class="example">a=[&quot;hello&quot;,1,nil,true] <br/>
 b=array.copy(a)
@@ -1464,10 +1449,8 @@ print(a==b) //false
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> insert (<font class="vartpe">array</font>
 array, <font class="vartpe">variable</font> element, [<font class="vartpe">int</font>
 index=end])</h3>
-<p>adds element to array. if index is specified, the new element will
-be at that location, shifting all other elements forward to make
-space. if not provided, it will instead add the element to the end of
-the array. Returns the index that the variable was placed at.
+<p>
+adds element to array. if index is specified, the new element will be at that location, shifting all other elements forward to make space. if not provided, it will instead add the element to the end of the array. Returns the index that the variable was placed at.
 </p>
 <p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,true]
 <br/>
@@ -1478,8 +1461,8 @@ array.insert(a,4,1) //array is now [&quot;hello&quot;,4,1,true]
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> remove (<font class="vartpe">array</font>
 array, <font class="vartpe">int</font> index)</h3>
-<p>removes an element from an array. shifts all other elements
-backwards to fill in the removed element's space. 
+<p>
+removes an element from an array. shifts all other elements backwards to fill in the removed element's space. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,true]
 <br/>
@@ -1491,8 +1474,8 @@ array.remove(a,1) //array is now [&quot;hello&quot;,true]
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> swap (<font class="vartpe">array</font>
 array, <font class="vartpe">int</font> index1, <font class="vartpe">int</font>
 index2)</h3>
-<p>swaps the positions of 2 variables in an array. if a position does
-not exist, nil will be used instead. 
+<p>
+swaps the positions of 2 variables in an array. if a position does not exist, nil will be used instead. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=[&quot;hello&quot;,1,true]
 <br/>
@@ -1503,18 +1486,14 @@ array.swap(a,0,2) //array is now [true,1,&quot;hello&quot;]
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> sort (<font class="vartpe">array</font>
 array, <font class="vartpe">callable</font> sorting function)</h3>
-<p>takes an array, and runs a storting function through it.<br/>
-mercury
-functions take 2 values and should return 1, 0, or -1.<br/>
-the array
-library adds sorting functions. these are given the type of C
-functions, but should not be called, and undefined behavior will
-result if they are. 
+<p>
+takes an array, and runs a storting function through it.<br/>
+mercury functions take 2 values and should return 1, 0, or -1.<br/>
+the array library adds sorting functions. these are given the type of C functions, but should not be called, and undefined behavior will result if they are. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=[7,1,3]
 <br/>
-array.sort(a,array.SORTING_GREATER_TO_LESSER) //array is now
-[7,3,1] 
+array.sort(a,array.SORTING_GREATER_TO_LESSER) //array is now [7,3,1] 
 </p>
 <p class="example" style="margin-bottom: 0in"><br/>
 
@@ -1533,13 +1512,10 @@ array.concat(a,&quot;,&quot;)
 <h2 class="western">functions</h2>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">file</span>|<span class="vartpe">nil</span></span> open (<font class="vartpe">string</font>
 path, <font class="vartpe">string</font> mode)</h3>
-<p>attempts to open a file at the specified path. if succesful,
-returns a file, otherwise, returns nil.<br/>
-mode specifies how the
-file is treated and what can be done. Mode must be read, write, or
-append, extended optional. The binary mode flag is automatically
-applied, so a file opened with &quot;r&quot; will open in &quot;rb&quot;,
-and &quot;w+&quot; will open in &quot;wb+&quot;</p>
+<p>
+attempts to open a file at the specified path. if succesful, returns a file, otherwise, returns nil.<br/>
+mode specifies how the file is treated and what can be done. Mode must be read, write, or append, extended optional. The binary mode flag is automatically applied, so a file opened with &quot;r&quot; will open in &quot;rb&quot;, and &quot;w+&quot; will open in &quot;wb+&quot;
+</p>
 <p class="example" style="margin-bottom: 0in">io.open(&quot;test.txt&quot;,&quot;r&quot;)
 //returns a file if test.txt exists. 
 </p>
@@ -1560,8 +1536,8 @@ io.close(a)
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> read (<font class="vartpe">file</font>
 file)</h3>
-<p>returns a string containing a file's entire contents. returns nil
-if a file was unable to be read. 
+<p>
+returns a string containing a file's entire contents. returns nil if a file was unable to be read. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;r&quot;)
 <br/>
@@ -1583,10 +1559,7 @@ io.write(a,&quot;hello!&quot;)
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> getfiles (<font class="vartpe">string</font>
 path)</h3>
-<p>returns an array of strings containing the files in a specified
-directory. if the directory could not be located, returns an empty
-array instead. If an empty string is given, returns the files in the
-current working directory. Does not include implicit paths . or .. 
+<p>returns an array of strings containing the files in a specified directory. if the directory could not be located, returns an empty array instead. If an empty string is given, returns the files in the current working directory. Does not include implicit paths . or .. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.getfiles(&quot;data&quot;)
 //might return something like
@@ -1597,11 +1570,7 @@ current working directory. Does not include implicit paths . or ..
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> getdirs (<font class="vartpe">string</font>
 path)</h3>
-<p>returns an array of strings containing the directories in another
-specified directory. if the directory could not be located, returns
-an empty array instead. If an empty string is given, returns the
-directories in the current working directory. Does not include
-implicit paths . or .. 
+<p>returns an array of strings containing the directories in another specified directory. if the directory could not be located, returns an empty array instead. If an empty string is given, returns the directories in the current working directory. Does not include implicit paths . or .. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.getdirs(&quot;&quot;)
 //might return something like [&quot;data&quot;,&quot;stuff&quot;] 
@@ -1611,9 +1580,7 @@ implicit paths . or ..
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> lines (<font class="vartpe">file</font>
 file)</h3>
-<p>returns an array of strings containing each line in a file. The
-file must be in read mode for any results to return. Does not include
-the newline characters themselves. 
+<p>returns an array of strings containing each line in a file. The file must be in read mode for any results to return. Does not include the newline characters themselves. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;r&quot;)
 <br/>
@@ -1625,9 +1592,8 @@ test&quot;]
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> post (<font class="vartpe">string</font>
 text)</h3>
-<p>writes a string to stdout. unlike print, the input must be a
-string. additionally, this function is not variadic, and will not add
-any terminating newlines. 
+<p>
+writes a string to stdout. unlike print, the input must be a string. additionally, this function is not variadic, and will not add any terminating newlines. 
 </p>
 <p class="example" style="margin-bottom: 0in">io.post(&quot;hello!\n&quot;)
 </p>
@@ -1635,8 +1601,8 @@ any terminating newlines.
 
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> prompt ()</h3>
-<p>awaits input from stdin. input will be accepted after the user
-hits enter. returns a string containing the text, minus newlines. 
+<p>
+awaits input from stdin. input will be accepted after the user hits enter. returns a string containing the text, minus newlines. 
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.prompt() 
 </p>
@@ -1644,12 +1610,8 @@ hits enter. returns a string containing the text, minus newlines.
 
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> input ()</h3>
-<p>awaits a single keypress from stdin. does not require pressing
-enter. returns the input as a single character.<br/>
-use caution if
-using this in a loop, as the control+C break sequence will not be
-captured by the program, and instead be sent as raw input. instead.
-you should check for the sequence 0x03 
+<p>awaits a single keypress from stdin. does not require pressing enter. returns the input as a single character.<br/>
+use caution if using this in a loop, as the control+C break sequence will not be captured by the program, and instead be sent as raw input. instead. you should check for the sequence 0x03 
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.input() 
 </p>
@@ -1658,8 +1620,7 @@ you should check for the sequence 0x03
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> remove (<font class="vartpe">string</font>
 path)</h3>
-<p>attempts to remove a file with the given path. if successful,
-returns true, otherwise false. 
+<p>attempts to remove a file with the given path. if successful, returns true, otherwise false. 
 </p>
 <p class="example" style="margin-bottom: 0in">io.remove(&quot;test.txt&quot;)
 </p>
@@ -1668,9 +1629,7 @@ returns true, otherwise false.
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> removedir (<font class="vartpe">string</font>
 path)</h3>
-<p>attempts to remove a directory with the given name/path. if
-successful, returns true, otherwise false. can only remove empty
-directories. 
+<p>attempts to remove a directory with the given name/path. if successful, returns true, otherwise false. can only remove empty directories. 
 </p>
 <p class="example" style="margin-bottom: 0in">io.remove(&quot;data&quot;)
 </p>
@@ -1679,8 +1638,7 @@ directories.
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> createdir (<font class="vartpe">string</font>
 path)</h3>
-<p>attempts to create a directory with the given name/path. if
-successful, returns true, otherwise false. 
+<p>attempts to create a directory with the given name/path. if successful, returns true, otherwise false. 
 </p>
 <p class="example">io.createdir(&quot;data&quot;) 
 </p>
@@ -1765,9 +1723,7 @@ varies when program is executed
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> execute (<font class="vartpe">string</font>
 command)</h3>
-<p>executes a string as if it were a shell command. input is
-platform-dependent. returns any text the command writes. This
-function uses C's popen function. 
+<p>executes a string as if it were a shell command. input is platform-dependent. returns any text the command writes. This function uses C's popen function. 
 </p>
 <p class="example" style="margin-bottom: 0in">os.execute(&quot;curl
 www.test-site.com&quot;) //returns a web request result 
@@ -1777,18 +1733,14 @@ www.test-site.com&quot;) //returns a web request result
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> call (<font class="vartpe">string</font>
 command)</h3>
-<p>executes a string as if it were a shell command. input is
-platform-dependent. returns a code from the command. This function
-uses C's system function. Some commands may work better with this
-function compared to execute. 
+<p>executes a string as if it were a shell command. input is platform-dependent. returns a code from the command. This function uses C's system function. Some commands may work better with this function compared to execute. 
 </p>
 <p class="example">os.call(&quot;curl www.test-site.com&quot;)
 //returns 0 
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">table</span></span> get_date (<font class="vartpe">int
 </font>epoch_time)</h3>
-<p>Returns a table containing data about the date given an epoch
-timestep. The following data is given:</p>
+<p>Returns a table containing data about the date given an epoch timestep. The following data is given:</p>
 <table width="100%" cellpadding="4" cellspacing="0" style="page-break-inside: avoid">
 	<col width="100*"/>
 
