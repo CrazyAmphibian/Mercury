@@ -343,8 +343,28 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 }
 
 
+inline bool check_pointer_dumped(void* ptr, mercury_uint* num_pointers_covered, void*** pointers_covered) {
+	for (mercury_uint i = 0; i < (*num_pointers_covered); i++) {
+		if ((*pointers_covered)[i] == ptr) {
+			return true;
+		}
+	}
+	return false;
+}
 
-mercury_string* m_stringify(mercury_rawdata data, uint8_t type) {
+inline bool add_dump_pointer(void* ptr, mercury_uint* num_pointers_covered, void*** pointers_covered) {
+	void* nptr = realloc(*pointers_covered, sizeof(void*) * ((*num_pointers_covered) + 1));
+	if (!nptr)return false;
+	*pointers_covered = (void**)nptr;
+
+	(*pointers_covered)[*num_pointers_covered] = ptr;
+
+	(*num_pointers_covered)++;
+	return true;
+}
+
+
+mercury_string* m_stringify(mercury_rawdata data, uint8_t type,mercury_uint* num_pointers_covered,void*** pointers_covered) {
 	mercury_string* str = nullptr;// mercury_cstring_to_mstring((char*)"", 0);
 
 
@@ -382,36 +402,43 @@ mercury_string* m_stringify(mercury_rawdata data, uint8_t type) {
 		}
 		break;
 	case M_TYPE_TABLE:
-		str = mercury_cstring_to_mstring((char*)"{", 1);
-		{
-			mercury_table* t = (mercury_table*)data.p;
-			for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
-				mercury_subtable* st = t->data[i];
-				for (mercury_int n = 0; n < st->size; n++) {
-					mercury_string* key=m_stringify(st->keys[n].data,i);
-					mercury_variable v = st->values[n];
-					mercury_string* value=m_stringify(v.data, v.type);
+		if (check_pointer_dumped(data.p, num_pointers_covered, pointers_covered)) {
+			str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (str)memset(str, 0, sizeof(mercury_string));
+		}
+		else {
+			add_dump_pointer(data.p, num_pointers_covered, pointers_covered);
+			str = mercury_cstring_to_mstring((char*)"{", 1);
+			{
+				mercury_table* t = (mercury_table*)data.p;
+				for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
+					mercury_subtable* st = t->data[i];
+					for (mercury_int n = 0; n < st->size; n++) {
+						mercury_string* key = m_stringify(st->keys[n].data, i, num_pointers_covered, pointers_covered);
+						mercury_variable v = st->values[n];
+						mercury_string* value = m_stringify(v.data, v.type, num_pointers_covered, pointers_covered);
 
-					if (!key || !value) {
+						if (!key || !value) {
+							if(key)mercury_mstring_delete(key);
+							if(value)mercury_mstring_delete(value);
+							continue;
+						}
+
+						mercury_mstrings_append(str, key);
 						mercury_mstring_delete(key);
+
+						mercury_mstring_addchars(str, (char*)"=", 1);
+
+						mercury_mstrings_append(str, value);
 						mercury_mstring_delete(value);
-						continue;
+
+						mercury_mstring_addchars(str, (char*)",");
+
 					}
-
-					mercury_mstrings_append(str, key);
-					mercury_mstring_delete(key);
-
-					mercury_mstring_addchars(str, (char*)"=",1);
-
-					mercury_mstrings_append(str, value);
-					mercury_mstring_delete(value);
-
-					mercury_mstring_addchars(str, (char*)",");
-					
 				}
 			}
+			mercury_mstring_addchars(str, (char*)"}");
 		}
-		mercury_mstring_addchars(str, (char*)"}");
 		break;
 	case M_TYPE_STRING:
 		str = (mercury_string*)malloc(sizeof(mercury_string));
@@ -465,72 +492,79 @@ mercury_string* m_stringify(mercury_rawdata data, uint8_t type) {
 		}
 		break;
 	case M_TYPE_ARRAY:
-		str = mercury_cstring_to_mstring((char*)"[", 1);
-		{
-			mercury_array* arr = (mercury_array*)data.p;
+		if (check_pointer_dumped(data.p, num_pointers_covered, pointers_covered)) {
+			str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (str)memset(str, 0, sizeof(mercury_string));
+		}
+		else {
+			add_dump_pointer(data.p, num_pointers_covered, pointers_covered);
+			str = mercury_cstring_to_mstring((char*)"[", 1);
+			{
+				mercury_array* arr = (mercury_array*)data.p;
 
-			if (arr->values) {
-#ifdef MERCURY_64BIT
-				for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
-					mercury_variable***** const st1 = arr->values[i1];
-					if (!st1)continue;
-					for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
-						mercury_variable**** const st2 = st1[i2];
-						if (!st2)continue;
-						for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
-							mercury_variable*** const st3 = st2[i3];
-							if (!st3)continue;
-							for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
-								mercury_variable** const st4 = st3[i4];
-								if (!st4)continue;
-								for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
-									mercury_variable* const st5 = st4[i5];
-									if (!st5)continue;
-									for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
-										mercury_variable const var = st5[i6];
-										const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
-#else
-				for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
-					mercury_variable** const st1 = arr->values[i1];
-					if (!st1)continue;
-					for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
-						mercury_variable* const st2 = st1[i2];
-						if (!st2)continue;
-						for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
-							mercury_variable const var = st2[i3];
-							const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
-#endif
-							if (var.type) {
-								temp = m_stringify(var.data, var.type);
-								if (!temp)continue;
+				if (arr->values) {
+	#ifdef MERCURY_64BIT
+					for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+						mercury_variable***** const st1 = arr->values[i1];
+						if (!st1)continue;
+						for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+							mercury_variable**** const st2 = st1[i2];
+							if (!st2)continue;
+							for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+								mercury_variable*** const st3 = st2[i3];
+								if (!st3)continue;
+								for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+									mercury_variable** const st4 = st3[i4];
+									if (!st4)continue;
+									for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+										mercury_variable* const st5 = st4[i5];
+										if (!st5)continue;
+										for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+											mercury_variable const var = st5[i6];
+											const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+	#else
+					for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+						mercury_variable** const st1 = arr->values[i1];
+						if (!st1)continue;
+						for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+							mercury_variable* const st2 = st1[i2];
+							if (!st2)continue;
+							for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+								mercury_variable const var = st2[i3];
+								const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+	#endif
+								if (var.type) {
+									temp = m_stringify(var.data, var.type, num_pointers_covered, pointers_covered);
+									if (!temp)continue;
 
-								mercury_string* temp2 = m_stringify({ index }, M_TYPE_INT);
-								mercury_mstrings_append(str, temp2);
-								mercury_mstring_delete(temp2);
+									mercury_string* temp2 = m_stringify({ index }, M_TYPE_INT, num_pointers_covered, pointers_covered);
+									mercury_mstrings_append(str, temp2);
+									mercury_mstring_delete(temp2);
 
-								mercury_mstring_addchars(str, (char*)"=", 1);
+									mercury_mstring_addchars(str, (char*)"=", 1);
 
-								mercury_mstrings_append(str, temp);
-								mercury_mstring_delete(temp);
+									mercury_mstrings_append(str, temp);
+									mercury_mstring_delete(temp);
 
-								mercury_mstring_addchars(str, (char*)",");
-							}
+									mercury_mstring_addchars(str, (char*)",");
+								}
 
-#ifdef MERCURY_64BIT
+	#ifdef MERCURY_64BIT
+										}
 									}
 								}
 							}
 						}
 					}
-				}
-#else
+	#else
+							}
 						}
 					}
+	#endif				
 				}
-#endif				
 			}
+			mercury_mstring_addchars(str, (char*)"]");
 		}
-		mercury_mstring_addchars(str, (char*)"]");
 		break;
 	default:
 		return nullptr;
@@ -556,7 +590,9 @@ void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_variable vartodump;
 	mercury_popstack(M,&vartodump);
 
-	mercury_string* dmp_str = m_stringify(vartodump.data, vartodump.type);
+	mercury_uint nptrs=0;
+	void** ptrs = nullptr;
+	mercury_string* dmp_str = m_stringify(vartodump.data, vartodump.type,&nptrs,&ptrs);
 	if (!dmp_str) {
 		dmp_str = (mercury_string*)malloc(sizeof(mercury_string));
 		if (!dmp_str) {
@@ -566,6 +602,7 @@ void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_i
 		dmp_str->ptr = nullptr;
 		dmp_str->size = 0;
 	}
+	free(ptrs);
 
 	mercury_free_var(&vartodump);
 	vartodump.type = M_TYPE_STRING;

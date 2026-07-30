@@ -124,7 +124,7 @@ bool mercury_mstrings_append(mercury_string* const basestr, const mercury_string
 		char* nptr = (char*)realloc(basestr->ptr, sizeof(char) * (basestr->size + appstr->size));
 		if (!nptr)return false;
 		basestr->ptr = nptr;
-		memcpy(basestr->ptr + basestr->size, appstr->ptr, appstr->size);
+		if(appstr->size)memcpy(basestr->ptr + basestr->size, appstr->ptr, appstr->size);
 		basestr->size += appstr->size;
 	}
 	return true;
