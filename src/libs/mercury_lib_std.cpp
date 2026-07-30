@@ -793,3 +793,288 @@ void mercury_lib_std_tofloat(mercury_state* const M_CPP_restrict M, const mercur
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
+
+enum deepcopy_returntypes :int {
+	DEEPCOPY_SUCCES = 0,
+	DEEPCOPY_MEMORY_ALLOCATION_ERROR = 1,
+	DEEPCOPY_UNCOPYABLE_TYPE = 2,
+};
+
+inline bool var_can_be_deepcopied(const mercury_variable* var) {
+	switch (var->type) {
+	case M_TYPE_NIL:
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+	case M_TYPE_BOOL:
+	case M_TYPE_CFUNC:
+	case M_TYPE_STRING:
+	case M_TYPE_FUNCTION:
+	case M_TYPE_ARRAY:
+	case M_TYPE_TABLE:
+		return true;
+	default:
+		return false;
+	}
+}
+
+inline bool type_is_pointer(const mercury_variable* var) {
+	switch (var->type) {
+	case M_TYPE_NIL:
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+	case M_TYPE_BOOL:
+	case M_TYPE_CFUNC:
+		return false;
+	default:
+		return true;
+	};
+
+}
+
+inline void* get_converted_pointer(const void* in,mercury_uint* num_pointers_converted, void*** pointer_conversions_in, void*** pointer_conversions_out) {
+	//printf("checking for self from %zu pointers\n",*num_pointers_converted);
+	for (mercury_uint i = 0; i < (*num_pointers_converted); i++) {
+		//printf("comparing %p to %p\n", (*pointer_conversions_in)[i],in);
+		if ( (*pointer_conversions_in)[i] == in) {
+			//printf("output convert pointer\n");
+			return (*pointer_conversions_out)[i];
+		}
+	}
+	return nullptr;
+}
+
+inline bool add_converted_pointer(void* originalp,void* newp, mercury_uint* num_pointers_converted, void*** pointer_conversions_in, void*** pointer_conversions_out) {
+	void* nptr=realloc(*pointer_conversions_in, sizeof(void*) * ((*num_pointers_converted) + 1));
+	if (!nptr)return false;
+	*pointer_conversions_in = (void**)nptr;
+	nptr = realloc(*pointer_conversions_out, sizeof(void*) * ((*num_pointers_converted) + 1) );
+	if (!nptr)return false;
+	*pointer_conversions_out = (void**)nptr;
+
+	//printf("adding pointer %p replacded by %p\n",originalp,newp);
+
+	(*pointer_conversions_in)[*num_pointers_converted] = originalp;
+	(*pointer_conversions_out)[*num_pointers_converted] = newp;
+
+	(*num_pointers_converted)++;
+	return true;
+}
+
+//pointer to an array of void*s
+int m_variable_deepcopy(mercury_variable* var_in, mercury_variable* var_out,mercury_uint* num_pointers_converted,void*** pointer_conversions_in,void*** pointer_conversions_out) {
+	var_out->type = var_in->type;
+	//printf("called!\n");
+	if (type_is_pointer(var_in)) {
+		void* cp = get_converted_pointer(var_in->data.p, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
+		if (cp) {
+			var_out->data.p = cp;
+			//mercury_increment_variable_refrence_count(var_out);
+			return DEEPCOPY_SUCCES;
+		}
+	}
+
+	switch (var_in->type) {
+		case M_TYPE_NIL:
+		case M_TYPE_INT:
+		case M_TYPE_FLOAT:
+		case M_TYPE_BOOL:
+		case M_TYPE_CFUNC:
+			var_out->data = var_in->data;
+			return DEEPCOPY_SUCCES;
+		case M_TYPE_TABLE:
+			{
+			mercury_table* newtab=mercury_newtable();
+			mercury_table* intab = (mercury_table*)var_in->data.p;
+			if (!newtab) {
+				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
+			}
+			add_converted_pointer(intab, newtab, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
+
+			newtab->enviromental = false;
+			newtab->refrences = 0;
+			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES;t++) {
+				mercury_subtable* st = intab->data[t];
+				mercury_variable key;
+				mercury_variable value;
+				for (mercury_int i = 0; i < st->size; i++) {
+					key=st->keys[i];
+					value=st->values[i];
+					if (var_can_be_deepcopied(&key) && var_can_be_deepcopied(&value) ) {
+						mercury_variable newkey;
+						mercury_variable newvalue;
+						if (m_variable_deepcopy(&key, &newkey, num_pointers_converted, pointer_conversions_in, pointer_conversions_out) != DEEPCOPY_SUCCES) {
+							continue;
+						}
+						if(m_variable_deepcopy(&value,&newvalue,num_pointers_converted,pointer_conversions_in,pointer_conversions_out) != DEEPCOPY_SUCCES) {
+							mercury_free_var(&newkey);
+							continue;
+						}
+						mercury_increment_variable_refrence_count(&newkey);
+						mercury_increment_variable_refrence_count(&newvalue);
+						mercury_setkey(newtab, &newkey, &newvalue);
+					}
+				}
+			}
+			var_out->data.p = newtab;
+
+			}
+			return DEEPCOPY_SUCCES;
+		case M_TYPE_STRING:
+			{
+			mercury_string* nptr = (mercury_string*)malloc(sizeof(mercury_string));
+			mercury_string* instr = (mercury_string*)var_in->data.p;
+			if (!nptr) {
+				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
+			}
+			memset(nptr, 0, sizeof(mercury_string));
+			nptr->ptr=(char*)malloc(instr->size);
+			if (!nptr->ptr) {
+				free(nptr);
+				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
+			}
+			add_converted_pointer(instr, nptr, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
+			memcpy(nptr->ptr, instr->ptr, instr->size);
+			nptr->size = instr->size;
+			nptr->refrences = 0;
+			var_out->data.p = nptr;
+			}
+			return DEEPCOPY_SUCCES;
+		case M_TYPE_ARRAY:
+			{
+				mercury_array* newarr = mercury_newarray();
+				newarr->refrences = 0;
+				mercury_array* inarr = (mercury_array*)var_in->data.p;
+				if (!newarr) {
+					return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
+				}
+				
+				add_converted_pointer(inarr, newarr, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
+
+				if (inarr->values) {
+#ifdef MERCURY_64BIT
+					for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+						mercury_variable***** const st1 = inarr->values[i1];
+						if (!st1)continue;
+						for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+							mercury_variable**** const st2 = st1[i2];
+							if (!st2)continue;
+							for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+								mercury_variable*** const st3 = st2[i3];
+								if (!st3)continue;
+								for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+									mercury_variable** const st4 = st3[i4];
+									if (!st4)continue;
+									for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+										mercury_variable* const st5 = st4[i5];
+										if (!st5)continue;
+										for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+											mercury_variable const var = st5[i6];
+											const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+#else
+					for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+						mercury_variable** const st1 = inarr->values[i1];
+						if (!st1)continue;
+						for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+							mercury_variable* const st2 = st1[i2];
+							if (!st2)continue;
+							for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+								mercury_variable const var = st2[i3];
+								const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+#endif
+								if (var.type && var_can_be_deepcopied(&var)) {
+									mercury_variable newvar;
+									if (m_variable_deepcopy((mercury_variable*)&var, &newvar, num_pointers_converted, pointer_conversions_in, pointer_conversions_out) != DEEPCOPY_SUCCES) {
+										continue;
+									}
+									mercury_increment_variable_refrence_count(&newvar);
+									mercury_setarray(newarr, &newvar, index);
+								}
+
+#ifdef MERCURY_64BIT
+							}
+						}
+					}
+										}
+									}
+								}
+#else
+							}
+						}
+					}
+#endif				
+				}
+
+				var_out->data.p = newarr;
+			}
+			
+			return DEEPCOPY_SUCCES;
+		case M_TYPE_FUNCTION:
+			{
+			mercury_function* nptr = (mercury_function*)malloc(sizeof(mercury_function));
+			mercury_function* infun = (mercury_function*)var_in->data.p;
+			if (!nptr) {
+				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
+			}
+			memset(nptr, 0, sizeof(mercury_function));
+			nptr->instructions = (mercury_opcode*)malloc(sizeof(mercury_opcode) * infun->numberofinstructions);
+			if (!nptr->instructions) {
+				free(nptr);
+				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
+			}
+
+			if (infun->debug_info) {
+				nptr->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * infun->numberofinstructions);
+				if (!nptr->debug_info) {
+					free(nptr->instructions);
+					free(nptr);
+					return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
+				}
+				memcpy(nptr->debug_info, infun->debug_info, sizeof(mercury_debug_token)* infun->numberofinstructions);
+			}
+			memcpy(nptr->instructions, infun->instructions, sizeof(mercury_opcode)* infun->numberofinstructions);
+			nptr->enviromental = false;
+			nptr->refrences = 0;
+
+			add_converted_pointer(infun, nptr, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
+			}
+			return DEEPCOPY_SUCCES;
+		case M_TYPE_FILE:
+		case M_TYPE_THREAD:
+		default:
+			return DEEPCOPY_UNCOPYABLE_TYPE;
+	}
+
+}
+
+
+
+void mercury_lib_std_deepcopy(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
+	if (!args_out) {
+		return;
+	}
+
+	mercury_variable in;
+	mercury_variable out;
+	mercury_popstack(M, &in);
+	
+	mercury_uint nc = 0;
+	void** cpi = nullptr;
+	void** cpo = nullptr;
+	int code=m_variable_deepcopy(&in, &out, &nc, &cpi, &cpo);
+	free(cpi);
+	free(cpo);
+	mercury_free_var(&in);
+
+	if (code != DEEPCOPY_SUCCES) {
+		out.data.i = 0;
+		out.type = M_TYPE_NIL;
+	}
+	mercury_increment_variable_refrence_count(&out);
+	mercury_pushstack(M, &out);
+
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+

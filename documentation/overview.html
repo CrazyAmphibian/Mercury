@@ -7,11 +7,12 @@
 	<meta name="created" content="2025-09-30T14:45:59.071000000"/>
 	<meta name="changed" content="2026-03-13T23:52:08.438000000"/>
 	<style type="text/css">
+		body {margin-left:210px;background-color:#ddd;}
 		h2.cjk { font-family: "NSimSun" }
 		h2.ctl { font-family: "Arial" }
 		h3.cjk { font-family: "NSimSun" }
 		h3.ctl { font-family: "Arial" }
-		p.codeblock-western { font-family: "Liberation Mono", monospace; margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
+		p.codeblock { font-family: "Liberation Mono", monospace; margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
 		p.codeblock-cjk { margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
 		p.codeblock-ctl { margin-bottom: 0in; background: #eeeeee; border: 1px solid #000000; padding: 0.02in }
 		h4.cjk { font-family: "NSimSun" }
@@ -19,13 +20,45 @@
 		.borderedtable { border-collapse: collapse;}
 		.borderedtable th, td {border:1px solid black;padding:0.25em;}
 		.compressedlist li{margin-top:0px;margin-bottom:0px;}
+		#navigationpane ul{
+			list-style-type:none;
+			padding-left:1em;
+		}
 	</style>
 </head>
-<body lang="en-US" dir="ltr"><p align="center" style="margin-top: 0.17in; text-decoration: none; page-break-after: avoid">
-<font face="Liberation Sans, sans-serif"><font size="7" style="font-size: 40pt"><b>Mercury</b></font></font></p>
+<body lang="en-US" dir="ltr">
+
+
+<span style="position:fixed;left:0px;top:0px;width:200px;height:100%;background-color:#dddddd;border-right:2px solid black;" id="navigationpane">
+ <ul>
+	<li><a href="#syntaxbasics">Basic Syntax</a></li>
+	<li><ul>
+		<li><a href="#syntaxbasics_hello">Hello world</a></li>
+		<li><a href="#syntaxbasics_comments">Comments</a></li>
+		<li><a href="#syntaxbasics_oporder">Order of operations</a></li>
+		<li><a href="#syntaxbasics_strings">Strings</a></li>
+		<li><a href="#syntaxbasics_keywords">Keywords</a></li>
+		<li><a href="#syntaxbasics_vartypes">Variable types</a></li>
+		<li><a href="#syntaxbasics_operators">Operators</a></li>
+		<li><a href="#syntaxbasics_control flow">Control flow</a></li>
+		<li><a href="#syntaxbasics_structures">Structure semantics</a></li>
+	</ul></li>
+	<li><a href="#compiler">The Compiler</a></li>
+	<li><ul>
+		<li><a href="#compiler_source">source code</a></li>
+		<li><a href="#compiler_tokens">tokenization</a></li>
+		<li><a href="#compiler_bytecode">bytecode</a></li>
+	</ul></li>
+	<li><a href="#bytecode">Bytecode</a></li>
+	
+ </ul>
+</span>
+
+
+<font face="Liberation Sans, sans-serif"><font size="7" style="font-size: 40pt"><b>Mercury</b></font></font>
 <p>Mercury is an interpreted dynamically-typed language with a simple
 but robust syntax.</p>
-<h2 class="western">Why Mercury?</h2>
+<h2>Why Mercury?</h2>
 <p>Mercury is here to show that a high-level language doesn't have to
 compromise on programmer freedom for the sake of simplicity. Drawing
 from the simplicity of C and ease of use from Lua, Mercury gives the
@@ -37,7 +70,7 @@ foundation of the language.</p>
 <p>Featuring things such as multithreadding, automatic garbage
 collection, and first class functions, Mercury is more than capable
 of standing up as a standalone language.</p>
-<h2 class="western">Design philosophy</h2>
+<h2>Design philosophy</h2>
 <p>Mercury is designed around a core set of ideas, listed in order of
 priority.</p>
 <p>Mercury should be:</p>
@@ -72,26 +105,28 @@ priority.</p>
 <br/>
 
 </p>
-<h2 class="western">Basic Syntax</h2>
-<h3 class="western">Hello world</h3>
+<h2 id="syntaxbasics">Basic Syntax</h2>
+<h3 id="syntaxbasics_hello">Hello world</h3>
 <p>Hello world in Mercury is quite straightforward</p>
-<p class="codeblock-western">print(&quot;Hello, world!&quot;)</p>
-<h3 class="western">Comments</h3>
+<p class="codeblock">print(&quot;Hello, world!&quot;)</p>
+
+<h3 id="syntaxbasics_comments">Comments</h3>
 <p>Comments follow the same syntax as C.</p>
 <p>A single line comment is done with two forward slashes</p>
-<p class="codeblock-western">print(&quot;Hello, world&quot;) //Quite
+<p class="codeblock">print(&quot;Hello, world&quot;) //Quite
 important, do not remove!</p>
 <p>A multi-line comment is done as such</p>
-<p class="codeblock-western">/*<br>
+<p class="codeblock">/*<br>
 this does some stuff.<br>
 Pretty cool stuff.<br>
 */<br>
 print(&quot;Hello, world&quot;)</p>
 <p>if two comment styles overlap, the multi-line takes priority.</p>
-<p class="codeblock-western">// This does stuff /*<br>
+<p class="codeblock">// This does stuff /*<br>
 now it doesn't<br>
 */</p>
-<h3>Order of operations</h3>
+
+<h3 id="syntaxbasics_oporder">Order of operations</h3>
 <p><br/>
 <br/>
 
@@ -109,15 +144,16 @@ now it doesn't<br>
 and do not follow standard order of operations. The exception to this
 is unary operations, which are read from right to left.</p>
 <p>For example:</p>
-<p class="codeblock-western">b=#a+1/3</p>
+<p class="codeblock">b=#a+1/3</p>
 <p>first, the variable 'a' is retrieved. Next, the length operator is
 applied to it. Then, it is added with 1, and divided by 3. Finally,
 the variable 'b' is set to the result</p>
 <p>this example showcases how operations are applied in order</p>
-<p class="codeblock-western">a=5+3/4 //returns 2.0<br>
+<p class="codeblock">a=5+3/4 //returns 2.0<br>
 a=3/4+5 //returns 5.75<br>
 a=5+(3/4)//returns 5.75</p>
-<h3 class="western">Strings</h3>
+
+<h3 id="syntaxbasics_strings">Strings</h3>
 <p>Strings are constructed with two quote marks and work like typical
 strings. Strings will run until they find another quote mark, even if
 that means spanning multiple lines. Strings accept escapes using
@@ -142,7 +178,7 @@ backslash, and follow similar rules to C string escapes.</p>
 
 
 
-<h3 class="western">Keywords</h3>
+<h3 id="syntaxbasics_keywords">Keywords</h3>
 <p>Mercury has 17 reserved keywords. These cannot be used for
 variable names, as they either are part of the language syntax, are
 represent another variable.</p>
@@ -171,7 +207,7 @@ share a name with a keyword without any issues.</p>
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h4 class="western">keywords: Static variables</h4>
+<h4>keywords: Static variables</h4>
 <p>Static variable keywords represent a constant value, and can be
 used for assignment or comparison</p>
 <ul class="compressedlist">
@@ -192,7 +228,7 @@ used for assignment or comparison</p>
 		<li>represents the boolean value of false</li>
 	</ul>
 </ul>
-<h4 class="western">keywords: flow control</h4>
+<h4>keywords: flow control</h4>
 <p>These keywords form the structure of a program and are vital for
 complex behavior</p>
 <ul class="compressedlist">
@@ -226,7 +262,7 @@ complex behavior</p>
 		<li>can be used in function to abort execution and return values</li>
 	</ul>
 </ul>
-<h4 class="western">keywords: scope specifiers</h4>
+<h4>keywords: scope specifiers</h4>
 <p>These keywords are used for variable retrieval and assignment to
 fine tune scope.</p>
 <ul class="compressedlist">
@@ -241,7 +277,8 @@ fine tune scope.</p>
 		state</li>
 	</ul>
 </ul>
-<h3 class="western">Variable types</h3>
+
+<h3 id="syntaxbasics_vartypes">Variable types</h3>
 <p>Mercury has 11 unique datatypes</p>
 <ul class="compressedlist">
 	<li>nil</li>
@@ -318,8 +355,8 @@ causing a thread to be deleted early will cause a memory leak, as the runtime wi
 for boolean operations, threads will always be treated as true<br>
 threads are reference-counted objects, and are not safe to access or modify across multiple threads<br>
 
-<h3 class="western">Operators</h3>
-<h4 class="western">Operators: Arithmetic</h4>
+<h3 id="syntaxbasics_operators">Operators</h3>
+<h4>Operators: Arithmetic</h4>
 <p style="margin-bottom: 0in">Arithmetic operators work only on
 numbers (either floats or ints). In most cases, if an operator is
 provided with two ints, the result will always be an int, and if a
@@ -361,7 +398,7 @@ float is provided, the result will be a float.</p>
 <p style="margin-bottom: 0in"><br/>
 
 </p>
-<h4 class="western">Operators: Bitwise</h4>
+<h4>Operators: Bitwise</h4>
 <p style="margin-bottom: 0in">Bitwise work much like arithmetic
 operators, in being able to take both ints and floats. The returned
 type is always equal to the type of the first (left) operand. This
@@ -374,7 +411,7 @@ can be used for casting floats to ints, or other niche tricks.</p>
 	<li>bitshift left &lt;&lt;</li>
 	<li>bitshift right &gt;&gt;</li>
 </ul>
-<h4 class="western">Operators: Logical</h4>
+<h4>Operators: Logical</h4>
 <p style="margin-bottom: 0in">Short-circuit evaluation is not
 provided. The returned value of logical operators is highly variable,
 dependent on each operator, but the boolean state will be maintained
@@ -400,7 +437,7 @@ for the purpose of conditional checks.</p>
 		single true operand. If false, returns the value false.</li>
 	</ul>
 </ul>
-<h4 class="western">Operators: Comparison</h4>
+<h4>Operators: Comparison</h4>
 <ul>
 	<li>Greater than &gt;</li>
 	<li>Less than &lt;</li>
@@ -409,7 +446,7 @@ for the purpose of conditional checks.</p>
 	<li>Equal ==</li>
 	<li>Not equal !=</li>
 </ul>
-<h4 class="western">Operators: listlike</h4>
+<h4>Operators: listlike</h4>
 <ul>
 	<li>Length #</li>
 	<ul>
@@ -423,12 +460,12 @@ for the purpose of conditional checks.</p>
 		only, attempting to assign to an index will result in an error.</li>
 	</ul>
 </ul>
-<h4 class="western">Operators: Other</h4>
+<h4>Operators: Other</h4>
 <ul>
 	<li>Concatenate ..</li>
 	<li>Call function ( )</li>
 </ul>
-<h4 class="western">Operators: Creation</h4>
+<h4>Operators: Creation</h4>
 <ul>
 	<li>New array [ ]</li>
 	<li>New table { }</li>
@@ -436,20 +473,20 @@ for the purpose of conditional checks.</p>
 </ul>
 
 
-<h3 class="western">Control Flow</h3>
-<h4 class="western">If statements</h4>
+<h3 id="syntaxbasics_control">Control Flow</h3>
+<h4>If statements</h4>
 <p>If statements in Mercury operate in a very similar way to those in
 other high level languages. They are split into 2 parts, the
 condition and the body. If the condition is true, then the contents
 of the body are executed. If statements start with if, followed by
 the condition. Next, the then keyword is used before the body, and is
 finished with end.</p>
-<p class="codeblock-western">if a&gt;20 then<br>
+<p class="codeblock">if a&gt;20 then<br>
 &emsp;print(&quot;a is kinda big&quot;)<br>
 end</p>
 <p>the else keyword can be used to add more complexity to an if
 check, and is quite simple to use<br>
-<p class="codeblock-western">
+<p class="codeblock">
 if a&gt;20 then<br>
 &emsp;print(&quot;a is kinda big&quot;)<br>
 else<br>
@@ -458,22 +495,22 @@ end</p>
 <p>the final layer is elseif, which combines else and another if
 statement together. Elseif can be used as many times as desired, but
 should go before else.</p>
-<p class="codeblock-western">if a&gt;20 then<br>
+<p class="codeblock">if a&gt;20 then<br>
 &emsp;print(&quot;a is kinda big&quot;)<br>
 elseif a&lt;0 then<br>
 &emsp;print(&quot;a is negative!&quot;)<br>
 else<br>
 &emsp;print(&quot;a is not that big&quot;)<br>
 end</p>
-<h4 class="western">while loops</h4>
+<h4>while loops</h4>
 <p>As with if statements, while loops are simple in operation</p>
-<p class="codeblock-western">n=0<br>
+<p class="codeblock">n=0<br>
 while n&lt;10 do<br>
 &emsp;do_stuff(n)<br>
 &emsp;n++<br>
 end</p>
 <p>the continue and break keyword can add further complexity.</p>
-<p class="codeblock-western">n=0<br>
+<p class="codeblock">n=0<br>
 while n&lt;10 do<br>
 &emsp;if should_abort(n) then<br>
 &emsp;&emsp;break<br>
@@ -484,7 +521,7 @@ while n&lt;10 do<br>
 &emsp;end<br>
 &emsp;stuff(n)<br>
 end</p>
-<h4 class="western">functions and returns</h4>
+<h4>functions and returns</h4>
 <p>Functions are designated with the keyword and parameters. Do note
 that a function may receive less parameters than specified.</p>
 <p>The return keyword will cause the immediate closure and escape
@@ -493,15 +530,15 @@ calling state. Returning in the main body of the program will halt
 all execution.</p>
 <p>Functions can either be assigned directly to a variable, or passed
 as an arg to another function.</p>
-<p class="codeblock-western">add=function(num1,num2)<br>
+<p class="codeblock">add=function(num1,num2)<br>
 &emsp;return num1+num2<br>
 end</p>
-<h4 class="western">Goto</h4>
+<h4>Goto</h4>
 <p>Goto can jump code execution to any location within the current
 state. Caution is advised when using goto, as it can potentially jump
 over variable declarations and cause bugs with scoping. It's
 recommended to explicitly state global or local keywords to be safe.</p>
-<p class="codeblock-western">a=0<br>
+<p class="codeblock">a=0<br>
 b=0<br>
 while a&lt;100 do<br>
 &emsp;while b&lt;100 do<br>
@@ -514,7 +551,7 @@ exit:</p>
 <p>for an example of incorrect usage of goto, this results in an
 error, since the label thing is not visible within the function state<br>
 </p>
-<p class="codeblock-western">
+<p class="codeblock">
 stuff=function()<br>
 &emsp;goto thing<br>
 end<br>
@@ -522,11 +559,11 @@ thing:<br>
 stuff()</p>
 
 
-<h3 class="western">Structure semantics</h3>
+<h3 id="syntaxbasics_structures">Structure semantics</h3>
 <p>Strings are created by enclosing characters in quote marks.
 Strings span across any amount of characters until another quote mark
 is hit, including newlines.</p>
-<p class="codeblock-western">msg=&quot;hello<br>
+<p class="codeblock">msg=&quot;hello<br>
 world!&quot;</p>
 <p>Strings are evaluated at tokenization, so longer strings do not
 add significantly more overhead, and escapes add no overhead.</p>
@@ -538,16 +575,16 @@ add significantly more overhead, and escapes add no overhead.</p>
 use [ and ], while tables use { and }. The compiler will not check if
 the index is valid when evaluating creation. There are 2 syntax modes
 to arrays and tables. Implicit indexing, and explicit indexing.</p>
-<p class="codeblock-western">my_array=[1,2,3] //implicit indexing.
+<p class="codeblock">my_array=[1,2,3] //implicit indexing.
 0=1, 1=2, 2=3<br>
 my_array=[0=1,1=2,2=3] //explicit
 indexing. Results in the same code and data as above.</p>
 <p>Explicit indexing can take named variables as well, which results
 in a get call.<br></p>
-<p class="codeblock-western">a=5<br>
+<p class="codeblock">a=5<br>
 my_array=[a=1] // 5=1</p>
 <p>This should not be confused with an explicit string index</p>
-<p class="codeblock-western">my_table={&quot;a&quot;=1} //doing this
+<p class="codeblock">my_table={&quot;a&quot;=1} //doing this
 with an array would result in an error. 
 </p>
 <p><br/>
@@ -556,11 +593,11 @@ with an array would result in an error.
 </p>
 <p>All structures can be indexed with brackets, with the variable you
 want in brackets</p>
-<p class="codeblock-western">my_array=[1,2,3]<br>
+<p class="codeblock">my_array=[1,2,3]<br>
 print(my_array[0]) // 1</p>
 <p>Tables can be indexed with period notation, allowing for a cleaner
 way to index with a string</p>
-<p class="codeblock-western">my_table={&quot;a&quot;=1}<br>
+<p class="codeblock">my_table={&quot;a&quot;=1}<br>
 print(my_table[&quot;a&quot;]) // 1<br>
 print(my_table.a) // 1. not to be
 confused with my_table[a]</p>
@@ -568,16 +605,17 @@ confused with my_table[a]</p>
 <br/>
 
 </p>
-<h2 class="western">The Compiler</h2>
+<h2 id="compiler">The Compiler</h2>
 <p>Mercury's compiler is (intentionally) very simple, generating code
 with two single-pass phases. The extent of the compiler's knowledge
 is at most backreferences to jump labels, and sometimes a couple of
 tokens ahead. This means that the compiler has very little ability to
 detect any code issues or inevitable runtime errors, requiring more
 careful programming.</p>
-<h3 class="western">Phase 0: source code</h3>
+
+<h3 id="compiler_source">Phase 0: source code</h3>
 <p>Consider the following program for the example:</p>
-<p class="codeblock-western">
+<p class="codeblock">
 <span style="background: #ffff00">print</span><span style="background: #5983b0">(</span><span style="background: #81d41a">&quot;Hello,
 world!&quot;</span><span style="background: #5983b0">)</span><br>
 <span style="background: #ffff00">a</span><span style="background: #5983b0">=</span><span style="background: #ff6d6d">5</span><br>
@@ -588,7 +626,8 @@ world!&quot;</span><span style="background: #5983b0">)</span><br>
 is positive&quot;</span><span style="background: #5983b0">)</span><br>
 <span style="background: #ff8000">end</span>
 </p>
-<h3 class="western">Phase 1: tokenization</h3>
+
+<h3 id="compiler_tokens">Phase 1: tokenization</h3>
 <p>The first phase of the compiler is to convert the source code into
 tokens to make the rest of the compilation easier and simpler. The
 tokenization phase cannot raise compiler errors, and will run from
@@ -600,7 +639,7 @@ separating symbols and strings)</p>
 <p>Tokens themselves store the associated source code text, as well
 as position in the code, and the type of the token.</p>
 <p>The above source code, displayed as 1 token per line</p>
-<p class="codeblock-western"><span style="background: #ffff00">Print</span><br>
+<p class="codeblock"><span style="background: #ffff00">Print</span><br>
 <span style="background: #5983b0">(</span><br>
 <span style="background: #81d41a">Hello,
 world!</span><br>
@@ -619,7 +658,8 @@ world!</span><br>
 positive</span><br>
 <span style="background: #5983b0">)</span><br>
 <span style="background: #ff8000">end</span></p>
-<h3 class="western">Phase 2: bytecode generation</h3>
+
+<h3 id="compiler_bytecode">Phase 2: bytecode generation</h3>
 <p>Once the array of tokens is generated, the program converts them
 into usable bytecode. The generation stage of the compiler is where
 compiler errors are raised and  the majority early exits will occur.</p>
@@ -627,7 +667,7 @@ compiler errors are raised and  the majority early exits will occur.</p>
 in 32 bit big endian space, and uninitialized memory set to NULL for
 simplicity. Some features such as constants have been removed for the
 sake of readability.</p>
-<p class="codeblock-western"><span style="background: #81d41a">0x0023
+<p class="codeblock"><span style="background: #81d41a">0x0023
    NSTR (New STRing)</span><br>
 <span style="background: #81d41a">0x0000<br>0x000D  length=13</span>
 <br>
@@ -712,7 +752,7 @@ sake of readability.</p>
 
 </p>
 
-<h2>bytecode</h2>
+<h2 id="bytecode">bytecode</h2>
 <p>
 Being an interpreted language, Mercury converts human readable source code into runtime usable bytecode. Bytecode itself is system dependent, and therefore not portable.<br>
 Bytecode is read in 16-bit opcode increments, with each opcode being a self-enclosed instruction. instructions can draw their arguments from 2 places, either the associated state's stack, or from bytecode space.<br>
@@ -748,9 +788,9 @@ When drawing from the stack, type checks will be done on the variable to determi
 	<tr> <td>LET</td> <td>Evaluates if 1 number is less than another</td> <td>in: greater, lesser<br>out: equality</td> <td> </td> </tr>
 	<tr> <td>GTE</td> <td>Evaluates if 1 number is greater than or equal to another</td> <td>in: lesser, greater<br>out: equality</td> <td> </td> </tr>
 	<tr> <td>LTE</td> <td>Evaluates if 1 number is less than or equal to another</td> <td>in: greater, lesser<br>out: equality</td> <td> </td> </tr>
-	<tr> <td>SENV</td> <td>Sets an environmental value</td> <td>in: value,key<br>out:</td> <td> </td> </tr>
+	<tr> <td>SENV</td> <td>Sets an environmental value</td> <td>in: key,value<br>out:</td> <td> </td> </tr>
 	<tr> <td>GENV</td> <td>Gets an environmental value</td> <td>in: key<br>out: value</td> <td> </td> </tr>
-	<tr> <td>SET</td> <td>Sets a structure value</td> <td>in: value,key,structure<br>out:</td> <td> </td> </tr>
+	<tr> <td>SET</td> <td>Sets a structure value</td> <td>in: key,structure,value<br>out:</td> <td> </td> </tr>
 	<tr> <td>GET</td> <td>Gets a structure value</td> <td>in: key,structure<br>out: value</td> <td> </td> </tr>
 	<tr> <td>SREG</td> <td>Unused</td> <td>in: value<br>out:</td> <td>number </td> </tr>
 	<tr> <td>GREG</td> <td>Unused</td> <td>in: <br>out: value</td> <td>number </td> </tr>
@@ -775,9 +815,9 @@ When drawing from the stack, type checks will be done on the variable to determi
 	<tr> <td>CNCT</td> <td>concatenates 2 values, converting to strings if needed.</td> <td>in: variable, variable <br>out: string</td> <td></td> </tr>
 	<tr> <td>CLS</td> <td>clears the stack</td> <td>in:  <br>out: </td> <td></td> </tr>
 	<tr> <td>GETL</td> <td>gets a value of the bottom-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
-	<tr> <td>SETL</td> <td>gets a value of the bottom-most environment</td> <td>in: value,key  <br>out: </td> <td></td> </tr>
+	<tr> <td>SETL</td> <td>gets a value of the bottom-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
 	<tr> <td>GETG</td> <td>gets a value of the top-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
-	<tr> <td>SETG</td> <td>gets a value of the top-most environment</td> <td>in: value,key  <br>out: </td> <td></td> </tr>
+	<tr> <td>SETG</td> <td>gets a value of the top-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
 	<tr> <td>CPYT</td> <td>copies the topmost stack value</td> <td>in: <br>out: variable</td> <td></td> </tr>
 	<tr> <td>SWPT</td> <td>swaps the topmost stack value with the second topmost value</td> <td>in: <br>out: </td> <td></td> </tr>
 	<tr> <td>CPYX</td> <td>copies the top specified number of stack values</td> <td>in: <br>out: ...</td> <td>number to copy</td> </tr>

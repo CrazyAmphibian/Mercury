@@ -397,6 +397,7 @@ s=tofloat(true) //returns 1.0 <br/>
 s=tofloat({1,2}) //returns
 nil 
 </p>
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> loadlibrary (<font class="vartpe">string</font>
 path)</h3>
 <p>attempts to load a dynamic library at the specified location. The
@@ -408,6 +409,24 @@ correctly.
 <p class="example">s=loadlibrary(&quot;mylib.dll&quot;) //returns
 true if on windows and the file is present 
 </p>
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">variable</span>|<span class="vartpe">nil</span></span> deepcopy (<font class="vartpe">variable</font>
+variable)</h3>
+<p>
+creates a clone of a variable, and recursively copies elements for arrays and tables. cloned variables contain the same values, however they are treated as seperate objects.<br>
+This function accounts for self-referential tables and supports the same variable being used multiple times in the same dataset.<br>
+some variable types are not applicable to be copied. attempting to copy a non-applicable variable type as the top-level element will make the function return nil. if the variable is the key or a value in a structure, its entry will be skipped over.<br>
+<br>
+accepted types: integers, floats, bools, strings, tables, arrays, functions, c functions<br>
+</p>
+<p class="example">
+t1={1,4,7}<br>
+t2=deepcopy(t1)<br>
+print(t2==t1) //false<br>
+print(t2[0]==t1[0]) //true<br>
+</p>
+
+
 <h1 id="lib_math">Math library</h1>
 <h2 class="western">constants</h2>
 <table cellpadding="2" cellspacing="0">
