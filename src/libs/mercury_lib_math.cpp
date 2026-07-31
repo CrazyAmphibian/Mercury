@@ -976,3 +976,118 @@ void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mer
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
+
+
+
+void mercury_lib_math_mean(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (!args_out)return;
+	mercury_variable out;
+
+	out.data.f = 0.0;
+	out.type = M_TYPE_FLOAT;
+
+	//we can do a backwards stack loop with no issue because the order doesn't matter here
+	for (mercury_int a = 0; a < args_in; a++) {
+		mercury_variable var;
+		mercury_popstack(M, &var);
+
+		//we just ignore non-number variables.
+		if (var.type == M_TYPE_FLOAT) {
+			out.data.f += var.data.f;
+		}
+		else if (var.type == M_TYPE_INT) {
+			out.data.f += (mercury_float)var.data.i;
+		}
+
+		mercury_free_var(&var);
+	}
+
+	out.data.f /= args_in;
+
+	mercury_pushstack(M, &out);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+
+void mercury_lib_math_mean_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
+	if (!args_out) {
+		return;
+	}
+	mercury_variable in;
+	mercury_popstack(M, &in);
+	if (in.type != M_TYPE_ARRAY) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_ARRAY, 1);
+	}
+
+	mercury_variable out;
+	out.data.f = 0.0;
+	out.type = M_TYPE_FLOAT;
+
+	mercury_uint elements_traversed = 0;
+
+	mercury_array* arr = (mercury_array*)in.data.p;
+
+	if (arr->values) {
+#ifdef MERCURY_64BIT
+		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+			mercury_variable***** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+				mercury_variable**** const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+					mercury_variable*** const st3 = st2[i3];
+					if (!st3)continue;
+					for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+						mercury_variable** const st4 = st3[i4];
+						if (!st4)continue;
+						for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+							mercury_variable* const st5 = st4[i5];
+							if (!st5)continue;
+							for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+								mercury_variable const var = st5[i6];
+								const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+#else
+		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+			mercury_variable** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+				mercury_variable* const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+					mercury_variable const var = st2[i3];
+					const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+#endif
+					if (var.type == M_TYPE_INT) {
+						elements_traversed++;
+						out.data.f += (mercury_float)var.data.i;
+					}
+					else if (var.type == M_TYPE_FLOAT) {
+						elements_traversed++;
+						out.data.f += var.data.f;
+					}
+
+#ifdef MERCURY_64BIT
+				}
+			}
+		}
+							}
+						}
+					}
+#else
+				}
+			}
+		}
+#endif				
+	}
+
+	out.data.f /= (mercury_float)elements_traversed;
+
+	mercury_free_var(&in);
+
+	mercury_pushstack(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}

@@ -27,6 +27,8 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_math_min_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_mean(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_math_mean_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 
 void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
