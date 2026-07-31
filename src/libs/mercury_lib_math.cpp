@@ -790,3 +790,189 @@ void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
+
+
+
+void mercury_lib_math_min_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
+	if (!args_out) {
+		return;
+	}
+	mercury_variable in;
+	mercury_popstack(M, &in);
+	if (in.type != M_TYPE_ARRAY) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE,in.type,M_TYPE_ARRAY,1);
+	}
+
+	mercury_variable out;
+#ifdef MERCURY_64BIT
+	out.data.i = 0x7ff0000000000000;
+#else
+	out.data.i = 0x7f800000;
+#endif
+	out.type = M_TYPE_FLOAT;
+
+	mercury_array* arr = (mercury_array*)in.data.p;
+
+	if (arr->values) {
+#ifdef MERCURY_64BIT
+		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+			mercury_variable***** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+				mercury_variable**** const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+					mercury_variable*** const st3 = st2[i3];
+					if (!st3)continue;
+					for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+						mercury_variable** const st4 = st3[i4];
+						if (!st4)continue;
+						for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+							mercury_variable* const st5 = st4[i5];
+							if (!st5)continue;
+							for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+								mercury_variable const var = st5[i6];
+								const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+#else
+		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+			mercury_variable** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+				mercury_variable* const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+					mercury_variable const var = st2[i3];
+					const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+#endif
+					if (var.type==M_TYPE_INT) {
+						if (out.type == M_TYPE_INT) {
+							if (var.data.i < out.data.i)out = var;
+						}
+						else {
+							if (var.data.i < out.data.f)out = var;
+						}
+					}
+					else if (var.type == M_TYPE_FLOAT) {
+						if (out.type == M_TYPE_INT) {
+							if (var.data.f < out.data.i)out = var;
+						}
+						else {
+							if (var.data.f < out.data.f)out = var;
+						}
+					}
+
+#ifdef MERCURY_64BIT
+				}
+			}
+		}
+							}
+						}
+					}
+#else
+				}
+			}
+		}
+#endif				
+	}
+
+
+	mercury_free_var(&in);
+	
+	mercury_pushstack(M,&out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+
+void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
+	if (!args_out) {
+		return;
+	}
+	mercury_variable in;
+	mercury_popstack(M, &in);
+	if (in.type != M_TYPE_ARRAY) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_ARRAY, 1);
+	}
+
+	mercury_variable out;
+#ifdef MERCURY_64BIT
+	out.data.i = 0xfff0000000000000;
+#else
+	out.data.i = 0xff800000;
+#endif
+	out.type = M_TYPE_FLOAT;
+
+	mercury_array* arr = (mercury_array*)in.data.p;
+
+	if (arr->values) {
+#ifdef MERCURY_64BIT
+		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+			mercury_variable***** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+				mercury_variable**** const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+					mercury_variable*** const st3 = st2[i3];
+					if (!st3)continue;
+					for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+						mercury_variable** const st4 = st3[i4];
+						if (!st4)continue;
+						for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+							mercury_variable* const st5 = st4[i5];
+							if (!st5)continue;
+							for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+								mercury_variable const var = st5[i6];
+								const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+#else
+		for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+			mercury_variable** const st1 = arr->values[i1];
+			if (!st1)continue;
+			for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+				mercury_variable* const st2 = st1[i2];
+				if (!st2)continue;
+				for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+					mercury_variable const var = st2[i3];
+					const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+#endif
+					if (var.type == M_TYPE_INT) {
+						if (out.type == M_TYPE_INT) {
+							if (var.data.i > out.data.i)out = var;
+						}
+						else {
+							if (var.data.i > out.data.f)out = var;
+						}
+					}
+					else if (var.type == M_TYPE_FLOAT) {
+						if (out.type == M_TYPE_INT) {
+							if (var.data.f > out.data.i)out = var;
+						}
+						else {
+							if (var.data.f > out.data.f)out = var;
+						}
+					}
+
+#ifdef MERCURY_64BIT
+				}
+			}
+		}
+							}
+						}
+					}
+#else
+				}
+			}
+		}
+#endif				
+	}
+
+
+	mercury_free_var(&in);
+
+	mercury_pushstack(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
