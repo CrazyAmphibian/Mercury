@@ -817,6 +817,8 @@ string)</h3>
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
+
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> fromarray (<font class="vartpe">array</font>
 array)</h3>
 <p>converts an array into a string. integers will have their lower 8
@@ -827,6 +829,17 @@ replaced with the null character (\x00).
 //returns &quot;hello&quot; 
 </p>
 <p class="example" style="margin-bottom: 0in"><br/>
+
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">array</span></span> separate (<font class="vartpe">string</font> string, <font class="vartpe">string</font> separator )</h3>
+<p>returns an array containing substrings of the input string, delimited by the separator. does not include the separator.<br>
+behavior is undefined if the seperator occurs at the start or end of the string, or if the seperator string is empty.
+</p>
+<p class="example" style="margin-bottom: 0in">string.separate("hello.world",".")
+//returns &quot;["hello","world"]&quot; 
+</p>
+<p class="example" style="margin-bottom: 0in"><br/>
+
 
 </p>
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> upper (<font class="vartpe">string</font>

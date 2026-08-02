@@ -147,6 +147,7 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 		return;
 	}
 	if (args_out < 1) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -695,7 +696,11 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, var_array.type, M_TYPE_ARRAY, 1);
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) { 
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_string* out_str=mercury_cstring_to_mstring((char*)"",0);
 

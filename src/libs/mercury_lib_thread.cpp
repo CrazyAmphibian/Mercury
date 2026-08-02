@@ -61,7 +61,10 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		mercury_raise_error_nonpointer(M, M_ERROR_NOT_ENOUGH_ARGS, args_in, 1);
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
+		return;
+	}
 
 
 	mercury_variable table_var;
@@ -191,7 +194,10 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 //bool if thread is finished. simple.
 void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 
 	mercury_variable in;
@@ -216,7 +222,10 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 //gets a value
 void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable in;
 	mercury_popstack(M, &in);
@@ -279,7 +288,10 @@ void mercury_lib_thread_abort(mercury_state* const M_CPP_restrict M, const mercu
 //returns number of values. 0 if not finished.
 void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable in;
 	mercury_popstack(M,&in);
@@ -337,7 +349,10 @@ void mercury_lib_thread_waitfor(mercury_state* const M_CPP_restrict M, const mer
 //inverse of is finished.
 void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable in;
 	mercury_popstack(M,&in);
@@ -382,6 +397,10 @@ void mercury_lib_thread_break(mercury_state* const M_CPP_restrict M, const mercu
 
 void mercury_lib_thread_check_error(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable in;
 	mercury_popstack(M, &in);

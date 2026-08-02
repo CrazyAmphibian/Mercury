@@ -586,6 +586,7 @@ mercury_string* m_stringify(mercury_rawdata data, uint8_t type,mercury_uint* num
 void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -618,6 +619,7 @@ void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_i
 void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -641,6 +643,7 @@ void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercur
 void mercury_lib_std_type(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -660,6 +663,7 @@ void mercury_lib_std_type(mercury_state* const M_CPP_restrict M, const mercury_i
 void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //pretty easy, actually. we already have a function.
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -678,6 +682,7 @@ void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercu
 void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //bit more complicated.
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -777,7 +782,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 	free(c);
 	
 
-	mercury_pushstack(M, &o);
+	if(args_out)mercury_pushstack(M, &o);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -786,6 +791,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 void mercury_lib_std_toint(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -811,6 +817,7 @@ void mercury_lib_std_toint(mercury_state* const M_CPP_restrict M, const mercury_
 void mercury_lib_std_tofloat(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //basically the same thing as the above.
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1078,6 +1085,7 @@ int m_variable_deepcopy(mercury_variable* var_in, mercury_variable* var_out,merc
 void mercury_lib_std_deepcopy(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 

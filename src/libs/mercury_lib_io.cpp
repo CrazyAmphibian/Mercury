@@ -138,7 +138,10 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable file_var;
 	mercury_popstack(M, &file_var);
@@ -258,7 +261,10 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable dir_var;
 	mercury_popstack(M,&dir_var);
@@ -350,7 +356,10 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable dir_var;
 	mercury_popstack(M, &dir_var);
@@ -447,7 +456,10 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable fil_var;
 	mercury_popstack(M, &fil_var);

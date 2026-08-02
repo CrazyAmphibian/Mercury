@@ -8,6 +8,7 @@
 void mercury_lib_table_copy(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //basically the same as array.copy
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 

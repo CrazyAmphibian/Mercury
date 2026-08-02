@@ -162,7 +162,10 @@ void mercury_lib_os_clock(mercury_state* const M_CPP_restrict M, const mercury_i
 
 void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //returns a date in table form, from epoch time.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable tvar;
 	mercury_popstack(M,&tvar);
@@ -256,7 +259,10 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable tvar;
 	mercury_popstack(M,&tvar);

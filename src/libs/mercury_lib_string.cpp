@@ -10,6 +10,9 @@
 void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -50,6 +53,7 @@ void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury
 void mercury_lib_string_reverse(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -93,6 +97,9 @@ void mercury_lib_string_reverse(mercury_state* const M_CPP_restrict M, const mer
 void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2,3))return;
 	if (!args_out) {
+		if(args_in>2)mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -181,6 +188,10 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3, 4))return;
 	if (!args_out) {
+		if(args_in>3)mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -276,6 +287,8 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 void mercury_lib_string_count(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -327,6 +340,7 @@ void mercury_lib_string_count(mercury_state* const M_CPP_restrict M, const mercu
 void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //converts the bytes to an array of ints.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -364,6 +378,7 @@ void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mer
 void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //converts an array of ints into a string
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -414,6 +429,8 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //seperates a string into an array of smaller strings.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -498,6 +515,7 @@ void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const me
 void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -547,6 +565,7 @@ void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercu
 void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -965,6 +984,7 @@ void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const merc
 		return;
 	};
 	if (!args_out) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 		return;
 	}
 
@@ -1481,6 +1501,9 @@ bool m_evaluate_patterns(mercury_string* str, M_PATTERN* patterns, mercury_int n
 void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2, 3))return;
 	if (!args_out) {
+		if(args_in>2)mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1556,6 +1579,8 @@ void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const merc
 void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //returns all instances of a match in an array.
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1615,6 +1640,10 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3,4))return;
 	if (!args_out) {
+		if(args_in>3)mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1702,6 +1731,8 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1751,6 +1782,7 @@ void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mer
 void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1801,6 +1833,7 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1868,6 +1901,7 @@ void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const 
 void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -1950,6 +1984,7 @@ void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const me
 void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 
@@ -2010,6 +2045,7 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 void mercury_lib_string_copy_string(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 	mercury_variable in;

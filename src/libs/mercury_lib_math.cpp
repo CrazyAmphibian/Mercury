@@ -8,7 +8,10 @@
 
 //returns the smallest value. takes vararg. if no values are provided, returns infinity
 void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
-	if (!args_out)return;
+	if (!args_out) { 
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
+		return; 
+	}
 	mercury_variable out;
 	
 #ifdef MERCURY_64BIT
@@ -62,7 +65,10 @@ void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_i
 
 //returns the biggestvalue. takes vararg. if no values are provided, returns negative infinity
 void mercury_lib_math_max(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
-	if (args_out < 1)return;
+	if (!args_out) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
+		return;
+	}
 	mercury_variable out;
 	
 #ifdef MERCURY_64BIT
@@ -118,7 +124,10 @@ void mercury_lib_math_floor(mercury_state* const M_CPP_restrict M, const mercury
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.i = 0;
@@ -149,7 +158,10 @@ void mercury_lib_math_ceil(mercury_state* const M_CPP_restrict M, const mercury_
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0;
@@ -181,7 +193,10 @@ void mercury_lib_math_to_radians(mercury_state* const M_CPP_restrict M, const me
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -214,7 +229,10 @@ void mercury_lib_math_to_degrees(mercury_state* const M_CPP_restrict M, const me
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -247,7 +265,11 @@ void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_i
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (!args_out)return;
+	if (!args_out) {
+		if (args_in > 1)mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable out;
 	
@@ -305,7 +327,10 @@ void mercury_lib_math_to_absolute(mercury_state* const M_CPP_restrict M, const m
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -343,7 +368,10 @@ void mercury_lib_math_to_sin(mercury_state* const M_CPP_restrict M, const mercur
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -375,7 +403,10 @@ void mercury_lib_math_to_cos(mercury_state* const M_CPP_restrict M, const mercur
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -408,7 +439,10 @@ void mercury_lib_math_to_tan(mercury_state* const M_CPP_restrict M, const mercur
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -440,7 +474,10 @@ void mercury_lib_math_to_asin(mercury_state* const M_CPP_restrict M, const mercu
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -472,7 +509,10 @@ void mercury_lib_math_to_acos(mercury_state* const M_CPP_restrict M, const mercu
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -505,7 +545,10 @@ void mercury_lib_math_to_atan(mercury_state* const M_CPP_restrict M, const mercu
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -537,7 +580,11 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 	mercury_variable out;
 	
 	out.data.f = 0.0;
@@ -767,7 +814,10 @@ void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
 	}
-	if (args_out < 1)return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
 
 	mercury_variable out;
 	
@@ -796,6 +846,7 @@ void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury
 void mercury_lib_math_min_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 	mercury_variable in;
@@ -889,6 +940,7 @@ void mercury_lib_math_min_array(mercury_state* const M_CPP_restrict M, const mer
 void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 	mercury_variable in;
@@ -980,7 +1032,10 @@ void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mer
 
 
 void mercury_lib_math_mean(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
-	if (!args_out)return;
+	if (!args_out) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in, 0);
+		return;
+	}
 	mercury_variable out;
 
 	out.data.f = 0.0;
@@ -1013,6 +1068,7 @@ void mercury_lib_math_mean(mercury_state* const M_CPP_restrict M, const mercury_
 void mercury_lib_math_mean_array(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
 	if (!args_out) {
+		mercury_discard_top_of_stack(M);
 		return;
 	}
 	mercury_variable in;
