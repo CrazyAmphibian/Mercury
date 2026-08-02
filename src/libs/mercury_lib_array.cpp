@@ -355,13 +355,19 @@ void mercury_lib_array_remove(mercury_state* const M_CPP_restrict M, const mercu
 
 	mercury_variable v;
 	mercury_getarray(arr, target, &v);
-	mercury_free_var(&v );
+	if (args_out) {
+		mercury_pushstack(M, &v);
+	}
+	else {
+		mercury_free_var(&v);
+	}
+	
 	for (mercury_int i = target; i <= cur_len; i++) {
 		mercury_getarray(arr, i + 1, &v);
 		mercury_setarray(arr, &v, i);
 	}
 
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
 
