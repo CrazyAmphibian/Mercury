@@ -287,8 +287,8 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 				case TOKEN_TYPE_STRING:
 					if(c=='\"'){ //end string reading.
 						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
-						cur_tok=new_compiler_token(col_num, line_num);
 						advance_position_from_char(c, c_prev, &col_num, &line_num);
+						cur_tok=new_compiler_token(col_num, line_num);
 						i++;
 					}else if(c=='\\'){ //escapes.
 						advance_position_from_char(c, c_prev, &col_num, &line_num);
@@ -386,6 +386,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 						}
 						
 					}else{ //add char to string.
+						advance_position_from_char(c, c_prev, &col_num, &line_num);
 						append_char_to_compiler_token(cur_tok,c);
 						i++;
 					}
