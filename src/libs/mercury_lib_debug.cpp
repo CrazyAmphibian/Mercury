@@ -272,11 +272,12 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 		mercury_variable in;
 		mercury_popstack(M, &in);
 		if (in.type == M_TYPE_FUNCTION) {
-			mercury_debug_token* toks = M->bytecode.debug_info;
+			mercury_function* func = (mercury_function*)in.data.p;
+			mercury_debug_token* toks = func->dbg_tokens;
 			printf("variable function %p debug info:\n", in.data.p);
 
 			if (toks) {
-				for (mercury_uint i = 0; i < (*((mercury_function*)in.data.p)).numberofinstructions; i++) {
+				for (mercury_uint i = 0; i < func->num_dbg_tokens; i++) {
 					mercury_debug_token t = toks[i];
 					printf("%zu] ln:%zi col:%zi ", i,t.line,t.col);
 					for (mercury_int c = 0; c < t.num_chars; c++) {
@@ -295,10 +296,10 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 	}
 	else {
 
-		mercury_debug_token* toks = M->bytecode.debug_info;
+		mercury_debug_token* toks = M->bytecode.dbg_tokens;
 		printf("state %p debug info:\n", M);
 		if (toks) {
-			for (mercury_uint i = 0; i < M->bytecode.numberofinstructions; i++) {
+			for (mercury_uint i = 0; i < M->bytecode.num_dbg_tokens; i++) {
 				mercury_debug_token t = toks[i];
 				printf("%zu] ln:%zi col:%zi ", i, t.line, t.col);
 				for (mercury_int c = 0; c < t.num_chars; c++) {
@@ -306,7 +307,7 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 				}
 				putchar('\n');
 			}
-			
+
 		}
 		
 	}

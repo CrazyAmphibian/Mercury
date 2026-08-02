@@ -188,7 +188,9 @@ struct mercury_function {
 	mercury_uint numberofinstructions = 0;
 	mercury_opcode* instructions = nullptr;
 	bool enviromental = false;
-	mercury_debug_token* debug_info=nullptr;
+	mercury_uint* instruction_dbg_lookup=nullptr; //index with an instruction, gives the index to dbg_tokens
+	mercury_uint num_dbg_tokens = 0;
+	mercury_debug_token* dbg_tokens = nullptr;
 };
 
 struct mercury_filewrapper {

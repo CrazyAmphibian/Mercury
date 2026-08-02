@@ -302,7 +302,9 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 		}
 		iso_M->bytecode.instructions = (mercury_opcode*)nbl;
 		iso_M->bytecode.numberofinstructions = func2->numberofinstructions;
-		iso_M->bytecode.debug_info = nullptr;
+		iso_M->bytecode.instruction_dbg_lookup = nullptr;
+		iso_M->bytecode.num_dbg_tokens = 0;
+		iso_M->bytecode.dbg_tokens = nullptr;
 		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(mercury_opcode));
 	}
 
@@ -1053,24 +1055,12 @@ int m_variable_deepcopy(mercury_variable* var_in, mercury_variable* var_out,merc
 				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
 			}
 			memset(nptr, 0, sizeof(mercury_function));
-			nptr->instructions = (mercury_opcode*)malloc(sizeof(mercury_opcode) * infun->numberofinstructions);
-			if (!nptr->instructions) {
+			mercury_clone_function(infun, nptr);
+			nptr->refrences = 0;
+			if (nptr->numberofinstructions != infun->numberofinstructions) {
 				free(nptr);
 				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
 			}
-
-			if (infun->debug_info) {
-				nptr->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * infun->numberofinstructions);
-				if (!nptr->debug_info) {
-					free(nptr->instructions);
-					free(nptr);
-					return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
-				}
-				memcpy(nptr->debug_info, infun->debug_info, sizeof(mercury_debug_token)* infun->numberofinstructions);
-			}
-			memcpy(nptr->instructions, infun->instructions, sizeof(mercury_opcode)* infun->numberofinstructions);
-			nptr->enviromental = false;
-			nptr->refrences = 0;
 
 			add_converted_pointer(infun, nptr, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
 			}

@@ -2715,34 +2715,45 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 		mercury_debug_token* dts=nullptr;
 
 		if (!remove_debug_info) {
-			dts = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * func->number_instructions);
-			if (!dts)return;
+			nmf->instruction_dbg_lookup = (mercury_uint*)malloc(sizeof(mercury_uint) * func->number_instructions);
+			if (!(nmf->instruction_dbg_lookup))return;
+			
 
 			for (mercury_int i = 0; i < func->number_instructions; i++) {
 				mercury_int toknum = func->instruction_tokens[i];
 
 				if (toknum >= num_tokens) {
 #ifdef MERCURY_DEBUG
-					printf("DEBUG/error|compiler: instruction #%zi (%hi/%hx) was assigned by token %zi, but we only have %zi avalible.\n",i,func->instructions[i], func->instructions[i],toknum,num_tokens);
+					printf("DEBUG/error|compiler: instruction #%zi (%hi/%hx) was assigned by token %zi, but we only have %zi avalible.\n", i, func->instructions[i], func->instructions[i], toknum, num_tokens);
 #endif
 					toknum = num_tokens - 1;
 				}
-				
-
-				compiler_token* t = tokens[toknum];
-				//printf("%zi %zi %zi %zi\n", i, toknum, t->line_col, t->line_num);
-				mercury_debug_token d;
-				d.col = t->line_col;
-				d.line = t->line_num;
-				d.chars = t->chars;
-				d.num_chars = t->num_chars;
-				dts[i] = d;
+				nmf->instruction_dbg_lookup[i] = toknum;
 			}
 
+			nmf->dbg_tokens = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * num_tokens);
 			for (mercury_int i = 0; i < num_tokens; i++) {
 				compiler_token* t = tokens[i];
+
+				if (t->token_type == TOKEN_TYPE_STRING) { //because the quote marks are lost in tokenization, we must add them back
+					nmf->dbg_tokens[i].chars = (char*)malloc(t->num_chars + 2);
+					if (nmf->dbg_tokens[i].chars) {
+						memcpy(nmf->dbg_tokens[i].chars + 1, t->chars, t->num_chars);
+						nmf->dbg_tokens[i].chars[0] = '\"';
+						nmf->dbg_tokens[i].chars[t->num_chars+1] = '\"';
+						nmf->dbg_tokens[i].num_chars = t->num_chars + 2;
+					}
+				}
+				else {
+					nmf->dbg_tokens[i].chars = t->chars;
+					nmf->dbg_tokens[i].num_chars = t->num_chars;
+				}	
+				nmf->dbg_tokens[i].col = t->line_col;
+				nmf->dbg_tokens[i].line = t->line_num;
 				free(t);
 			}
+			nmf->num_dbg_tokens = num_tokens;
+
 		}
 		else {
 			for (mercury_int i = 0; i < num_tokens; i++) {
@@ -2750,6 +2761,9 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 				free(t->chars);
 				free(t);
 			}
+			nmf->dbg_tokens = nullptr;
+			nmf->num_dbg_tokens = 0;
+			nmf->instruction_dbg_lookup = nullptr;
 		}
 		
 		free(tokens);
@@ -2758,7 +2772,6 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 		nmf->refrences = 1;
 		nmf->instructions = func->instructions;
 		nmf->numberofinstructions = func->number_instructions;
-		nmf->debug_info = dts;
 		
 		free(func);
 

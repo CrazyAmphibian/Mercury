@@ -188,7 +188,9 @@ int main(int argc, char** argv) {
 
 		M->bytecode.instructions = compiled->instructions;
 		M->bytecode.numberofinstructions = compiled->numberofinstructions;
-		M->bytecode.debug_info = compiled->debug_info;
+		M->bytecode.dbg_tokens = compiled->dbg_tokens;
+		M->bytecode.num_dbg_tokens = compiled->num_dbg_tokens;
+		M->bytecode.instruction_dbg_lookup = compiled->instruction_dbg_lookup;
 
 		//printf("current stack: %i\n", M->sizeofstack);
 
@@ -199,9 +201,23 @@ int main(int argc, char** argv) {
 		if (funcy.type == M_TYPE_FUNCTION) {
 			M->programcounter = 0;
 			free(code);
-			free(M->bytecode.instructions);
 			M->bytecode.numberofinstructions = 0;
-			free(M->bytecode.debug_info);
+
+			if (M->bytecode.instructions) {
+				free(M->bytecode.instructions);
+			}
+
+			if (M->bytecode.instruction_dbg_lookup) {
+				free(M->bytecode.instruction_dbg_lookup);
+			}
+			if (M->bytecode.dbg_tokens) {
+				for (mercury_uint i = 0; i < M->bytecode.num_dbg_tokens; i++) {
+					free(M->bytecode.dbg_tokens[i].chars);
+				}
+				free(M->bytecode.dbg_tokens);
+			}
+			M->bytecode.num_dbg_tokens = 0;
+
 			
 
 			for (mercury_uint i = 0; i < M->sizeofstack;i++) {

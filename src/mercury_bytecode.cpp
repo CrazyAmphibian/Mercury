@@ -1437,18 +1437,42 @@ void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / N
 
 	memcpy(fptr->instructions, M->bytecode.instructions + M->programcounter, function_size * sizeof(mercury_opcode));
 
-	if (M->bytecode.debug_info) {
-		fptr->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * function_size);
-		if (fptr->debug_info == nullptr) {
+	if (M->bytecode.instruction_dbg_lookup) {
+		fptr->instruction_dbg_lookup = (mercury_uint*)malloc(sizeof(mercury_uint) * function_size);
+		if (fptr->instruction_dbg_lookup == nullptr) {
 			free(fptr->instructions);
 			free(fptr);
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
-		memcpy(fptr->debug_info, M->bytecode.debug_info + M->programcounter, function_size * sizeof(mercury_debug_token));
+		memcpy(fptr->instruction_dbg_lookup, M->bytecode.instruction_dbg_lookup + M->programcounter, function_size * sizeof(mercury_uint));
+		fptr->dbg_tokens = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * M->bytecode.num_dbg_tokens);
+		if (fptr->dbg_tokens == nullptr) {
+			free(fptr->instructions);
+			free(fptr->instruction_dbg_lookup);
+			free(fptr);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		for (mercury_uint i = 0; i < M->bytecode.num_dbg_tokens; i++) {
+			fptr->dbg_tokens[i] = M->bytecode.dbg_tokens[i];
+			fptr->dbg_tokens[i].chars = (char*)malloc(M->bytecode.dbg_tokens[i].num_chars);
+			if (!fptr->dbg_tokens[i].chars) {
+				free(fptr->instructions);
+				free(fptr->dbg_tokens);
+				free(fptr->instruction_dbg_lookup);
+				free(fptr);
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
+				return;
+			}
+			fptr->num_dbg_tokens = M->bytecode.num_dbg_tokens;
+			memcpy(fptr->dbg_tokens[i].chars, M->bytecode.dbg_tokens[i].chars, M->bytecode.dbg_tokens[i].num_chars);
+		}
 	}
 	else {
-		fptr->debug_info = nullptr;
+		fptr->instruction_dbg_lookup = nullptr;
+		fptr->num_dbg_tokens = 0;
+		fptr->dbg_tokens = nullptr;
 	}
 
 

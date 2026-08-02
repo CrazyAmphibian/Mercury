@@ -133,6 +133,11 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		//t->state->bytecode.numberofinstructions = ((mercury_function*)func_var.data.p)->numberofinstructions;
 		//t->state->bytecode.instructions = ((mercury_function*)func_var.data.p)->instructions;
 		mercury_clone_function((mercury_function*)func_var.data.p,&(t->state->bytecode));
+		if (((mercury_function*)func_var.data.p)->numberofinstructions != t->state->bytecode.numberofinstructions) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+			return;
+		}
 
 		if (vart) {
 			for (mercury_int i = 0; i < args_in - 2; i++) {

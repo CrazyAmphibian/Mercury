@@ -46,8 +46,18 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 		}
 		memset(prepend, NULL, sizeof(mercury_string));
 
-		if (M->bytecode.debug_info) {
-			mercury_debug_token T = M->bytecode.debug_info[M->programcounter - 1];
+		if (M->bytecode.instruction_dbg_lookup) {
+			mercury_uint dbg_tok_num=M->bytecode.instruction_dbg_lookup[M->programcounter - 1];
+			mercury_debug_token T,T_n,T_p;
+			bool next=false;
+			bool prev=false;
+			if (dbg_tok_num)prev = true;
+			if (dbg_tok_num+1 < M->bytecode.num_dbg_tokens)next = true;
+			T=M->bytecode.dbg_tokens[dbg_tok_num];
+			if(prev)T_p= M->bytecode.dbg_tokens[dbg_tok_num-1];
+			if(next)T_n= M->bytecode.dbg_tokens[dbg_tok_num+1];
+
+
 			char* tchars = (char*)malloc(T.num_chars + 1);
 			if (!tchars) {
 				mercury_mstring_delete(out);
@@ -56,7 +66,49 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 			}
 			memcpy(tchars, T.chars, T.num_chars);
 			tchars[T.num_chars] = '\0';
-			snprintf(buffer, buffer_size, "line %zi col %zi at %s",T.line,T.col,tchars);
+
+			char* n_tchars = nullptr;
+			if (next) {
+				n_tchars = (char*)malloc(T_n.num_chars + 1);
+				if (!n_tchars) {
+					free(tchars);
+					mercury_mstring_delete(out);
+					mercury_mstring_delete(prepend);
+					return nullptr;
+				}
+				memcpy(n_tchars, T_n.chars, T_n.num_chars);
+				n_tchars[T_n.num_chars] = '\0';
+			}
+
+			char* p_tchars = nullptr;
+			if (next) {
+				p_tchars = (char*)malloc(T_p.num_chars + 1);
+				if (!p_tchars) {
+					free(tchars);
+					mercury_mstring_delete(out);
+					mercury_mstring_delete(prepend);
+					return nullptr;
+				}
+				memcpy(p_tchars, T_p.chars, T_p.num_chars);
+				p_tchars[T_p.num_chars] = '\0';
+			}
+
+			if (next && prev) {
+				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s%s", T.line, T.col, p_tchars,tchars, n_tchars);
+				free(p_tchars);
+				free(n_tchars);
+			}
+			else if (next) {
+				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s", T.line, T.col, tchars,n_tchars);
+				free(n_tchars);
+			}
+			else if (prev) {
+				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s", T.line, T.col, p_tchars,tchars);
+				free(p_tchars);
+			}
+			else {
+				snprintf(buffer, buffer_size, "line %zi col %zi at %s", T.line, T.col, tchars);
+			}
 			free(tchars);
 		}
 		else {

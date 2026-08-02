@@ -453,6 +453,9 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 	newstate->bytecode.instructions = nullptr;
 	newstate->bytecode.numberofinstructions = 0;
 	newstate->bytecode.refrences = 0xFFFF;
+	newstate->bytecode.dbg_tokens = nullptr;
+	newstate->bytecode.num_dbg_tokens = 0;
+	newstate->bytecode.instruction_dbg_lookup = nullptr;
 
 	newstate->enviroment = mercury_newtable();
 	if (!newstate->enviroment)return nullptr;
@@ -554,8 +557,14 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 		free(M->bytecode.instructions);
 	}
 
-	if (M->bytecode.debug_info) {
-		free(M->bytecode.debug_info);
+	if (M->bytecode.instruction_dbg_lookup) {
+		free(M->bytecode.instruction_dbg_lookup);
+	}
+	if (M->bytecode.dbg_tokens) {
+		for (mercury_uint i = 0; i < M->bytecode.num_dbg_tokens; i++) {
+			free(M->bytecode.dbg_tokens[i].chars);
+		}
+		free(M->bytecode.dbg_tokens);
 	}
 
 	if (M->masterstate == M && M->registers) {
@@ -608,8 +617,14 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 		ffunction->refrences--;
 		if (!ffunction->refrences) {
 			free(ffunction->instructions); //this causes a heap issue. dunno why.
-			if (ffunction->debug_info) {
-				free(ffunction->debug_info);
+			if (ffunction->instruction_dbg_lookup) {
+				free(ffunction->instruction_dbg_lookup);
+			}
+			if (ffunction->dbg_tokens) {
+				for (mercury_uint i = 0; i < ffunction->num_dbg_tokens; i++) {
+					free(ffunction->dbg_tokens[i].chars);
+				}
+				free(ffunction->dbg_tokens);
 			}
 			free(ffunction);
 		}
@@ -1331,20 +1346,35 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 }
 
 void mercury_clone_function(mercury_function* in, mercury_function* out) {
+	out->numberofinstructions = in->numberofinstructions - 1;// guard value. this will be overwritten later as long as the function executes correctly and these should be the same number.
 	out->refrences = 1;
-	if (in->debug_info) {
-		out->debug_info = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * in->numberofinstructions);
-		if (!out->debug_info)return;
-		memcpy(out->debug_info, in->debug_info, sizeof(mercury_debug_token) * in->numberofinstructions);
+	if (in->instruction_dbg_lookup) {
+		out->instruction_dbg_lookup = (mercury_uint*)malloc(sizeof(mercury_uint) * in->numberofinstructions);
+		if (!out->instruction_dbg_lookup)return;
+		out->dbg_tokens = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * in->num_dbg_tokens);
+		if (!out->dbg_tokens)return;
+		out->num_dbg_tokens = in->num_dbg_tokens;
+		for (mercury_uint i = 0; i < in->num_dbg_tokens; i++) {
+			out->dbg_tokens[i] = in->dbg_tokens[i];
+			out->dbg_tokens[i].chars = (char*)malloc(in->dbg_tokens[i].num_chars);
+			if (out->dbg_tokens[i].chars) {
+				memcpy(out->dbg_tokens[i].chars, in->dbg_tokens[i].chars, in->dbg_tokens[i].num_chars);
+			}
+		}
+		memcpy(out->instruction_dbg_lookup, in->instruction_dbg_lookup, sizeof(mercury_uint) * in->numberofinstructions);
+
 	}
 	else {
-		out->debug_info = nullptr;
+		out->instruction_dbg_lookup = nullptr;
+		out->num_dbg_tokens = 0;
+		out->dbg_tokens = nullptr;
 	}
 	out->instructions = (mercury_opcode*)malloc(sizeof(mercury_opcode) * in->numberofinstructions);
 	if (!out->instructions)return;
 	memcpy(out->instructions, in->instructions, sizeof(mercury_opcode) * in->numberofinstructions);
 	out->numberofinstructions = in->numberofinstructions;
 	out->enviromental = false;
+	out->refrences = 1;
 }
 
 inline const char* m_get_opcode_str(mercury_opcode instruction) {
