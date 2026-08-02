@@ -412,6 +412,16 @@ print(t2[0]==t1[0]) //true<br>
 </p>
 
 
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> error (<font class="vartpe">variable</font> errorstring)</h3>
+<p>
+throws a custom error string. follows standard error reporting and propagation rules. non-string types will be converted to strings.
+</p>
+<p class="example">
+if data==nil then<br>
+error("data is missing!")<br>
+end<br>
+</p>
+
 <h1 id="lib_math">Math library</h1>
 <h2 class="western">constants</h2>
 <table cellpadding="2" cellspacing="0">
@@ -976,6 +986,17 @@ variadic arguments.<br/>
 		</td>
 		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
 			a pointer value for complex datatypes. other datatypes will be interpreted as nullptr (0).<br><b>NOTE:</b> format behavior is platform-dependent</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
+			flags, width</p>
+		</td>
+	</tr>
+	<tr>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			c, C</p>
+		</td>
+		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0in"><p>
+			a single character from an integer value. ignores everything but the lowest 8 bits.
 		</td>
 		<td style="border-top: none; border-bottom: 1.50pt solid #000000; border-left: 1.50pt solid #000000; border-right: 1.50pt solid #000000; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0.02in; padding-right: 0.02in"><p>
 			flags, width</p>

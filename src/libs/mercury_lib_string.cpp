@@ -777,6 +777,15 @@ mercury_int m_readformat(mercury_string* str, mercury_int offset, mercury_string
 				value.i = mercury_checkint(v_arr + *num_vars);
 			}
 			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, value.i, "zX", args, args_def);
+			return add_off;
+		case 'c':
+		case 'C':
+			if (*num_vars) {
+				(*num_vars)--;
+				value.i = mercury_checkint(v_arr + *num_vars);
+			}
+			printf_wrapper_takes_int(printfbuffer, BUFFER_SIZE, str_out, value.i, "c", args, args_def);
+			return add_off;
 return add_off;
 		case 'f':
 			if (*num_vars) {
