@@ -1,18 +1,23 @@
 # Mercury
 **current version: Alpha 6**
 
-is an interpreted programming language
+Mercury is an interpreted stack-based programming language focused on being simple, reasonably fast, and putting responsibility in the hands of programmers.
 
 Some features include:
 * integers and floats as distinct types
-* multithreading
-* self-modifying code
+* true OS-level multithreading
+* runtime code compiling
 * logical XOR
 * strong dynamic typing
 * fine variable scope control
 * lambdas / anonymous functions
+* automatic garbage collection
+* multiple function return values
+* mostly unrestricted goto
 
-
+```mrc
+print("hello, world!")
+```
 
 ## how to build
 
