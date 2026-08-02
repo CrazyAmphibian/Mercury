@@ -1683,6 +1683,7 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_std_tofloat, "tofloat", nullptr);
 	mercury_register_library(mercury_lib_std_dynamic_library_load, "loadlibrary", nullptr);
 	mercury_register_library(mercury_lib_std_deepcopy, "deepcopy", nullptr);
+	mercury_register_library(mercury_lib_std_error, "error", nullptr);
 
 
 	mercury_register_library((void*)&m_const_type_nil, "TYPE_NIL", nullptr, M_TYPE_INT);

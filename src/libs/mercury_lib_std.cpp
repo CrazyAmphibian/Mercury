@@ -1114,4 +1114,26 @@ void mercury_lib_std_deepcopy(mercury_state* const M_CPP_restrict M, const mercu
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
+void mercury_lib_std_error(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,1))return;
+
+
+	mercury_variable in;
+	in.type = M_TYPE_NIL;
+	if(args_in)mercury_popstack(M, &in);
+	mercury_string* str=mercury_tostring(&in);
+	if (str) {
+		char* cstr = mercury_mstring_to_cstring(str);
+		if (cstr) {
+			mercury_raise_error(M, M_ERROR_CUSTOM_STRING, (const mercury_int*)cstr);
+			free(cstr);
+		}
+		mercury_mstring_delete(str);
+	}
+	mercury_free_var(&in);
+	
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,0);
+}
+
 

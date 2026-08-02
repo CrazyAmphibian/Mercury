@@ -21,6 +21,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 void mercury_lib_std_toint(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_std_tofloat(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_std_deepcopy(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_std_error(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 
 const mercury_int m_const_type_nil = M_TYPE_NIL;
 const mercury_int m_const_type_int = M_TYPE_INT;
