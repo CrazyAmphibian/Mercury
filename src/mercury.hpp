@@ -45,8 +45,8 @@ typedef float mercury_float;
 #define MERCURY_32BIT
 #endif
 
-#define MERCURY_VERSION 0
-#define MERCURY_VERSION_PATCH 7
+#define MERCURY_VERSION 1
+#define MERCURY_VERSION_PATCH 0
 
 #define MERCURY
 #if defined(DEBUG) || defined(_DEBUG)
