@@ -1,5 +1,5 @@
 # Mercury
-**current version: Alpha 6**
+**current version: 1.0**
 
 Mercury is an interpreted stack-based programming language focused on being simple, reasonably fast, and putting responsibility in the hands of programmers.
 
