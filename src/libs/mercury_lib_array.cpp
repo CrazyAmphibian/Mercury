@@ -316,7 +316,7 @@ void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercu
 	}
 
 	mercury_free_var(&arr_var);
-	mercury_free_var(&var_to_ins);
+	//mercury_free_var(&var_to_ins);
 	if(len_var.type)mercury_free_var(&len_var);
 
 	if (args_out) {
