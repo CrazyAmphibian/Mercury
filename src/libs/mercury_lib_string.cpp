@@ -1403,7 +1403,7 @@ bool m_evaluate_patterns(mercury_string* str, M_PATTERN* patterns, mercury_int n
 		patterns[n].last_good_char = 0;
 	}
 	for (mercury_int c = str_start; c < str->size; c++) {
-		char cc = str->ptr[c];
+		unsigned char cc = str->ptr[c];
 		
 		
 		M_PATTERN* p = patterns+current_pattern;
