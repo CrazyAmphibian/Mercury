@@ -471,27 +471,34 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 
 	
 	mercury_array* arr = mercury_newarray();
-
-	mercury_int bsize = 256;
-	mercury_int cbuf = 0;
-	char* buf = (char*)malloc(bsize);
-	if (!buf) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION);
-		return;
-	}
 	mercury_int count = 0;
 
 	mercury_filewrapper* fw = (mercury_filewrapper*)fil_var.data.p;
 	if (fw->open) {
 		FILE* f = fw->file;
 		rewind(f);
+		fseek(f, 0, SEEK_END);
+		mercury_int total_len = ftell(f);
+		rewind(f);
+		char* buffer=(char*)malloc(total_len);
+		if (!buffer && total_len) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		if (total_len) { //support for empty file reading
+			fread(buffer, 1, total_len, f);
+			rewind(f);
+		}
+		mercury_int run_end = 0;
+		mercury_int run_start = 0;
 		while (true) {
-			int c=fgetc(f);
-			if (c == '\n' || c == '\r' || c==EOF) {
-				if (cbuf) {
-					mercury_string* s= mercury_cstring_to_mstring(buf,cbuf);
+			if (run_end == total_len) { //end of file
+				if (run_end - run_start) {
+					mercury_string* s = mercury_cstring_to_mstring(buffer+ run_start, run_end -run_start);
 					if (!s) {
 						mercury_raise_error(M, M_ERROR_ALLOCATION);
+						free(buffer);
+						mercury_destroyarray(arr);
 						return;
 					}
 					mercury_variable v;
@@ -499,29 +506,37 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 					v.data.p = s;
 					mercury_setarray(arr, &v, count);
 					count++;
-					cbuf = 0;
 				}
-				if (c == EOF)break;
+				break;
 			}
-			else {
-				buf[cbuf] = (char)c;
-				cbuf++;
-				if (cbuf >= bsize) {
-					void* n=realloc(buf, bsize * 2);
-					if (!n) {
+			char cur_char=buffer[run_end];
+			if (cur_char == '\n' || cur_char == '\r') {
+				if (run_end - run_start) {
+					mercury_string* s = mercury_cstring_to_mstring(buffer + run_start, run_end - run_start);
+					if (!s) {
 						mercury_raise_error(M, M_ERROR_ALLOCATION);
-						free(buf);
-						rewind(f);
+						free(buffer);
+						mercury_destroyarray(arr);
 						return;
 					}
-					buf = (char*)n;
-					bsize *= 2;
+					mercury_variable v;
+					v.type = M_TYPE_STRING;
+					v.data.p = s;
+					mercury_setarray(arr, &v, count);
+					count++;
 				}
+				run_end++;
+				run_start = run_end;
+			}
+			else {
+				run_end++;
 			}
 		}
-		rewind(f);
+		free(buffer);
+
+		
 	}
-	free(buf);
+	
 
 	mercury_free_var(&fil_var);
 	fil_var.type = M_TYPE_ARRAY;
