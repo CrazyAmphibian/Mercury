@@ -239,7 +239,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_free_var(&function);
 	mercury_free_var(&listlike);
 
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 0);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 

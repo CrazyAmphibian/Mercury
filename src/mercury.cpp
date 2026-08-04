@@ -504,9 +504,8 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
 		mercury_free_var(M->stack+i);
 	}
-	if (!for_deletion) {
-		M->sizeofstack = 0;
-	}
+	M->sizeofstack = 0;
+	
 
 	
 	
@@ -809,22 +808,22 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 	if (arr->values) {
 #ifdef MERCURY_64BIT
 		//this can't be the best way to do it. i mean... just look at this piece of shit.
-		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 > 0; i1--) {
+		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 >= 0; i1--) {
 			mercury_variable***** const st1 = arr->values[i1];
 			if (!st1)continue;
-			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
+			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 >= 0; i2--) {
 				mercury_variable**** const st2 = st1[i2];
 				if (!st2)continue;
-				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
+				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 >= 0; i3--) {
 					mercury_variable*** const st3 = st2[i3];
 					if (!st3)continue;
-					for (int i4 = (MERCURY_SIZE_SUBARRAY_4 - 1); i4 > 0; i4--) {
+					for (int i4 = (MERCURY_SIZE_SUBARRAY_4 - 1); i4 >= 0; i4--) {
 						mercury_variable** const st4 = st3[i4];
 						if (!st4)continue;
-						for (int i5 = (MERCURY_SIZE_SUBARRAY_5 - 1); i5 > 0; i5--) {
+						for (int i5 = (MERCURY_SIZE_SUBARRAY_5 - 1); i5 >= 0; i5--) {
 							mercury_variable* const st5 = st4[i5];
 							if (!st5)continue;
-							for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 > 0; i6--) {
+							for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 >= 0; i6--) {
 								mercury_variable* var = st5+i6;
 								if (var->type)mercury_free_var(var);
 							}
@@ -840,13 +839,13 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 		}
 #else
 		//it's less shit here but still not great.
-		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 > 0; i1--) {
+		for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1); i1 >= 0; i1--) {
 			mercury_variable** const st1 = arr->values[i1];
 			if (!st1)continue;
-			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
+			for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 >= 0; i2--) {
 				mercury_variable* const st2 = st1[i2];
 				if (!st2)continue;
-				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
+				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 >= 0; i3--) {
 					mercury_variable* const var = st2+i3;
 					if (var->type)mercury_free_var(var);
 				}

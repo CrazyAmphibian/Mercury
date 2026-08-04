@@ -182,6 +182,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 				}
 				str->ptr = s;
 				str->size = len;
+				str->refrences = 1;
 				str->constant = false;
 				out.type = M_TYPE_STRING;
 				out.data.p = str;
@@ -195,7 +196,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 
 	mercury_free_var(&file_var);
 
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -483,7 +484,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_filewrapper* fw = (mercury_filewrapper*)fil_var.data.p;
 	if (fw->open) {
 		FILE* f = fw->file;
-
+		rewind(f);
 		while (true) {
 			int c=fgetc(f);
 			if (c == '\n' || c == '\r' || c==EOF) {
@@ -494,7 +495,6 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 						return;
 					}
 					mercury_variable v;
-					
 					v.type = M_TYPE_STRING;
 					v.data.p = s;
 					mercury_setarray(arr, &v, count);
