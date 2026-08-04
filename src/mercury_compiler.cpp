@@ -1433,7 +1433,8 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 			return 0;
 		}
 		token_offset++;
-		
+
+		add_instruction(funcargreadf,M_OPCODE_CLS,0); //discards extra args in
 		mercury_int toks_consumed=0;
 		compiler_function* ff = mercury_compile_tokens_to_bytecode(tokens, num_tokens, token_offset,&toks_consumed);
 		if (!ff) {
