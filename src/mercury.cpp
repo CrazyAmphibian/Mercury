@@ -177,7 +177,7 @@ mercury_string* mercury_mstring_substring(mercury_string* str, mercury_int start
 
 	nstr->size = 1l+end - start;
 	nstr->ptr=(char*)malloc(sizeof(char)*nstr->size);
-	nstr->refrences = 0;
+	nstr->refrences = 1;
 	nstr->constant = false;
 	if (!nstr->ptr) {
 		nstr->size = 0;
