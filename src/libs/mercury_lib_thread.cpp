@@ -216,7 +216,7 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 	out.type = M_TYPE_BOOL;
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 1 : 0;
 
-
+	mercury_free_var(&in);
 	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -250,6 +250,7 @@ void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const me
 		t->threadobject = NULL;
 #endif
 	}
+	mercury_free_var(&in);
 	mercury_variable out;
 	mercury_pullstack(t->state, &out); //take the bottom of stack. it's the proper order with returns.
 	mercury_pushstack(M, &out);
@@ -284,7 +285,7 @@ void mercury_lib_thread_abort(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	t->finished = true;
 
-
+	mercury_free_var(&in);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 }
 
@@ -315,7 +316,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, cons
 		out.data.i = t->state->sizeofstack;
 	}
 	
-
+	mercury_free_var(&in);
 	mercury_pushstack(M, &out);
 
 
@@ -347,6 +348,8 @@ void mercury_lib_thread_waitfor(mercury_state* const M_CPP_restrict M, const mer
 #endif
 	}
 
+	mercury_free_var(&in);
+
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 }
 
@@ -370,7 +373,7 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 	out.type = M_TYPE_BOOL;
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 0 : 1;
 
-
+	mercury_free_var(&in);
 	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
