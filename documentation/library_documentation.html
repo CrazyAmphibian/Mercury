@@ -1709,12 +1709,31 @@ path)</h3>
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">bool</span></span> createdir (<font class="vartpe">string</font>
 path)</h3>
 <p>attempts to create a directory with the given name/path. if successful, returns true, otherwise false. 
 </p>
 <p class="example">io.createdir(&quot;data&quot;) 
 </p>
+
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span>|<span class="vartpe">nil</span></span> serialize (<font class="vartpe">serializable</font> variable)</h3>
+<p>
+converts a serializable variable into a string that can be read back later with deserialize. this is both faster and more space efficient than trying to recompile variables as code.
+ignores non-serializable types, and returns nil on faliure. does not support recursive tables.
+</p>
+<p class="example">io.write(output_file,io.serialize(data)) 
+</p>
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">variable</span>|<span class="vartpe">nil</span></span> deserialize (<font class="vartpe">string</font> serialized)</h3>
+<p>
+converts a serialized string back into data. returns nil on failiure.
+</p>
+<p class="example">data=io.deserialize(io.read(output_file)) 
+</p>
+
+
 <h1 id="lib_os">OS library</h1>
 <h2 class="western">constants</h2>
 <table cellpadding="2" cellspacing="0">

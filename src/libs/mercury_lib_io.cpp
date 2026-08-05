@@ -768,3 +768,657 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
+
+const size_t char_array_blocksize = 500;
+enum m_serialize_types:unsigned char{
+	SERIALIZED_NIL = '\0',
+	SERIALIZED_INT64,
+	SERIALIZED_INT32,
+	SERIALIZED_INT16,
+	SERIALIZED_INT8,
+	SERIALIZED_INT8UNSIGNED,
+	SERIALIZED_FLOAT32,
+	SERIALIZED_FLOAT64,
+	SERIALIZED_BOOLTRUE,
+	SERIALIZED_BOOLFALSE,
+	SERIALIZED_STRING_SIZEEMPTY, //empty string
+	SERIALIZED_STRING_SIZESINGLE, //1 character string
+	SERIALIZED_STRING_SIZE8,
+	SERIALIZED_STRING_SIZE16,
+	SERIALIZED_STRING_SIZE32,
+	SERIALIZED_STRING_SIZE64,
+	SERIALIZED_ARRAY_SIZE8, //unused
+	SERIALIZED_ARRAY_SIZE16, //unused
+	SERIALIZED_ARRAY_SIZE32, //unused
+	SERIALIZED_ARRAY_SIZE64, //unused
+	SERIALIZED_ARRAY_SIZEBITWIDTH,
+	SERIALIZED_TABLE_SIZE8, //unused
+	SERIALIZED_TABLE_SIZE16, //unused
+	SERIALIZED_TABLE_SIZE132, //unused
+	SERIALIZED_TABLE_SIZE164, //unused
+	SERIALIZED_TABLE_SIZEBITWIDTH,
+};
+
+
+inline bool check_chars_preallocation(unsigned char** chars, mercury_int* num_chars, mercury_int* chars_allocated, mercury_int chars_requested) {
+	mercury_int defecit = num_chars + chars_requested - chars_allocated;
+	if (defecit>0) {
+		mercury_int blocks_needed = (defecit + char_array_blocksize - 1) / char_array_blocksize;
+		void* nptr=realloc(*chars, (size_t)(*chars_allocated + (char_array_blocksize * blocks_needed) ) );
+		if (!nptr)return false;
+		*chars = (unsigned char*)nptr;
+		(*chars_allocated) += char_array_blocksize * blocks_needed;
+	}
+	return true;
+}
+
+inline bool check_pointer_serial(void* ptr, mercury_uint* num_pointers_covered, void*** pointers_covered) {
+	for (mercury_uint i = 0; i < (*num_pointers_covered); i++) {
+		if ((*pointers_covered)[i] == ptr) {
+			return true;
+		}
+	}
+	return false;
+}
+
+inline bool add_serial_pointer(void* ptr, mercury_uint* num_pointers_covered, void*** pointers_covered) {
+	void* nptr = realloc(*pointers_covered, sizeof(void*) * ((*num_pointers_covered) + 1));
+	if (!nptr)return false;
+	*pointers_covered = (void**)nptr;
+
+	(*pointers_covered)[*num_pointers_covered] = ptr;
+
+	(*num_pointers_covered)++;
+	return true;
+}
+
+inline bool can_serialize_var(const mercury_variable* var) {
+	switch (var->type) {
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+	case M_TYPE_BOOL:
+	case M_TYPE_STRING:
+	case M_TYPE_ARRAY:
+	case M_TYPE_TABLE:
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool m_serialize_variable(const mercury_variable* var, unsigned char** chars,mercury_int* num_chars,mercury_int* chars_allocated,void*** pointerscovered,mercury_uint* num_pointers_covered) {
+	
+	switch (var->type) {
+		case M_TYPE_INT:
+			if (var->data.i<= SCHAR_MAX && var->data.i >= SCHAR_MIN) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 2))return false;
+				(*chars)[*num_chars] = SERIALIZED_INT8;
+				(*num_chars)++;
+				(*chars)[*num_chars] = (signed char)var->data.i;
+				(*num_chars)++;
+				return true;
+			}
+			else if (var->data.i<=UCHAR_MAX && var->data.i>0) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 2))return false;
+				(*chars)[*num_chars] = SERIALIZED_INT8UNSIGNED;
+				(*num_chars)++;
+				(*chars)[*num_chars] = (unsigned char)var->data.i;
+				(*num_chars)++;
+				return true;
+			}
+			else if (var->data.i<= SHRT_MAX && var->data.i >= SHRT_MIN) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 3))return false;
+				(*chars)[*num_chars] = SERIALIZED_INT16;
+				(*num_chars)++;
+				*(short*)(*chars+*num_chars) = (short)var->data.i;
+				(*num_chars)+=2;
+				return true;
+			}
+			else if (var->data.i<= INT_MAX && var->data.i >= INT_MIN) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 5))return false;
+				(*chars)[*num_chars] = SERIALIZED_INT32;
+				(*num_chars)++;
+				*(int*)(*chars + *num_chars) = (int)var->data.i;
+				(*num_chars) += 4;
+				return true;
+			}
+			else {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 9))return false;
+				(*chars)[*num_chars] = SERIALIZED_INT64;
+				(*num_chars)++;
+				*(int64_t*)(*chars + *num_chars) = (int64_t)var->data.i;
+				(*num_chars) += 8;
+				return true;
+			}
+			return false;
+		case M_TYPE_FLOAT:
+#ifdef MERCURY_64BIT
+			if (!check_chars_preallocation(chars, num_chars, chars_allocated, 9))return false;
+			(*chars)[*num_chars] = SERIALIZED_FLOAT64;
+			(*num_chars)++;
+			*(double*)(*chars + *num_chars) = (double)var->data.f;
+			(*num_chars) += 8;
+			return true;
+#else
+			if (!check_chars_preallocation(chars, num_chars, chars_allocated, 5))return false;
+			(*chars)[*num_chars] = SERIALIZED_FLOAT32;
+			(*num_chars)++;
+			*(float*)(*chars + *num_chars) = (float)var->data.f;
+			(*num_chars) += 4;
+			return true;
+#endif
+			return false;
+		case M_TYPE_BOOL:
+			if (!check_chars_preallocation(chars, num_chars, chars_allocated, 1))return false;
+			(*chars)[*num_chars] = var->data.i ? SERIALIZED_BOOLTRUE : SERIALIZED_BOOLFALSE;
+			(*num_chars)++;
+			return true;
+		case M_TYPE_STRING:
+			{
+			mercury_string* str=(mercury_string*)var->data.p;
+			if (!str->size) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 1))return false;
+				(*chars)[*num_chars] = SERIALIZED_STRING_SIZEEMPTY;
+				(*num_chars)++;
+				return true;
+			}
+			else if (str->size == 1) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 2))return false;
+				(*chars)[*num_chars] = SERIALIZED_STRING_SIZESINGLE;
+				(*num_chars)++;
+				(*chars)[*num_chars] = str->ptr[0];
+				(*num_chars)++;
+				return true;
+			}
+			else if (str->size <= UCHAR_MAX) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, str->size+2))return false;
+				(*chars)[*num_chars] = SERIALIZED_STRING_SIZE8;
+				(*num_chars)++;
+				*(unsigned char*)(*chars + *num_chars) = (unsigned char)str->size;
+				(*num_chars)++;
+				memcpy(*chars + *num_chars, str->ptr, str->size);
+				(*num_chars)+=str->size;
+				return true;
+			}
+			else if (str->size <= USHRT_MAX) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, str->size + 3))return false;
+				(*chars)[*num_chars] = SERIALIZED_STRING_SIZE16;
+				(*num_chars)++;
+				*(unsigned short*)(*chars + *num_chars) = (unsigned short)str->size;
+				(*num_chars)+=2;
+				memcpy(*chars + *num_chars, str->ptr, str->size);
+				(*num_chars) += str->size;
+				return true;
+			}
+			else if (str->size <= INT_MAX) {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, str->size + 5))return false;
+				(*chars)[*num_chars] = SERIALIZED_STRING_SIZE32;
+				(*num_chars)++;
+				*(int*)(*chars + *num_chars) = (int)str->size;
+				(*num_chars) += 4;
+				memcpy(*chars + *num_chars, str->ptr, str->size);
+				(*num_chars) += str->size;
+				return true;
+			}
+			else {
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, str->size + 9))return false;
+				(*chars)[*num_chars] = SERIALIZED_STRING_SIZE32;
+				(*num_chars)++;
+				*(int64_t*)(*chars + *num_chars) = (int64_t)str->size;
+				(*num_chars) += 8;
+				memcpy(*chars + *num_chars, str->ptr, str->size);
+				(*num_chars) += str->size;
+				return true;
+			}
+			}
+			return false;
+		case M_TYPE_ARRAY:
+			if (check_pointer_serial(var->data.p, num_pointers_covered, pointerscovered))return true;
+			{
+			if (!check_chars_preallocation(chars, num_chars, chars_allocated, 1 + sizeof(mercury_int)))return false;
+			(*chars)[*num_chars] = SERIALIZED_ARRAY_SIZEBITWIDTH;
+			(*num_chars)++;
+			*(mercury_int*)(*chars + *num_chars) = 0;
+			mercury_int elements_offset = *num_chars;
+			(*num_chars) += sizeof(mercury_int);
+			mercury_int cur_elems = 0;
+			mercury_array* arr = (mercury_array*)var->data.p;
+			if (!add_serial_pointer(arr, num_pointers_covered, pointerscovered))return false;
+			if (arr->values) {
+#ifdef MERCURY_64BIT
+				for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+					mercury_variable***** const st1 = arr->values[i1];
+					if (!st1)continue;
+					for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+						mercury_variable**** const st2 = st1[i2];
+						if (!st2)continue;
+						for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+							mercury_variable*** const st3 = st2[i3];
+							if (!st3)continue;
+							for (int i4 = 0; i4 < MERCURY_SIZE_SUBARRAY_4; i4++) {
+								mercury_variable** const st4 = st3[i4];
+								if (!st4)continue;
+								for (int i5 = 0; i5 < MERCURY_SIZE_SUBARRAY_5; i5++) {
+									mercury_variable* const st5 = st4[i5];
+									if (!st5)continue;
+									for (int i6 = 0; i6 < MERCURY_SIZE_SUBARRAY_6; i6++) {
+										mercury_variable const var = st5[i6];
+										const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3, i4, i5, i6);
+#else
+				for (int i1 = 0; i1 < MERCURY_SIZE_SUBARRAY_1; i1++) {
+					mercury_variable** const st1 = arr->values[i1];
+					if (!st1)continue;
+					for (int i2 = 0; i2 < MERCURY_SIZE_SUBARRAY_2; i2++) {
+						mercury_variable* const st2 = st1[i2];
+						if (!st2)continue;
+						for (int i3 = 0; i3 < MERCURY_SIZE_SUBARRAY_3; i3++) {
+							mercury_variable const var = st2[i3];
+							const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
+#endif
+							if (can_serialize_var(&var)) {
+								mercury_variable indexvar;
+								indexvar.type = M_TYPE_INT;
+								indexvar.data.i = index;
+
+								if (var.type == M_TYPE_ARRAY || var.type == M_TYPE_TABLE) {
+									if (check_pointer_serial(var.data.p, num_pointers_covered, pointerscovered))continue;
+								}
+
+								if (!m_serialize_variable(&indexvar, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+								if (!m_serialize_variable(&var, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+
+								cur_elems++;
+							}
+
+#ifdef MERCURY_64BIT
+						}
+					}
+				}
+									}
+								}
+							}
+#else
+						}
+					}
+				}
+#endif				
+			}
+
+			*(mercury_int*)(*chars + elements_offset) = cur_elems;
+			return true;
+			}
+			return false;
+		case M_TYPE_TABLE:
+			if (check_pointer_serial(var->data.p, num_pointers_covered, pointerscovered))return true;
+			{
+				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 1 + sizeof(mercury_int)))return false;
+				(*chars)[*num_chars] = SERIALIZED_TABLE_SIZEBITWIDTH;
+				(*num_chars)++;
+				*(mercury_int*)(*chars + *num_chars) = 0;
+				mercury_int elements_offset =  *num_chars;
+				(*num_chars) += sizeof(mercury_int);
+				mercury_int cur_elems = 0;
+				mercury_table* tab = (mercury_table*)var->data.p;
+				if (!add_serial_pointer(tab, num_pointers_covered, pointerscovered))return false;
+
+				for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+					mercury_subtable* st = tab->data[t];
+					for (mercury_int i = 0; i < st->size; i++) {
+						if (can_serialize_var(st->values+i) && can_serialize_var(st->keys + i)) {
+							if(st->keys[i].type==M_TYPE_ARRAY || st->keys[i].type == M_TYPE_TABLE){
+								if(check_pointer_serial(st->keys[i].data.p,num_pointers_covered,pointerscovered))continue;
+							}
+							if (st->values[i].type == M_TYPE_ARRAY || st->values[i].type == M_TYPE_TABLE) {
+								if (check_pointer_serial(st->values[i].data.p, num_pointers_covered, pointerscovered))continue;
+							}
+							if (!m_serialize_variable(st->keys+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+							if (!m_serialize_variable(st->values+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+							cur_elems++;
+						}
+
+					}
+				}
+
+				*(mercury_int*)(*chars + elements_offset) = cur_elems;
+				return true;
+			}
+			return false;
+		case M_TYPE_NIL:
+		default:
+			if (!check_chars_preallocation(chars, num_chars, chars_allocated, 1))return false;
+			(*chars)[*num_chars] = SERIALIZED_NIL;
+			(*num_chars)++;
+			return true;
+	}
+	return false;
+}
+
+
+void mercury_lib_io_serialize(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+		return;
+	}
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
+
+	mercury_variable in;
+	mercury_popstack(M, &in);
+	mercury_variable out;
+
+	unsigned char* chars = nullptr;
+	mercury_int num_chars=0;
+	mercury_int chars_allocated=0;
+	void** pointerscovered = nullptr;
+	mercury_uint num_pointers_covered = 0;
+
+
+	if (m_serialize_variable(&in, &chars, &num_chars, &chars_allocated, &pointerscovered, &num_pointers_covered)) {
+		mercury_string* str=(mercury_string*)malloc(sizeof(mercury_string));
+		if (!str) {
+			free(chars);
+			free(pointerscovered);
+			mercury_raise_error_nonpointer(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		str->ptr = (char*)chars;
+		str->constant = false;
+		str->refrences = 1;
+		str->size = num_chars;
+		out.data.p = str;
+		out.type = M_TYPE_STRING;
+	}
+	else {
+		free(chars);
+		free(pointerscovered);
+		out.type = M_TYPE_NIL;
+		out.data.i = 0;
+	}
+
+	mercury_pushstack_unrefed(M,&out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+inline bool deser_chars_avalible(mercury_int size,mercury_int position,mercury_int requested) {
+	return position + requested <= size;
+}
+
+bool m_deserialize_variable(mercury_variable* out,const unsigned char* chars,const mercury_int size,mercury_int* position) {
+	if (!deser_chars_avalible(size, *position, 1))return false;
+	unsigned char cur_char = chars[*position];
+	switch (cur_char) {
+		case SERIALIZED_NIL:
+			out->data.i = 0;
+			out->type = M_TYPE_NIL;
+			(*position)++;
+			return true;
+		case SERIALIZED_BOOLFALSE:
+			out->data.i = 0;
+			out->type = M_TYPE_BOOL;
+			(*position)++;
+			return true;
+		case SERIALIZED_BOOLTRUE:
+			out->data.i = 1;
+			out->type = M_TYPE_BOOL;
+			(*position)++;
+			return true;
+		case SERIALIZED_INT8:
+			(*position)++;
+			if(!deser_chars_avalible(size, *position, 1))return false;
+			out->data.i = *(signed char*)(chars+*position);
+			out->type = M_TYPE_INT;
+			(*position)++;
+			return true;
+		case SERIALIZED_INT8UNSIGNED:
+			(*position)++;
+			if (!deser_chars_avalible(size, *position, 1))return false;
+			out->data.u = *(unsigned char*)(chars + *position);
+			out->type = M_TYPE_INT;
+			(*position)++;
+			return true;
+		case SERIALIZED_INT16:
+			(*position)++;
+			if (!deser_chars_avalible(size, *position, 2))return false;
+			out->data.i = *(short*)(chars + *position);
+			out->type = M_TYPE_INT;
+			(*position)+=2;
+			return true;
+		case SERIALIZED_INT32:
+			(*position)++;
+			if (!deser_chars_avalible(size, *position, 4))return false;
+			out->data.i = *(int*)(chars + *position);
+			out->type = M_TYPE_INT;
+			(*position) += 4;
+			return true;
+		case SERIALIZED_INT64:
+			(*position)++;
+			if (!deser_chars_avalible(size, *position, 8))return false;
+			out->data.i = *(int64_t*)(chars + *position);
+			out->type = M_TYPE_INT;
+			(*position) += 8;
+			return true;
+		case SERIALIZED_FLOAT32:
+			(*position)++;
+			if (!deser_chars_avalible(size, *position, 4))return false;
+			out->data.f = *(float*)(chars + *position);
+			out->type = M_TYPE_FLOAT;
+			(*position) += 4;
+			return true;
+		case SERIALIZED_FLOAT64:
+			(*position)++;
+			if (!deser_chars_avalible(size, *position, 8))return false;
+			out->data.f = *(double*)(chars + *position);
+			out->type = M_TYPE_FLOAT;
+			(*position) += 8;
+			return true;
+		case SERIALIZED_STRING_SIZEEMPTY:
+			{
+			(*position)++;
+			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (!str)return false;
+			memset(str, 0, sizeof(mercury_string));
+			out->type = M_TYPE_STRING;
+			out->data.p = str;
+			}
+			return true;
+		case SERIALIZED_STRING_SIZESINGLE:
+		{
+			(*position)++;
+			if (!deser_chars_avalible(size, *position, 1))return false;
+			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (!str)return false;
+			memset(str, 0, sizeof(mercury_string));
+			str->size = 1;
+			str->ptr = (char*)malloc(1);
+			if (!str->ptr) { free(str); return false; }
+			str->ptr[0] = chars[*position];
+			(*position)++;
+			out->type = M_TYPE_STRING;
+			out->data.p = str;
+		}
+			return true;
+		case SERIALIZED_STRING_SIZE8:
+		{
+			(*position)++;
+
+			if (!deser_chars_avalible(size, *position, 1))return false;
+			mercury_int needed_size=*(unsigned char*)(chars+*position);
+			(*position)++;
+
+			if (!deser_chars_avalible(size, *position, needed_size))return false;
+			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (!str)return false;
+			memset(str, 0, sizeof(mercury_string));
+			str->size = needed_size;
+			str->ptr = (char*)malloc(needed_size);
+			if (!str->ptr) { free(str); return false; }
+			memcpy(str->ptr, chars + *position, needed_size);
+			(*position) += needed_size;
+			out->type = M_TYPE_STRING;
+			out->data.p = str;
+		}
+			return true;
+		case SERIALIZED_STRING_SIZE16:
+		{
+			(*position)++;
+
+			if (!deser_chars_avalible(size, *position, 2))return false;
+			mercury_int needed_size = *(unsigned short*)(chars + *position);
+			(*position)+=2;
+
+			if (!deser_chars_avalible(size, *position, needed_size))return false;
+			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (!str)return false;
+			memset(str, 0, sizeof(mercury_string));
+			str->size = needed_size;
+			str->ptr = (char*)malloc(needed_size);
+			if (!str->ptr) { free(str); return false; }
+			memcpy(str->ptr, chars + *position, needed_size);
+			(*position) += needed_size;
+			out->type = M_TYPE_STRING;
+			out->data.p = str;
+		}
+			return true;
+		case SERIALIZED_STRING_SIZE32:
+		{
+			(*position)++;
+
+			if (!deser_chars_avalible(size, *position, 4))return false;
+			mercury_int needed_size = *(int*)(chars + *position);
+			(*position) += 4;
+
+			if (!deser_chars_avalible(size, *position, needed_size))return false;
+			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (!str)return false;
+			memset(str, 0, sizeof(mercury_string));
+			str->size = needed_size;
+			str->ptr = (char*)malloc(needed_size);
+			if (!str->ptr) { free(str); return false; }
+			memcpy(str->ptr, chars + *position, needed_size);
+			(*position) += needed_size;
+			out->type = M_TYPE_STRING;
+			out->data.p = str;
+		}
+			return true;
+		case SERIALIZED_STRING_SIZE64:
+		{
+			(*position)++;
+
+			if (!deser_chars_avalible(size, *position, 8))return false;
+			mercury_int needed_size = *(int*)(chars + *position);
+			(*position) += 8;
+
+			if (!deser_chars_avalible(size, *position, needed_size))return false;
+			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+			if (!str)return false;
+			memset(str, 0, sizeof(mercury_string));
+			str->size = needed_size;
+			str->ptr = (char*)malloc(needed_size);
+			if (!str->ptr) { free(str); return false; }
+			memcpy(str->ptr, chars + *position, needed_size);
+			(*position) += needed_size;
+			out->type = M_TYPE_STRING;
+			out->data.p = str;
+		}
+			return true;
+		case SERIALIZED_ARRAY_SIZEBITWIDTH:
+			{
+				(*position)++;
+				mercury_array* arr=mercury_newarray();
+				if (!deser_chars_avalible(size, *position, sizeof(mercury_int) ))return false;
+				if (!arr)return false;
+				mercury_int asize = *(mercury_int*)(chars + *position);
+				(*position) += sizeof(mercury_int);
+				while (asize) {
+					mercury_variable key;
+					mercury_variable value;
+					if (!m_deserialize_variable(&key, chars, size, position))return false;
+					if (key.type != M_TYPE_INT) {
+						mercury_free_var(&key);
+						return false;
+					}
+					if (!m_deserialize_variable(&value, chars, size, position))return false;
+					if (!mercury_setarray(arr, &value, key.data.i)) {
+						mercury_free_var(&value);
+						return false;
+					}
+					asize--;
+				}
+				out->type = M_TYPE_ARRAY;
+				out->data.p = arr;
+			}
+			return true;
+		case SERIALIZED_TABLE_SIZEBITWIDTH:
+		{
+			(*position)++;
+			mercury_table* arr = mercury_newtable();
+			if (!deser_chars_avalible(size, *position, sizeof(mercury_int)))return false;
+			if (!arr)return false;
+			mercury_int asize = *(mercury_int*)(chars + *position);
+			(*position) += sizeof(mercury_int);
+			while (asize) {
+				mercury_variable key;
+				mercury_variable value;
+				if (!m_deserialize_variable(&key, chars, size, position))return false;
+				if (!m_deserialize_variable(&value, chars, size, position)) {
+					mercury_free_var(&key);
+					return false;
+				};
+				if (mercury_setkey(arr, &key,&value)==-1) {
+					mercury_free_var(&key);
+					mercury_free_var(&value);
+					return false;
+				}
+				asize--;
+			}
+			out->type = M_TYPE_TABLE;
+			out->data.p = arr;
+		}	
+			return true;
+		default:
+			return false;
+	}
+}
+
+void mercury_lib_io_deserialize(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
+		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+		return;
+	}
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
+
+	mercury_variable in;
+	mercury_popstack(M, &in);
+
+	if (in.type != M_TYPE_STRING) {
+		mercury_free_var(&in);
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_STRING, 1);
+		return;
+	}
+
+	mercury_variable out;
+	out.data.i = 0;
+	out.type = M_TYPE_NIL;
+
+	mercury_int pos = 0;
+	mercury_string* str = (mercury_string*)in.data.p;
+
+	if (!m_deserialize_variable(&out, (unsigned char*)str->ptr, str->size, &pos)) {
+		mercury_free_var(&out);
+		out.data.i = 0;
+		out.type = M_TYPE_NIL;
+	}
+
+
+	mercury_free_var(&in);
+	mercury_pushstack_unrefed(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}

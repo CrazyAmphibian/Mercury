@@ -1828,6 +1828,8 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_io_remove, "remove", "io");
 	mercury_register_library(mercury_lib_io_removedir, "removedir", "io");
 	mercury_register_library(mercury_lib_io_createdir, "createdir", "io");
+	mercury_register_library(mercury_lib_io_serialize, "serialize", "io");
+	mercury_register_library(mercury_lib_io_deserialize, "deserialize", "io");
 
 
 #endif

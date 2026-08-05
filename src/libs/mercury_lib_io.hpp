@@ -20,5 +20,6 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 void mercury_lib_io_remove(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_io_removedir(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_io_createdir(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
-
+void mercury_lib_io_serialize(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_io_deserialize(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 
