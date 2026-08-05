@@ -1677,6 +1677,8 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 	v.type = M_TYPE_STRING;
 	
 	v.data.p=mercury_mstrings_concat(s1, s2);
+	mercury_mstring_delete(s1);
+	mercury_mstring_delete(s2);
 	mercury_pushstack_unrefed(M, &v);
 }
 

@@ -228,6 +228,7 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 		free(st->values);
 		free(st);
 	}
+	free(table->data);
 	free(table);
 }
 
