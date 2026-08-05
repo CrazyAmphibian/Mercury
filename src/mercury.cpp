@@ -550,7 +550,7 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 
 	free(M->stack);
 
-	if (M->enviroment)mercury_destroytable(M->enviroment);
+	//if (M->enviroment)mercury_destroytable(M->enviroment);
 
 	if (M->bytecode.instructions) {
 		free(M->bytecode.instructions);

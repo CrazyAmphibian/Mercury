@@ -73,7 +73,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable* vart = nullptr;
 	if (args_in > 2) {
 		vart = (mercury_variable*)malloc(sizeof(mercury_variable) * args_in - 2);
-		if (!vart) {
+		if (!vart && args_in>2) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
@@ -96,10 +96,12 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 
 	if ( func_var.type != M_TYPE_FUNCTION) {
+		free(vart);
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, func_var.type, M_TYPE_FUNCTION,1);
 		return;
 	}
 	if ((table_var.type && table_var.type != M_TYPE_TABLE)) {
+		free(vart);
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, table_var.type, M_TYPE_TABLE, 2);
 		return;
 	}
@@ -107,6 +109,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 	mercury_threadholder* t=(mercury_threadholder*)malloc(sizeof(mercury_threadholder));
 	if (!t) {
+		free(vart);
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
@@ -117,7 +120,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		t->state = mercury_newstate();
 		t->customenv = true;
 		if (t->state) {
-			free(t->state->enviroment);
+			mercury_destroytable(t->state->enviroment);
 			t->state->enviroment = (mercury_table*)table_var.data.p;
 			//printf("making with custom\n");
 		}
@@ -160,6 +163,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		}
 		else {
 			if (table_var.type)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
+			mercury_free_var(&table_var);
 			//t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
 			mercury_destroystate(t->state);
 			free(t);
@@ -175,6 +179,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		else {
 			if (table_var.type)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
 			//t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
+			mercury_free_var(&table_var);
 			mercury_destroystate(t->state);
 			free(t);
 		}
