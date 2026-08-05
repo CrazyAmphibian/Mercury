@@ -362,7 +362,7 @@ void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mer
 		mercury_variable* v=(mercury_variable*)malloc(sizeof(mercury_variable));
 		if (!v)continue;
 		v->type = M_TYPE_INT;
-		v->data.i = str->ptr[i];
+		v->data.i = (unsigned char)str->ptr[i];
 		mercury_setarray(arr, v, i);
 	}
 
@@ -409,7 +409,7 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 		mercury_variable v;
 		mercury_getarray(arr, i,&v);
 		if (v.type == M_TYPE_INT) {
-			st->ptr[i] = v.data.i & 0xFF;
+			st->ptr[i] = (unsigned char)(v.data.i & 0xFF);
 		}
 		else {
 			st->ptr[i] = '\0';
