@@ -1667,18 +1667,36 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 	mercury_variable v1;
 	mercury_popstack(M, &v1);
 
-	mercury_string* s1 = mercury_tostring(&v1);
-	mercury_string* s2 = mercury_tostring(&v2);
+	bool s1_shouldfree = v1.type != M_TYPE_STRING;
+	bool s2_shouldfree = v2.type != M_TYPE_STRING;
 
-	mercury_free_var(&v1);
-	mercury_free_var(&v2);
+	mercury_string* s1;
+	if (s1_shouldfree) {
+		s1 = mercury_tostring(&v1);
+	}
+	else {
+		s1 = (mercury_string*)v1.data.p;
+	}
+
+	mercury_string* s2;
+	if (s2_shouldfree) {
+		s2 = mercury_tostring(&v2);
+	}
+	else {
+		s2 = (mercury_string*)v2.data.p;
+	}
+
 
 	mercury_variable v;
 	v.type = M_TYPE_STRING;
 	
 	v.data.p=mercury_mstrings_concat(s1, s2);
-	mercury_mstring_delete(s1);
-	mercury_mstring_delete(s2);
+
+	mercury_free_var(&v1);
+	mercury_free_var(&v2);
+
+	if (s1_shouldfree)mercury_mstring_delete(s1);
+	if (s2_shouldfree)mercury_mstring_delete(s2);
 	mercury_pushstack_unrefed(M, &v);
 }
 
