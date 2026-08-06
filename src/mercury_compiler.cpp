@@ -124,7 +124,7 @@ inline bool append_char_to_compiler_token(compiler_token* token, char c){
 
 inline void advance_position_from_char(char c,char c_prev,mercury_int* col,mercury_int* line){
 	(*col)++;
-	if(c=='\n' || c=='\r' && !(c_prev=='\r' && c=='\n') ){
+	if( (c=='\n' || c=='\r') && !(c_prev=='\r' && c=='\n') ){
 		*col=1;
 		(*line)++;
 	}
