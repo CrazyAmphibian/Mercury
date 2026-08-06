@@ -822,7 +822,7 @@ inline bool check_pointer_serial(void* ptr, const mercury_uint* num_pointers_cov
 }
 
 inline bool add_serial_pointer(void* ptr, mercury_uint* num_pointers_covered, void*** pointers_covered) {
-	if ((*num_pointers_covered) % char_array_blocksize == 0) { //only reallocate every 500 to save speed, probly.
+	if ((*num_pointers_covered) % char_array_blocksize == 0) { //only reallocate every 16 to save speed, probly.
 		void* nptr = realloc(*pointers_covered, sizeof(void*) * ((*num_pointers_covered) + char_array_blocksize));
 		if (!nptr)return false;
 		*pointers_covered = (void**)nptr;

@@ -419,23 +419,29 @@ mercury_function* SORTING_M_FUNCTION = nullptr;
 mercury_state* SORTING_M_STATE = nullptr;
 
 int mercury_sort_use_mercury_function(const void* a, const void* b) {
-	mercury_variable* var_a = *(mercury_variable**)a;
-	mercury_variable* var_b = *(mercury_variable**)b;
+	mercury_variable var_a = *(mercury_variable*)a;
+	mercury_variable var_b = *(mercury_variable*)b;
 
 	mercury_state* M=mercury_newstate(SORTING_M_STATE);
-	M->bytecode.instructions = SORTING_M_FUNCTION->instructions;
-	M->bytecode.numberofinstructions = SORTING_M_FUNCTION->numberofinstructions;
-	mercury_pushstack(M,var_b);
-	mercury_pushstack(M,var_a);
+	//M->bytecode.instructions = SORTING_M_FUNCTION->instructions;
+	//M->bytecode.numberofinstructions = SORTING_M_FUNCTION->numberofinstructions;
+	mercury_function oldf = M->bytecode;
+	M->bytecode = *SORTING_M_FUNCTION;
+	mercury_pushstack(M,&var_b);
+	mercury_pushstack(M,&var_a);
 	while (mercury_stepstate(M));
 	mercury_variable var_o;
 	mercury_popstack(M,&var_o);
+	M->bytecode = oldf;
 	mercury_destroystate(M);
 	if (var_o.type == M_TYPE_INT) {
 		mercury_free_var(&var_o);
 		return (int)var_o.data.i;
 	}
-	mercury_free_var(&var_o);
+	else {
+		mercury_free_var(&var_o);
+	}
+	
 	return 0;
 }
 
