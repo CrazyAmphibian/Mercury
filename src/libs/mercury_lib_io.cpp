@@ -769,7 +769,7 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-const size_t char_array_blocksize = 500;
+const size_t char_array_blocksize = 16;
 enum m_serialize_types:unsigned char{
 	SERIALIZED_NIL = '\0',
 	SERIALIZED_INT64,
@@ -812,7 +812,7 @@ inline bool check_chars_preallocation(unsigned char** chars, mercury_int* num_ch
 	return true;
 }
 
-inline bool check_pointer_serial(void* ptr, mercury_uint* num_pointers_covered, void*** pointers_covered) {
+inline bool check_pointer_serial(void* ptr, const mercury_uint* num_pointers_covered, void*** pointers_covered) {
 	for (mercury_uint i = 0; i < (*num_pointers_covered); i++) {
 		if ((*pointers_covered)[i] == ptr) {
 			return true;
@@ -822,9 +822,11 @@ inline bool check_pointer_serial(void* ptr, mercury_uint* num_pointers_covered, 
 }
 
 inline bool add_serial_pointer(void* ptr, mercury_uint* num_pointers_covered, void*** pointers_covered) {
-	void* nptr = realloc(*pointers_covered, sizeof(void*) * ((*num_pointers_covered) + 1));
-	if (!nptr)return false;
-	*pointers_covered = (void**)nptr;
+	if ((*num_pointers_covered) % char_array_blocksize == 0) { //only reallocate every 500 to save speed, probly.
+		void* nptr = realloc(*pointers_covered, sizeof(void*) * ((*num_pointers_covered) + char_array_blocksize));
+		if (!nptr)return false;
+		*pointers_covered = (void**)nptr;
+	}
 
 	(*pointers_covered)[*num_pointers_covered] = ptr;
 
@@ -973,7 +975,7 @@ bool m_serialize_variable(const mercury_variable* var, unsigned char** chars,mer
 			}
 			return false;
 		case M_TYPE_ARRAY:
-			if (check_pointer_serial(var->data.p, num_pointers_covered, pointerscovered))return true;
+			//if (check_pointer_serial(var->data.p, num_pointers_covered, pointerscovered))return true;
 			{
 			if (!check_chars_preallocation(chars, num_chars, chars_allocated, 1 + sizeof(mercury_int)))return false;
 			(*chars)[*num_chars] = SERIALIZED_ARRAY_SIZEBITWIDTH;
@@ -983,6 +985,7 @@ bool m_serialize_variable(const mercury_variable* var, unsigned char** chars,mer
 			(*num_chars) += sizeof(mercury_int);
 			mercury_int cur_elems = 0;
 			mercury_array* arr = (mercury_array*)var->data.p;
+			mercury_uint orig_n_ptr_conv = *num_pointers_covered;
 			if (!add_serial_pointer(arr, num_pointers_covered, pointerscovered))return false;
 			if (arr->values) {
 #ifdef MERCURY_64BIT
@@ -1045,11 +1048,12 @@ bool m_serialize_variable(const mercury_variable* var, unsigned char** chars,mer
 			}
 
 			*(mercury_int*)(*chars + elements_offset) = cur_elems;
+			*num_pointers_covered = orig_n_ptr_conv;
 			return true;
 			}
 			return false;
 		case M_TYPE_TABLE:
-			if (check_pointer_serial(var->data.p, num_pointers_covered, pointerscovered))return true;
+			//if (check_pointer_serial(var->data.p, num_pointers_covered, pointerscovered))return true;
 			{
 				if (!check_chars_preallocation(chars, num_chars, chars_allocated, 1 + sizeof(mercury_int)))return false;
 				(*chars)[*num_chars] = SERIALIZED_TABLE_SIZEBITWIDTH;
@@ -1059,6 +1063,7 @@ bool m_serialize_variable(const mercury_variable* var, unsigned char** chars,mer
 				(*num_chars) += sizeof(mercury_int);
 				mercury_int cur_elems = 0;
 				mercury_table* tab = (mercury_table*)var->data.p;
+				mercury_uint orig_n_ptr_conv = *num_pointers_covered;
 				if (!add_serial_pointer(tab, num_pointers_covered, pointerscovered))return false;
 
 				for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
@@ -1080,6 +1085,7 @@ bool m_serialize_variable(const mercury_variable* var, unsigned char** chars,mer
 				}
 
 				*(mercury_int*)(*chars + elements_offset) = cur_elems;
+				*num_pointers_covered = orig_n_ptr_conv;
 				return true;
 			}
 			return false;
