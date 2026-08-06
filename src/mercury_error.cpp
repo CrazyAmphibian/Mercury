@@ -30,7 +30,7 @@ inline const char* get_type_string(uint8_t type) {
 	return typetostring[type];
 }
 
-mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1, const mercury_int* data2, const mercury_int* data3) {
+mercury_string* mercury_get_state_traceback(mercury_state* M) {
 	mercury_string* out = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!out)return out;
 	memset(out, NULL, sizeof(mercury_string));
@@ -47,15 +47,15 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 		memset(prepend, NULL, sizeof(mercury_string));
 
 		if (M->bytecode.instruction_dbg_lookup) {
-			mercury_uint dbg_tok_num=M->bytecode.instruction_dbg_lookup[M->programcounter - 1];
-			mercury_debug_token T,T_n,T_p;
-			bool next=false;
-			bool prev=false;
+			mercury_uint dbg_tok_num = M->bytecode.instruction_dbg_lookup[M->programcounter - 1];
+			mercury_debug_token T, T_n, T_p;
+			bool next = false;
+			bool prev = false;
 			if (dbg_tok_num)prev = true;
-			if (dbg_tok_num+1 < M->bytecode.num_dbg_tokens)next = true;
-			T=M->bytecode.dbg_tokens[dbg_tok_num];
-			if(prev)T_p= M->bytecode.dbg_tokens[dbg_tok_num-1];
-			if(next)T_n= M->bytecode.dbg_tokens[dbg_tok_num+1];
+			if (dbg_tok_num + 1 < M->bytecode.num_dbg_tokens)next = true;
+			T = M->bytecode.dbg_tokens[dbg_tok_num];
+			if (prev)T_p = M->bytecode.dbg_tokens[dbg_tok_num - 1];
+			if (next)T_n = M->bytecode.dbg_tokens[dbg_tok_num + 1];
 
 
 			char* tchars = (char*)malloc(T.num_chars + 1);
@@ -94,16 +94,16 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 			}
 
 			if (next && prev) {
-				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s%s", T.line, T.col, p_tchars,tchars, n_tchars);
+				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s%s", T.line, T.col, p_tchars, tchars, n_tchars);
 				free(p_tchars);
 				free(n_tchars);
 			}
 			else if (next) {
-				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s", T.line, T.col, tchars,n_tchars);
+				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s", T.line, T.col, tchars, n_tchars);
 				free(n_tchars);
 			}
 			else if (prev) {
-				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s", T.line, T.col, p_tchars,tchars);
+				snprintf(buffer, buffer_size, "line %zi col %zi at %s%s", T.line, T.col, p_tchars, tchars);
 				free(p_tchars);
 			}
 			else {
@@ -124,6 +124,16 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 
 		M = M->parentstate;
 	}
+	return out;
+}
+
+
+
+mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1, const mercury_int* data2, const mercury_int* data3) {
+	mercury_string* out = mercury_get_state_traceback(M);
+	if (!out)return nullptr;
+	const size_t buffer_size = 1000;
+	char buffer[buffer_size];
 	
 	switch (errorcode) {
 		case M_ERROR_ALLOCATION:

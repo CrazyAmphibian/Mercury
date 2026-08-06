@@ -31,6 +31,8 @@ inline void mercury_raise_error_nonpointer(mercury_state* M, const uint32_t erro
 }
 
 
+mercury_string* mercury_get_state_traceback(mercury_state* M);
+
 //helper functions for making c functions. returns true if there's a problem, false if nothing went wrong. if()return;
 
 //variadic functions need not apply. also if you want to take optional args, you should specify max_args as the largest number you want to take. this function ensures that additional args will be discarded, and if args are missing, an error will be thrown.

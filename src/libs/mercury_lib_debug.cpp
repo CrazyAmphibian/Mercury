@@ -314,3 +314,20 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
+
+
+void mercury_lib_debug_get_traceback(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
+	if (!args_out)return;
+
+	mercury_variable out;
+	out.type = M_TYPE_STRING;
+	out.data.p=mercury_get_state_traceback(M);
+	if (!out.data.p) {
+		mercury_raise_error_nonpointer(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	mercury_pushstack(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
