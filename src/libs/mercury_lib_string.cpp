@@ -551,7 +551,7 @@ void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	os->size = str->size;
 	os->constant = false;
-	os->refrences = 1;
+	os->refrences = 0;
 
 	mercury_free_var(&var_string);
 	
@@ -603,7 +603,7 @@ void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	os->size = str->size;
 	os->constant = false;
-	os->refrences = 1;
+	os->refrences = 0;
 
 	mercury_free_var(&var_string);
 	
@@ -1805,6 +1805,7 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
+	os->refrences = 0;
 
 	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
@@ -1856,6 +1857,7 @@ void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const 
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
+	os->refrences = 0;
 
 	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
@@ -1924,6 +1926,7 @@ void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const me
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
+	os->refrences = 0;
 
 	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
@@ -2007,6 +2010,7 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
+	os->refrences = 0;
 
 	mercury_string* is = (mercury_string*)instr.data.p;
 	mercury_int pos = 0;
