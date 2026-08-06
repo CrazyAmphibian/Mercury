@@ -550,6 +550,8 @@ void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercu
 		
 	}
 	os->size = str->size;
+	os->constant = false;
+	os->refrences = 1;
 
 	mercury_free_var(&var_string);
 	
@@ -600,6 +602,8 @@ void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercu
 
 	}
 	os->size = str->size;
+	os->constant = false;
+	os->refrences = 1;
 
 	mercury_free_var(&var_string);
 	

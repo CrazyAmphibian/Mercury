@@ -436,15 +436,9 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 	M->bytecode = oldf;
 	//mercury_destroystate(M);
 	mercury_clearstate(M);
-	if (var_o.type == M_TYPE_INT) {
-		mercury_free_var(&var_o);
-		return (int)var_o.data.i;
-	}
-	else {
-		mercury_free_var(&var_o);
-	}
-	
-	return 0;
+	int out = (int)mercury_checkint(&var_o);
+	mercury_free_var(&var_o);
+	return out;
 }
 
 
