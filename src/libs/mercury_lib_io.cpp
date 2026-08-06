@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
-
+#include <climits>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
