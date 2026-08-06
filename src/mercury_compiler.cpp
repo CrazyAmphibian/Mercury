@@ -244,6 +244,10 @@ inline unsigned char read_dec_string_as_num(char c1,char c2,char c3){
 	return out;
 }
 
+inline bool char_is_bin(char c) {
+	return c == '1' || c == '0';
+}
+
 compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_int* num_out){
 	
 	*num_out = 0;
@@ -392,7 +396,7 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 					}
 					break;
 				case TOKEN_TYPE_NUMBER:
-					if(!char_is_number(c) && c!='.' && c!='x' && !char_is_hex(c) ){ //for decimal and hex
+					if(!char_is_number(c) && c!='.' && c!='x' && !char_is_hex(c) && c!='b') { //for decimal and hex
 						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
 						cur_tok=new_compiler_token(col_num, line_num);
 					}else{
@@ -1173,7 +1177,30 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 		cstr[cur_tok->num_chars]='\0';
 		char* end;
 		
-		mercury_int i = strtoll(cstr, &end, 0);
+		mercury_int i;
+		if (cstr[0] == '-') {
+			if (cur_tok->num_chars > 3 && cstr[2] == 'x') {
+				i = -strtoll(cstr + 3, &end, 16);
+			}
+			else if (cur_tok->num_chars > 3 && cstr[2] == 'b') {
+				i = -strtoll(cstr + 3, &end, 2);
+			}
+			else {
+				i = strtoll(cstr, &end, 10);
+			}
+		}
+		else {
+			if (cur_tok->num_chars > 2 && cstr[1] == 'x') {
+				i = strtoll(cstr + 2, &end, 16);
+			}
+			else if (cur_tok->num_chars > 2 && cstr[1] == 'b') {
+				i = strtoll(cstr + 2, &end, 2);
+			}
+			else {
+				i = strtoll(cstr, &end, 10);
+			}
+		}
+		
 		if (*end=='\0') {
 			add_instruction(f, M_OPCODE_NINT,token_offset);
 			add_rawdata_bitwidth_size(f, *((binarydata*)&i),token_offset);
@@ -2007,7 +2034,7 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 					f->errorcode = prepend->errorcode;
 					f->token_error_num = prepend->token_error_num;
 					for (mercury_int n = 0; n < i->args_out; n++) {
-						delete_compiler_function(varfuncs[n]);
+						if(varfuncs[n])delete_compiler_function(varfuncs[n]);
 					}
 					delete_compiler_function(prepend);
 					delete_compiler_function(getvarfunc);
