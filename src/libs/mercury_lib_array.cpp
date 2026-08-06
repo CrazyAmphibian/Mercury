@@ -422,7 +422,8 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 	mercury_variable var_a = *(mercury_variable*)a;
 	mercury_variable var_b = *(mercury_variable*)b;
 
-	mercury_state* M=mercury_newstate(SORTING_M_STATE);
+	mercury_state* M= mercury_get_child_state(SORTING_M_STATE);
+	if (!M)return 0;
 	//M->bytecode.instructions = SORTING_M_FUNCTION->instructions;
 	//M->bytecode.numberofinstructions = SORTING_M_FUNCTION->numberofinstructions;
 	mercury_function oldf = M->bytecode;
@@ -433,7 +434,8 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 	mercury_variable var_o;
 	mercury_popstack(M,&var_o);
 	M->bytecode = oldf;
-	mercury_destroystate(M);
+	//mercury_destroystate(M);
+	mercury_clearstate(M);
 	if (var_o.type == M_TYPE_INT) {
 		mercury_free_var(&var_o);
 		return (int)var_o.data.i;
