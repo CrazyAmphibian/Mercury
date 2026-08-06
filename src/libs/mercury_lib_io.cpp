@@ -1221,6 +1221,7 @@ bool m_deserialize_variable(mercury_variable* out,const unsigned char* chars,con
 			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(mercury_string));
+			str->refrences = 1;
 			out->type = M_TYPE_STRING;
 			out->data.p = str;
 			}
@@ -1232,6 +1233,7 @@ bool m_deserialize_variable(mercury_variable* out,const unsigned char* chars,con
 			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(mercury_string));
+			str->refrences = 1;
 			str->size = 1;
 			str->ptr = (char*)malloc(1);
 			if (!str->ptr) { free(str); return false; }
@@ -1253,6 +1255,7 @@ bool m_deserialize_variable(mercury_variable* out,const unsigned char* chars,con
 			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(mercury_string));
+			str->refrences = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1274,6 +1277,7 @@ bool m_deserialize_variable(mercury_variable* out,const unsigned char* chars,con
 			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(mercury_string));
+			str->refrences = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1295,6 +1299,7 @@ bool m_deserialize_variable(mercury_variable* out,const unsigned char* chars,con
 			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(mercury_string));
+			str->refrences = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1316,6 +1321,7 @@ bool m_deserialize_variable(mercury_variable* out,const unsigned char* chars,con
 			mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(mercury_string));
+			str->refrences = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
