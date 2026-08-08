@@ -1113,15 +1113,8 @@ struct M_PATTERN{
 
 void m_initialize_pattern(M_PATTERN* P) {
 	if (!P)return;
-	P->first_good_char = 0;
-	P->last_good_char = 0;
+	memset(P, 0, sizeof(M_PATTERN));
 	P->match_type = MATCH_SINGLE;
-	P->passed = false;
-	int i = 0xFF;
-	while (i>=0) {
-		P->allowed_chars[i] = false;
-		i--;
-	}
 }
 
 
