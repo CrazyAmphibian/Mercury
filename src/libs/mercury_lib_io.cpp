@@ -801,7 +801,12 @@ enum m_serialize_types:unsigned char{
 
 
 inline bool check_chars_preallocation(unsigned char** chars, mercury_int* num_chars, mercury_int* chars_allocated, mercury_int chars_requested) {
-	mercury_int defecit = num_chars + chars_requested - chars_allocated;
+#ifdef MERCURY_64BIT
+	if (*num_chars > *chars_allocated) {
+		printf("serialization called a preallocation with %zi chars set, but only %zi are allocated\n",*num_chars,*chars_allocated);
+	}
+#endif
+	mercury_int defecit = *num_chars + chars_requested - *chars_allocated;
 	if (defecit>0) {
 		mercury_int blocks_needed = (defecit + char_array_blocksize - 1) / char_array_blocksize;
 		void* nptr=realloc(*chars, (size_t)(*chars_allocated + (char_array_blocksize * blocks_needed) ) );
@@ -1150,6 +1155,11 @@ void mercury_lib_io_serialize(mercury_state* const M_CPP_restrict M, const mercu
 
 
 inline bool deser_chars_avalible(mercury_int size,mercury_int position,mercury_int requested) {
+#ifdef MERCURY_DEBUG 
+	if (!(position + requested <= size)) {
+		printf("deserialize failed to find needed chars! we need %zi more, but only have %zi remaining\n",requested,size-position);
+	}
+#endif
 	return position + requested <= size;
 }
 
