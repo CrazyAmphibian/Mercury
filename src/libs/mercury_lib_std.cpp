@@ -188,12 +188,12 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 		mercury_int srefs = tab->refrences;
 
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
-			mercury_subtable* subt = tab->data[t];
-			for (mercury_int i = 0; i < subt->size; i++) {
+			mercury_subtable subt = tab->data[t];
+			for (mercury_int i = 0; i < subt.size; i++) {
 				mercury_variable k;
-				mercury_clonevariable(subt->keys+i,&k); //because strings are not refed, we need to copy them to avoid using a freed pointer.
+				mercury_clonevariable(subt.keys+i,&k); //because strings are not refed, we need to copy them to avoid using a freed pointer.
 				mercury_variable v;
-				mercury_clonevariable(subt->values + i, &v);
+				mercury_clonevariable(subt.values + i, &v);
 				
 				if (function.type == M_TYPE_CFUNC) {
 					mercury_pushstack_unrefed(SubM, &k);
@@ -204,7 +204,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					mercury_pullstack(SubM, &o);
 					if (mercury_checkbool(&o)) {
 						t = M_NUMBER_OF_TYPES; //soft break from both loops.
-						i = subt->size;
+						i = subt.size;
 					}
 					mercury_free_var(&o);
 					
@@ -221,7 +221,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					mercury_pullstack(SubM, &o);
 					if (mercury_checkbool(&o)) {
 						t = M_NUMBER_OF_TYPES;
-						i = subt->size;
+						i = subt.size;
 					}
 					mercury_free_var(&o);
 				}
@@ -414,10 +414,10 @@ mercury_string* m_stringify(mercury_rawdata data, uint8_t type,mercury_uint* num
 			{
 				mercury_table* t = (mercury_table*)data.p;
 				for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
-					mercury_subtable* st = t->data[i];
-					for (mercury_int n = 0; n < st->size; n++) {
-						mercury_string* key = m_stringify(st->keys[n].data, i, num_pointers_covered, pointers_covered);
-						mercury_variable v = st->values[n];
+					mercury_subtable st = t->data[i];
+					for (mercury_int n = 0; n < st.size; n++) {
+						mercury_string* key = m_stringify(st.keys[n].data, i, num_pointers_covered, pointers_covered);
+						mercury_variable v = st.values[n];
 						mercury_string* value = m_stringify(v.data, v.type, num_pointers_covered, pointers_covered);
 
 						if (!key || !value) {
@@ -939,12 +939,12 @@ int m_variable_deepcopy(mercury_variable* var_in, mercury_variable* var_out,merc
 			newtab->enviromental = false;
 			newtab->refrences = 0;
 			for (uint8_t t = 0; t < M_NUMBER_OF_TYPES;t++) {
-				mercury_subtable* st = intab->data[t];
+				mercury_subtable st = intab->data[t];
 				mercury_variable key;
 				mercury_variable value;
-				for (mercury_int i = 0; i < st->size; i++) {
-					key=st->keys[i];
-					value=st->values[i];
+				for (mercury_int i = 0; i < st.size; i++) {
+					key=st.keys[i];
+					value=st.values[i];
 					if (var_can_be_deepcopied(&key) && var_can_be_deepcopied(&value) ) {
 						mercury_variable newkey;
 						mercury_variable newvalue;

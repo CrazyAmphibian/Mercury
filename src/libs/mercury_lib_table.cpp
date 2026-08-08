@@ -25,28 +25,30 @@ void mercury_lib_table_copy(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_table* oldtab = (mercury_table*)tab_var.data.p;
 
 	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++){
-		mercury_subtable* st_n = newtab->data[t];
-		mercury_subtable* st_o = oldtab->data[t];
+		mercury_subtable st_n = newtab->data[t];
+		mercury_subtable st_o = oldtab->data[t];
 
-		st_n->values=(mercury_variable*)malloc(sizeof(mercury_variable) * st_o->size);
-		if (!st_n->values) {
+		st_n.values=(mercury_variable*)malloc(sizeof(mercury_variable) * st_o.size);
+		if (!st_n.values) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
 		
-		st_n->keys = (mercury_variable*)malloc(sizeof(mercury_variable) * st_o->size);
-		if (!st_n->keys) {
-			free(st_n->values);
+		st_n.keys = (mercury_variable*)malloc(sizeof(mercury_variable) * st_o.size);
+		if (!st_n.keys) {
+			free(st_n.values);
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
 		}
 
-		st_n->size = st_o->size;
+		st_n.size = st_o.size;
 
-		for (mercury_int i = 0; i < st_o->size; i++) {
-			mercury_clonevariable(st_o->keys+i, st_n->keys+i);
-			mercury_clonevariable(st_o->values+i, st_n->values+i);
+		for (mercury_int i = 0; i < st_o.size; i++) {
+			mercury_clonevariable(st_o.keys+i, st_n.keys+i);
+			mercury_clonevariable(st_o.values+i, st_n.values+i);
 		}
+
+		newtab->data[t] = st_n;
 	}
 	newtab->refrences = 1;
 

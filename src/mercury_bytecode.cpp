@@ -1135,7 +1135,7 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 
 	mercury_state* check_state = M;
 	while (check_state) {
-		mercury_subtable* st = check_state->enviroment->data[key.type];
+		mercury_subtable* st = check_state->enviroment->data+key.type;
 		mercury_int sz = st->size;
 		while (sz) {
 			sz--;
@@ -1151,24 +1151,25 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 		check_state = check_state->parentstate;
 	}
 
-	mercury_subtable* st = M->enviroment->data[key.type];
-	void* nptr = realloc(st->keys, sizeof(mercury_variable) * (st->size + 1));
+	mercury_subtable st = M->enviroment->data[key.type];
+	void* nptr = realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
 	if (!nptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	st->keys = (mercury_variable*)nptr;
-	nptr = realloc(st->values, sizeof(mercury_variable) * (st->size + 1));
+	st.keys = (mercury_variable*)nptr;
+	nptr = realloc(st.values, sizeof(mercury_variable) * (st.size + 1));
 	if (!nptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	st->values = (mercury_variable*)nptr;
+	st.values = (mercury_variable*)nptr;
 
-	st->keys[st->size] = key;
-	st->values[st->size] = value;
+	st.keys[st.size] = key;
+	st.values[st.size] = value;
 
-	st->size++;
+	st.size++;
+	M->enviroment->data[key.type] = st;
 }
 
 void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
@@ -1189,13 +1190,13 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 		}
 		*/
 
-		mercury_subtable* st= check_state->enviroment->data[key.type];
-		mercury_int sz=st->size;
+		mercury_subtable st= check_state->enviroment->data[key.type];
+		mercury_int sz=st.size;
 		while (sz){
 			sz--;
-			if (mercury_vars_equal(st->keys+ sz, &key)) {
+			if (mercury_vars_equal(st.keys+ sz, &key)) {
 				mercury_free_var(&key);
-				mercury_clonevariable(st->values + sz, &value);
+				mercury_clonevariable(st.values + sz, &value);
 				mercury_pushstack_unrefed(M, &value);
 				return;
 			}
@@ -1648,7 +1649,7 @@ void M_BYTECODE_LEN(mercury_state* const M_CPP_restrict M) { //LENgth
 		{
 			mercury_table* t = ((mercury_table*)var.data.p);
 			for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
-				out.data.i += t->data[i]->size;
+				out.data.i += t->data[i].size;
 			}
 		}
 		break;
@@ -1716,13 +1717,13 @@ void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 	mercury_variable k;
 	mercury_popstack(M, &k);
 	mercury_variable v;
-	mercury_subtable* st = M->enviroment->data[k.type];
-	mercury_int sz = st->size;
+	mercury_subtable st = M->enviroment->data[k.type];
+	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st->keys+sz,&k)) {
+		if (mercury_vars_equal(st.keys+sz,&k)) {
 			mercury_free_var(&k);
-			mercury_clonevariable(st->values + sz, &v);
+			mercury_clonevariable(st.values + sz, &v);
 			mercury_pushstack_unrefed(M, &v);
 			return;
 		}
@@ -1741,35 +1742,36 @@ void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	mercury_popstack(M, &value);
 
 
-	mercury_subtable* st = M->enviroment->data[key.type];
-	mercury_int sz = st->size;
+	mercury_subtable st = M->enviroment->data[key.type];
+	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st->keys + sz, &key)) {
+		if (mercury_vars_equal(st.keys + sz, &key)) {
 			mercury_free_var(&key);
-			mercury_free_var(st->values+sz);
-			st->values[sz] = value;
+			mercury_free_var(st.values+sz);
+			st.values[sz] = value;
 			return;
 		}
 	}
 
-	void* nptr=realloc(st->keys, sizeof(mercury_variable) * (st->size + 1));
+	void* nptr=realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
 	if (!nptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	st->keys = (mercury_variable*)nptr;
-	nptr=realloc(st->values, sizeof(mercury_variable) * (st->size + 1));
+	st.keys = (mercury_variable*)nptr;
+	nptr=realloc(st.values, sizeof(mercury_variable) * (st.size + 1));
 	if (!nptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	st->values = (mercury_variable*)nptr;
+	st.values = (mercury_variable*)nptr;
 
-	st->keys[st->size] = key;
-	st->values[st->size] = value;
+	st.keys[st.size] = key;
+	st.values[st.size] = value;
 
-	st->size++;
+	st.size++;
+	M->enviroment->data[key.type] = st;
 }
 
 void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
@@ -1777,13 +1779,13 @@ void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
 	mercury_variable k;
 	mercury_popstack(M, &k);
 	mercury_variable v;
-	mercury_subtable* st = M->masterstate->enviroment->data[k.type];
-	mercury_int sz = st->size;
+	mercury_subtable st = M->masterstate->enviroment->data[k.type];
+	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st->keys + sz, &k)) {
+		if (mercury_vars_equal(st.keys + sz, &k)) {
 			mercury_free_var(&k);
-			mercury_clonevariable(st->values + sz, &v);
+			mercury_clonevariable(st.values + sz, &v);
 			mercury_pushstack_unrefed(M, &v);
 			return;
 		}
@@ -1802,35 +1804,36 @@ void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 	mercury_popstack(M, &value);
 
 
-	mercury_subtable* st = M->masterstate->enviroment->data[key.type];
-	mercury_int sz = st->size;
+	mercury_subtable st = M->masterstate->enviroment->data[key.type];
+	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st->keys + sz, &key)) {
+		if (mercury_vars_equal(st.keys + sz, &key)) {
 			mercury_free_var(&key);
-			mercury_free_var(st->values + sz);
-			st->values[sz] = value;
+			mercury_free_var(st.values + sz);
+			st.values[sz] = value;
 			return;
 		}
 	}
 
-	void* nptr = realloc(st->keys, sizeof(mercury_variable) * (st->size + 1));
+	void* nptr = realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
 	if (!nptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	st->keys = (mercury_variable*)nptr;
-	nptr = realloc(st->values, sizeof(mercury_variable) * (st->size + 1));
+	st.keys = (mercury_variable*)nptr;
+	nptr = realloc(st.values, sizeof(mercury_variable) * (st.size + 1));
 	if (!nptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	st->values = (mercury_variable*)nptr;
+	st.values = (mercury_variable*)nptr;
 
-	st->keys[st->size] = key;
-	st->values[st->size] = value;
+	st.keys[st.size] = key;
+	st.values[st.size] = value;
 
-	st->size++;
+	st.size++;
+	M->masterstate->enviroment->data[key.type] = st;
 }
 
 void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M) { // CoPY Top (of stack)

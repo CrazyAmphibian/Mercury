@@ -1072,17 +1072,17 @@ bool m_serialize_variable(const mercury_variable* var, unsigned char** chars,mer
 				if (!add_serial_pointer(tab, num_pointers_covered, pointerscovered))return false;
 
 				for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
-					mercury_subtable* st = tab->data[t];
-					for (mercury_int i = 0; i < st->size; i++) {
-						if (can_serialize_var(st->values+i) && can_serialize_var(st->keys + i)) {
-							if(st->keys[i].type==M_TYPE_ARRAY || st->keys[i].type == M_TYPE_TABLE){
-								if(check_pointer_serial(st->keys[i].data.p,num_pointers_covered,pointerscovered))continue;
+					mercury_subtable st = tab->data[t];
+					for (mercury_int i = 0; i < st.size; i++) {
+						if (can_serialize_var(st.values+i) && can_serialize_var(st.keys + i)) {
+							if(st.keys[i].type==M_TYPE_ARRAY || st.keys[i].type == M_TYPE_TABLE){
+								if(check_pointer_serial(st.keys[i].data.p,num_pointers_covered,pointerscovered))continue;
 							}
-							if (st->values[i].type == M_TYPE_ARRAY || st->values[i].type == M_TYPE_TABLE) {
-								if (check_pointer_serial(st->values[i].data.p, num_pointers_covered, pointerscovered))continue;
+							if (st.values[i].type == M_TYPE_ARRAY || st.values[i].type == M_TYPE_TABLE) {
+								if (check_pointer_serial(st.values[i].data.p, num_pointers_covered, pointerscovered))continue;
 							}
-							if (!m_serialize_variable(st->keys+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
-							if (!m_serialize_variable(st->values+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+							if (!m_serialize_variable(st.keys+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+							if (!m_serialize_variable(st.values+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
 							cur_elems++;
 						}
 

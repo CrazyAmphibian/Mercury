@@ -82,7 +82,7 @@ struct mercury_subtable {
 };
 
 struct mercury_table {
-	mercury_subtable** data;
+	mercury_subtable* data;
 	mercury_uint refrences = 0;
 	bool enviromental = false;
 };
