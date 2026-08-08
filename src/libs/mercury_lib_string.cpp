@@ -1629,7 +1629,7 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 	
 	matchvar.type = M_TYPE_ARRAY;
 	matchvar.data.p = arr;
-	mercury_pushstack(M,&matchvar);
+	mercury_pushstack_unrefed(M,&matchvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1719,7 +1719,7 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 	
 	matchvar.type = M_TYPE_STRING;
 	matchvar.data.p = outstr;
-	mercury_pushstack(M, &matchvar);
+	mercury_pushstack_unrefed(M, &matchvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
