@@ -963,6 +963,113 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 	return true;
 }
 
+//clears the variable at the index WITHOUT freeing it. you must manually do that!
+bool mercury_cleararrayindex(mercury_array* const array, const mercury_int pos) {
+	mercury_variable cleared_var;
+	cleared_var.data.i = 0;
+	cleared_var.type = M_TYPE_NIL;
+#ifdef MERCURY_64BIT
+	if (!array->values) {
+		array->values = (mercury_variable******)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
+		if (!array->values) {
+			return false;
+		}
+	}
+
+	int current_subindex = get_array_index_from_mint_1(pos);
+	mercury_variable***** sa1 = array->values[current_subindex];
+	if (!sa1) {
+		sa1 = (mercury_variable*****)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
+		if (!sa1) {
+			return false;
+		}
+		array->values[current_subindex] = sa1;
+	}
+
+	current_subindex = get_array_index_from_mint_2(pos);
+	mercury_variable**** sa2 = sa1[current_subindex];
+	if (!sa2) {
+		sa2 = (mercury_variable****)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(void*));
+		if (!sa2) {
+			return false;
+		}
+		sa1[current_subindex] = sa2;
+	}
+
+	current_subindex = get_array_index_from_mint_3(pos);
+	mercury_variable*** sa3 = sa2[current_subindex];
+	if (!sa3) {
+		sa3 = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_4, sizeof(void*));
+		if (!sa3) {
+			return false;
+		}
+		sa2[current_subindex] = sa3;
+	}
+
+	current_subindex = get_array_index_from_mint_4(pos);
+	mercury_variable** sa4 = sa3[current_subindex];
+	if (!sa4) {
+		sa4 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_5, sizeof(void*));
+		if (!sa4) {
+			return false;
+		}
+		sa3[current_subindex] = sa4;
+	}
+
+	current_subindex = get_array_index_from_mint_5(pos);
+	mercury_variable* sa5 = sa4[current_subindex];
+	if (!sa5) {
+		sa5 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_6, sizeof(mercury_variable));
+		if (!sa5) {
+			return false;
+		}
+		sa4[current_subindex] = sa5;
+	}
+
+	current_subindex = get_array_index_from_mint_6(pos);
+	mercury_variable* arrvar = sa5 + current_subindex;
+	if (arrvar->type) {
+		mercury_free_var(arrvar);
+	}
+	sa5[current_subindex] = cleared_var;
+#else
+	if (!array->values) {
+		array->values = (mercury_variable***)calloc(MERCURY_SIZE_SUBARRAY_1, sizeof(void*));
+		if (!array->values) {
+			return false;
+		}
+	}
+
+	int current_subindex = get_array_index_from_mint_1(pos);
+	mercury_variable** sa1 = array->values[current_subindex];
+	if (!sa1) {
+		sa1 = (mercury_variable**)calloc(MERCURY_SIZE_SUBARRAY_2, sizeof(void*));
+		if (!sa1) {
+			return false;
+		}
+		array->values[current_subindex] = sa1;
+	}
+
+	current_subindex = get_array_index_from_mint_2(pos);
+	mercury_variable* sa2 = sa1[current_subindex];
+	if (!sa2) {
+		sa2 = (mercury_variable*)calloc(MERCURY_SIZE_SUBARRAY_3, sizeof(mercury_variable));
+		if (!sa2) {
+			return false;
+		}
+		sa1[current_subindex] = sa2;
+	}
+
+	current_subindex = get_array_index_from_mint_3(pos);
+	mercury_variable* arrvar = sa2 + current_subindex;
+	if (arrvar->type) {
+		mercury_free_var(arrvar);
+	}
+	sa2[current_subindex] = cleared_var;
+#endif
+	return true;
+}
+
 void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_variable* out) {
 	if (!array->values)goto no_index;
 #ifdef MERCURY_64BIT

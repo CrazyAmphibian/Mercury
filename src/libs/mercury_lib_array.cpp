@@ -480,6 +480,7 @@ void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury
 	}
 
 	for (mercury_int i = 0; i < arr_size; i++) { //see above.
+		mercury_cleararrayindex(arr, i);
 		mercury_setarray(arr, tlist+i,i);
 	}
 	free(tlist);

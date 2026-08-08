@@ -302,6 +302,7 @@ MERCURY_DYNAMIC_LIBRARY mercury_array* mercury_newarray();
 MERCURY_DYNAMIC_LIBRARY bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos);
 MERCURY_DYNAMIC_LIBRARY void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_variable* out);
 MERCURY_DYNAMIC_LIBRARY mercury_int mercury_array_len(const mercury_array* const arr);
+MERCURY_DYNAMIC_LIBRARY bool mercury_cleararrayindex(mercury_array* const array, const mercury_int pos);
 
 
 //state
