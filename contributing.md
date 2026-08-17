@@ -27,4 +27,4 @@ inline assembly or other such micro-optimizations are not likely to be accepted 
 Though written in C++, mercury takes a C coding style, and using C++ features like classes or std:: is heavily discouraged. You should do your best to find a different implementation, and such code is only to be accepted where absolutely necessary.
 nullptr should be used over NULL, and malloc() over new.
 
-names of functions, types, and constants that exist for mercury, and that are included in header files should be given names that denote they belong to mercury, such as prefixing with mercury_ or M_. This makes code more readable, and reduces the change of name clashes.
+names of functions, types, and constants that exist for mercury, and that are included in header files should be given names that denote they belong to mercury, such as prefixing with mercury_ or M_. This makes code more readable, and reduces the chance of name clashes.
