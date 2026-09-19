@@ -1805,7 +1805,8 @@ converts a serialized string back into data. returns nil on failiure.
 
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> getworkingdir (<font class="vartpe"></font>)</h3>
 <p>
-returns the executable's working directory, usually where the program was executed from, and not nescicarily where the executable is. returns the path using the system's path seperator.
+returns the executable's working directory, usually where the program was executed from, and not nescicarily where the executable is. returns the path using the system's path seperator.<br>
+This is the path OS commands will execute in, and this is where filesystem modification will be relative to if no absolute position is given.
 </p>
 <p class="example">f=io.open(io.getworkingdir().."/file.txt","r")
 </p>
