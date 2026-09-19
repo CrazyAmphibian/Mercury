@@ -6,10 +6,11 @@
 #include <cstring>
 #include <climits>
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 #include <Windows.h>
 #include <direct.h>
 #include <conio.h>
+#include <libloaderapi.h>
 #else
 #include <unistd.h>
 #include <dirent.h>
@@ -1440,6 +1441,187 @@ void mercury_lib_io_deserialize(mercury_state* const M_CPP_restrict M, const mer
 
 
 	mercury_free_var(&in);
+	mercury_pushstack_unrefed(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+
+void mercury_lib_io_cwd(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0)) {
+		return;
+	}
+
+	if (args_out) {
+		char* buffer=nullptr;
+		#ifdef _WIN32
+		buffer=_getcwd(buffer, 0);
+		#else
+		buffer = getcwd(buffer, 0);
+		#endif
+		if (!buffer) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+			return;
+		}
+
+		mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+		if (!str) {
+			free(buffer);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+			return;
+		}
+		str->constant = false;
+		str->ptr = buffer;
+		str->refrences = 0;
+		str->size = strlen(buffer);
+
+		mercury_variable nvar;
+		nvar.type = M_TYPE_STRING;
+		nvar.data.p = str;
+		mercury_pushstack(M, &nvar);
+	}
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0)) {
+		return;
+	}
+
+	if (args_out) {
+		char* buffer = (char*)malloc(_MAX_PATH + 2);
+		if (!buffer) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+			return;
+		}
+#ifdef _WIN32
+		GetModuleFileNameA(0, buffer, _MAX_PATH + 1);
+#else
+		ssize_t len = readlink("/proc/self/exe", buffer,_MAX_PATH + 1);
+		if (len == -1) {
+			buffer[0] = '\0';
+		}
+		else {
+			buffer[len] = '\0';
+		}
+#endif
+		for (int ptr = strlen(buffer); ptr >= 0; ptr--) { //remove the executable itself from the path.
+			
+#ifndef _WIN32 //windows shouldn't ever need this since drives occupy the top-level space. (eg: C:/program.exe, and  not /program.exe)
+			if (ptr == 0) { //because SOMEONE will execute it at root.
+				buffer[0] = '/';
+				buffer[1] = '\0';
+			}
+			else
+#endif
+			if (buffer[ptr] == '/' || buffer[ptr] == '\\') {
+				buffer[ptr] = '\0';
+				break;
+			}
+		}
+
+		mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+		if (!str) {
+			free(buffer);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+			return;
+		}
+		str->constant = false;
+		str->ptr = buffer;
+		str->refrences = 0;
+		str->size = strlen(buffer);
+
+		mercury_variable nvar;
+		nvar.type = M_TYPE_STRING;
+		nvar.data.p = str;
+		mercury_pushstack(M, &nvar);
+	}
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+void mercury_lib_io_readbytes(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //like read, but only a specific number of bytes.
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2,3)) {
+		return;
+	}
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		if(args_in>2)mercury_discard_top_of_stack(M);
+		return;
+	}
+
+	mercury_variable start_var;
+	if (args_in > 2) {
+		mercury_popstack(M, &start_var);
+		if (start_var.type != M_TYPE_INT) {
+			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, start_var.type, M_TYPE_INT, 3);
+			return;
+		}
+	}
+	else {
+		start_var.data.i = 0;
+	}
+
+	mercury_variable len_var;
+	mercury_popstack(M, &len_var);
+	if (len_var.type != M_TYPE_INT) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, len_var.type, M_TYPE_INT, 2);
+		return;
+	}
+
+	mercury_variable file_var;
+	mercury_popstack(M, &file_var);
+	if (file_var.type != M_TYPE_FILE) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_FILE, 1);
+		return;
+	}
+
+	mercury_variable out;
+
+	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;
+	FILE* F = fw->file;
+
+	if (F && fw->open) {
+		char* buffer=(char*)malloc(len_var.data.i);
+		if (!buffer) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+			return;
+		}
+		rewind(F);
+		fseek(F, start_var.data.i, SEEK_SET);
+		size_t read=fread(buffer, sizeof(char), len_var.data.i, F);
+		mercury_string* outstr=(mercury_string*)malloc(sizeof(mercury_string));
+		if (!outstr) {
+			free(buffer);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+			return;
+		}
+		outstr->constant = false;
+		outstr->ptr = buffer;
+		outstr->refrences = 1;
+		outstr->size = read;
+
+		out.type = M_TYPE_STRING;
+		out.data.p = outstr;
+	}
+	else {
+		out.type = M_TYPE_NIL;
+		out.data.i = 0;
+	}
+
+	mercury_free_var(&file_var);
+
 	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);

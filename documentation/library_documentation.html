@@ -1726,11 +1726,43 @@ ignores non-serializable types, and returns nil on faliure. does not support rec
 <p class="example">io.write(output_file,io.serialize(data)) 
 </p>
 
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">variable</span>|<span class="vartpe">nil</span></span> deserialize (<font class="vartpe">string</font> serialized)</h3>
 <p>
 converts a serialized string back into data. returns nil on failiure.
 </p>
 <p class="example">data=io.deserialize(io.read(output_file)) 
+</p>
+
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> getworkingdir (<font class="vartpe"></font>)</h3>
+<p>
+returns the executable's working directory, usually where the program was executed from, and not nescicarily where the executable is. returns the path using the system's path seperator.
+</p>
+<p class="example">f=io.open(io.getworkingdir().."/file.txt","r")
+</p>
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> getexecutabledir (<font class="vartpe"></font>)</h3>
+<p>
+returns the directory the executable is in. returns the path using the system's path seperator.
+</p>
+<p class="example">f=io.open(io.getexecutabledir().."/file.txt","r")
+</p>
+
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> readbytes (<span class="vartpe">file</span> file, <span class="vartpe">int</span> number_bytes, [<span class="vartpe">int</span> offset=0])</h3>
+<p>
+returns a string containing number_bytes characters from the file, starting at the offset byte. if there are fewer characters avalible than requested, then the resulting string will be a shorter length than number_bytes. returns nil if the  file was unable to be read.
+</p>
+<p
+class="example">io.readbytes(file,100,0) --reads 100 characters<br>
+io.readbytes(file,100,100) --reads the next 100 characters<br>
+<br>
+offset=0<br>
+while true do<br>
+&nbsp;	str=io.readbytes(file,20,offset)<br>
+&nbsp;	offset+=#str<br>
+&nbsp;	if #str!=20 then break end --hit end of file<br>
+end<br>
 </p>
 
 
