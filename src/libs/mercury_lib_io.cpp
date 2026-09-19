@@ -1553,7 +1553,7 @@ void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, c
 #ifdef _WIN32
 		char* buffer = (char*)malloc(_MAX_PATH + 2);
 #else
-		char* buffer = (char*)malloc(MAX_PATH + 2);
+		char* buffer = (char*)malloc(PATH_MAX + 2);
 #endif
 		if (!buffer) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -1563,7 +1563,7 @@ void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, c
 #ifdef _WIN32
 		GetModuleFileNameA(0, buffer, _MAX_PATH + 1);
 #else
-		ssize_t len = readlink("/proc/self/exe", buffer,_MAX_PATH + 1);
+		ssize_t len = readlink("/proc/self/exe", buffer, PATH_MAX + 1);
 		if (len == -1) {
 			buffer[0] = '\0';
 		}
