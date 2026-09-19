@@ -1928,7 +1928,6 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_io_deserialize, "deserialize", "io");
 	mercury_register_library(mercury_lib_io_cwd, "getworkingdir", "io");
 	mercury_register_library(mercury_lib_io_executabledirectory, "getexecutabledir", "io");
-	mercury_register_library(mercury_lib_io_readbytes, "readbytes", "io");
 
 
 #endif

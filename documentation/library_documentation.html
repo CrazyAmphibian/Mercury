@@ -1607,18 +1607,29 @@ io.close(a)
 <p class="example" style="margin-bottom: 0in"><br/>
 
 </p>
+
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> read (<font class="vartpe">file</font>
-file)</h3>
+file, [<span class="vartpe">int</span> number_bytes=all], [<span class="vartpe">int</span> offset=0])</h3>
 <p>
-returns a string containing a file's entire contents. returns nil if a file was unable to be read. 
+returns nil if a file was unable to be read. otherwise, returns the contents of the provided file.<br>
+If number_bytes is not provided or is nil, the entire contents of the file are read.<br>
+otherwise, number_bytes characters will attempt to be read. if offset is provided, then that byte offset is where reading will begin.<br>
+if not enough characters are available, the string returned will be smaller than number_bytes, potentially returning an empty string.
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;r&quot;)
 <br/>
-io.read(a) //returns the contents of the file. 
+io.read(a) //returns the entire contents of the file. <br>
+<br>
+offset=0 //reads until end of file.<br>
+while true do<br>
+&nbsp;	str=io.readbytes(a,20,offset)<br>
+&nbsp;	offset+=#str<br>
+&nbsp;	if #str!=20 then break end //hit end of file<br>
+end<br>
 </p>
-<p class="example" style="margin-bottom: 0in"><br/>
 
-</p>
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> write (<font class="vartpe">file</font>
 file, <font class="vartpe">string</font> data)</h3>
 <p>attempts to write data to a file. 
@@ -1749,21 +1760,6 @@ returns the directory the executable is in. returns the path using the system's 
 <p class="example">f=io.open(io.getexecutabledir().."/file.txt","r")
 </p>
 
-<h3 class="funcheader"> <span class="returntype"><span class="vartpe">string</span></span> readbytes (<span class="vartpe">file</span> file, <span class="vartpe">int</span> number_bytes, [<span class="vartpe">int</span> offset=0])</h3>
-<p>
-returns a string containing number_bytes characters from the file, starting at the offset byte. if there are fewer characters avalible than requested, then the resulting string will be a shorter length than number_bytes. returns nil if the  file was unable to be read.
-</p>
-<p
-class="example">io.readbytes(file,100,0) --reads 100 characters<br>
-io.readbytes(file,100,100) --reads the next 100 characters<br>
-<br>
-offset=0<br>
-while true do<br>
-&nbsp;	str=io.readbytes(file,20,offset)<br>
-&nbsp;	offset+=#str<br>
-&nbsp;	if #str!=20 then break end --hit end of file<br>
-end<br>
-</p>
 
 
 <h1 id="lib_os">OS library</h1>
