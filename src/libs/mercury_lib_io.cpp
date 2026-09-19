@@ -259,8 +259,21 @@ void mercury_lib_io_close(mercury_state* const M_CPP_restrict M, const mercury_i
 }
 
 void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
-	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2,3)) {
 		return;
+	}
+
+	mercury_variable offset_var;
+	if (args_in > 2) {
+		mercury_popstack(M, &offset_var);
+		if (offset_var.type != M_TYPE_INT) {
+			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, offset_var.type, M_TYPE_INT, 3);
+			return;
+		}
+	}
+	else {
+		offset_var.type = M_TYPE_NIL;
+		offset_var.data.i = 0;
 	}
 
 	mercury_variable data_var;
@@ -279,15 +292,25 @@ void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_string* str = (mercury_string*)data_var.data.p;
 	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;
 
+	mercury_variable out;
+	out.type = M_TYPE_INT;
+	out.data.i = 0;
 	if (fw->modeflags&MERCURY_FILEFLAG_WRITE) {
-		fwrite(str->ptr, 1, str->size, fw->file);
+		if (offset_var.type) {
+			fseek(fw->file, offset_var.data.i, SEEK_SET);
+		}
+		else {
+			fseek(fw->file, 0, SEEK_END);
+		}
+		out.data.i = (mercury_int)fwrite(str->ptr, 1, str->size, fw->file);
 		fflush(fw->file);
 	}
 	mercury_free_var(&data_var);
 	mercury_free_var(&file_var);
 
+	if (args_out)mercury_pushstack(M, &out);
 
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
 

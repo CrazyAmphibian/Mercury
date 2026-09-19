@@ -1583,8 +1583,62 @@ array.concat(a,&quot;,&quot;)
 </p>
 <h1 id="lib_io">IO library</h1>
 <h2 class="western">functions</h2>
+
 <h3 class="funcheader"> <span class="returntype"><span class="vartpe">file</span>|<span class="vartpe">nil</span></span> open (<font class="vartpe">string</font>
 path, <font class="vartpe">string</font> mode)</h3>
+
+<table style="border:2px solid;border-collapse:collapse;">
+	<tr>
+		<th style="border:1px solid;padding:3px;">Mode</th>
+		<th style="border:1px solid;padding:3px;">can read</th>
+		<th style="border:1px solid;padding:3px;">can write</th>
+		<th style="border:1px solid;padding:3px;">if file doesn't exist</th>
+		<th style="border:1px solid;padding:3px;">if file exists</th>
+	</tr>
+	<tr>
+		<td style="border:1px solid;padding:3px;">r, rb (read)</td>
+		<td style="border:1px solid;padding:3px;">yes</td>
+		<td style="border:1px solid;padding:3px;">no</td>
+		<td style="border:1px solid;padding:3px;">no file opened</td>
+		<td style="border:1px solid;padding:3px;">file opens</td>
+	</tr>
+	<tr>
+		<td style="border:1px solid;padding:3px;">w, wb (write)</td>
+		<td style="border:1px solid;padding:3px;">no</td>
+		<td style="border:1px solid;padding:3px;">any position</td>
+		<td style="border:1px solid;padding:3px;">file created</td>
+		<td style="border:1px solid;padding:3px;">contents cleared</td>
+	</tr>
+	<tr>
+		<td style="border:1px solid;padding:3px;">a, ab (append)</td>
+		<td style="border:1px solid;padding:3px;">no</td>
+		<td style="border:1px solid;padding:3px;">only at end of file</td>
+		<td style="border:1px solid;padding:3px;">file created</td>
+		<td style="border:1px solid;padding:3px;">file opens</td>
+	</tr>
+	<tr>
+		<td style="border:1px solid;padding:3px;">r+, rb+ (extended read)</td>
+		<td style="border:1px solid;padding:3px;">yes</td>
+		<td style="border:1px solid;padding:3px;">any position</td>
+		<td style="border:1px solid;padding:3px;">no file opened</td>
+		<td style="border:1px solid;padding:3px;">file opens</td>
+	</tr>
+	<tr>
+		<td style="border:1px solid;padding:3px;">w+, wb+ (extended write)</td>
+		<td style="border:1px solid;padding:3px;">yes</td>
+		<td style="border:1px solid;padding:3px;">any position</td>
+		<td style="border:1px solid;padding:3px;">file created</td>
+		<td style="border:1px solid;padding:3px;">contents cleared</td>
+	</tr>
+	<tr>
+		<td style="border:1px solid;padding:3px;">a+, ab+ (extended append)</td>
+		<td style="border:1px solid;padding:3px;">yes</td>
+		<td style="border:1px solid;padding:3px;">only at end of file</td>
+		<td style="border:1px solid;padding:3px;">file created</td>
+		<td style="border:1px solid;padding:3px;">file opens</td>
+	</tr>
+</table>
+
 <p>
 attempts to open a file at the specified path. if succesful, returns a file, otherwise, returns nil.<br/>
 mode specifies how the file is treated and what can be done. Mode must be read, write, or append, extended optional. The binary mode flag is automatically applied, so a file opened with &quot;r&quot; will open in &quot;rb&quot;, and &quot;w+&quot; will open in &quot;wb+&quot;
@@ -1630,9 +1684,12 @@ end<br>
 </p>
 
 
-<h3 class="funcheader"> <span class="returntype"><span class="vartpe">void</span></span> write (<font class="vartpe">file</font>
-file, <font class="vartpe">string</font> data)</h3>
-<p>attempts to write data to a file. 
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> write (<font class="vartpe">file</font>
+file, <font class="vartpe">string</font> data, [<font class="vartpe">int</font> offset=end])</h3>
+<p>attempts to write data to a file. returns how many characaters were written.<br>
+if offset is specified, the file will attempt (but may not, depending on file mode) to be written at that point.<br>
+otherwise, the characters will be added at the end of the file.
+of offset is greater than the number of characters in the file, the characters between the write are defined per implementation, though is generally filled with NULL (0x00).
 </p>
 <p class="example" style="margin-bottom: 0in">a=io.open(&quot;test.txt&quot;,&quot;w&quot;)
 <br/>
