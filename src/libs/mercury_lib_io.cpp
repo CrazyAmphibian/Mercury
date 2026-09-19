@@ -1572,14 +1572,6 @@ void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, c
 		}
 #endif
 		for (int ptr = strlen(buffer); ptr >= 0; ptr--) { //remove the executable itself from the path.
-			
-#ifndef _WIN32 //windows shouldn't ever need this since drives occupy the top-level space. (eg: C:/program.exe, and  not /program.exe)
-			if (ptr == 0) { //because SOMEONE will execute it at root.
-				buffer[0] = '/';
-				buffer[1] = '\0';
-			}
-			else
-#endif
 			if (buffer[ptr] == '/' || buffer[ptr] == '\\') {
 				buffer[ptr] = '\0';
 				break;
