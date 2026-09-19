@@ -1598,3 +1598,41 @@ void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, c
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
+
+
+void mercury_lib_io_filelength(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
+		return;
+	}
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		return;
+	}
+
+	mercury_variable file_var;
+	mercury_popstack(M, &file_var);
+	if (file_var.type != M_TYPE_FILE) {
+		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_FILE, 1);
+		return;
+	}
+	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;
+
+	
+	mercury_variable out;
+	out.type = M_TYPE_INT;
+
+	if (fw->modeflags) {
+		fseek(fw->file, 0, SEEK_END);
+		out.data.i = ftell(fw->file);
+		rewind(fw->file);
+	}
+	else {
+		out.data.i = 0;
+	}
+
+	mercury_free_var(&file_var);
+
+	mercury_pushstack(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}

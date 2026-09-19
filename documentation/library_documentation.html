@@ -1818,6 +1818,18 @@ returns the directory the executable is in. returns the path using the system's 
 <p class="example">f=io.open(io.getexecutabledir().."/file.txt","r")
 </p>
 
+<h3 class="funcheader"> <span class="returntype"><span class="vartpe">int</span></span> size (<font class="vartpe">file</font> file)</h3>
+<p>
+returns the size of a file in bytes.<br>
+if the file has read access, this will be the size of the entire file.<br>
+if the file does not have read access, but has write access, this is instead the number of bytes written to the file.<br>
+otherwise, returns 0.<br>
+
+</p>
+<p class="example">
+io.read(f,io.size(f)\2) //reads the first half of the file.<br>
+io.read(f,nil,io.size(f)\2) //then, the second half<br>
+</p>
 
 
 <h1 id="lib_os">OS library</h1>
