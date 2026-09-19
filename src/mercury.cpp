@@ -624,7 +624,7 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 		mercury_filewrapper* fw = (mercury_filewrapper*)var->data.p;
 		fw->refrences--;
 		if (!fw->refrences) {
-			if (fw->open)fclose(fw->file);
+			if (fw->modeflags)fclose(fw->file);
 			free(fw);
 		}
 	}

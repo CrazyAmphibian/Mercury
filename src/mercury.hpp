@@ -193,10 +193,15 @@ struct mercury_function {
 	mercury_debug_token* dbg_tokens = nullptr;
 };
 
+enum M_FILEFLAGS :uint8_t { //append and extended mode doesn't really impact the mercury runtime at all, so
+	MERCURY_FILEFLAG_READ = 1 << 0,
+	MERCURY_FILEFLAG_WRITE = 1 << 1,
+};
+
 struct mercury_filewrapper {
 	mercury_uint refrences = 0;
 	FILE* file;
-	bool open = false;
+	uint8_t modeflags;
 };
 
 

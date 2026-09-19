@@ -56,13 +56,15 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 	const char* mode = mercury_mstring_to_cstring((mercury_string*)mode_var.data.p);
 	int mode_l = (int)strlen(mode);
 
+	uint8_t flags = 0;
+
 	if (mode_l == 1) {
 		char c = mode[0];
 		free((char*)mode);
 		mode = nullptr;
-		if (c == 'r')mode = "rb";
-		else if(c == 'w')mode = "wb";
-		else if(c == 'a')mode = "ab";
+		if (c == 'r') { mode = "rb"; flags = MERCURY_FILEFLAG_READ; }
+		else if (c == 'w') { mode = "wb"; flags = MERCURY_FILEFLAG_WRITE; }
+		else if (c == 'a') { mode = "ab"; flags = MERCURY_FILEFLAG_WRITE; }
 	}
 	else if (mode_l == 2) {
 		char c = mode[0];
@@ -70,16 +72,16 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 		free((char*)mode);
 		mode = nullptr;
 		if (c == 'r') {
-			if (c2 == 'b')mode = "rb";
-			else if (c2 == '+')mode = "rb+";
+			if (c2 == 'b') { mode = "rb"; flags = MERCURY_FILEFLAG_READ; }
+			else if (c2 == '+') { mode = "rb+"; flags = MERCURY_FILEFLAG_READ | MERCURY_FILEFLAG_WRITE; }
 		}
 		else if (c == 'w') {
-			if (c2 == 'b')mode = "wb";
-			else if (c2 == '+')mode = "wb+";
+			if (c2 == 'b') { mode = "wb"; flags = MERCURY_FILEFLAG_WRITE; }
+			else if (c2 == '+') { mode = "wb+"; flags = MERCURY_FILEFLAG_READ | MERCURY_FILEFLAG_WRITE; }
 		}
 		else if (c == 'a') {
-			if (c2 == 'b')mode = "ab";
-			else if (c2 == '+')mode = "ab+";
+			if (c2 == 'b') { mode = "ab"; flags = MERCURY_FILEFLAG_WRITE; }
+			else if (c2 == '+') { mode = "ab+"; flags = MERCURY_FILEFLAG_READ | MERCURY_FILEFLAG_WRITE; }
 		}
 	}
 	else if (mode_l == 3) {
@@ -89,9 +91,9 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 		free((char*)mode);
 		mode = nullptr;
 		if (c2 == 'b' && c3=='+') {
-			if (c == 'r')mode="rb+";
-			else if (c == 'w')mode="wb+";
-			else if (c == 'a')mode="ab+";
+			if (c == 'r') { mode = "rb+"; flags = MERCURY_FILEFLAG_READ | MERCURY_FILEFLAG_WRITE; }
+			else if (c == 'w') { mode = "wb+"; flags = MERCURY_FILEFLAG_READ | MERCURY_FILEFLAG_WRITE; }
+			else if (c == 'a') { mode = "ab+"; flags = MERCURY_FILEFLAG_READ | MERCURY_FILEFLAG_WRITE; }
 		}
 	}
 
@@ -114,7 +116,7 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 			return;
 		}
 		fw->refrences = 1;
-		fw->open = true;
+		fw->modeflags = flags;
 		fw->file = F;
 
 		out.data.p = fw;
@@ -156,7 +158,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_filewrapper* fw= (mercury_filewrapper*)file_var.data.p;
 	FILE* F = fw->file;
 
-	if (F && fw->open) {
+	if (F && (fw->modeflags&MERCURY_FILEFLAG_READ) ) {
 
 		if (fseek(F, 0, SEEK_END)) {
 			out.type = M_TYPE_NIL;
@@ -216,8 +218,8 @@ void mercury_lib_io_close(mercury_state* const M_CPP_restrict M, const mercury_i
 
 
 	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;
-	if (fw->open) {
-		fw->open = false;
+	if (fw->modeflags) {
+		fw->modeflags = 0;
 		if(fw->file)fclose(fw->file);
 	}
 
@@ -247,8 +249,9 @@ void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_string* str = (mercury_string*)data_var.data.p;
 	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;
 
-	if (fw->open) {
+	if (fw->modeflags&MERCURY_FILEFLAG_WRITE) {
 		fwrite(str->ptr, 1, str->size, fw->file);
+		fflush(fw->file);
 	}
 	mercury_free_var(&data_var);
 	mercury_free_var(&file_var);
@@ -475,7 +478,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_int count = 0;
 
 	mercury_filewrapper* fw = (mercury_filewrapper*)fil_var.data.p;
-	if (fw->open) {
+	if (fw->modeflags & MERCURY_FILEFLAG_READ) {
 		FILE* f = fw->file;
 		rewind(f);
 		fseek(f, 0, SEEK_END);
@@ -1590,7 +1593,7 @@ void mercury_lib_io_readbytes(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;
 	FILE* F = fw->file;
 
-	if (F && fw->open) {
+	if (F && (fw->modeflags & MERCURY_FILEFLAG_READ) ) {
 		char* buffer=(char*)malloc(len_var.data.i);
 		if (!buffer) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
