@@ -1550,7 +1550,11 @@ void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, c
 	}
 
 	if (args_out) {
+#ifdef _WIN32
 		char* buffer = (char*)malloc(_MAX_PATH + 2);
+#else
+		char* buffer = (char*)malloc(MAX_PATH + 2);
+#endif
 		if (!buffer) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
