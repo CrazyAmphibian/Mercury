@@ -662,7 +662,8 @@ the relative coordinates x,y
 seed])</h3>
 <p>If no parameter is given, returns the current random seed state as
 an int. otherwise, if an integer is provided, it sets the random seed
-state. 
+state.<br>
+only the lower 32 bits of the supplied seed are used.
 </p>
 <p class="example" style="margin-bottom: 0in">math.randomseed(os.time())
 </p>
@@ -673,7 +674,8 @@ state.
 minimum, <font class="vartpe">number</font> maximum])</h3>
 <p>returns a random number as a float. if no arguments are provided,
 the number will be between 0 and 1, otherwise, it will be between
-minimum and maximum. 
+minimum and maximum. <br>
+the results of a random call are slightly different between 32 and 64 bit systems, but are generally equal out to 7 digits between 0 and 1.
 </p>
 <p class="example" style="margin-bottom: 0in">math.random(1,5) //may
 return 4.671... 
