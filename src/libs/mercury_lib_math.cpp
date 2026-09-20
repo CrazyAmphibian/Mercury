@@ -676,9 +676,9 @@ void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercur
 	};
 
 	mercury_variable v2;
-	mercury_popstack(M, &v2);
 	mercury_variable v1;
-	mercury_popstack(M, &v1);
+	if (args_in>0)mercury_popstack(M, &v2);
+	if (args_in>1)mercury_popstack(M, &v1);
 
 	if (args_in && (v1.type != M_TYPE_INT) && (v1.type != M_TYPE_FLOAT) ) {
 		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v1.type, 1);
