@@ -627,39 +627,24 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 
 
 
-/* why implement our own randomness function?
-well... because C's stdlib random kinda blows. only 15 bits of space (on windows, at least)? oh please.
-This probably isn't as performant, but you're going to lose speed with mercury being interpreted so...
-but hey, with this we can really customize it, you can save the random state! also 64 bits of width! */
-#ifdef MERCURY_64BIT
-const uint64_t M_RANDOM_MAX = 0xFFFFFFFFFFFFFFFF; //for the sake of porting C code over.
-uint64_t M_RANDOM_STATE = 0x0000DEADBEEF0000;
 /*
-basic xorshift
-numbers from the paper: George Marsaglia Xorshift RNGs
+modified xorshift*.
+64 bit-ish. 32 bit saved state, and 32 bit output. better than stdlib's 15 bits on windows, at least.
+this gives us compatability between 32 and 64 bit systems (not accounting for float math differences with float random).
+also, since we controll it, we can easily save the state, or change it.
 */
-uint64_t m_random() { //basic Xorshift
-	uint64_t n = M_RANDOM_STATE;
-	n ^= n << 3;
-	n ^= n >> 27;
-	n ^= n << 11;
-	M_RANDOM_STATE = n;
-	return n;
-}
-#else
+uint64_t M_RANDOM_STATE =0x0000BEEFFACE0000 ;
 const uint32_t M_RANDOM_MAX = 0xFFFFFFFF;
-uint32_t M_RANDOM_STATE = 0xDEADBEEF;
-uint32_t m_random() {
-	uint32_t n = M_RANDOM_STATE;
-	n ^= n << 4;
-	n ^= n >> 9;
-	n ^= n << 13;
-	M_RANDOM_STATE = n;
-	return n;
+inline uint32_t m_random() {
+	M_RANDOM_STATE ^= M_RANDOM_STATE >> 12;
+	M_RANDOM_STATE ^= M_RANDOM_STATE << 25;
+	M_RANDOM_STATE ^= M_RANDOM_STATE >> 27;
+	M_RANDOM_STATE ;
+	uint32_t out = ((M_RANDOM_STATE * 0x2545F4914F6CDD1Du) & 0x0000FFFFFFFF0000) >> 16;
+	// AAAABBBBCCCCDDDD -> ----CCCCBBBB----
+	M_RANDOM_STATE = ((M_RANDOM_STATE & 0xFFFF0000) << 16) | ((M_RANDOM_STATE & 0xFFFF00000000) >> 16);
+	return out;
 }
-#endif
-
-
 
 
 
@@ -690,7 +675,7 @@ void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercur
 		return;
 	}
 
-	mercury_uint r = m_random();
+	uint32_t r = m_random();
 	mercury_float f = (mercury_float)r / (mercury_float)M_RANDOM_MAX;
 
 	if (!args_out)return;
@@ -751,7 +736,7 @@ void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mer
 		return;
 	}
 
-	mercury_uint r = m_random();
+	uint32_t r = m_random();
 
 	if (!args_out)return;
 
@@ -785,7 +770,7 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 		if (args_out) {
 			mercury_variable o;
 			o.type = M_TYPE_INT;
-			o.data.u = M_RANDOM_STATE;
+			o.data.u = (M_RANDOM_STATE&0x0000FFFFFFFF0000) >>16;
 			mercury_pushstack(M,&o);
 		}
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
@@ -799,7 +784,7 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 			return;
 		}
 
-		M_RANDOM_STATE = v1.data.u;
+		M_RANDOM_STATE = (v1.data.u&0xFFFFFFFF)<<16;
 		mercury_free_var(&v1);
 
 		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
