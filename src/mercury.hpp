@@ -170,9 +170,9 @@ inline int get_array_index_from_mint_2(mercury_uint i) {
 inline int get_array_index_from_mint_3(mercury_uint i) {
 	return i&0b111111111111;
 }
-constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111;
-constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111;
-constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b111111111111;
+constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111 + 1;
+constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111 + 1;
+constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b111111111111 + 1;
 
 constexpr int MERCURY_WIDTH_SUBARRAY_1 = 10;
 constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;
