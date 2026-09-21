@@ -62,11 +62,11 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 
 	if (function.type != M_TYPE_CFUNC && function.type != M_TYPE_FUNCTION) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, function.type, M_TYPE_TABLE, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED, &function, 2);
 		return;
 	}
 	if (listlike.type != M_TYPE_TABLE && listlike.type != M_TYPE_ARRAY) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, listlike.type, M_TYPE_TABLE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &listlike, 1);
 		return;
 	}
 
@@ -268,12 +268,12 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	mercury_popstack(M,&func);
 
 	if (tab.type != M_TYPE_TABLE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE,tab.type, M_TYPE_TABLE,2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab, M_TYPE_TABLE, 2);
 		free(argt);
 		return;
 	}
 	if (func.type != M_TYPE_CFUNC && func.type != M_TYPE_FUNCTION) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, func.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED, &func, 1);
 		free(argt);
 		return;
 	}
@@ -626,7 +626,7 @@ void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_variable codestr;
 	mercury_popstack(M,&codestr);
 	if (codestr.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, codestr.type,M_TYPE_STRING,1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &codestr,M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -747,7 +747,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 	mercury_popstack(M,&i);
 
 	if (i.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, i.type, M_TYPE_STRING,1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &i, M_TYPE_STRING, 1);
 		return;
 	}
 

@@ -15,7 +15,7 @@ void mercury_lib_table_copy(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable tab_var;
 	mercury_popstack(M,&tab_var);
 	if (tab_var.type != M_TYPE_TABLE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, tab_var.type, M_TYPE_TABLE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, M_TYPE_TABLE, 1);
 		return;
 	}
 

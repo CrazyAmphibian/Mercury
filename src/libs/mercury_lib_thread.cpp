@@ -97,12 +97,12 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 	if ( func_var.type != M_TYPE_FUNCTION) {
 		free(vart);
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, func_var.type, M_TYPE_FUNCTION,1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &func_var, M_TYPE_FUNCTION, 1);
 		return;
 	}
 	if ((table_var.type && table_var.type != M_TYPE_TABLE)) {
 		free(vart);
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, table_var.type, M_TYPE_TABLE, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table_var, M_TYPE_TABLE, 2);
 		return;
 	}
 
@@ -208,7 +208,7 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -235,7 +235,7 @@ void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const me
 	mercury_variable in;
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -267,7 +267,7 @@ void mercury_lib_thread_abort(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -302,7 +302,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, cons
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -332,7 +332,7 @@ void mercury_lib_thread_waitfor(mercury_state* const M_CPP_restrict M, const mer
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -365,7 +365,7 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 	mercury_variable in;
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -387,7 +387,7 @@ void mercury_lib_thread_break(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable in;
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 
@@ -413,7 +413,7 @@ void mercury_lib_thread_check_error(mercury_state* const M_CPP_restrict M, const
 	mercury_variable in;
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_THREAD) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_THREAD, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
 		return;
 	}
 	mercury_threadholder* t = (mercury_threadholder*)in.data.p;

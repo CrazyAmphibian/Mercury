@@ -38,7 +38,7 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_variable mode_var;
 	mercury_popstack(M,&mode_var);
 	if (mode_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, mode_var.type, M_TYPE_STRING, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &mode_var, M_TYPE_STRING, 2);
 		return;
 	}
 
@@ -46,7 +46,7 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_variable file_var;
 	mercury_popstack(M,&file_var);
 	if (file_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -152,7 +152,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 	if (args_in > 2) {
 		mercury_popstack(M, &offset_var);
 		if (offset_var.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, offset_var.type, M_TYPE_INT, 3);
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &offset_var, M_TYPE_INT, 3);
 			return;
 		}
 	}
@@ -165,7 +165,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 	if (args_in > 1) {
 		mercury_popstack(M, &length_var);
 		if (length_var.type != M_TYPE_INT && length_var.type) {
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, length_var.type, M_TYPE_INT, 2);
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &length_var, M_TYPE_INT, 2);
 			return;
 		}
 		if (length_var.data.i < 0)length_var.data.i = 0;
@@ -179,7 +179,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_variable file_var;
 	mercury_popstack(M, &file_var);
 	if (file_var.type != M_TYPE_FILE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_FILE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, M_TYPE_FILE, 1);
 		return;
 	}
 
@@ -242,7 +242,7 @@ void mercury_lib_io_close(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_variable file_var;
 	mercury_popstack(M, &file_var);
 	if (file_var.type != M_TYPE_FILE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_FILE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, M_TYPE_FILE, 1);
 		return;
 	}
 
@@ -267,7 +267,7 @@ void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_i
 	if (args_in > 2) {
 		mercury_popstack(M, &offset_var);
 		if (offset_var.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, offset_var.type, M_TYPE_INT, 3);
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &offset_var, M_TYPE_INT, 3);
 			return;
 		}
 	}
@@ -279,14 +279,14 @@ void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_variable data_var;
 	mercury_popstack(M, &data_var);
 	if (data_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, data_var.type, M_TYPE_STRING, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &data_var, M_TYPE_STRING, 2);
 		return;
 	}
 
 	mercury_variable file_var;
 	mercury_popstack(M, &file_var);
 	if (file_var.type != M_TYPE_FILE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_FILE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, M_TYPE_FILE, 1);
 		return;
 	}
 	mercury_string* str = (mercury_string*)data_var.data.p;
@@ -327,7 +327,7 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_variable dir_var;
 	mercury_popstack(M,&dir_var);
 	if (dir_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -422,7 +422,7 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable dir_var;
 	mercury_popstack(M, &dir_var);
 	if (dir_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -522,7 +522,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_variable fil_var;
 	mercury_popstack(M, &fil_var);
 	if (fil_var.type != M_TYPE_FILE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, fil_var.type, M_TYPE_FILE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &fil_var, M_TYPE_FILE, 1);
 		return;
 	}
 
@@ -682,7 +682,7 @@ void mercury_lib_io_remove(mercury_state* const M_CPP_restrict M, const mercury_
 	mercury_variable dir_var;
 	mercury_popstack(M, &dir_var);
 	if (dir_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_string* fst = (mercury_string*)dir_var.data.p;
@@ -714,7 +714,7 @@ void mercury_lib_io_removedir(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable dir_var;
 	mercury_popstack(M, &dir_var);
 	if (dir_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_string* fst = (mercury_string*)dir_var.data.p;
@@ -752,7 +752,7 @@ void mercury_lib_io_createdir(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable dir_var;
 	mercury_popstack(M, &dir_var);
 	if (dir_var.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, dir_var.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_string* fst = (mercury_string*)dir_var.data.p;
@@ -1478,7 +1478,7 @@ void mercury_lib_io_deserialize(mercury_state* const M_CPP_restrict M, const mer
 
 	if (in.type != M_TYPE_STRING) {
 		mercury_free_var(&in);
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, in.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1612,7 +1612,7 @@ void mercury_lib_io_filelength(mercury_state* const M_CPP_restrict M, const merc
 	mercury_variable file_var;
 	mercury_popstack(M, &file_var);
 	if (file_var.type != M_TYPE_FILE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, file_var.type, M_TYPE_FILE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, M_TYPE_FILE, 1);
 		return;
 	}
 	mercury_filewrapper* fw = (mercury_filewrapper*)file_var.data.p;

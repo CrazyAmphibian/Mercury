@@ -33,7 +33,7 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable cvar;
 	mercury_popstack(M,&cvar);
 	if (cvar.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, cvar.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_string* code = (mercury_string*)cvar.data.p;
@@ -108,7 +108,7 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_variable cvar;
 	mercury_popstack(M, &cvar);
 	if (cvar.type != M_TYPE_STRING) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, cvar.type, M_TYPE_STRING, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, M_TYPE_STRING, 1);
 		return;
 	}
 	mercury_string* code = (mercury_string*)cvar.data.p;
@@ -178,7 +178,7 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 		t = (time_t)tvar.data.f;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, tvar.type, M_TYPE_INT, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, M_TYPE_INT, 1);
 		return;
 	}
 	mercury_free_var(&tvar);
@@ -268,7 +268,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_popstack(M,&tvar);
 
 	if(tvar.type!=M_TYPE_TABLE) {
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, tvar.type, M_TYPE_TABLE, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, M_TYPE_TABLE, 1);
 		return;
 	}
 	tm timedata;
