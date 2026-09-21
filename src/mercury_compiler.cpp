@@ -1180,10 +1180,12 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 		mercury_int i;
 		if (cstr[0] == '-') {
 			if (cur_tok->num_chars > 3 && cstr[2] == 'x') {
-				i = -strtoll(cstr + 3, &end, 16);
+				i = strtoull(cstr + 3, &end, 16);
+				i *= -1;
 			}
 			else if (cur_tok->num_chars > 3 && cstr[2] == 'b') {
-				i = -strtoll(cstr + 3, &end, 2);
+				i = strtoull(cstr + 3, &end, 2);
+				i *= -1;
 			}
 			else {
 				i = strtoll(cstr, &end, 10);
@@ -1191,10 +1193,10 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 		}
 		else {
 			if (cur_tok->num_chars > 2 && cstr[1] == 'x') {
-				i = strtoll(cstr + 2, &end, 16);
+				i = strtoull(cstr + 2, &end, 16);
 			}
 			else if (cur_tok->num_chars > 2 && cstr[1] == 'b') {
-				i = strtoll(cstr + 2, &end, 2);
+				i = strtoull(cstr + 2, &end, 2);
 			}
 			else {
 				i = strtoll(cstr, &end, 10);
