@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+
 void M_BYTECODE_NOP(mercury_state* const M_CPP_restrict M) {
 	return;
 }
@@ -34,7 +35,7 @@ void M_BYTECODE_ADD(mercury_state* const M_CPP_restrict M) {
 			argsfloat |= 1;
 			break;
 		default:
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type,2);
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 			mercury_free_var(&v);
 			return;
 		}
@@ -52,7 +53,7 @@ void M_BYTECODE_ADD(mercury_state* const M_CPP_restrict M) {
 			argsfloat |= 2;
 			break;
 		default:
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 			mercury_free_var(&v);
 			return;
 		}
@@ -103,7 +104,7 @@ void M_BYTECODE_SUB(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 1;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -121,7 +122,7 @@ void M_BYTECODE_SUB(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 2;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -172,7 +173,7 @@ void M_BYTECODE_MUL(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 1;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -190,7 +191,7 @@ void M_BYTECODE_MUL(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 2;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -236,7 +237,7 @@ void M_BYTECODE_DIV(mercury_state* const M_CPP_restrict M) {
 		f1 = v.data.f;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -253,7 +254,7 @@ void M_BYTECODE_DIV(mercury_state* const M_CPP_restrict M) {
 		f2 = v.data.f;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -284,7 +285,7 @@ void M_BYTECODE_POW(mercury_state* const M_CPP_restrict M) {
 		f1 = v.data.f;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -301,7 +302,7 @@ void M_BYTECODE_POW(mercury_state* const M_CPP_restrict M) {
 		f2 = v.data.f;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -333,7 +334,7 @@ void M_BYTECODE_IDIV(mercury_state* const M_CPP_restrict M) {
 		i1 = (mercury_int)v.data.f;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -350,7 +351,7 @@ void M_BYTECODE_IDIV(mercury_state* const M_CPP_restrict M) {
 		i2 = (mercury_int)v.data.f;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -386,7 +387,7 @@ void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 1;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -404,7 +405,7 @@ void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 2;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -413,6 +414,10 @@ void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M) {
 	
 	switch (argsfloat) {
 	case 0:
+		if (i1 == 0) {
+			mercury_raise_error(M, M_ERROR_DIV_ZERO);
+			return;
+		}
 		v.type = M_TYPE_INT;
 		v.data.i = i2 % i1;
 		break;
@@ -450,7 +455,7 @@ void M_BYTECODE_BAND(mercury_state* const M_CPP_restrict M) {
 		i1 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -465,7 +470,7 @@ void M_BYTECODE_BAND(mercury_state* const M_CPP_restrict M) {
 		i2 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -497,7 +502,7 @@ void M_BYTECODE_BOR(mercury_state* const M_CPP_restrict M) {
 		i1 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -512,7 +517,7 @@ void M_BYTECODE_BOR(mercury_state* const M_CPP_restrict M) {
 		i2 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -544,7 +549,7 @@ void M_BYTECODE_BXOR(mercury_state* const M_CPP_restrict M) {
 		i1 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -559,7 +564,7 @@ void M_BYTECODE_BXOR(mercury_state* const M_CPP_restrict M) {
 		i2 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -590,7 +595,7 @@ void M_BYTECODE_BNOT(mercury_state* const M_CPP_restrict M) {
 		i1 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -627,7 +632,7 @@ void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M) {
 		i1 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -642,7 +647,7 @@ void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M) {
 		i2 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -674,7 +679,7 @@ void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M) {
 		i1 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -689,7 +694,7 @@ void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M) {
 		i2 = v.data.i;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -884,7 +889,7 @@ void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 1;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -902,7 +907,7 @@ void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 2;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -950,7 +955,7 @@ void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 1;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -968,7 +973,7 @@ void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 2;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -1016,7 +1021,7 @@ void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 1;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -1034,7 +1039,7 @@ void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 2;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -1082,7 +1087,7 @@ void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 1;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 2);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
 		mercury_free_var(&v);
 		return;
 	}
@@ -1100,7 +1105,7 @@ void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 		argsfloat |= 2;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, v.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
 		mercury_free_var(&v);
 		return;
 	}
@@ -1226,7 +1231,7 @@ void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
 		break;
 	case M_TYPE_ARRAY:
 		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, table.type, M_TYPE_INT, 2);
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table,M_TYPE_INT, 2);
 			mercury_free_var(&value);
 			mercury_free_var(&key);
 			mercury_free_var(&table);
@@ -1236,7 +1241,7 @@ void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
 		mercury_free_var(&key);
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
 		mercury_free_var(&value);
 		mercury_free_var(&key);
 		mercury_free_var(&table);
@@ -1260,7 +1265,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		break;
 	case M_TYPE_ARRAY:
 		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, table.type, M_TYPE_INT, 2);
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table, M_TYPE_INT, 2);
 			mercury_free_var(&key);
 			mercury_free_var(&table);
 			return;
@@ -1280,7 +1285,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		value.data.p = mercury_mstring_substring((mercury_string*)table.data.p, key.data.i, key.data.i);
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
 		mercury_free_var(&key);
 		mercury_free_var(&table);
 		return;
@@ -1616,7 +1621,7 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 		((mercury_cfunc)(ck.data.p))(M,args_in,args_out);
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, ck.type, 0);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, &ck, 0);
 		mercury_free_var(&ck);
 		return;
 	}
@@ -1911,7 +1916,7 @@ void M_BYTECODE_UNM(mercury_state* const M_CPP_restrict M) { //UNary Minus
 		var.data.f *= -1.0;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, var.type,1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &var, 1);
 		return;
 	}
 	M->stack[M->sizeofstack - 1] = var;
@@ -1936,7 +1941,7 @@ void M_BYTECODE_INC(mercury_state* const M_CPP_restrict M) { //INCrement
 		var.data.f += 1.0;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, var.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &var, 1);
 		return;
 	}
 	M->stack[M->sizeofstack - 1] = var;
@@ -1961,7 +1966,7 @@ void M_BYTECODE_DEC(mercury_state* const M_CPP_restrict M) { //DECrement
 		var.data.f -= 1.0;
 		break;
 	default:
-		mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, var.type, 1);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &var, 1);
 		return;
 	}
 	M->stack[M->sizeofstack - 1] = var;

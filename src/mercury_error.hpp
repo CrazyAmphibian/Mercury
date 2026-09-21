@@ -34,6 +34,10 @@ inline void mercury_raise_error_nonpointer(mercury_state* M, const uint32_t erro
 	mercury_raise_error(M, errorcode, &data1, &data2, &data3);
 }
 
+inline void mercury_raise_error_firstargpointeronly(mercury_state* M, const uint32_t errorcode, void* data1 = 0, const mercury_int data2 = 0, const mercury_int data3 = 0) {
+	mercury_raise_error(M, errorcode, (const mercury_int*)data1, &data2, &data3);
+}
+
 
 mercury_string* mercury_get_state_traceback(mercury_state* M);
 
