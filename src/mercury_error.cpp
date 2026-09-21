@@ -137,28 +137,28 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 	
 	switch (errorcode) {
 		case M_ERROR_ALLOCATION:
-			mercury_mstring_addchars(out, ": memory allocation failiure.", 29);
+			mercury_mstring_addchars(out, ": memory allocation failiure.\n", 29);
 			break;
 		case M_ERROR_WRONG_TYPE:
-			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected %s, got %s\n", *data3, get_type_string((uint8_t)*data2), get_type_string((uint8_t)*data1));
+			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected %s, got %s.\n", *data3, get_type_string((uint8_t)*data2), get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
 		case M_ERROR_DIV_ZERO:
-			mercury_mstring_addchars(out, ": integer division by 0.", 23);
+			mercury_mstring_addchars(out, ": integer division by 0.\n", 23);
 			break;
 		case M_ERROR_INSTRUCTION_FAILIURE:
-			mercury_mstring_addchars(out, ": failiure to execute instruction.", 23);
+			mercury_mstring_addchars(out, ": failiure to execute instruction.\n", 23);
 			break;
 		case M_ERROR_CALL_NOT_FUNCTION:
-			snprintf(buffer, buffer_size, ": attempt to call non-function value %s.", get_type_string((uint8_t)*data1));
+			snprintf(buffer, buffer_size, ": attempt to call non-function value %s.\n", get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
 		case M_ERROR_INDEX_INVALID_TYPE:
-			snprintf(buffer, buffer_size, ": attempt to index invalid variable type %s.", get_type_string((uint8_t)*data1));
+			snprintf(buffer, buffer_size, ": attempt to index invalid variable type %s.\n", get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
 		case M_ERROR_NOT_ENOUGH_ARGS:
-			snprintf(buffer, buffer_size, ": incorrect number of args. expected %zi, got %zi.", *data2, *data1);
+			snprintf(buffer, buffer_size, ": incorrect number of args. expected %zi, got %zi.\n", *data2, *data1);
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
 		case M_ERROR_CUSTOM_STRING:
@@ -166,23 +166,66 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 			mercury_mstring_addchars(out, (char*)data1, strlen((char*)data1));
 			break;
 		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER:
-			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected a number, got %s.", *data2, get_type_string((uint8_t)*data1));
+			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected a number, got %s.\n", *data2, get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
 		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION:
-			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected any function type, got %s.", *data2, get_type_string((uint8_t)*data1));
+			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected any function type, got %s.\n", *data2, get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
 		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE:
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected an array or table, got %s\n", *data2, get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
+		case M_ERROR_WRONG_TYPE_VARIABLEPROVIDED:
+			{
+			mercury_string* str=mercury_tostring((mercury_variable*)data1);
+			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected %s, got %s ", *data3, get_type_string((uint8_t)*data2), get_type_string( ((mercury_variable*)data1)->type));
+			mercury_mstring_addchars(out, buffer, strlen(buffer));
+			mercury_mstrings_append(out, str);
+			mercury_mstring_delete(str);
+			mercury_mstring_addchars(out, ".\n", 2);
+			}
+			break;
+		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED:
+			{
+			mercury_string* str = mercury_tostring((mercury_variable*)data1);
+			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected a number, got %s ", *data2, get_type_string(((mercury_variable*)data1)->type));
+			mercury_mstring_addchars(out, buffer, strlen(buffer));
+			mercury_mstrings_append(out, str);
+			mercury_mstring_delete(str);
+			mercury_mstring_addchars(out, ".\n", 2);
+			}
+			break;
+		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED:
+			{
+			mercury_string* str = mercury_tostring((mercury_variable*)data1);
+			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected any function type, got %s ", *data2, get_type_string(((mercury_variable*)data1)->type));
+			mercury_mstring_addchars(out, buffer, strlen(buffer));
+			mercury_mstrings_append(out, str);
+			mercury_mstring_delete(str);
+			mercury_mstring_addchars(out, ".\n", 2);
+			}
+			break;
+		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED:
+			{
+			mercury_string* str = mercury_tostring((mercury_variable*)data1);
+			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected an array or table, got %s ", *data2, get_type_string(((mercury_variable*)data1)->type));
+			mercury_mstring_addchars(out, buffer, strlen(buffer));
+			mercury_mstrings_append(out, str);
+			mercury_mstring_delete(str);
+			mercury_mstring_addchars(out, ".\n", 2);
+			}
+			break;
 		default:
 			mercury_mstring_addchars(out, ": unknown error.",16);
 			break;
 	}
 
-
+	/*M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, //args: variable pointer, expected type, arg number
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take ints or floats
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take C and M functions
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED*/
 	return out;
 }
 

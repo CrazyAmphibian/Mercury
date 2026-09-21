@@ -15,11 +15,15 @@ enum M_ERROR_TYPES:uint32_t {
 	M_ERROR_CALL_NOT_FUNCTION = 6 ,// args: provided
 	M_ERROR_INDEX_INVALID_TYPE = 7, // args: provided
 	M_ERROR_NOT_ENOUGH_ARGS = 8, //args: provided, expected
-	M_ERROR_CUSTOM_STRING = 9, //args: string
+	M_ERROR_CUSTOM_STRING = 9, //args: c string
 	M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER, //args: provided, arg number. for functions that can take ints or floats
 	M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, //args: provided, arg number. for functions that can take C and M functions
 	M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE,//args: provided, arg number. for functions that can take arrays or tables.
 	M_ERROR_EXECUTION_ABORT,
+	M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, //args: variable pointer, expected type, arg number
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take ints or floats
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take C and M functions
+	M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED,//args: variable pointer, arg number. for functions that can take arrays or tables.
 };
 
 mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t errorcode, const mercury_int* data1 = nullptr, const mercury_int* data2 = nullptr, const mercury_int* data3 = nullptr);
