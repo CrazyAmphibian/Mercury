@@ -416,6 +416,8 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 						comment_mode=COMMENT_MULTI;
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
 						i++;
+					}else if(char_is_number(c) && (c_prev=='.' || c_prev=='-') ) { //numbers like .1 and -4
+						cur_tok->token_type = TOKEN_TYPE_NUMBER;
 					}else if(char_is_symbol(c) && symbol_can_merge_token(cur_tok,c) ){
 						append_char_to_compiler_token(cur_tok,c);
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
