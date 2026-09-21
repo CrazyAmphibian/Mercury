@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html"></a></td>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_0.5.html">0.5 operators</a></td>
+	<td><a href="manual_0.6.html">0.6 lexical scope</a></td>
+	<td><a href="manual_0.6.html"></a></td>
+</tr>
+</table>
+
+
+<div>
+	<h3>default visibility behavior</h3>
+	<p>by default, when a variable used, the Mercury runtime will first search outwards for a variable with the same name (a variable counts as defined even if it is nil).<br>
+	if an existing variable is found, that is what will be assigned to or retrieved from.<br>
+	if no variable exists, one will be created in the innermost code body.<br>
+	this process is done every time a variable is accessed.</p>
+	
+	<p class="codeblock">
+		stuff=function()<br>
+			a=10<br>
+		end<br>
+		<br>
+		//scenario 1: a was defined before the function call<br>
+		a=5<br>
+		stuff() //looks for a, and finds a exists, and sets it to 10
+		print(a) //10<br>
+		<br>
+		//scenario 2: a was not defined before the function call<br>
+		stuff() //looks for a, and does not find it, and so creates a variable.<br>
+		print(a) // the variable was created in the function body's state, and so is not visible here.<br>
+	</p>
+	
+</div>
+
+<div>
+	<h3>local keyword</h3>
+	
+	<p>the local keyword is placed before a named variable, on either the get or set side. It tells the compiler that it is to search only inside the innermost state for the variable.</p>
+	<p class="codeblock">
+		stuff=function()<br>
+			local a=10<br>
+		end<br>
+		<br>
+		a=5<br>
+		stuff() // a is marked as local, and so it is created inside the function's state, and never sees the outside variable of the same name.<br>
+		print(a) //5<br>
+	</p>
+	
+	<p class="codeblock">
+		stuff=function()<br>
+			&emsp;local a=a<br>
+			&emsp;a+=20<br>
+			&emsp;print(a)<br>
+		end<br>
+		<br>
+		a=5<br>
+		stuff() //prints 25, because it takes a=5 from here and adds 20 to it.<br>
+		print(a) //still 5, because the function copied the variable a into a local variable, whose modifications do not propagate back to the host state.<br>
+	</p>
+	
+</div>
+
+
+<div>
+	<h3>global keyword</h3>
+	
+	<p>the global keyword is used in the same manner as local, but instead makes the variable go to the topmost (global) state.</p>
+	<p class="codeblock">
+		stuff=function()<br>
+			global a=10<br>
+		end<br>
+		<br>
+		stuff() // a is marked as global, so it checks the topmost state, and sets the value.<br>
+		print(a) //10<br>
+	</p>
+	
+	<p>the two keywords can be used together to create some strange effects</p>
+	
+	<p class="codeblock">
+		stuff=function()<br>
+			&emsp;local a=a<br>
+			&emsp;a+=20 //default access looks for locals before globals<br>
+			&emsp;print(a, global a)<br>
+		end<br>
+		<br>
+		global a=5<br>
+		stuff() //prints 25 5, because the local version is created then added by 20, while the global version remains unchanged<br>
+	</p>
+	
+</div>
+
+
+</body>
+</html>

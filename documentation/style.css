@@ -1,8 +1,56 @@
 body{
 	background-color:#ddd;
-	
+	font-family:sans-serif;
 }
 
+
+table{
+	border-collapse:collapse;
+}
+
+table th, table td{
+	border: 1px solid black;
+}
+
+ul , ol{
+	padding-left: 1.1em;
+}
+
+a{
+	text-decoration:inherit;
+}
+
+#docuheader{
+	width:50%;
+	position:relative;
+	left:25%;
+}
+#docuheader td{
+	border:2px solid black;
+	padding-left:3px;
+	padding-right:3px;
+	font-family:monospace;
+	font-size:150%;
+	font-weight:bold;
+	text-align:center;
+	width:33%;
+}
+
+
+.centertable td{
+	text-align:center;
+}
+
+.tablefirstcollummono td:first-child{
+	font-family:monospace;
+}
+
+/*use with divs or paragraphs*/
+.codeblock{
+	font-family:monospace;
+	border: 2px solid black;
+	padding:0.5em;
+}
 
 .m_comment{
 	color:DarkGreen;

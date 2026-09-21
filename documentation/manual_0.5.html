@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html"></a></td>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_0.4.html">0.4 flow control</a></td>
+	<td><a href="manual_0.5.html">0.5 operators</a></td>
+	<td><a href="manual_0.6.html">0.6 lexical scope</a></td>
+</tr>
+</table>
+
+
+<div>
+	<h3>arithmetic operators</h3>
+	<p>these operators can take any number type, and return a number type. in general, if one arg is a float, a float will be returned. if both args are ints, then an int will be returned.</p>
+	
+	<table class="tablefirstcollummono">
+		<tr><th>symbol</th> <th>operation</th> <th>type</th> <th>comments</th></tr>
+		<tr><td>+</td> <td>addition</td> <td>binary</td> <td> </td></tr>
+		<tr><td>-</td> <td>subtraction</td> <td>binary</td> <td> </td></tr>
+		<tr><td>-</td> <td>negation</td> <td>unary</td> <td>in general putting - before a variable will make it negation</td></tr>
+		<tr><td>*</td> <td>multiplication</td> <td>binary</td> <td> </td></tr>
+		<tr><td>/</td> <td>division</td> <td>binary</td> <td>always returns a float</td></tr>
+		<tr><td>^</td> <td>exponentiation</td> <td>binary</td> <td>always returns a float</td></tr>
+		<tr><td>%</td> <td>modulo</td> <td>binary</td> <td></td></tr>
+		<tr><td>\</td> <td>integer division</td> <td>binary</td> <td>always returns an int</td></tr>
+		<tr><td>++</td> <td>increment</td> <td>unary</td> <td>must be used on a named variable as a standalone statement</td></tr>
+		<tr><td>--</td> <td>decrement</td> <td>unary</td> <td>must be used on a named variable as a standalone statement</td></tr>
+	</table>
+	
+</div>
+
+<div>
+	<h3>bitwise operators</h3>
+	<p>these operators can take any number type, return a number type of the left-hand (first) arg type.</p>
+	
+	<table class="tablefirstcollummono">
+		<tr><th>symbol</th> <th>operation</th> <th>type</th> <th>comments</th></tr>
+		<tr><td>&</td> <td>bitwise and</td> <td>binary</td> <td> </td></tr>
+		<tr><td>|</td> <td>bitwise or</td> <td>binary</td> <td> </td></tr>
+		<tr><td>~</td> <td>bitwise xor</td> <td>binary</td> <td> </td></tr>
+		<tr><td>!</td> <td>bitwise not</td> <td>unary</td> <td>not to be confused with logical not</td></tr>
+	</table>
+</div>
+
+<div>
+	<h3>comparative operators</h3>
+	<p>these operators can take any number type, and return a boolean.</p>
+	
+	<table class="tablefirstcollummono">
+		<tr><th>symbol</th> <th>operation</th> <th>type</th> <th>comments</th></tr>
+		<tr><td>&gt;</td> <td>greater than</td> <td>binary</td> <td> </td></tr>
+		<tr><td>&lt;</td> <td>less than</td> <td>binary</td> <td> </td></tr>
+		<tr><td>&gt;=</td> <td>greater than or equal</td> <td>binary</td> <td> </td></tr>
+		<tr><td>&lt;=</td> <td>less than or equal</td> <td>binary</td> <td></td></tr>
+		<tr><td>==</td> <td>equal to</td> <td>binary</td> <td>can take any type</td></tr>
+		<tr><td>!=</td> <td>not equal to</td> <td>binary</td> <td>can take any type</td></tr>
+	</table>
+</div>
+
+<div>
+	<h3>boolean operators</h3>
+	<p>these operators can take any type and return a value that is able to be evaluated as a boolean value.<br>
+	boolean operators do not perform short circuit logic.</p>
+	
+	<table class="tablefirstcollummono">
+		<tr><th>symbol</th> <th>operation</th> <th>type</th> <th>comments</th></tr>
+		<tr><td>&&</td> <td>logical and</td> <td>binary</td> <td>if true, returns the right-hand (second) arg, otherwise false.</td></tr>
+		<tr><td>||</td> <td>logical or</td> <td>binary</td> <td>if true, returns the left-hand (first) arg, otherwise false.</td></tr>
+		<tr><td>~~</td> <td>logical xor</td> <td>binary</td> <td>if true, returns the true arg, otherwise returns false.</td></tr>
+		<tr><td>!!</td> <td>logical not</td> <td>unary</td> <td>always returns a boolean type.</td></tr>
+
+	</table>
+</div>
+
+<div>
+	<h3>structure operators</h3>
+	<p>these operators are usable on structures, and cannot be used for self-modification.</p>
+	
+	<table class="tablefirstcollummono">
+		<tr><th>symbol</th> <th>operation</th> <th>type</th> <th>comments</th></tr>
+		<tr><td>#</td> <td>length<br>count</td> <td>unary</td> <td>arrays: returns the highest index, plus one, or 0 if no elements.<br>strings: returns number of characters<br>tables: returns number of stored elements (may include nil)</td></tr>
+		<tr><td>[ ]</td> <td>retrieve<br>get</td> <td>binary</td> <td>also used for assignment. cannot be used for self-modification.</td></tr>
+
+	</table>
+</div>
+
+<div>
+	<h3>misc operators</h3>
+	<p>these do not fall into one of the other categories</p>
+	
+	<table class="tablefirstcollummono">
+		<tr><th>symbol</th> <th>operation</th> <th>type</th> <th>comments</th></tr>
+		<tr><td>..</td> <td>concatenate</td> <td>binary</td> <td>can take any type, forces string conversion. always returns a string.</td></tr>
+		<tr><td>( )</td> <td>call</td> <td>variadic</td> <td>also used for nesting sub-statements.</td></tr>
+
+	</table>
+</div>
+
+
+
+<div>
+	<h3>self-modification</h3>
+	<p>except where noted, all binary operators can use self-modify syntax. this not only looks cleaner, but is slightly faster, as it can skip re-attaining the variable's location.<br>
+	this is done by putting your operator symbol after a variable, then adding an equals sign to it.<br>
+	self-modification treats the existing variable as the left-hand side arg.</p>
+	
+	<p class="codeblock">
+		a=10<br>
+		a=a+5<br>
+		a+=5 //does the same code as above.<br>
+		print(a) //20<br>
+		<br>
+		a\=4 //same as a=a\4<br>
+		print(a) //5<br>
+	</p>
+</div>
+
+</body>
+</html>

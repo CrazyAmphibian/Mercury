@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html"></a></td>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_0.1.html">0.1 basic syntax</a></td>
+	<td><a href="manual_0.2.html">0.2 Variable types</a></td>
+	<td><a href="manual_0.3.html">0.3 keywords</a></td>
+</tr>
+</table>
+
+
+<div>
+	<h3>Variable Types</h3>
+	<p>Mercury has 11 distinct datatypes. All variable types in mercury are first class, meaning they can be freely stored or passed to functions.</p>
+	<ul>
+		<li>nil
+			<ul>
+				<li>Represents nothing, undefined variables, and recoverable errors</li>
+				<li>Evaluates as false</li>
+				<li>Primitive value</li>
+			</ul>
+		</li>
+		<li>int
+			<ul>
+				<li>Represents signed integer values</li>
+				<li>Evaluates as true is the value is not 0</li>
+				<li>Primitive value</li>
+			</ul>
+		</li>
+		<li>float
+			<ul>
+				<li>Represents floating point numbers</li>
+				<li>Evaluates as true regardless of value</li>
+				<li>Primitive value</li>
+			</ul>
+		</li>
+		<li>bool
+			<ul>
+				<li>Represents a boolean value.</li>
+				<li>Evaluates according to it's value</li>
+				<li>Primitive value</li>
+			</ul>
+		</li>
+		<li>table
+			<ul>
+				<li>Represents an associative dictionary</li>
+				<li>Evaluates as true regardless of contents</li>
+				<li>Referenced value</li>
+			</ul>
+		</li>
+		<li>string
+			<ul>
+				<li>Represents a series of characters, such as words.</li>
+				<li>Evaluates as true regardless of contents</li>
+				<li>Referenced value</li>
+			</ul>
+		</li>
+		<li>c function
+			<ul>
+				<li>Represents a function written in C++ using mercury's backend API</li>
+				<li>Evaluates as true</li>
+				<li>Immutable value</li>
+			</ul>
+		</li>
+		<li>array
+			<ul>
+				<li>Represents an array of values</li>
+				<li>Evaluates as true regardless of contents</li>
+				<li>Referenced value</li>
+			</ul>
+		</li>
+		<li>function
+			<ul>
+				<li>Represents a function written in mercury</li>
+				<li>Evaluates as true regardless of contents</li>
+				<li>Referenced value</li>
+			</ul>
+		</li>
+		<li>file
+			<ul>
+				<li>Represents a handle to a file on the system</li>
+				<li>Evaluates as true regardless of state</li>
+				<li>Referenced value</li>
+			</ul>
+		</li>
+		<li>thread
+			<ul>
+				<li>Represents a handle to a thread object</li>
+				<li>Evaluates as true regardless of state</li>
+				<li>Referenced value</li>
+			</ul>
+		</li>
+	</ul>
+</div>
+
+<div>
+	<h3>nil</h3>
+	nil is a special datatype, with some exceptions and special behavior.<br>
+	This is because besides being a valid variable, it is also used for invalid data, too.<br>
+	<br>
+	for example, functions, when provided with nil, are not guaranteed to treat the nil value as if it were provided. In some cases this is useful, as it means nil can act like a default argument in a function with multiple optional args.<br>
+	in other cases, such as data traversal and iteration, nil is almost always ignored as a value, and will not be processed.<br>
+	<br>
+	due to this, it is not recommended to use nil as a value for anything you want complex explicit behavior for.<br>
+	regardless, nil is still first class, and is able to be used for indexes of tables, passing to functions, and variable assignment, and the language will remember its value.<br>
+	
+	nil can be created with its associated keyword.<br>
+	<p class="codeblock">
+	a = nil
+	</p>
+</div>
+
+<div>
+	<h3>int and float</h3>
+	<p>int and float, while 2 distinct types with slightly different semantics, are in many cases interchangeable as a grouped "number" type.</p>
+
+	<p>ints will be promoted to floats in cases where the 2 types mix, though in some cases, floats will be truncated into ints.</p>
+	
+	<p>integers have multiple creation syntaxes</p>
+	<p class="codeblock">
+	a = 1 //standard signed integer creation syntax<br>
+	a = 0xF10C //unsigned hexadecimal creation syntax<br>
+	a = 0b110010 //unsigned binary creation syntax<br>
+	</p>
+	
+	<p>while floats have one syntax, which just involves a period and a number`</p>
+	<p class="codeblock">
+	a = 1.0<br>
+	a = 1. //this is also ok<br>
+	a = .0 //and this, too<br>
+	</p>	
+</div>
+
+<div>
+	<h3>bool</h3>
+	<p>though every type can be used in comparisons, booleans are the intended method, as their behavior is gaurenteed</p>
+
+	<p>booleans can be created with keywords, or with comparisons</p>
+	<p class="codeblock">
+	a = true<br>
+	a = false<br>
+	a = b>c<br>
+	</p>
+</div>
+
+<div>
+	<h3>table and array</h3>
+	<p>tables store data in a key-value format, where each value is associated with, and retrieved by a key. each key associated with one value, and each value can only be associated with one key (though the value can be copied into other keys)</p>
+
+	<p>tables are created with curly brackets, and have 2 value modes, implicit and explicit. implicit values start at 0, and increment upwards.</p>
+	<p class="codeblock">
+	a = {} //empty table<br>
+	a = {"a",7,false}<br>
+	a = {"id"=7,"here"=false}<br>
+	</p>
+	
+	<p>explicit values can be defined with variables, too. variables are stored as their value, and not a reference to the variable, so if the variable is changed after setting, it will not return the initial value.</p>
+	<p class="codeblock">
+	a = "test"<br>
+	b = {a=true} // equal to "test"=true<br>
+	b = {"a"=true} // not to be confused with this.<br>
+	</p>
+	
+	<p>and indexing is done with brackets. periods can also be used to index tables, and treat the index like a string</p>
+	<p class="codeblock">
+	a = {"var1"=true,"var2"=false}<br>
+	print(a["var1"]) // true<br>
+	print(a.var2) // false<br>
+	</p>
+	
+	<p>tables are refrences, and share values between all copies</p>
+	<p class="codeblock">
+	a = {"var"=5}<br>
+	b=a<br>
+	a.var2 = 6<br>
+	print(b.var2) // 6<br>
+	</p>
+	
+	<p>arrays are used in a very similar manner and with similar quirks to tables, except they are created using square brackets, and can only store integer indexes. arrays are much faster and memory efficient with consecutive data, and tables are faster and efficient with sparse or mixed data.</p>
+	<p class="codeblock">
+	a = [1,2,3]<br>
+	b = [0=1,1=2,2=3] //same data, explicit indexes<br>
+	</p>
+
+</div>
+
+<div>
+	<h3>string</h3>
+	<p>Strings represent any number of any kind of characters, including NULL.</p>
+
+	<p>strings are created with double quote marks, and will cross any number of characters until a closing quote is found</p>
+	<p class="codeblock">
+	a = "hello"<br>
+	b = "hello<br>
+	<br>
+	there" //string includes the newlines<br>
+	</p>
+	
+	<p>strings are escaped with backslash (\), and have similar rules to C's escapes</p>
+	<table class="centertable tablefirstcollummono">
+		<tr> <th>sequence</th> <th>result</th> </tr>
+		<tr> <td>\\</td> <td>\</td> </tr>
+		<tr> <td>\"</td> <td>"</td> </tr>
+		<tr> <td>\'</td> <td>'</td> </tr>
+		<tr> <td>\t</td> <td>tab</td> </tr>
+		<tr> <td>\n</td> <td>newline</td> </tr>
+		<tr> <td>\r</td> <td>carriage return</td> </tr>
+		<tr> <td>\?</td> <td>?</td> </tr>
+		<tr> <td>\a</td> <td>bell</td> </tr>
+		<tr> <td>\b</td> <td>backspace</td> </tr>
+		<tr> <td>\e</td> <td>ASCII escape (0x1B)</td> </tr>
+		<tr> <td>\f</td> <td>formfeed</td> </tr>
+		<tr> <td>\v</td> <td>vertical tab</td> </tr>
+		<tr> <td>\x00</td> <td>hex character input</td> </tr>
+		<tr> <td>\123</td> <td>decimal character input</td> </tr>
+	</table>
+	
+	<p>strings can be indexed (but not assigned to) using the index syntax, given an integer. doing so returns a 1 character string of the character at that index (starting at 0). if an out of bounds integer is provided, an empty string will be given instead.</p>
+	<p class="codeblock">
+	a="test"<br>
+	print(a[0],a[3]) // t t<br>
+	</p>
+	
+</div>
+
+<div>
+	<h3>functions and C functions</h3>
+	
+	<p>functions of any type can be called the same way, using parenthesis, and delimit args with commas</p>
+	<p class="codeblock">
+	print(6) //c function<br>
+	my_function(12,6) //mercury function<br>
+	</p>
+	
+</div>
+
+
+<div>
+	<h3>files and threads</h3>
+	<p>files and threads are used exclusively for their respective libraries, and will be covered later</p>	
+</div>
+
+</body>
+</html>

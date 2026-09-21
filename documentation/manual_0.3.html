@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html"></a></td>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_0.2.html">0.2 Variable types</a></td>
+	<td><a href="manual_0.3.html">0.3 keywords</a></td>
+	<td><a href="manual_0.4.html">0.4 flow control</a></td>
+</tr>
+</table>
+
+
+<div>
+	<h3>keywords</h3>
+	<p>mercury has 18 reserved keywords. these have special treatment from the compiler, and cannot be directly used as variable names. keywords are case sensitive.</p>
+	<ul>
+		<li>if</li>
+		<li>do</li>
+		<li>nil</li>
+		<li>inf</li>
+		<li>end</li>
+		<li>true</li>
+		<li>then</li>
+		<li>else</li>
+		<li>goto</li>
+		<li>break</li>
+		<li>while</li>
+		<li>false</li>
+		<li>local</li>
+		<li>global</li>
+		<li>elseif</li>
+		<li>return</li>
+		<li>continue</li>
+		<li>function</li>
+	</ul>
+</div>
+
+<div>
+	<h3>static variables</h3>
+	<p>static variables represent a constant data, and can be used for assignment or comparison</p>
+	<ul>
+		<li>nil
+		<ul><li>represents the nil datatype</li></ul>
+		</li>
+		<li>inf
+		<ul><li>represents infinity as a float</li></ul>
+		</li>
+		<li>true
+		<ul><li>represents boolean true</li></ul>
+		</li>
+		<li>false
+		<ul><li>represents boolean false</li></ul>
+		</li>
+	</ul>
+</div>
+
+<div>
+	<h3>scope specifiers</h3>
+	<p>these keywords modify how the compiler assigns and retrieves variables to fine tune scope</p>
+	<ul>
+		<li>global
+		<ul><li>tells the compiler the variable should belong to the top-level state</li></ul>
+		</li>
+		<li>local
+		<ul><li>tells the compiler the variable should belong to the bottom-most state</li></ul>
+		</li>
+	</ul>
+</div>
+
+<div>
+	<h3>flow control</h3>
+	<p>these keywords determine how a program behaves, and are written in a specific way</p>
+	<ul>
+		<li>end
+		<ul><li>universal delimiter for statment bodies</li></ul>
+		</li>
+		<li>if then else elseif
+		<ul><li>used in if statements</li></ul>
+		</li>
+		<li>while do
+		<ul><li>used in while loops</li></ul>
+		</li>
+		<li>break continue
+		<ul><li>modifies loop execution</li></ul>
+		</li>
+		<li>goto
+		<ul><li>unconditional jump to a specific point in code.</li></ul>
+		</li>
+		<li>return
+		<ul><li>stops execution of the current state, and pushes return variables upwards</li></ul>
+		</li>
+		<li>function
+		<ul><li>starts a function body</li></ul>
+		</li>
+	</ul>
+</div>
+
+</body>
+</html>

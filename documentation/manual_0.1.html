@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html"></a></td>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_0.0.html">0.0 preface</a></td>
+	<td><a href="manual_0.1.html">0.1 basic syntax</a></td>
+	<td><a href="manual_0.2.html">0.2 Variable types</a></td>
+</tr>
+</table>
+
+
+<div>
+	<h3>Hello world</h3>
+	<p class="codeblock">print("hello, world!")</p>
+</div>
+<div>
+	<h3>Comments</h3>
+	<p>Comments in mercury come in 2 varieties, single line, and multi-line</p>
+	<p>Single line comments span until the line ends</p>
+	<p class="codeblock">print("hello, world!") //this code does stuff</p>
+	
+	<p>Multi-line comments span until the delimiting characters.</p>
+	<p class="codeblock">/*<br>
+	this no longer does anything<br>
+	<br>
+	print("hello, world!")<br>
+	*/</p>
+	
+	<p>If a single and multi-line comment overlap, the multi-line comment takes priority</p>
+	<p class="codeblock">
+	//commented! /* <br>
+		also commented! <br>
+	*/ <br>
+	<br>
+	/* comment! // still a comment! */ print("this code still runs.") <br>
+	</p>
+</div>
+
+<div>
+	<h3>Order of Operations</h3>
+	<p>Mercury splits operations into the following groups, executed into this order:</p>
+	<ol>
+		<li>variable retrieval</li>
+		<li>variable indexing</li>
+		<li>function call</li>
+		<li>unary operation</li>
+		<li>binary operation</li>
+		<li>variable assignment</li>
+	</ol>
+	
+	<p>binary operations are applied in left-to-right order, with no regard for conventional math operations order.<br>
+	unary operations are applied in right-to-left order<br>
+	both indexing and function calls are done left-to-right, with each calling its own sub-order of operations for each index/arg</p>
+	
+	
+	<p>for example:</p>
+	<p class="codeblock"> b = #a + 1 / 3 </p>
+	<p>the following happens:<br>
+	<br>
+	first, the variable a is retrieved<br>
+	next, the length operator (#) is applied to it<br>
+	then, the number 1 is added to the result<br>
+	then, the result is divided by 3<br>
+	finally, the variable b is assigned the result.<br>
+	</p>
+	
+	<p>another example:</p>
+	<p class="codeblock">
+	a = 5 + 3 / 4 &emsp; &emsp;//a is 2.0<br>
+	a = 3 / 4 + 5 &emsp; &emsp;//a is 5.75<br>
+	a = 5 + (3 / 4)&emsp;&emsp;//a is 5.75<br>
+	</p>
+	
+</div>
+
+</body>
+</html>

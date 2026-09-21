@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html"></a></td>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_0.3.html">0.3 keywords</a></td>
+	<td><a href="manual_0.4.html">0.4 flow control</a></td>
+	<td><a href="manual_0.5.html">0.5 operators</a></td>
+</tr>
+</table>
+
+
+<div>
+	<h3>if statements</h3>
+	<p>if statements allow for conditional running of code segments. the basic if statement is quite simple.</p>
+	<p class="codeblock">
+	if condition then<br>
+	//code to run<br>
+	end<br>
+	</p>
+	
+	<p>the else keyword can be used in conjunction, and runs code if the condition is false. only one else can be used in a block.</p>
+	<p class="codeblock">
+	if a>5 then<br>
+	print("a is more than 5")<br>
+	else<br>
+	print("a is not more than 5")<br>
+	end<br>
+	</p>
+	
+	<p>the final piece is the elseif keyword, which acts as a secondary check. you can use as many elseif blocks in a statment as you want, however elseif must come before else.</p>
+	<p class="codeblock">
+	if a>0 then<br>
+	print("a is positive")<br>
+	elseif a&lt;0 then<br>
+	print("a is negative")<br>
+	else<br>
+	print("a is 0")<br>
+	end<br>
+	</p>
+	
+</div>
+
+
+
+<div>
+	<h3>while loops</h3>
+	<p>while loops continually execute their body as long as the condition is true</p>
+	<p class="codeblock">
+	while condition do<br>
+	//code to run<br>
+	end<br>
+	</p>
+	
+	<p>break can be used to jump out of the loop prematurely. in the case of nested loops, the innermost loop is affected only.</p>
+	<p class="codeblock">
+	a=10<br>
+	while a do<br>
+	a--<br>
+	if should_exit() then break end<br>
+	end<br>
+	</p>
+	
+	<p>continue can be used to skip the current iteration of the loop. as the same with break, only the innermost loop is affected.</p>
+	<p class="codeblock">
+	a=10<br>
+	while a do<br>
+	a--<br>
+	if a%2==0 then continue end<br>
+	print(a)<br>
+	end<br>
+	</p>
+	
+</div>
+
+
+<div>
+	<h3>functions</h3>
+	<p>functions exist to segment portions of code, and to make re-use easier. functions are defined by the function keyword, followed by parenthesis containing args. afterwards, the code body, then end keyword.<br><br>unlike other languages, mercury functions are not given a name, rather they are directly assigned to variables. this means that technically speaking, every function is a lambda/anonymous. return can be used to push values back.</p>
+	<p class="codeblock">
+	add_2_numbers=function(a,b)<br>
+	return a+b<br>
+	end<br>
+	<br>
+	sum = add_2_numbers(5,10) //15<br>
+	</p>
+	
+	<p>if a function is provided more args than it requests, the additional args will be discarded</p>
+	<p class="codeblock">
+	sum = add_2_numbers(5,10,50) //still 15, the 50 is dropped when calling<br>
+	</p>
+
+	<p>when less args are given, any missing will be filled in with nil</p>
+	<p class="codeblock">
+	sum = add_2_numbers(5) //throws an error, because this will attempt to add nil to 5.
+	</p>
+	
+	<p>variables in functions are, by default, local to that function, and cannot be accessed outside of it. functions can still see and change values outside of their body, as long as the names do not overlap</p>
+	<p class="codeblock">
+	add_2_numbers(1,2) <br>
+	print(a,b) //nil nil, because a and b are local to the function<br>
+	<br>
+	a=10<br>
+	add_2_numbers(1,2) //a is still 10, as the function makes its own version of the variable a when it is called<br>
+	<br>
+	add_a_number=function(b)<br>
+		return a+b<br>
+	end<br>
+	add_a_number(5) // returns 15, as the function searches outwards to find a, which is 10.
+	</p>
+	
+	<p>functions can return multiple values, with similar rules to input args regarding too many/too few.</p>
+	<p class="codeblock">
+	sum,c=add_2_numbers(1,2) <br>
+	print(sum,c) //3 nil <br>
+	<br>
+	add_numbers=function(a,b)<br>
+		return a+b,a,b<br>
+	end<br>
+	<br>
+	sum,first,second = add_numbers(10,20)// output: 30 10 20<br>
+	sum = add_numbers(17,3) //output: 20<br>
+	</p>
+	
+</div>
+
+
+<div>
+	<h3>goto</h3>
+	<p>goto represents an unconditional jump to a line of code that can be earlier or later than the jump.</p>
+	<p class="codeblock">
+	goto skip<br>
+	a=50<br>
+	skip:<br>
+	print(a) //nil, because a's defenition was jumped over<br>
+	</p>
+	
+	<p>goto can jump into or out of if statments, or for loops.</p>
+	<p class="codeblock">
+	if a&lt;=0 then<br>
+		&nbsp;a=10<br>
+		&nbsp;label:<br>
+		&nbsp;set=true<br>
+	end<br>
+	<br>
+	while a do<br>
+		&nbsp;a--<br>
+		&nbsp;if a%3==1 then goto label end<br>
+	end<br>
+	</p>
+	
+	<p>goto cannot jump into or out of a function body. trying to do so will result in nothing happening, as the compiler cannot see the label, and never sets the goto jump to any position.</p>
+	<p class="codeblock">
+	stuff=function()<br>
+		label:<br>
+		goto label2: //invalid. the only visible label is label<br>
+	end<br>
+	
+	goto label: //invalid. the only visible label is label2<br>
+	label2:<br>
+	</p>
+	
+</div>
+
+
+</body>
+</html>
