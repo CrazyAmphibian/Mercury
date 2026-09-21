@@ -81,7 +81,7 @@ mercury_string* mercury_get_state_traceback(mercury_state* M) {
 			}
 
 			char* p_tchars = nullptr;
-			if (next) {
+			if (prev) {
 				p_tchars = (char*)malloc(T_p.num_chars + 1);
 				if (!p_tchars) {
 					free(tchars);
