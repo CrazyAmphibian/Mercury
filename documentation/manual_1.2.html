@@ -189,6 +189,8 @@
 		if provided, sets the random number generator's seed.<br>
 		only the lowest 32 bits of the seed will be read.<br>
 		returns the current seed.<br>
+		<br>
+		this function is not thread safe.<br>
 	</p>
 	<p class="codeblock">
 		math.randomseed(os.time())
@@ -203,6 +205,8 @@
 		if no arguments are provided, the result will be between 0 and 1.<br>
 		otherwise, it will be between the minimum and maximum<br>
 		the results of a random call are slightly different between 32 and 64 bit systems, but are generally equal out to 7 digits between 0 and 1.<br>
+		<br>
+		this function is not thread safe.<br>
 		
 	</p>
 	<p class="codeblock">
@@ -215,8 +219,9 @@
 	<h3 class="function"> <span class="type">int</span> randomint (<span class="optional">[<span class="type">int</span> minimum, <span class="type">int</span> maximum]</span>)</h3>
 	<p>
 		returns a random number as an int.<br>
-		the random number will be between minimum and maximum, inclusive of the high and low bounds. 
-		
+		the random number will be between minimum and maximum, inclusive of the high and low bounds.<br> 
+		<br>
+		this function is not thread safe.<br>
 	</p>
 	<p class="codeblock">
 		math.randomint(1,5) //may return 4

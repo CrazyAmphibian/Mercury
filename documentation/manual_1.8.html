@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.7.html">1.7 Table Library</a></td>
+	<td><a href="manual_1.8.html">1.8 Thread Library</a></td>
+	<td><a href="manual_1.9.html">1.9 Debug Library</a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>Thread library contents are placed into the global thread table</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+<div>
+	<h3 class="function"> <span class="type">thread</span>|<span class="type">nil</span> new ( <span class="type">function</span> function, <span class="optional">[<span class="type">table</span> enviroment=_ENV]</span>, <span class="type">variable</span> ... )</h3>
+	
+	<p>
+		creates a new thread with a given function, and immedietly begins execution. caution is advised when multithreading, as no safeguards are put in place to prevent data races.<br>
+		optional second arg specifies an environment override to prevent the thread from modifying global data. can be supplied with nil to ignore it.<br>
+		accepts any number of further arguments, which will be supplied to the thread function as parameters.<br>
+		returns a thread object on successful thread start, or nil if the thread failed to start.<br>
+		if no return value is specified, the thread will not be created.<br>
+	</p>
+	
+	<p>
+		<h4>notes on thread safety</h4>
+	
+		privative datatypes can be safely read, but their values can potentially change mid-read<br>
+		referenced types are unsafe to read, as the reference counter can be modified by multiple threads, leading to memory use-after-free crash.<br>
+		reading variables from the environment is safe, with the same caveats as primitive datatypes<br>
+		however, writing to an environment can lead to a data race where the table is being read mid-reallocation<br>
+		C functions are completely safe to use, barring other type complications, as they are immutable, however some are not thread safe.<br>
+		<br>
+		it is recommended to not use global variables while in a thread, including standard library tables.<br>
+		If you are unsure, it is best advised to set the environment parameter to an empty table, and pipe in everything you need in a dedicated single level table, or individual parameters<br>
+	</p>
+	
+	<p class="codeblock">
+		function a()<br>
+		 return 20<br>
+		end<br>
+		t=thread.new(a) <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">bool</span> isfinished (<span class="type">thread</span> thread)</h3>
+	<p>
+		returns a bool if a thread has finished execution. 
+		
+	</p>
+	<p class="codeblock">
+		b=thread.isfinished(t) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">bool</span> isrunning (<span class="type">thread</span> thread)</h3>
+	<p>
+		returns a bool if a thread is executing code.<br>
+		will always returns the inverse result of isfinished. 
+		
+	</p>
+	<p class="codeblock">
+		b=thread.isrunning(t) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">variable</span>|<span class="type">nil</span> fetch (<span class="type">thread</span> thread)</h3>
+	<p>
+		returns the next variable from a finished thread.<br>
+		if there are no more variables returned by the thread, nil will be given instead<br>
+		Will halt execution of the main thread to wait for the thread to finish. <br>
+		
+	</p>
+	<p class="codeblock">
+		a=function(n)<br>
+			return n*2,n+5<br>
+		end<br>
+		<br>
+		t=thread.new(a,{},10)<br>
+		<br>
+		thread.fetch(t) //returns 20<br>
+		thread.fetch(t) //returns 15<br>
+		thread.fetch(t) //returns nil<br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> abort (<span class="type">thread</span> thread)</h3>
+	<p>
+		kills a thread. This should only be used in dire circumstances where a thread is held up indefinitely, as resources will not properly be freed. 
+		
+	</p>
+	<p class="codeblock">
+		thread.abort(t) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">int</span> getcount (<span class="type">thread</span> thread)</h3>
+	<p>
+		returns the next number of results that a thread has in the form of an integer, or 0, if the thread is still running. 
+		
+	</p>
+	<p class="codeblock">
+		while thread.getcount(t) do<br>
+		 thread.fetch(t)<br>
+		end <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">int</span> await (<span class="type">thread</span> thread)</h3>
+	<p>
+		halts the main thread until the supplied thread is finished. 
+		
+	</p>
+	<p class="codeblock">
+		thread.await(t) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> break (<span class="type">thread</span> thread)</h3>
+	<p>
+		attempts to stop a running thread by forcing it to stop bytecode execution.<br>
+		preferable to thread.abort, as it allows for variables to be properly freed.<br>
+		does nothing on a thread that has finished executing. 
+		
+	</p>
+	<p class="codeblock">
+		thread.break(t) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">bool</span> checkerror (<span class="type">thread</span> thread)</h3>
+	<p>
+		returns a boolean if a thread encountered an error. 	
+	</p>
+	<p class="codeblock">
+		thread.checkerror(t) 
+	</p>
+</div>
+<br>
+
+</body>
+</html>

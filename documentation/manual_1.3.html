@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.2.html">1.2 Math Library</a></td>
+	<td><a href="manual_1.3.html">1.3 String Library</a></td>
+	<td><a href="manual_1.4.html">1.4 OS Library</a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>string library contents are placed into the global string table</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+
+<div>
+	<h3 class="function"><span class="type">string</span> sub (<span class="type">string</span> str, <span class="type">int</span> start, <span class="type">int</span> end)</h3>
+	<p>
+		returns a sub string of a given string with a specified offset.<br>
+		returns an empty string if the offsets are out of bounds.
+	</p>
+	<p class="codeblock">
+		string.sub(&quot;hello, world!&quot;,0,4) //returns &quot;hello&quot; 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> reverse (<span class="type">string</span> str)</h3>
+	<p>
+		returns a string which contains the reverse copy of the input string
+	</p>
+	<p class="codeblock">
+		string.reverse(&quot;hello&quot;) //returns &quot;olleh&quot; <br>
+		string.reverse(&quot;racecar&quot;) //returns &quot;racecar&quot; <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span>|<span class="type">nil</span>, <span class="type">int</span>|<span class="type">nil</span> find (<span class="type">string</span> str, <span class="type">string</span> match, <span class="optional">[<span class="type">int</span> start=0]</span> )</h3>
+	<p>
+		attempts to find the string match inside of the provided string.<br>
+		if found, returns the position in the string where it occurs, as well as where it ends.<br>
+		otherwise, returns nil. <br>
+	</p>
+	<p class="codeblock">
+		string.find(&quot;hello, world!&quot;,&quot;ll&quot;) //returns 2,3 <br/>
+		string.find(&quot;hello, world!&quot;,&quot;ll&quot;,3) //returns nil,nil <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span>, <span class="type">int</span> replace (<span class="type">string</span> str, <span class="type">string</span> match, <span class="type">string</span> replacment, <span class="optional">[<span class="type">int</span> max_replacments=infinity]</span> )</h3>
+	<p>
+		searches a string for all occurrences of a match, and replaces them with another string.<Br>
+		if the max replacements argument is provided, it can be used to limit the number of replacements done. <Br>
+		returns the new string, as well as how many replacements were done.<Br>
+	</p>
+	<p class="codeblock">
+		string.replace(&quot;hello, world!&quot;,&quot;l&quot;,&quot;t&quot;,2) //returns &quot;hetto, world!&quot;, 2
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> count (<span class="type">string</span> str, <span class="type">string</span> match)</h3>
+	<p>
+		returns the number of times the match is found in the string. 
+	</p>
+	<p class="codeblock">
+		string.count(&quot;hello, world!&quot;,&quot;l&quot;) //returns 3 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span> toarray (<span class="type">string</span> str)</h3>
+	<p>
+		returns an array representing the characters in a string. 
+	</p>
+	<p class="codeblock">
+		string.toarray(&quot;hello&quot;) //returns [104,101,108,108,111] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> fromarray (<span class="type">array</span> characters)</h3>
+	<p>
+		converts an array into a string. integers will have their lower 8 bits turned into a character.<br>
+		all other types will be ignored, and replaced with the null character (\x00). 
+	</p>
+	<p class="codeblock">
+		string.fromarray([104,101,108,108,111]) //returns &quot;hello&quot; 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span> separate (<span class="type">string</span> str, <span class="type">string</span> separator)</h3>
+	<p>
+		returns an array containing substrings of the input string, delimited by the separator. does not include the separator.<br>
+		behavior is undefined if the seperator occurs at the start or end of the string, or if the seperator string is empty.
+	</p>
+	<p class="codeblock">
+		string.separate("hello.world",".") //returns &quot;["hello","world"]&quot; 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> upper (<span class="type">string</span> str)</h3>
+	<p>
+		takes a string and returns it with all uppercase characters. 
+	</p>
+	<p class="codeblock">
+		string.upper(&quot;Hello, World!&quot;) //returns &quot;HELLO, WORLD!&quot; 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> lower (<span class="type">string</span> str)</h3>
+	<p>
+		takes a string and returns it with all lowercase characters. 
+	</p>
+	<p class="codeblock">
+		string.lower(&quot;Hello, World!&quot;) //returns &quot;hello, world!&quot; 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> format (<span class="type">string</span> formatstring, <span class="type">variable</span> ...)</h3>
+	<p>
+		takes a formatted string and adds in received values. works with similar syntax to C's printf.<br/>
+		formats start with a %, followed by a character depending on the value. this function will type coerce, and will never cause an error from the variadic arguments.<br/>
+	</p>
+	
+	<p>
+		formats use the following format: <span style="font-family:monospace;">%&lt;type>&lt;flags>&lt;width>.&lt;precision></span>
+	</p>
+	<table class="tablefirstcollummono">
+		<tr><th>character</th><th>type</th><th>modifiers</th></tr>
+		<tr><td>%</td><td>the character %</td><td> </td></tr>
+		<tr><td>i, I</td><td>an integer value</td><td>flags, width</td></tr>
+		<tr><td>u, U</td><td>an unsigned integer value</td><td>flags, width</td></tr>
+		<tr><td>f, F</td><td>a float value</td><td>flags, width, percision</td></tr>
+		<tr><td>e, E</td><td>a float value in scientific notation</td><td>flags, width, percision</td></tr>
+		<tr><td>g, G</td><td>a float value which automatically changes between f and e modes depening on value and precision</td><td>flags, width, percision</td></tr>
+		<tr><td>s, S</td><td>a string value</td><td>flags, width</td></tr>
+		<tr><td>x, X</td><td>an integer as hexadecimal</td><td>flags, width</td></tr>
+		<tr><td>x, X</td><td>an integer as an unsigned octal</td><td>flags, width</td></tr>
+		<tr><td>a, A</td><td>a float value as hexadecimal</td><td>flags, width, percision</td></tr>
+		<tr><td>p, P</td><td>a pointer value to a complex datatype. other types will be interpreted as nullptr (0)<br><b>NOTE:</b> format behavior is platform-dependent</td><td>flags, width</td></tr>
+		<tr><td>c, C</td><td>an integer as a character. ignores everything but the 8 lowest bits.</td><td>flags, width</td></tr>
+	</table>
+	<br>
+	<table class="tablefirstcollummono">
+		<tr><th>character</th><th>flag</th></tr>
+		<tr><td>0</td><td>use 0 instead of space for padding numbers</td></tr>
+		<tr><td>-</td><td>align left instead of right. overrides 0</td></tr>
+		<tr><td>(SPACE)</td><td>positive numbers will put a space at the start</td></tr>
+		<tr><td>+</td><td>positive numbers will put a + at the start</td></tr>
+		<tr><td>#</td><td>changes how certain types are displayed</td></tr>
+	</table>
+	
+	
+	<p class="codeblock">
+		string.format(&quot;the time is %2i:%02i&quot;,hours,minutes) 
+	</p>
+</div>
+<br>
+
+
+<h3>Mercury string patterns</h3>
+<p>
+string patterns follow the behavior of character specifier.<br>
+for example, %l matches any letter. to make it match more than one, add %+ or %- to the end of it (%l%+ or %l%-).<br>
+pattern sequences are always 2 characters wide, and start with a % to make them stand out and for clarity.
+</p>
+
+<table class="tablefirstcollummono">
+	<tr> <th>sequence</th> <th>matched characters</th> </tr>
+	<tr> <td>%%</td> <td>%</td> </tr>
+	<tr> <td>%n</td> <td>any number</td> </tr>
+	<tr> <td>%l</td> <td>any letter</td> </tr>
+	<tr> <td>%w</td> <td>any lowercase letter</td> </tr>
+	<tr> <td>%u</td> <td>any uppercase letter</td> </tr>
+	<tr> <td>%a</td> <td>any alphanumeric character</td> </tr>
+	<tr> <td>%s</td> <td>any symbol</td> </tr>
+	<tr> <td>%(SPACE)</td> <td>any whitespace character</td> </tr>
+	<tr> <td>%.</td> <td>any character. wildcard</td> </tr>
+	<tr> <td>%x</td> <td>any hexadecimal character (0-9, a-f, A-F)</td> </tr>
+</table>
+<br>
+
+<table class="tablefirstcollummono">
+	<tr> <th>sequence</th> <th>character specifier</th> </tr>
+	<tr> <td>%*</td> <td>0 to infinity matches, greedy</td> </tr>
+	<tr> <td>%~</td> <td>0 to infinity matches</td> </tr>
+	<tr> <td>%+</td> <td>1 to infinity matches, greedy</td> </tr>
+	<tr> <td>%-</td> <td>1 to infinity matches</td> </tr>
+	<tr> <td>%?</td> <td>0 or 1 matches</td> </tr>
+	<tr> <td>%!</td> <td>1 match (default behavior)</td> </tr>
+	<tr> <td>%/</td> <td>0 to infinity matches, greedy, inverted</td> </tr>
+	<tr> <td>%\</td> <td>0 to infinity matches, inverted</td> </tr>
+	<tr> <td>%#</td> <td>1 to infinity matches, greedy, inverted</td> </tr>
+	<tr> <td>%@</td> <td>1 to infinity matches, inverted</td> </tr>
+	<tr> <td>%|</td> <td>0 or 1 matches, inverted</td> </tr>
+	<tr> <td>%=</td> <td>1 match, inverted</td> </tr>
+</table>
+
+
+<div>
+	<h3 class="function"> <span class="type">int</span>|<span class="type">nil</span>, <span class="type">int</span>|<span class="type">nil</span>  pfind (<span class="type">string</span> str, <span class="type">string</span> match, <span class="option">[<span class="type">int</span> start=0]</span>)</h3>
+	<p>
+		The same principal as string.find, but uses pattern matching on the match string. 
+	</p>
+	<p class="codeblock">
+		string.pfind("result: 12.7","-%?%n%+.%?%n%*") //returns 8, 11
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">array</span> pextract (<span class="type">string</span> str, <span class="type">string</span> match)</h3>
+	<p>
+		Takes a string and a pattern match, and returns all matches as an array. if none were found, an empty array will be returned. 
+	</p>
+	<p class="codeblock">
+		string.pextract("result: 12.7","-%?%n%+.%?%n%*") //returns ["12.7"] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span>, <span class="type">int</span> preplace  (<span class="type">string</span> str, <span class="type">string</span> match, <span class="optional">[<span class="type">int</span> max_replacments=infinity]</span>)</h3>
+	<p>
+		same function as string.replace, but works with pattern matching for finding occurrences. 
+	</p>
+	<p class="codeblock">
+		string.preplace("hello, world!","l%+","t",1) //returns "heto, world!", 2
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">int</span> pcount  (<span class="type">string</span> str, <span class="type">string</span> match)</h3>
+	<p>
+		same as string.count, but uses pattern matches. 
+	</p>
+	<p class="codeblock">
+		string.pcount("hello, world!","l%+") //returns 2 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span> escape (<span class="type">string</span> string)</h3>
+	<p>
+		takes a string, and substitutes characters so that it could be interpreted properly as a string in mercury.<br>
+		replaces quote mark (") and backslash (\)
+	</p>
+	<p class="codeblock">
+		string.escape("this is a \"cool\" test!") //returns "this is a \"cool\" test!"
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span> escape_url (<span class="type">string</span> string)</h3>
+	<p>
+		takes a string, and substitutes characters so that it could be interpreted properly as a URL location. this does not create a URL adress, as many control characters will be escaped, such as ( / + or & 
+	</p>
+	<p class="codeblock">
+		string.escape_url(&quot;awesome cool file/thing.odt&quot;) //returns &quot;awesome%20cool%20file%2Fthing.odt&quot; 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span> escape_c (<span class="type">string</span> string)</h3>
+	<p>
+		takes a string, and substitutes characters that conform to the C escape sequence standards. does not escape hex characters, but will escape null. 
+	</p>
+	<p class="codeblock">
+		string.escape_c(&quot;how\tinteresting!\0\\\nquite!&quot;) //returns &quot;how\tinteresting!\0\\\nquite!&quot; 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span> escape_html (<span class="type">string</span> string)</h3>
+	<p>
+		takes a string, and substitutes characters so that the text may be used in HTML or XML without causing any special formatting changes.<br/>
+		escapes the following characters: &lt; &gt; &amp; &quot;
+	</p>
+	<p class="codeblock">
+		string.escape_html(&quot;&lt;span class='thing'&gt;woah!&lt;/span&gt;&quot;) //returns &quot;&amp;lt;span class=&amp;#39;thing&amp;#39;&amp;gt;woah!&amp;lt;/span&amp;gt;&quot;
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span> copy (<span class="type">string</span> string)</h3>
+	<p>
+		takes a string and creates a copy of it, as a distinct object with separate internal pointer and reference count. strings, unlike arrays or tables, will compare content to determine equality, so a copied string will be equal with the original.<br>
+		useful for sending string values over to a thread where refcounting can result in races.
+	</p>
+	<p class="codeblock">
+		a="hello"<br>
+		b=string.copy(a)<br>
+		print(a,b,a==b) //outputs "hello" "hello" true <br>
+	</p>
+</div>
+<br>
+
+
+</body>
+</html>

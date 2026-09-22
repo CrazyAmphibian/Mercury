@@ -108,7 +108,7 @@
 <br>
 
 <div>
-	<h3 class="function"><span class="type">function</span> | <span class="type">string</span> compile  (<span class="type">string</span> code)</h3>
+	<h3 class="function"><span class="type">function</span>|<span class="type">string</span> compile  (<span class="type">string</span> code)</h3>
 	<p>
 		attempts to compile a string as if it were mercury code. if successful, it will return a function which does that code. otherwise, returns a string containing the error encountered when compiling. 
 	</p>
@@ -151,7 +151,7 @@
 <br>
 
 <div>
-	<h3 class="function"><span class="type">number</span> | <span class="type">nil</span> tonumber  (<span class="type">variable</span> variable)</h3>
+	<h3 class="function"><span class="type">number</span>|<span class="type">nil</span> tonumber  (<span class="type">variable</span> variable)</h3>
 	<p>
 		returns a number which represents another variable.<br>
 		attempts to return an integer first, then a float. otherwise, returns nil. 
@@ -165,7 +165,7 @@
 <br>
 
 <div>
-	<h3 class="function"><span class="type">int</span> | <span class="type">nil</span> toint  (<span class="type">variable</span> variable)</h3>
+	<h3 class="function"><span class="type">int</span>|<span class="type">nil</span> toint  (<span class="type">variable</span> variable)</h3>
 	<p>
 		returns an integer which represents another variable.<br>
 		Operates in the same manner as tonumber, but will type convert a float result into an int. may return nil. 
@@ -179,7 +179,7 @@
 <br>
 
 <div>
-	<h3 class="function"><span class="type">float</span> | <span class="type">nil</span> tofloat  (<span class="type">variable</span> variable)</h3>
+	<h3 class="function"><span class="type">float</span>|<span class="type">nil</span> tofloat  (<span class="type">variable</span> variable)</h3>
 	<p>
 		returns a float which represents another variable.<br>
 		Operates in the same manner as tonumber, but will type convert an int result into a float. may return nil. 
@@ -206,7 +206,7 @@
 <br>
 
 <div>
-	<h3 class="function"><span class="type">variable</span> | <span class="type">nil</span>  deepcopy  (<span class="type">variable</span> variable)</h3>
+	<h3 class="function"><span class="type">variable</span>|<span class="type">nil</span>  deepcopy  (<span class="type">variable</span> variable)</h3>
 	<p>
 		creates a clone of a variable, and recursively copies elements for arrays and tables. cloned variables contain the same values, however they are treated as seperate objects.<br>
 		This function accounts for self-referential tables and supports the same variable being used multiple times in the same dataset.<br>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.3.html">1.3 String Library</a></td>
+	<td><a href="manual_1.4.html">1.4 OS Library</a></td>
+	<td><a href="manual_1.5.html">1.5 IO Library</a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>OS library contents are placed into the global os table</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+		<tr> <td>IS_POSIX</td> <td>bool</td> <td>Windows: false<br>Linux, MacOS: true</td> <td>whether or not mercury is running on a POSIX system (eg, Linux, MacOS)</td> </tr>
+		<tr> <td>IS_UNIX</td> <td>bool</td> <td>Windows: false<br>Linux, MacOS: true</td> <td>same value as IS_POSIX</td> </tr>
+		<tr> <td>IS_64BIT</td> <td>bool</td> <td>64 bit: true<br>32 bit: false</td> <td>whether or not the mercury is running on a 64 bit system</td> </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+
+<div>
+	<h3 class="function"><span class="type">int</span> time ( )</h3>
+	<p>
+		returns an integer of the current time in seconds since the epoch (unix time) 
+	</p>
+	<p class="codeblock">
+		os.time() //result varies when program is executed 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">float</span> clock ( )</h3>
+	<p>
+		returns a float of how long the program has been running 
+	</p>
+	<p class="codeblock">
+		os.clock()
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> execute  (<span class="type">string</span> command )</h3>
+	<p>
+		executes a string as if it were a shell command.<br>
+		input is platform-dependent.<br>
+		This function uses C's popen function, meaning command output is piped into a string. Some commands may not function as expected.
+	</p>
+	<p class="codeblock">
+		os.execute("curl www.test-site.com") //returns a web request result 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> call   (<span class="type">string</span> command )</h3>
+	<p>
+		executes a string as if it were a shell command.<br>
+		input is platform-dependent.<br>
+		This function uses C's system function, meaning the command runs in stdout/stdin, and this returns the response code of the command.
+	</p>
+	<p class="codeblock">
+		os.call("curl www.test-site.com") //returns 0
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">table</span> get_date  (<span class="type">int</span> epoch_time )</h3>
+	<p>
+		Returns a table containing data about the date given an epoch timestep.<br>
+		The following data is given:
+	</p>
+	
+	<table class="tablefirstcollummono">
+		<tr> <th>Key</th> <th>value</th> </tr>
+		<tr> <td>seconds</td> <td>The number of seconds in the time as an integer from 0 to 60</td> </tr>
+		<tr> <td>minutes</td> <td>The number of minutes in the time as an integer from 0 to 60</td> </tr>
+		<tr> <td>hours</td> <td>The number of hours in the time as an integer from 0 to 23</td> </tr>
+		<tr> <td>hours12</td> <td>The number of hours in the time as an integer from 1 to 12</td> </tr>
+		<tr> <td>ispm</td> <td>A boolean if a 12 hour clock would read the time as PM, to be used with hours12</td> </tr>
+		<tr> <td>year</td> <td>The year of the time, as an integer</td> </tr>
+		<tr> <td>month</td> <td>The month of the time, as an integer from 1 to 12</td> </tr>
+		<tr> <td>dayofweek</td> <td>The day of the week, as an integer from 0 to 6, with 0 representing Sunday.</td> </tr>
+		<tr> <td>dayofmonth</td> <td>The day of the month, as an integer from 1 to 31.</td> </tr>
+		<tr> <td>dayofyear</td> <td>The day of the year, as an integer from 1 to 366.</td> </tr>
+	</table>
+	
+	<p class="codeblock">
+		print("the year is " .. os.get_date(os.time()).year)
+	</p>
+</div>
+<br>
+
+
+<div>
+	<h3 class="function"><span class="type">int</span> get_time  (<span class="type">table</span> date )</h3>
+	<p>
+		Returns an integer as epoch time, based upon the date table provided.<br>
+		returns -1 on an error.<br>
+		Behavior before the epoch (January 1st, 1970) is system dependent, and may fail.<br>
+		<br>
+		The function uses the following keys, though does have fallback values:<br>
+	</p>
+	
+	<table class="tablefirstcollummono">
+		<tr> <th>Key</th> <th>value</th> </tr>
+		<tr> <td>seconds</td> <td>The number of seconds in the time as an integer from 0 to 60. Default: 0</td> </tr>
+		<tr> <td>minutes</td> <td>The number of minutes in the time as an integer from 0 to 60.  Default: 0</td> </tr>
+		<tr> <td>hours</td> <td>The number of hours in the time as an integer from 0 to 23. Default: 0</td> </tr>
+		<tr> <td>year</td> <td>The year of the time, as an integer. Default: 1900</td> </tr>
+		<tr> <td>month</td> <td>The month of the time, as an integer from 1 to 12.  Default: 1</td> </tr>
+		<tr> <td>dayofmonth</td> <td>The day of the month, as an integer from 1 to 31. Default: 1</td> </tr>
+		<tr> <td>daylightsavings</td> <td>If daylight savings is active. 0=no, 1=yes, -1=auto detect. Default: 0</td> </tr>
+	</table>
+	
+	<p class="codeblock">
+		print("the time during january 3rd, 2143 is "..get_time({"year"=2143,"month"=1,"dayofmonth"=3}))
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">void</span> exit  ( <span class="optional">[<span class="type">int</span> exitcode=0]</span> )</h3>
+	<p>
+		Closes the executable immediately, and returns an exit code to the operating system.<br>
+		By default this is 0. on 64 bit systems, integers will be downgraded to 32 bit before being passed.<br>
+		If a non-integer type is provided, exits with code 0.
+	</p>
+	<p class="codeblock">
+		if something_wrong then<br>
+		os.exit(1)<br>
+		end<br>
+	</p>
+</div>
+<br>
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.4.html">1.4 OS Library</a></td>
+	<td><a href="manual_1.5.html">1.5 IO Library</a></td>
+	<td><a href="manual_1.6.html">1.6 Array Library</a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>IO library contents are placed into the global io table</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+
+<div>
+	<h3 class="function"><span class="type">file</span>|<span class="type">nil</span> open ( <span class="type">string</span> path, <span class="type">string</span> mode )</h3>
+	
+	<table class="tablefirstcollummono">
+	<tr>
+		<th>Mode</th>
+		<th>can read</th>
+		<th>can write</th>
+		<th>if file doesn't exist</th>
+		<th>if file exists</th>
+	</tr>
+	<tr>
+		<td>r, rb (read)</td>
+		<td>yes</td>
+		<td>no</td>
+		<td>no file opened</td>
+		<td>file opens</td>
+	</tr>
+	<tr>
+		<td>w, wb (write)</td>
+		<td>no</td>
+		<td>any position</td>
+		<td>file created</td>
+		<td>contents cleared</td>
+	</tr>
+	<tr>
+		<td>a, ab (append)</td>
+		<td>no</td>
+		<td>only at end of file</td>
+		<td>file created</td>
+		<td>file opens</td>
+	</tr>
+	<tr>
+		<td>r+, rb+ (extended read)</td>
+		<td>yes</td>
+		<td>any position</td>
+		<td>no file opened</td>
+		<td>file opens</td>
+	</tr>
+	<tr>
+		<td>w+, wb+ (extended write)</td>
+		<td>yes</td>
+		<td>any position</td>
+		<td>file created</td>
+		<td>contents cleared</td>
+	</tr>
+	<tr>
+		<td>a+, ab+ (extended append)</td>
+		<td>yes</td>
+		<td>only at end of file</td>
+		<td>file created</td>
+		<td>file opens</td>
+	</tr>
+</table>
+	
+	<p>
+		attempts to open a file at the specified path.<br>
+		if succesful, returns a file, otherwise, returns nil.<br>
+		<br>
+		mode specifies how the file is treated and what can be done.<br>
+		Mode must be read, write, or append, extended optional.<br>
+		The binary mode flag is automatically applied, so a file opened with "r" will open in "rb", and "w+" will open in "wb+" 
+	</p>
+	
+	<p class="codeblock">
+		io.open("test.txt","r") //returns a file if test.txt exists. 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">void</span> close ( <span class="type">file</span> file )</h3>
+	
+	<p>
+		closes an open file. this is needed to allow other programs to modify the files. 
+	</p>
+	
+	<p class="codeblock">
+		a=io.open("test.txt","r")<Br>
+		io.close(a) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> read ( <span class="type">file</span> file, <span class="optional">[<span class="type">int</span> number_bytes=all]</span>, <span class="optional">[<span class="type">int</span> offset=0]</span> )</h3>
+	
+	<p>
+		returns nil if a file was unable to be read. otherwise, returns the contents of the provided file.<br>
+		If number_bytes is not provided or is nil, the entire contents of the file are read.<br>
+		otherwise, number_bytes characters will attempt to be read. if offset is provided, then that byte offset is where reading will begin.<br>
+		if not enough characters are available, the string returned will be smaller than number_bytes, potentially returning an empty string. <br>
+	</p>
+	
+	<p class="codeblock">
+		a=io.open("test.txt","r")<br>
+		io.read(a) //returns the entire contents of the file.<br>
+		<br>
+		offset=0 //reads until end of file.<br>
+		while true do<br>
+		  str=io.readbytes(a,20,offset)<br>
+		  offset+=#str<br>
+		  if #str!=20 then break end //hit end of file<br>
+		end<br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> write ( <span class="type">file</span> file, <span class="type">string</span> data, <span class="optional">[<span class="type">int</span> offset=end]</span> )</h3>
+	
+	<p>
+		attempts to write data to a file. returns how many characaters were written.<br>
+		if offset is specified, the file will attempt (but may not, depending on file mode) to be written at that point.<br>
+		otherwise, the characters will be added at the end of the file.<br>
+		if offset is greater than the number of characters in the file, the characters between the write are defined per implementation, though is generally filled with NULL (0x00). <br>
+	</p>
+	
+	<p class="codeblock">
+		a=io.open("test.txt","w")<br>
+		io.write(a,"hello!") <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span> getfiles ( <span class="type">string</span> path )</h3>
+	
+	<p>
+		returns an array of strings containing the files in a specified directory.<br>
+		if the directory could not be located, returns an empty array instead.<br>
+		If an empty string is given, returns the files in the current working directory.<br>
+		Does not include implicit paths . or .. 
+	</p>
+	
+	<p class="codeblock">
+		a=io.getfiles("data") //might return something like ["test.txt","image.jpg","cool_song.mp3"] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span> getdirs ( <span class="type">string</span> path )</h3>
+	
+	<p>
+		returns an array of strings containing the directories in a specified directory.<br>
+		if the directory could not be located, returns an empty array instead.<br>
+		If an empty string is given, returns the files in the current working directory.<br>
+		Does not include implicit paths . or .. 
+	</p>
+	
+	<p class="codeblock">
+		a=io.getdirs("") //might return something like ["data","stuff"] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span> lines ( <span class="type">file</span> file )</h3>
+	
+	<p>
+		returns an array of strings containing each line in a file. The file must be in read mode for any results to return. Does not include the newline characters themselves. 
+	</p>
+	
+	<p class="codeblock">
+		a=io.open("test.txt","r")<Br>
+		io.lines(a) //might return ["this","is","","a test"] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">void</span> post ( <span class="type">string</span> text )</h3>
+	
+	<p>
+		writes a string to stdout.<br>
+		unlike print, the input must be a string. additionally, this function is not variadic, and will not add any terminating newlines. 
+	</p>
+	
+	<p class="codeblock">
+		io.post("hello!\n") 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> prompt ( )</h3>
+	
+	<p>
+		awaits input from stdin. input will be accepted after the user hits enter. returns a string containing the text, minus newlines.
+	</p>
+	
+	<p class="codeblock">
+		a=io.prompt() 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> input ( )</h3>
+	
+	<p>
+		awaits a single keypress from stdin. does not require pressing enter. returns the input as a single character.<Br>
+		use caution if using this in a loop, as the control+C break sequence will not be captured by the program, and instead be sent as raw input.<br>
+		instead. you should check for the sequence 0x03 
+	</p>
+	
+	<p class="codeblock">
+		a=io.input() 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">bool</span> remove ( <span class="type">string</span> path )</h3>
+	
+	<p>
+		attempts to remove a file with the given path.<br>
+		if successful, or the file doesn't exist, returns true, otherwise false. 
+	</p>
+	
+	<p class="codeblock">
+		io.remove("test.txt") 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">bool</span> removedir ( <span class="type">string</span> path )</h3>
+	
+	<p>
+		attempts to remove a directory with the given name/path.<br>
+		if successful, or the directory doesn't exist, returns true, otherwise false.<br>
+		can only remove empty directories. 
+	</p>
+	
+	<p class="codeblock">
+		io.removedir("data") 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">bool</span> createdir ( <span class="type">string</span> path )</h3>
+	
+	<p>
+		attempts to create a directory with the given name/path.<br>
+		if successful, or the directory already exists, returns true, otherwise false. 
+	</p>
+	
+	<p class="codeblock">
+		io.createdir("data")
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span>|<span class="type">nil</span> serialize ( <span class="type">serializable</span> variable )</h3>
+	
+	<p>
+		converts a serializable variable into a string that can be read back later with deserialize.<br>
+		this is both faster and more space efficient than trying to recompile variables as code.<br>
+		ignores non-serializable types, and returns nil on faliure. does not support and ignores self-referential data.  
+	</p>
+	
+	<p class="codeblock">
+		io.write(output_file,io.serialize(data)) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">variable</span>|<span class="type">nil</span> deserialize ( <span class="type">string</span> serialized )</h3>
+	
+	<p>
+		converts a serialized string back into data.<br>
+		returns nil on failiure. 
+	</p>
+	
+	<p class="codeblock">
+		data=io.deserialize(io.read(output_file))
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> getworkingdir ( )</h3>
+	
+	<p>
+		returns the executable's working directory, usually where the program was executed from, and not nescicarily where the executable is.<br>
+		returns the path using the system's path separator.<br>
+		This is the path OS commands will execute in, and this is where filesystem modification will be relative to if no absolute position is given. <br>
+	</p>
+	
+	<p class="codeblock">
+		f=io.open(io.getworkingdir().."/file.txt","r") 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> getexecutabledir ( )</h3>
+	
+	<p>
+		returns the directory the executable is in.<br>
+		returns the path using the system's path separator. 
+	</p>
+	
+	<p class="codeblock">
+		f=io.open(io.getexecutabledir().."/file.txt","r")  
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> size ( <span class="type">file</span> file )</h3>
+	
+	<p>
+		returns the size of a file in bytes.<br>
+		if the file has read access, this will be the size of the entire file.<br>
+		if the file does not have read access, but has write access, this is instead the number of bytes written to the file.<br>
+		otherwise, returns 0.<br>
+	</p>
+	
+	<p class="codeblock">
+		io.read(f,io.size(f)\2) //reads the first half of the file.<br>
+		io.read(f,nil,io.size(f)\2) //then, the second half<br>
+	</p>
+</div>
+<br>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.5.html">1.5 IO Library</a></td>
+	<td><a href="manual_1.6.html">1.6 Array Library</a></td>
+	<td><a href="manual_1.7.html">1.7 Table Library</a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>Array library contents are placed into the global array table</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+		<tr> <td>SORTING_GREATER_TO_LESSER</td> <td>int</td> <td>1</td> <td>sorting function. largest number to smallest</td> </tr>
+		<tr> <td>SORTING_LESSER_TO_GREATER</td> <td>int</td> <td>2</td> <td>sorting function. smallest number to largest</td> </tr>
+		<tr> <td>SORTING_GREATER_TO_LESSER_MAGNITUDE</td> <td>int</td> <td>3</td> <td>sorting function. biggest number to smallest, takes absolute value</td> </tr>
+		<tr> <td>SORTING_LESSER_TO_GREATER_MAGNITUDE</td> <td>int</td> <td>4</td> <td>sorting function. smallest number to biggest, takes absolute value</td> </tr>
+		<tr> <td>SORTING_ALPHABETICAL_A_TO_Z</td> <td>int</td> <td>5</td> <td>sorting function. arranges strings to be alphabetical A to Z</td> </tr>
+		<tr> <td>SORTING_ALPHABETICAL_Z_TO_A</td> <td>int</td> <td>6</td> <td>sorting function. arranges strings to be alphabetical Z to A</td> </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+
+<div>
+	<h3 class="function"><span class="type">void</span> flush ( <span class="type">array</span> array )</h3>
+	
+	<p>
+		removes all nil entries from an array, so that all values spanning 0 to the maximum have a value 
+	</p>
+	
+	<p class="codeblock">
+		a=["hello",1,nil,true]<br>
+		array.flush(a) //a is now ["hello",1,true] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span> copy ( <span class="type">array</span> array )</h3>
+	
+	<p>
+		returns a new array containing the same values as the old one, but as a seperate object. 
+	</p>
+	
+	<p class="codeblock">
+		a=["hello",1,nil,true]<br>
+		b=array.copy(a)<br>
+		print(a==b) //false <br>
+	</p>
+</div>
+<Br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> insert ( <span class="type">array</span> array, <span class="type">variable</span> element, <span class="optional">[<span class="type">int</span> index=end]</span> )</h3>
+	
+	<p>
+		adds element to array.<br>
+		if index is specified, the new element will be at that location, shifting all other elements forward to make space.<br>
+		if not provided, it will instead add the element to the end of the array.<br>
+		Returns the index that the variable was placed at.<br>
+	</p>
+	
+	<p class="codeblock">
+		a=["hello",1,nil,true]<br>
+		b=array.copy(a)<br>
+		print(a==b) //false <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> remove  ( <span class="type">array</span> array, <span class="type">int</span> index )</h3>
+	
+	<p>
+		removes an element from an array.<br>
+		shifts all other elements backwards to fill in the removed element's space.<br>
+		if a return arg is specified, the returns the removed element, otherwise it is discarded. 
+	</p>
+	
+	<p class="codeblock">
+		a=["hello",1,true]<br>
+		array.remove(a,1) //array is now ["hello",true] <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">void</span> swap  ( <span class="type">array</span> array, <span class="type">int</span> index1, <span class="type">int</span> index2 )</h3>
+	
+	<p>
+		swaps the positions of 2 variables in an array.<br>
+		if a position does not exist, nil will be used instead. 
+	</p>
+	
+	<p class="codeblock">
+		a=["hello",1,true]<br>
+		array.swap(a,0,2) //array is now [true,1,"hello"] <br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">void</span> sort  ( <span class="type">array</span> array, <span class="type">function</span>|<span class="type">int</span> sorting_function )</h3>
+	
+	<p>
+		takes an array, and runs a sorting function through it.<br>
+		mercury functions take 2 values and should return 1, 0, or -1. <br>
+		one of the constant array library functions can be used as well<br>
+		<br>
+		this function is not thread safe.<br>
+	</p>
+	
+	<p class="codeblock">
+		a=[7,1,3]<Br>
+		array.sort(a,array.SORTING_GREATER_TO_LESSER) //array is now [7,3,1] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> concat  ( <span class="type">array</span> array, <span class="type">string</span> separator )</h3>
+	
+	<p>
+		returns a string formed from each element in an array, from 0 to the end, and adds the separator string between each element.<br>
+		automatically runs tostring on each element. 
+	</p>
+	
+	<p class="codeblock">
+		a=["hello",1,true]<br>
+		array.concat(a,",") //returns "hello,1,true" 
+	</p>
+</div>
+<br>
+</body>
+</html>

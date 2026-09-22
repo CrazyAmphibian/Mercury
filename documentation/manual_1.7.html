@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.6.html">1.6 Array Library</a></td>
+	<td><a href="manual_1.7.html">1.7 Table Library</a></td>
+	<td><a href="manual_1.8.html">1.8 Thread Library</a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>Table library contents are placed into the global table table</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+<div>
+	<h3 class="function"><span class="type">table</span> copy ( <span class="type">table</span> table )</h3>
+	
+	<p>
+		creates a new table which contains the same values as the supplied table. 
+	</p>
+	
+	<p class="codeblock">
+		a={"hello",1,nil,true}<br>
+		b=table.copy(a)<br>
+		print(a==b) //false <br>
+	</p>
+</div>
+<br>
+
+</body>
+</html>

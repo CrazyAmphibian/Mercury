@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.8.html">1.8 Thread Library</a></td>
+	<td><a href="manual_1.9.html">1.9 Debug Library</a></td>
+	<td><a href="manual_1.10.html"></a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>Debug library contents are placed into the global debug table</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> dumpstack ( )</h3>
+	<p>
+		logs information about the current state's stack to stdout, including how many variables are on the stack, what the variables' values are, and unallocated variables, as well as the allocated size of the stack array.
+	</p>
+	<p class="codeblock">
+		debug.dumpstack() 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> dumpstate ( )</h3>
+	<p>
+		logs information about the current state structure to stdout, including how far the each state is into execution, the instruction address, and which state is the parent state recursively, until the master state is reached.
+	</p>
+	<p class="codeblock">
+		debug.dumpstate() 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> dumpenv ( )</h3>
+	<p>
+		logs information about the environment to stdout, including associated state, and all values stored inside the environment table, and does so for each parent state until the master state.
+	</p>
+	<p class="codeblock">
+		debug.dumpenv() 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> dumpconstants ( )</h3>
+	<p>
+		logs information about the state's constants to stdout, including how many constants the state has, and what the values of the constants are.
+	</p>
+	<p class="codeblock">
+		debug.dumpconstants() 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> dumpbytecode ( <span class="optional">[<span class="type">function</span> function=_ENV]</span> )</h3>
+	<p>
+		logs information about the provided function to stdout, including the number of instructions, and each opcode and additional information.<br>
+		if no arg is given, instead uses the current state's bytecode. 
+	</p>
+	<p class="codeblock">
+		debug.dumpbytecode(my_function) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> dumprawbytecode ( <span class="optional">[<span class="type">function</span> function=_ENV]</span> )</h3>
+	<p>
+		logs information about the provided function to stdout, including the number of instructions, as well as a binary view of each, including raw data in the form of signed, unsigned, and char values.<br>
+		if no arg is given, instead uses the current state's bytecode. 
+	</p>
+	<p class="codeblock">
+		debug.dumprawbytecode(my_function) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> showrefs ( <span class="type">variable</span> var )</h3>
+	<p>
+		Shows how many refs the value has, printed to stdout. If a non ref-counted variable is provided, it will display an invalid message, but not error.
+	</p>
+	<p class="codeblock">
+		debug.showrefs(i) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">void</span> dumpdebuginfo ( <span class="optional">[<span class="type">function</span> function=_ENV]</span> )</h3>
+	<p>
+		Displays the given function's (or current state's) debug tokens to stdout.
+	</p>
+	<p class="codeblock">
+		debug.dumpdebuginfo(my_function) 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span> traceback ( )</h3>
+	<p>
+		returns a string containing the current traceback, including line number, column, and associated code
+	</p>
+	<p class="codeblock">
+		print("current location in code: "..debug.traceback())
+	</p>
+</div>
+<br>
+
+</body>
+</html>
