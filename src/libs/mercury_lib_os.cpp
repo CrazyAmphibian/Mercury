@@ -209,12 +209,12 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 
 	
 	kvar.type = M_TYPE_INT;
-	kvar.data.i = timedata.tm_hour+1;
+	kvar.data.i = timedata.tm_hour;
 	mercury_table_set_cstring_keyvalue(outt, "hours", &kvar);
 
 	
 	kvar.type = M_TYPE_INT;
-	kvar.data.i = (timedata.tm_hour%12)+1;
+	kvar.data.i = ((timedata.tm_hour%12)+1);
 	mercury_table_set_cstring_keyvalue(outt, "hours12", &kvar);
 
 	
@@ -224,12 +224,12 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 
 	
 	kvar.type = M_TYPE_INT;
-	kvar.data.i = timedata.tm_year+1900;
+	kvar.data.i = (timedata.tm_year+1900);
 	mercury_table_set_cstring_keyvalue(outt, "year", &kvar);
 
 	
 	kvar.type = M_TYPE_INT;
-	kvar.data.i = timedata.tm_mon + 1;
+	kvar.data.i = (timedata.tm_mon + 1);
 	mercury_table_set_cstring_keyvalue(outt, "month", &kvar);
 
 	
@@ -244,7 +244,7 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 
 	
 	kvar.type = M_TYPE_INT;
-	kvar.data.i = timedata.tm_yday+1;
+	kvar.data.i = (timedata.tm_yday+1);
 	mercury_table_set_cstring_keyvalue(outt, "dayofyear", &kvar);
 
 	mercury_variable outv;
@@ -288,7 +288,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	
 	mercury_table_get_cstring_keyvalue(tab, "hours", &var);
 	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
-		timedata.tm_hour = (int)mercury_checkint(&var) - 1;
+		timedata.tm_hour = (int)mercury_checkint(&var);
 	}
 	else {
 		timedata.tm_hour = 0;
