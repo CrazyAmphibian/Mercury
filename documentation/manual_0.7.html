@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html"></a></td>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_0.6.html">0.6 lexical scope</a></td>
+	<td><a href="manual_0.7.html">0.7 executable and globals</a></td>
+	<td><a href="manual_0.8.html"></a></td>
+</tr>
+</table>
+
+
+<div>
+	<h3>predefined global variables</h3>
+	<p>besides the variables provided by libraries (which will be covered next chapter), states come with 2 predefined variables that can be accessed no matter what.<br>
+	the first one is the global environment table, <span style="font-family:monospace;">_G</span><br>
+	the second one is the local environment table, <span style="font-family:monospace;">_ENV</span><br>
+	when in the topmost state (the master state), <span style="font-family:monospace;">_ENV</span> and <span style="font-family:monospace;">_G</span> are the same object.
+	</p>
+	
+	<p class="codeblock">
+		a=10<br>
+		print(_ENV.a) //prints 10<br>
+		_ENV.a=nil<br>
+		print(a) //prints nil<br>
+	</p>
+	
+	<p>
+		because environments use ordinary tables, it means you can modify them in whichever way you want, as they are still first class, and the only exceptions to them is that environmental tables are protected from being freed.<br>
+		though, they cannot be deleted, only their contents<br>
+	</p>
+	
+	<p class="codeblock">
+		_G=nil<br>
+		print("still works") //while _G was removed, the table still is held in the state, and so enviromental access still works<br>
+		_G="hello" //valid, as the value associated with "_G" is changed, since _G is usually just a table being stored like any other<br>
+	</p>
+	
+</div>
+
+<div>
+	<h3>mercury runtime</h3>
+	<p>
+		when running mercury from it's executable, a new global is added, <span style="font-family:monospace;">_ARGS</span>. this is an array of the command line arguments which led to the executable being ran. args passed to the language start at 0, though negative index args exist and represent the executable's args, not the language's.
+	</p>
+	
+	consider the following startup command
+	<p class="codeblock">
+		mercury -n test_value=22
+	</p>
+	and in mercury:
+	<p class="codeblock">
+		print(_ARGS[0]) // test_value=22<br>
+		print(_ARGS[-1]) // -n<br>
+		print(_ARGS[-2]) // mercury<br>
+	</p>
+	
+</div>
+
+<div>
+	<h3>command line arguments</h3>
+	<p>
+		when running the standalone executable, mercury (the executable) has some args that changes what it does.<br>
+		mercury uses the following syntax for starting the executable:
+		<span style="font-family:monospace;">mercury [options] &lt;file> [runtime args]</span>
+	</p>
+	
+	<table class="tablefirstcollummono">
+		<tr> <th>executable arg</th> <th>effect</th> </tr>
+		<tr> <td>-?<br>-h<br>--help<br>/?</td> <td>shows a help message displaying all args, then exits</td> </tr>
+		<tr> <td>-v<br>--version<br>/v</td> <td>displays the version, then exits</td> </tr>
+		<tr> <td>-i<br>/i</td> <td>enables interactive mode. implied if no file is given</td> </tr>
+		<tr> <td>-n<br>--no-file<br>/n</td> <td>Starts with no input file, treating all following args as for the runtime.</td> </tr>
+	</table>
+	
+	
+	
+</div>
+
+</body>
+</html>
