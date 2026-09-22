@@ -442,55 +442,6 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 }
 
 
-void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2);
-
-	mercury_variable var_func;
-	mercury_popstack(M,&var_func);
-	if (var_func.type != M_TYPE_FUNCTION && var_func.type != M_TYPE_CFUNC) {
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, M_TYPE_FUNCTION, 2);
-		return;
-	}
-
-	mercury_variable var_array;
-	mercury_popstack(M,&var_array);
-	if (var_array.type != M_TYPE_ARRAY) {
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_array, M_TYPE_ARRAY, 1);
-		return;
-	}
-
-	mercury_array* arr = (mercury_array*)var_array.data.p;
-	mercury_int arr_size=mercury_array_len(arr)+1;
-	mercury_variable* tlist=(mercury_variable*)malloc(sizeof(mercury_variable)*arr_size);
-	if (!tlist) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION);
-		return;
-	}
-	for (mercury_int i = 0; i < arr_size; i++) { //this could probably be optimized with a memcpy. oh well.
-		mercury_getarray(arr, i, tlist+i);
-	}
-
-	if (var_func.type == M_TYPE_CFUNC) {
-		qsort(tlist, arr_size, sizeof(mercury_variable), (int (*)(const void*, const void*))(var_func.data.p) ); //be careful with C, dummy.
-	}
-	else {
-		SORTING_M_FUNCTION = (mercury_function*)var_func.data.p;
-		SORTING_M_STATE = M;
-		qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_use_mercury_function); //surely this will work.
-	}
-
-	for (mercury_int i = 0; i < arr_size; i++) { //see above.
-		mercury_cleararrayindex(arr, i);
-		mercury_setarray(arr, tlist+i,i);
-	}
-	free(tlist);
-	
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
-}
-
-
-
-
 int mercury_sort_greater_to_lesser(const void* a, const void* b) {
 	mercury_variable var_a = *(mercury_variable*)a;
 	mercury_variable var_b = *(mercury_variable*)b;
@@ -530,7 +481,7 @@ int mercury_sort_lesser_to_greater(const void* a, const void* b) {
 	if (var_b.type != M_TYPE_INT && var_b.type != M_TYPE_FLOAT) {
 		return 0;
 	}
-	
+
 	if (var_a.type == M_TYPE_INT) {
 		if (var_b.type == M_TYPE_INT) {
 			return (var_a.data.i > var_b.data.i) - (var_a.data.i < var_b.data.i);
@@ -566,7 +517,7 @@ int mercury_sort_greater_to_lesser_absolute(const void* a, const void* b) {
 			return (abs(var_a.data.i) < abs(var_b.data.i)) - (abs(var_a.data.i) > abs(var_b.data.i));
 		}
 		else {
-			return (abs(var_a.data.i) < fabs(var_b.data.f) ) - (abs(var_a.data.i) > fabs(var_b.data.f));
+			return (abs(var_a.data.i) < fabs(var_b.data.f)) - (abs(var_a.data.i) > fabs(var_b.data.f));
 		}
 	}
 	else {
@@ -627,7 +578,7 @@ int mercury_sort_alphabet_az(const void* a, const void* b) {
 
 	mercury_string* str_a = (mercury_string*)var_a.data.p;
 	mercury_string* str_b = (mercury_string*)var_b.data.p;
-	
+
 	mercury_int s_a = str_a->size;
 	mercury_int s_b = str_b->size;
 
@@ -641,11 +592,12 @@ int mercury_sort_alphabet_az(const void* a, const void* b) {
 		short b = c >= s_b ? -1 : string_b[c];
 		if (a > b) {
 			return 1;
-		} else if (b > a) {
+		}
+		else if (b > a) {
 			return -1;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -683,6 +635,71 @@ int mercury_sort_alphabet_za(const void* a, const void* b) {
 	}
 
 	return 0;
+}
+
+void mercury_lib_array_sort(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2);
+
+	mercury_variable var_func;
+	mercury_popstack(M,&var_func);
+	if (var_func.type != M_TYPE_INT && var_func.type != M_TYPE_CFUNC) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, M_TYPE_FUNCTION, 2);
+		return;
+	}
+
+	mercury_variable var_array;
+	mercury_popstack(M,&var_array);
+	if (var_array.type != M_TYPE_ARRAY) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_array, M_TYPE_ARRAY, 1);
+		return;
+	}
+
+	mercury_array* arr = (mercury_array*)var_array.data.p;
+	mercury_int arr_size=mercury_array_len(arr)+1;
+	mercury_variable* tlist=(mercury_variable*)malloc(sizeof(mercury_variable)*arr_size);
+	if (!tlist) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	for (mercury_int i = 0; i < arr_size; i++) { //this could probably be optimized with a memcpy. oh well.
+		mercury_getarray(arr, i, tlist+i);
+	}
+
+	if (var_func.type == M_TYPE_INT) {
+		switch(var_func.data.i) {
+			case m_sort_greater_to_lesser:
+				qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_greater_to_lesser);
+				break;
+			case m_sort_lesser_to_greater:
+				qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_lesser_to_greater);
+				break;
+			case m_sort_greater_to_lesser_absolute:
+				qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_greater_to_lesser_absolute);
+				break;
+			case m_sort_lesser_to_greater_absolute:
+				qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_lesser_to_greater_absolute);
+				break;
+			case m_sort_alphabet_az:
+				qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_alphabet_az);
+				break;
+			case m_sort_alphabet_za:
+				qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_alphabet_za);
+				break;
+		}
+	}
+	else {
+		SORTING_M_FUNCTION = (mercury_function*)var_func.data.p;
+		SORTING_M_STATE = M;
+		qsort(tlist, arr_size, sizeof(mercury_variable), mercury_sort_use_mercury_function); //surely this will work.
+	}
+
+	for (mercury_int i = 0; i < arr_size; i++) { //see above.
+		mercury_cleararrayindex(arr, i);
+		mercury_setarray(arr, tlist+i,i);
+	}
+	free(tlist);
+	
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 }
 
 

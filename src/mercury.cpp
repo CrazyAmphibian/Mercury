@@ -1868,12 +1868,12 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_array_sort, "sort", "array");
 	mercury_register_library(mercury_lib_array_concat, "concat", "array");
 
-	mercury_register_library(mercury_sort_greater_to_lesser, "SORTING_GREATER_TO_LESSER", "array");
-	mercury_register_library(mercury_sort_lesser_to_greater, "SORTING_LESSER_TO_GREATER", "array");
-	mercury_register_library(mercury_sort_greater_to_lesser_absolute, "SORTING_GREATER_TO_LESSER_MAGNITUDE", "array");
-	mercury_register_library(mercury_sort_lesser_to_greater_absolute, "SORTING_LESSER_TO_GREATER_MAGNITUDE", "array");
-	mercury_register_library(mercury_sort_alphabet_az, "SORTING_ALPHABETICAL_A_TO_Z", "array");
-	mercury_register_library(mercury_sort_alphabet_za, "SORTING_ALPHABETICAL_Z_TO_A", "array");
+	mercury_register_library((void*)&m_sort_greater_to_lesser, "SORTING_GREATER_TO_LESSER", "array", M_TYPE_INT);
+	mercury_register_library((void*)&m_sort_lesser_to_greater, "SORTING_LESSER_TO_GREATER", "array", M_TYPE_INT);
+	mercury_register_library((void*)&m_sort_greater_to_lesser_absolute, "SORTING_GREATER_TO_LESSER_MAGNITUDE", "array", M_TYPE_INT);
+	mercury_register_library((void*)&m_sort_lesser_to_greater_absolute, "SORTING_LESSER_TO_GREATER_MAGNITUDE", "array", M_TYPE_INT);
+	mercury_register_library((void*)&m_sort_alphabet_az, "SORTING_ALPHABETICAL_A_TO_Z", "array", M_TYPE_INT);
+	mercury_register_library((void*)&m_sort_alphabet_za, "SORTING_ALPHABETICAL_Z_TO_A", "array", M_TYPE_INT);
 #endif
 #ifdef MERCURY_LIB_STRING
 	mercury_register_library(mercury_lib_string_sub, "sub", "string");
