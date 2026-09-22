@@ -609,7 +609,7 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 	if (y.type == M_TYPE_INT) {
 		y.data.f = (mercury_float)y.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (y.type == M_TYPE_FLOAT) {
 		y.data.f = y.data.f;
 	}
 	else {
