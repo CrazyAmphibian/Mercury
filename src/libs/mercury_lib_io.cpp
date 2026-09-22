@@ -691,11 +691,14 @@ void mercury_lib_io_remove(mercury_state* const M_CPP_restrict M, const mercury_
 
 
 	int r=remove(cfilestr);
+	if (r == -1 && errno==ENOENT) {
+		r = 0;
+	}
 
 	if (args_out) {
 		mercury_variable out;
 		out.type = M_TYPE_BOOL;
-		out.data.i = r != 0 ? 1 : 0;
+		out.data.i = r == 0 ? 1 : 0;
 		mercury_pushstack(M, &out);
 	}
 
@@ -723,14 +726,20 @@ void mercury_lib_io_removedir(mercury_state* const M_CPP_restrict M, const mercu
 
 #if defined(_WIN32) || defined(_WIN64)
 	int r = _rmdir(cfilestr);
+	if (r == -1 && errno == ENOENT) {
+		r = 0;
+	}
 #else
 	int r = rmdir(cfilestr);
+	if (r == -1 && errno == ENOENT) {
+		r = 0;
+	}
 #endif
 
 	if (args_out) {
 		mercury_variable out;
 		out.type = M_TYPE_BOOL;
-		out.data.i = r != 0 ? 1 : 0;
+		out.data.i = r == 0 ? 1 : 0;
 		mercury_pushstack(M, &out);
 	}
 
@@ -760,15 +769,21 @@ void mercury_lib_io_createdir(mercury_state* const M_CPP_restrict M, const mercu
 	char* cfilestr = mercury_mstring_to_cstring(fst);
 #if defined(_WIN32) || defined(_WIN64)
 	int r = _mkdir(cfilestr);
+	if (r == -1 && errno == EEXIST) {
+		r = 0;
+	}
 #else
 	int r = mkdir(cfilestr,0755); //rwxr-xr-x
+	if (r == -1 && errno == EEXIST) {
+		r = 0;
+	}
 #endif
 	
 
 	if (args_out) {
 		mercury_variable out;
 		out.type = M_TYPE_BOOL;
-		out.data.i = r != 0 ? 1 : 0;
+		out.data.i = r == 0 ? 1 : 0;
 		mercury_pushstack(M, &out);
 	}
 
