@@ -767,16 +767,7 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 		return;
 	}
 
-	if (!args_in) {
-		if (args_out) {
-			mercury_variable o;
-			o.type = M_TYPE_INT;
-			o.data.u = (M_RANDOM_STATE&0x0000FFFFFFFF0000) >>16;
-			mercury_pushstack(M,&o);
-		}
-		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
-	}
-	else {
+	if (args_in) {
 		mercury_variable v1;
 		mercury_popstack(M,&v1);
 
@@ -787,10 +778,16 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 
 		M_RANDOM_STATE = (v1.data.u&0xFFFFFFFF)<<16;
 		mercury_free_var(&v1);
-
-		MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 	}
 
+
+	if (args_out) {
+		mercury_variable o;
+		o.type = M_TYPE_INT;
+		o.data.u = (M_RANDOM_STATE & 0x0000FFFFFFFF0000) >> 16;
+		mercury_pushstack(M, &o);
+	}
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 
 }
 
