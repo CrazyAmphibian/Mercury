@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_0.0.html">0 Overview</a></td>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+</tr>
+<tr>
+	<td><a href="manual_1.0.html">1.0 Libraries</a></td>
+	<td><a href="manual_1.1.html">1.1 Standard Library</a></td>
+	<td><a href="manual_1.2.html">1.2 Math Library</a></td>
+</tr>
+</table>
+
+
+<div>
+	<p>Standard library contents are put directly into the global enviroment, and do not need an additional table access to use.</p>
+
+	<h2>CONSTANTS</h2>
+	
+	<table>
+		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
+		<tr> <td>M_TYPE_NIL</td> <td>Int</td>  <td>0</td>  <td>Numeric type of nil</td>  </tr>
+		<tr> <td>M_TYPE_INT</td> <td>Int</td>  <td>1</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_FLOAT</td> <td>Int</td>  <td>2</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_BOOL</td> <td>Int</td>  <td>3</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_TABLE</td> <td>Int</td>  <td>4</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_STRING</td> <td>Int</td>  <td>5</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_CFUNC</td> <td>Int</td>  <td>6</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_ARRAY</td> <td>Int</td>  <td>7</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_FUNCTION</td> <td>Int</td>  <td>8</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_FILE</td> <td>Int</td>  <td>9</td>  <td>ditto.</td>  </tr>
+		<tr> <td>M_TYPE_THREAD</td> <td>Int</td>  <td>10</td>  <td>ditto.</td>  </tr>
+	</table>
+	
+	<h2>FUNCTIONS</h2>	
+</div>
+
+
+<div>
+	<h3 class="function"><span class="type">void</span> print (<span class="type">variable</span> ...)</h3>
+	<p>
+		converts every arg to a string, then writes each to stdout, using tab (\t) as a delimiter between each variable. puts newline (\n) at the end of every call, even if no variables were given.
+	</p>
+	<p class="codeblock">
+		print("hello","world") // hello world
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">void</span> iterate  (<span class="type">structure</span> data, <span class="type">callable</span> executor)</h3>
+	<p>
+		takes a structure and a callable. for each element, the index, associated data, and structure will be sent to the callable. The key will be the first argument, the value will be the second, and the structure will be the third. if the callable returns a value considered true by mercury boolean logic, it will stop traversing the structure similar to how the break keyword works in a loop. returning a non-true value will simply halt iteration of the current element, like the continue keyword in a loop.
+	</p>
+	<p class="codeblock">
+		a=[1,2,"hello",4)<br>
+		iterate(a,print)<br>
+		/*<br>
+		output:<br>
+		0&emsp;1&emsp;array 0x01234567<br>
+		1&emsp;2&emsp;array 0x01234567<br>
+		2&emsp;hello&emsp;array 0x01234567<br>
+		3&emsp;4&emsp;array 0x01234567<br>
+		*/ 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">bool</span>, <span class="type">...</span> rcall  (<span class="type">callable</span> function, <span class="type">table</span> enviroment, <span class="type">variable</span> ...)</h3>
+	<p>
+		takes a function and calls it with a restricted environment given by a table.<br/>
+		the function will run its code as normal, but will not have access to any variables that were not supplied in the table.<br/>
+		additionally, any errors thrown in the restricted environment will not propagate to the calling state.<br>
+		any number of args can be sent to the function. <br>
+		returns a boolean if the function was succesfully called as its first arg, followed by the function's normal return variables.
+	</p>
+	<p class="codeblock">
+		a=function() <br/>
+		print(&quot;hello&quot;) <br/>
+		end
+		<br/>
+		<br/>
+		rcall(a,{}) //this will result in an error being thrown, because a is trying to call a nil value (print). 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> dump  (<span class="type">serializable</span> variable)</h3>
+	<p>
+		takes a variable, and returns a string containing data which represents that variable. this string, when compiled back, will be read as that variable. not as good as io.serialize for saving data, but it is useful for a human-readable format.
+	</p>
+	<p class="codeblock">
+		a=[&quot;hello&quot;,1,nil,true] <br/>
+		dump(a)
+		//returns as a string [[0]=&quot;hello&quot;,[1]=1,[3]=true] 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">function</span> | <span class="type">string</span> compile  (<span class="type">string</span> code)</h3>
+	<p>
+		attempts to compile a string as if it were mercury code. if successful, it will return a function which does that code. otherwise, returns a string containing the error encountered when compiling. 
+	</p>
+	<p class="codeblock">
+		a=compile(&quot;print(\&quot;hello, world!\&quot;)&quot;)
+		<br/>
+		a() //hello, world! 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> type  (<span class="type">variable</span> variable)</h3>
+	<p>
+		returns the type of a variable as an integer 
+	</p>
+	<p class="codeblock">
+		if type(a)!=M_TYPE_INT then <br/>
+		a=0<br/>
+		print(&quot;something went wrong!&quot;) <br/>
+		end 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">string</span> tostring  (<span class="type">variable</span> variable)</h3>
+	<p>
+		returns a string representing a variable 
+	</p>
+	<p class="codeblock">
+		a=17 <br/>
+		s=tostring(a) //returns &quot;17&quot;<br/>
+		<br/>
+		a={} <br/>
+		s=tostring(a) //returns &quot;table 0x00000000&quot;.<br/>
+		the pointer will differ with each program launch. <br/>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">number</span> | <span class="type">nil</span> tonumber  (<span class="type">variable</span> variable)</h3>
+	<p>
+		returns a number which represents another variable.<br>
+		attempts to return an integer first, then a float. otherwise, returns nil. 
+	</p>
+	<p class="codeblock">
+		s=tonumber(&quot;12.47&quot;) //returns 12.47<br/>
+		s=tonumber(true) //returns 1 <br/>
+		s=tonumber({1,2}) //returns nil 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">int</span> | <span class="type">nil</span> toint  (<span class="type">variable</span> variable)</h3>
+	<p>
+		returns an integer which represents another variable.<br>
+		Operates in the same manner as tonumber, but will type convert a float result into an int. may return nil. 
+	</p>
+	<p class="codeblock">
+		s=toint(&quot;12.47&quot;) //returns 12<br/>
+		s=toint(true) //returns 1 <br/>
+		s=toint({1,2}) //returns nil 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">float</span> | <span class="type">nil</span> tofloat  (<span class="type">variable</span> variable)</h3>
+	<p>
+		returns a float which represents another variable.<br>
+		Operates in the same manner as tonumber, but will type convert an int result into a float. may return nil. 
+	</p>
+	<p class="codeblock">
+		s=tofloat(&quot;12.47&quot;) //returns 12.47<br/>
+		s=tofloat(true) //returns 1.0 <br/>
+		s=tofloat({1,2}) //returns nil 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">bool</span>  loadlibrary  (<span class="type">string</span> path)</h3>
+	<p>
+		attempts to load a dynamic library at the specified location. The library it looks for is a precompiled C/C++ file. The file is platform dependent.<br>
+		On windows, it will be a dll, and on unix systems, it will be an so.<br>
+		Returns a bool if the library was loaded correctly. 
+	</p>
+	<p class="codeblock">
+		s=loadlibrary(&quot;mylib.dll&quot;) //returns true if on windows and the file is present 
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">variable</span> | <span class="type">nil</span>  deepcopy  (<span class="type">variable</span> variable)</h3>
+	<p>
+		creates a clone of a variable, and recursively copies elements for arrays and tables. cloned variables contain the same values, however they are treated as seperate objects.<br>
+		This function accounts for self-referential tables and supports the same variable being used multiple times in the same dataset.<br>
+		some variable types are not applicable to be copied. attempting to copy a non-applicable variable type as the top-level element will make the function return nil. if the variable is the key or a value in a structure, its entry will be skipped over.<br>
+		<br>
+		accepted types: integers, floats, bools, strings, tables, arrays, functions, c functions<br>
+	</p>
+	<p class="codeblock">
+		t1={1,4,7}<br>
+		t2=deepcopy(t1)<br>
+		print(t2==t1) //false<br>
+		print(t2[0]==t1[0]) //true<br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">void</span> error  (<span class="type">errorstring</span> variable)</h3>
+	<p>
+		throws a custom error string. follows standard error reporting and propagation rules. non-string types will be converted to strings.
+	</p>
+	<p class="codeblock">
+		if data==nil then<br>
+		error("data is missing!")<br>
+		end
+	</p>
+</div>
+<br>
+
+</body>
+</html>
