@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+	<td><a href="manual_3.0.html"></a> </td>
+</tr>
+<tr>
+	<td><a href="manual_2.0.html">2.0 C++ Introduction</a></td>
+	<td><a href="manual_2.1.html">2.1 types and typedefs</a></td>
+	<td><a href="manual_2.1.html">2.2 the state and the stack</a></td>
+</tr>
+</table>
+
+
+
+
+<div>
+	<h3>general typedefs</h3>
+	<p>to make programming easier, and cross-platform, mercury uses some typedefs for basic types</p>
+	
+	<p class="codeblock">
+	#include &lt;stdint.h><br>
+	<br>
+	#if INT64_MAX==INTPTR_MAX<br>
+	&nbsp;&nbsp;typedef int64_t mercury_int;<br>
+	&nbsp;&nbsp;typedef uint64_t mercury_uint;<br>
+	&nbsp;&nbsp;typedef double mercury_float;<br>
+	&nbsp;&nbsp;#define MERCURY_64BIT<br>
+	#else<br>
+	&nbsp;&nbsp;typedef int32_t mercury_int;<br>
+	&nbsp;&nbsp;typedef uint32_t mercury_uint;<br>
+	&nbsp;&nbsp;typedef float mercury_float;<br>
+	&nbsp;&nbsp;#define MERCURY_32BIT<br>
+	#endif<br>
+	<br>
+	<br>
+	typedef uint16_t mercury_opcode;<br>
+	constexpr size_t MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE = sizeof(mercury_int) / sizeof(mercury_opcode);<br>
+	</p>
+	types are defined in an enum.
+	
+	<p class="codeblock">
+	extern uint8_t M_NUMBER_OF_TYPES;<br>
+<br>
+	enum M_TYPE_ENUMS:uint8_t {<br>
+		&nbsp;&nbsp;M_TYPE_NIL = 0,<br>
+		&nbsp;&nbsp;M_TYPE_INT = 1,<br>
+		&nbsp;&nbsp;M_TYPE_FLOAT = 2,<br>
+		&nbsp;&nbsp;M_TYPE_BOOL = 3,<br>
+		&nbsp;&nbsp;M_TYPE_TABLE = 4,<br>
+		&nbsp;&nbsp;M_TYPE_STRING = 5,<br>
+		&nbsp;&nbsp;M_TYPE_CFUNC = 6,<br>
+		&nbsp;&nbsp;M_TYPE_ARRAY = 7,<br>
+		&nbsp;&nbsp;M_TYPE_FUNCTION = 8,<br>
+		&nbsp;&nbsp;M_TYPE_FILE = 9,<br>
+		&nbsp;&nbsp;M_TYPE_THREAD=10,<br>
+	};<br>
+	</p>
+</div>
+
+
+<div>
+	<h3>primative types</h3>
+	<p>primitive types are stored as raw binary data. since all mercury types are of the same size, and the same size of a pointer on the system, a union is a logical compiler structure to use to group it together.<br>
+	<br>
+	variables themselves (not their data) are almost always stored as a literal, and passed as a pointer.<br>
+	</p>
+	
+	<p class="codeblock">
+	union mercury_rawdata {<br>
+		&nbsp;&nbsp;mercury_int i;<br>
+		&nbsp;&nbsp;mercury_uint u;<br>
+		&nbsp;&nbsp;mercury_float f;<br>
+		&nbsp;&nbsp;void* p;<br>
+	};<br>
+
+	struct mercury_variable {<br>
+		&nbsp;&nbsp;uint8_t type = 0;<br>
+		&nbsp;&nbsp;mercury_rawdata data;<br>
+	};<br>
+	
+	</p>
+	<p>
+	this handles nil, ints, floats, and booleans well enough, but complex datatypes use the pointer component of the rawdata and store the data there.
+	</p>
+	
+</div>
+
+
+<div>
+	<h3>strings</h3>
+	<p>
+		strings are the simplest proprietary type, since they seek to solve the problem of C strings being null terminated, which isn't a terribly bad thing when you consider the historic reasons for it. regardless, this is how strings are stored
+	</p>
+	<p class="codeblock">
+	struct mercury_string {<br>
+		&nbsp;&nbsp;mercury_int size=0;<br>
+		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+		&nbsp;&nbsp;char* ptr = nullptr;<br>
+		&nbsp;&nbsp;bool constant = false;<br>
+	};
+	</p>
+	<p>
+	the variable constant is used for an optimization, where the char* is managed by something other than the mercury runtime, or represents a constant character string that is baked into read-only memory.<br>
+	do not make the mistake of setting a constant string to point to a function's instruction space, as when the function's lifetime ceases, the pointer will be invalid.
+	</p>
+</div>
+
+
+<div>
+	<h3>files</h3>
+	<p>
+		files are fairly straightforward, since they exist to act as a nice wrapper to obfuscate the gritty C backend of files and all the annoyances that can cause, plus, garbage collection.
+	</p>
+	<p class="codeblock">
+	#include &lt;stdio.h><br>
+	<br>
+	enum M_FILEFLAGS :uint8_t {<br>
+		&nbsp;&nbsp;MERCURY_FILEFLAG_READ = 1 &lt;&lt; 0,<br>
+		&nbsp;&nbsp;MERCURY_FILEFLAG_WRITE = 1 &lt;&lt; 1,<br>
+	};<br>
+	<br>
+	struct mercury_filewrapper {<br>
+		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+		&nbsp;&nbsp;FILE* file;<br>
+		&nbsp;&nbsp;uint8_t modeflags;<br>
+	};<br>
+	</p>
+</div>
+
+<div>
+	<h3>threads</h3>
+	<p>
+		threads are the second type which are more or less just a wrapper, but here it's more justified because threads are not only more risky, but also system dependent.
+	</p>
+	<p class="codeblock">
+	#ifdef _WIN32<br>
+	&nbsp;&nbsp;#include &lt;Windows.h><br>
+	#else<br>
+	&nbsp;&nbsp;#include &lt;pthread.h><br>
+	#endif<br>
+	<br>
+	struct mercury_threadholder {<br>
+		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+		&nbsp;&nbsp;volatile bool finished = false;<br>
+		&nbsp;&nbsp;bool customenv = false;<br>
+		&nbsp;&nbsp;#ifdef _WIN32<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;HANDLE threadobject = NULL;<br>
+		&nbsp;&nbsp;#else<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;pthread_t threadobject = NULL;<br>
+		&nbsp;&nbsp;#endif<br>
+		&nbsp;&nbsp;mercury_state* state = nullptr;<br>
+	};<br>
+	</p>
+</div>
+
+
+<div>
+	<h3>C functions</h3>
+	<p>
+		C functions are merely a classification of function with a particular syntax.
+	</p>
+	<p class="codeblock">
+		typedef void (*mercury_cfunc) (mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+	</p>
+	<p>
+		C function typedefs are not terribly readable, so here's it in proper written form
+	</p>
+	<p class="codeblock">
+		void function_name(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {<br>
+		<br>
+		}<br>
+	</p>
+	<p>
+		actually writing C functions will be covered later.
+	</p>
+</div>
+
+
+<div>
+	<h3>C functions</h3>
+	<p>
+		C functions are merely a classification of function with a particular syntax.
+	</p>
+	<p class="codeblock">
+		typedef void (*mercury_cfunc) (mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+	</p>
+	<p>
+		C function typedefs are not terribly readable, so here's it in proper written form
+	</p>
+	<p class="codeblock">
+		void function_name(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {<br>
+		<br>
+		}<br>
+	</p>
+	<p>
+		actually writing C functions will be covered later.
+	</p>
+</div>
+
+
+<div>
+	<h3>tables</h3>
+	<p>
+		tables are the first truly unique mercury type. implemented as an array of variables and keys, seperated by type.
+	</p>
+	<p class="codeblock">
+	struct mercury_subtable {<br>
+		&nbsp;&nbsp;mercury_int size = 0;<br>
+		&nbsp;&nbsp;mercury_variable* keys = nullptr;<br>
+		&nbsp;&nbsp;mercury_variable* values = nullptr;<br>
+	};<br>
+
+	struct mercury_table {<br>
+		&nbsp;&nbsp;mercury_subtable* data;<br>
+		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+		&nbsp;&nbsp;bool enviromental = false;<br>
+	};<br>
+	</p>
+	<p>
+		when a table is created, data is allocated with a size to fit M_NUMBER_OF_TYPES elements, meaning that each type gets its own dedicated subtable.<Br>
+		<Br>
+		from there, keys and values are stored in an array, which is resized according to the runtime's needs. because of this, tables are not very time efficient with large amounts of data. though, tables are made for sparse and mixed type data.<Br>
+	</p>
+</div>
+
+
+<div>
+	<h3>arrays</h3>
+	<p>
+		arrays are structured in a manner that is quite confounding, however it represents a real tradeoff being made. that being between spare data efficiency and access speed.
+	</p>
+	<p class="codeblock">
+	struct mercury_array { <br>
+	&nbsp;&nbsp;	mercury_uint refrences = 0;<br>
+	&nbsp;&nbsp;#ifdef MERCURY_64BIT<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;	mercury_variable****** values = nullptr;<br>
+	&nbsp;&nbsp;#else<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;	mercury_variable*** values = nullptr;<br>
+	&nbsp;&nbsp;#endif<br>
+	};<br>
+<br>
+	#ifdef MERCURY_64BIT<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_4 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_5 = 0b111111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_6 = 0b111111111111 + 1;<br>
+<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_1 = 10;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_3 = 10;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_4 = 10;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_5 = 12;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_6 = 12;<br>
+
+	#else<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b111111111111 + 1;<br>
+<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_1 = 10;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;<br>
+	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_3 = 12;<br>
+	#endif
+	</p>
+	<p>
+		a mercury array is a pointer to a pointer several times, until you get a pointer to variable.<br>
+		this is because arrays are split up into bit ranges, as to not make setting a negative variable allocate several hundred GB of memory. this wastes some efficiency in dereferencing, but this solves the issue of semi-spare data, and keeps the access time linear with array size, since each index is based on the number.<br>
+		the result is that in a worst case, one variable will allocate at most 100 kB on a 64 bit system.<br>
+	</p>
+</div>
+
+</body>
+</html>
