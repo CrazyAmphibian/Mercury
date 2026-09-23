@@ -662,6 +662,9 @@ void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
 
 void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* out) {
 	if (M->sizeofstack==0) {
+#ifdef MERCURY_DEBUG
+		printf("popstack called when stack was empty.\n");
+#endif
 		out->type = M_TYPE_NIL;
 		out->data.i = 0;
 		return;
@@ -673,6 +676,9 @@ void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* o
 //takes from the bottom instead of the top of stack
 void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* out) {
 	if (M->sizeofstack == 0) {
+#ifdef MERCURY_DEBUG
+		printf("pullstack called when stack was empty.\n");
+#endif
 		out->type = M_TYPE_NIL;
 		out->data.i = 0;
 		return;
