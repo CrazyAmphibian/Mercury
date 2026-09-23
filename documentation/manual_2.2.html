@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+	<td><a href="manual_3.0.html"></a> </td>
+</tr>
+<tr>
+	<td><a href="manual_2.1.html">2.1 types and typedefs</a></td>
+	<td><a href="manual_2.2.html">2.2 state and stack</a></td>
+	<td><a href="manual_2.3.html">2.3 bytecode and ops</a></td>
+</tr>
+</table>
+
+
+
+
+<div>
+	<h3>the state</h3>
+	<p>the mercury runtime operates on 1 state at a time. this state stores everything, from variables to bytecode.</p>
+	<p class="codeblock">
+	struct mercury_state {<br>
+	mercury_state* parentstate = nullptr; <br>
+	mercury_state* masterstate = nullptr;<br>
+	mercury_state* childstate = nullptr; <br>
+<br>
+	mercury_uint sizeofstack = 0; <br>
+	mercury_variable* stack = nullptr;<br>
+	mercury_uint allocatedstacksize = 0;<br>
+
+	mercury_variable* registers = nullptr;<br>
+	mercury_variable* constants = nullptr;<br>
+	mercury_uint num_constants = 0;<br>
+<br>
+	mercury_uint programcounter = 0;<br>
+	mercury_function bytecode;<br>
+	uint32_t errorcode;<br>
+<br>
+	mercury_table* enviroment;<br>
+	};<br>
+	</p>
+	
+	<p>
+		when a function is called, the childstate variable is used to store the state that the function will call in.<br>
+		likewise, parentstate and masterstate store this state's host. though masterstate always refers to the top level element (including self), while parentstate is 1 level up (not including self)<br>
+		
+	
+	</p>
+</div>
+
+<div>
+	<h3>the stack</h3>
+	<p>
+	being a stack-based language, the stack is very important, and has to be kept correct, or else the runtime will quickly fall apart.<br>
+	the stack is simply an array of variables, with last in first out (LIFO) accessing by default.<br>
+	<br>
+	mercury breaks down code into chunks called "statements", which are things such as a=5, or print("hello, world").<br>
+	statements are always stack neutral, meaning that by the end of a statement, there should be no elements on the stack.<br>
+	the runtime cannot see statements, as it's a concept that the compiler is designed around, but it's important to know nonetheless.<br>
+	<br>
+	the stack array is dynamically reallocated when it needs to be, meaning that a stack overflow isn't possible in pure mercury code.<br>
+	</p>
+	
+	<p class="codeblock">
+		void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* out) {<br>
+			&nbsp;if (M->sizeofstack==0) {<br>
+				&nbsp;&nbsp;out->type = M_TYPE_NIL;<br>
+				&nbsp;&nbsp;out->data.i = 0;<br>
+				&nbsp;&nbsp;return;<br>
+			&nbsp;}<br>
+			&nbsp;M->sizeofstack--;<br>
+			&nbsp;*out=  M->stack[M->sizeofstack];<br>
+		}<br>
+	</p>
+	
+	<p>
+	there are some safeguards in place to prevent an underflow reading invalid memory
+	</p>
+</div>
+
+
+</body>
+</html>

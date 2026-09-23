@@ -15,7 +15,7 @@
 <tr>
 	<td><a href="manual_2.0.html">2.0 C++ Introduction</a></td>
 	<td><a href="manual_2.1.html">2.1 types and typedefs</a></td>
-	<td><a href="manual_2.1.html">2.2 the state and the stack</a></td>
+	<td><a href="manual_2.2.html">2.2 state and stack</a></td>
 </tr>
 </table>
 
@@ -279,6 +279,34 @@
 		the result is that in a worst case, one variable will allocate at most 100 kB on a 64 bit system.<br>
 	</p>
 </div>
+
+
+<div>
+	<h3>functions</h3>
+	<p>
+		functions store raw bytecode, as well as some debug information (sometimes). since functions are a rather barebones dataset, they depend on a state to execute their instructions in.
+	</p>
+	<p class="codeblock">
+	struct mercury_debug_token {<br>
+		char* chars=nullptr;<br>
+		mercury_int num_chars=0;<br>
+		mercury_int col=0;<br>
+		mercury_int line=0;<br>
+	};<br>
+<br>
+	struct mercury_function {<br>
+		mercury_uint refrences = 0;<br>
+		mercury_uint numberofinstructions = 0;<br>
+		mercury_opcode* instructions = nullptr;<br>
+		bool enviromental = false;<br>
+		mercury_uint* instruction_dbg_lookup=nullptr;<br>
+		mercury_uint num_dbg_tokens = 0;<br>
+		mercury_debug_token* dbg_tokens = nullptr;<br>
+	};
+	</p>
+
+</div>
+
 
 </body>
 </html>
