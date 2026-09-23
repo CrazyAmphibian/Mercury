@@ -701,42 +701,7 @@ bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 
 	M->stack[M->sizeofstack] = *var;
 	M->sizeofstack++;
-
-	switch (var->type) {
-	case M_TYPE_STRING:
-		((mercury_string*)var->data.p)->refrences++;
-		break;
-	case M_TYPE_ARRAY:
-	{
-		mercury_array* a = (mercury_array*)var->data.p;
-		a->refrences++;
-	}
-		break;
-	case M_TYPE_TABLE:
-	{
-		mercury_table* t = (mercury_table*)var->data.p;
-		t->refrences++;
-	}
-		break;
-	case M_TYPE_FUNCTION:
-	{
-		mercury_function* f = (mercury_function*)var->data.p;
-		f->refrences++;
-	}
-		break;
-	case M_TYPE_FILE:
-	{
-		mercury_filewrapper* w = (mercury_filewrapper*)var->data.p;
-		w->refrences++;
-	}
-		break;
-	case M_TYPE_THREAD:
-	{
-		mercury_threadholder* t = (mercury_threadholder*)var->data.p;
-		t->refrences++;
-	}
-		break;
-	}
+	mercury_increment_variable_refrence_count(var);
 
 	return true;
 }
