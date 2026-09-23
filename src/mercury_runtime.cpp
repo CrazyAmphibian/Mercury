@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 			printf("\n[options]\n");
 			printf("%-20s Display this text, then exits\n", "-?, -h, --help, /?");
 			printf("%-20s Displays the program version, then exits\n", "-v, --version, /v");
-			printf("%-20s Enables interactive mode. Implied if no file is provided\n", "-i, /i");
+			printf("%-20s Enables interactive mode. Implied if no file is provided\n", "-i, --interactive, /i");
 			printf("%-20s Starts Mercury with no input file, treating all following args as input args. Implies interactive mode.\n", "--no-file, -n, /n");
 			return 0;
 		}
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 			printf("Merecury version %i.%i, %u bit\n", MERCURY_VERSION, MERCURY_VERSION_PATCH, (unsigned int)(sizeof(mercury_int) << 3));
 			return 0;
 		}
-		else if (arg_is_string(argv[i], "-i") || arg_is_string(argv[i], "/i")) {
+		else if (arg_is_string(argv[i], "-i") || arg_is_string(argv[i], "--interactive") || arg_is_string(argv[i], "/i")) {
 			interactivemode = true;
 		}
 		else if (arg_is_string(argv[i],"--no-file") || arg_is_string(argv[i], "-n") || arg_is_string(argv[i], "/n")) {
