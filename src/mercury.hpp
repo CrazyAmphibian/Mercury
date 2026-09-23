@@ -39,8 +39,8 @@ typedef uint64_t mercury_uint;
 typedef double mercury_float;
 #define MERCURY_64BIT
 #else
-typedef __int32 mercury_int;
-typedef unsigned __int32 mercury_uint;
+typedef int32_t mercury_int;
+typedef uint32_t mercury_uint;
 typedef float mercury_float;
 #define MERCURY_32BIT
 #endif
