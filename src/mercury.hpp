@@ -358,6 +358,11 @@ inline void mercury_discard_top_of_stack(mercury_state* const M_CPP_restrict M) 
 
 inline void mercury_increment_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
+	case M_TYPE_NIL:
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+	case M_TYPE_BOOL:
+		return;
 	case M_TYPE_STRING:
 		((mercury_string*)var->data.p)->refrences++;
 		return;
@@ -380,6 +385,11 @@ inline void mercury_increment_variable_refrence_count(const mercury_variable* co
 }
 inline void mercury_decrement_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
+	case M_TYPE_NIL:
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+	case M_TYPE_BOOL:
+		return;
 	case M_TYPE_STRING:
 		((mercury_string*)var->data.p)->refrences--;
 		return;
