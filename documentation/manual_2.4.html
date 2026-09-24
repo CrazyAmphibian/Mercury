@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+	<td><a href="manual_3.0.html"></a> </td>
+</tr>
+<tr>
+	<td><a href="manual_2.3.html">2.3 bytecode and ops</a></td>
+	<td><a href="manual_2.4.html">2.4 making C++ function</a></td>
+	<td><a href="manual_2.5.html"></a></td>
+</tr>
+</table>
+
+
+
+
+<div>
+	<h3>function responsibilities</h3>
+
+	<p>
+		a C function has to keep mind to the args_in and args_out variables. they are not requests, but demands. failing to modify the stack correctly will lead to corruption.<br>
+		the only exception to this is throwing an error, where the state will be discarded anyways, and the stack won't matter.<br>
+		<br>
+		so, keeping that in mind, let's go over how to make a C function add 10 to a number.
+	</p>
+	<p class="codeblock">
+		#include "mercury.hpp"<br>
+		<br>
+		void add_10_to(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {<br>
+		&emsp;&emsp;mercury_variable in;<br>
+		&emsp;&emsp;mercury_popstack(M,&in);<br>
+		&emsp;&emsp;in.data.i+=10;<br>
+		&emsp;&emsp;merucry_pushstack(M,&in);<br>
+		}<br>
+
+	</p>
+	<p>
+		if you're paying attention, you will notice 2 big issues. one is that we are completely ignoring the arg variables, the other is that we are not performing any type checking.<br>
+		<br>
+		let's get to type checking later, for now let's just go over the arg variables.<br>
+		fortunately, the error header comes with some functions to make this easy, so simply including it will make your life easier.
+	</p>
+	<p class="codeblock">
+		#include "mercury.hpp"<br>
+		#include "mercury_error.hpp"<br>
+		<br>
+		void add_10_to(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {<br>
+		&emsp;&emsp;if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in,1)){ <br>
+		&emsp;&emsp;&emsp;&emsp;return; //we want 1 arg minimum, and 1 arg maximum<br>
+		&emsp;&emsp;}<br>
+		<br>
+		&emsp;&emsp;mercury_variable in;<br>
+		&emsp;&emsp;mercury_popstack(M,&in);<br>
+		&emsp;&emsp;in.data.i+=10;<br>
+		&emsp;&emsp;if(args_out)merucry_pushstack(M,&in);<br>
+		<br>
+		&emsp;&emsp;MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1); //because we are sending 1 arg<br>
+		}<br>
+
+	</p>
+	<p>
+		and now finally, let's add typechecking.
+	</p>
+	<p class="codeblock">
+		#include "mercury.hpp"<br>
+		#include "mercury_error.hpp"<br>
+		<br>
+		void add_10_to(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {<br>
+		&emsp;&emsp;if(MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in,1)){ <br>
+		&emsp;&emsp;&emsp;&emsp;return; //we want 1 arg minimum, and 1 arg maximum<br>
+		&emsp;&emsp;}<br>
+		<br>
+		&emsp;&emsp;mercury_variable in;<br>
+		&emsp;&emsp;mercury_popstack(M,&in);<br>
+		&emsp;&emsp;if(in.type!=M_TYPE_INT){<br>
+			&emsp;&emsp;&emsp;&emsp;mercury_raise_error_nonpointer(M,M_ERROR_WRONG_TYPE,in.type,M_TYPE_INT,1);<br>
+			&emsp;&emsp;&emsp;&emsp;return;<br>
+		&emsp;&emsp;}<br>
+		&emsp;&emsp;in.data.i+=10;<br>
+		&emsp;&emsp;if(args_out)merucry_pushstack(M,&in);<br>
+		<br>
+		&emsp;&emsp;MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1); //because we are sending 1 arg<br>
+		}<br>
+
+	</p>
+</div>
+
+
+</body>
+</html>
