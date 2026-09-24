@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+	<td><a href="manual_3.0.html"></a> </td>
+</tr>
+<tr>
+	<td><a href="manual_2.2.html">2.2 state and stack</a></td>
+	<td><a href="manual_2.3.html">2.3 bytecode and ops</a></td>
+	<td><a href="manual_2.4.html">2.4 making C++ function</a></td>
+</tr>
+</table>
+
+
+
+
+<div>
+	<h3>bytecode execution</h3>
+
+	<p>
+		mercury puts all data relevant to a function inside of its bytecode. this results in bytecode that uses up more space, however, it also means that the language is fairly simple to execute.<br>
+		<br>
+		like any bytecode, mercury uses several different opcodes, each with a single, specific function.<br>
+		unlike a low-level CPU bytecode, though, the opcodes do have a fair bit of flexability, and are actually just fancy functions.
+	</p>
+	<p class="codeblock">
+		typedef void (*mercury_instruction) (mercury_state* const M_CPP_restrict M);<br>
+		<br>
+		//or, written in a more readable form:<br>
+		void mercury_instruction(mercury_state* const M_CPP_restrict M) {<br>
+		<br>
+		}<br>
+		<br>
+		extern mercury_instruction mercury_bytecode_list[];<br>
+		<br>
+		enum mercury_opcodes:mercury_opcode {<br>
+		...<br>
+		};<br>
+		<br>
+	</p>
+	<p>
+	the mercury_bytecode_list is an array of opcode functions, and the enum mercury_opcodes gives a human readable way to index the array.<br>
+	the sum execution of a single instruction is  <span style="font-family:monospace;">mercury_bytecode_list[opcode](state);</span><br>
+	<br>
+	you may notice that unlike a C function, an opcode does not have any parameters other than state. This is because their operation is much more rigid, and most opcodes have a very specific, often single way of running.<br>
+	</p>
+</div>
+
+<div>
+	<h3>bytecode sample</h3>
+	<p>
+	all bytecode examples will be shown in 32 bit space, for simplicity and cleanness, though the principals are the same. additionally, big endian, with unused memory zeroed.
+	</p>
+	
+	<p>
+	a classic hello world:
+	</p>
+	
+	<table class="borderless codeblock">
+		<tr><th>offset</th><th>bytecode</th><th></th></tr>
+		<tr><td>0x00000000</td><td>0x0023</td><td>NSTR (New STRing)</td></tr>
+		<tr><td>0x00000001</td><td>0x0000</td><td>length:</td></tr>
+		<tr><td>0x00000002</td><td>0x000D</td><td>13</td></tr>
+		<tr><td>0x00000003</td><td>0x6865</td><td>he</td></tr>
+		<tr><td>0x00000004</td><td>0x6C6C</td><td>ll</td></tr>
+		<tr><td>0x00000005</td><td>0x6F2C</td><td>o,</td></tr>
+		<tr><td>0x00000006</td><td>0x2077</td><td> w</td></tr>
+		<tr><td>0x00000007</td><td>0x6F72</td><td>or</td></tr>
+		<tr><td>0x00000008</td><td>0x6C64</td><td>ld</td></tr>
+		<tr><td>0x00000009</td><td>0x2100</td><td>! </td></tr>
+		<tr><td>0x0000000A</td><td>0x0023</td><td>NSTR</td></tr>
+		<tr><td>0x0000000B</td><td>0x0000</td><td>length:</td></tr>
+		<tr><td>0x0000000C</td><td>0x0005</td><td>5</td></tr>
+		<tr><td>0x0000000D</td><td>0x7072</td><td>pr</td></tr>
+		<tr><td>0x0000000E</td><td>0x696E</td><td>in</td></tr>
+		<tr><td>0x0000000F</td><td>0x7400</td><td>t </td></tr>
+		<tr><td>0x00000010</td><td>0x0019</td><td>GENV (Get ENViroment variable)</td></tr>
+		<tr><td>0x00000011</td><td>0x002D</td><td>CALL</td></tr>
+		<tr><td>0x00000012</td><td>0x000</td><td>in:</td></tr>
+		<tr><td>0x00000013</td><td>0x001</td><td>1</td></tr>
+		<tr><td>0x00000014</td><td>0x000</td><td>out:</td></tr>
+		<tr><td>0x00000015</td><td>0x000</td><td>0</td></tr>
+	</table>
+	
+	<p>
+		it can help with understanding more to compress it, and make it a bit more readable.
+	</p>
+
+	<table class="codeblock borderless">
+		<tr><th>offset</th><th>bytecode</th><th></th></tr>
+		<tr><td>0x00000000</td><td>0x0023</td><td>NSTR size:13 "hello, world!"</td></tr>
+		<tr><td>0x0000000A</td><td>0x0023</td><td>NSTR size:5 "print"</td></tr>
+		<tr><td>0x00000010</td><td>0x0019</td><td>GENV (Get ENViroment variable)</td></tr>
+		<tr><td>0x00000011</td><td>0x002D</td><td>CALL in:1 out:0</td></tr>
+	</table>
+
+	<p>
+		and to break down the stack with each instruction
+	</p>
+	
+	<table class="codeblock">
+		<tr><th>instruction</th><th>stack after instruction</th></tr>
+		<tr><td> - </td><td> &lt;- bottom&emsp;&emsp;[stack empty]&emsp;&emsp;top -> </td></tr>
+		<tr><td>NSTR size:13 "hello, world!"</td><td>"hello, world"</td></tr>
+		<tr><td>NSTR size:5 "print"</td><td>"hello, world", "print"</td></tr>
+		<tr><td>GENV</td><td>"hello, world", print (C function)</td></tr>
+		<tr><td>CALL in:1 out:0</td><td>[stack empty]</td></tr>
+	</table>
+
+	
+	
+</div>
+
+
+
+<div>
+	<h3>opcode list</h3>
+	
+	
+	<table class="codeblock" >
+	<tr> <th>Identifier</th> <th>Description</th> <th>stack elements</th> <th>bytecode elements</th> <tr>
+	<tr> <td>NOP</td> <td>No operation</td> <td>in:<br>out:</td> <td> </td> </tr>
+	<tr> <td>ADD</td> <td>Adds 2 numbers</td> <td>in: term, term<br>out: sum</td> <td> </td> </tr>
+	<tr> <td>SUB</td> <td>Subtracts 2 numbers</td> <td>in: subtrahend, term<br>out: difference</td> <td> </td> </tr>
+	<tr> <td>MUL</td> <td>Multiplies 2 numbers</td> <td>in: factor, factor<br>out: product</td> <td> </td> </tr>
+	<tr> <td>DIV</td> <td>Divides 2 numbers</td> <td>in: divisor, dividend<br>out: quotient</td> <td> </td> </tr>
+	<tr> <td>POW</td> <td>Exponentiates 2 numbers</td> <td>in: exponent, base<br>out: power</td> <td> </td> </tr>
+	<tr> <td>IDIV</td> <td>Divides 2 numbers as integers</td> <td>in: divisor, dividend<br>out: quotient</td> <td> </td> </tr>
+	<tr> <td>MOD</td> <td>Divides 2 numbers and returns the remainder via truncating modulo</td> <td>in: divisor, dividend<br>out: remainder</td> <td> </td> </tr>
+	<tr> <td>BAND</td> <td>Bitwise AND on 2 numbers</td> <td>in: term, term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BOR</td> <td>Bitwise OR on 2 numbers</td> <td>in: term, term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BXOR</td> <td>Bitwise XOR on 2 numbers</td> <td>in: term, term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BNOT</td> <td>Bitwise NOT on 1 number</td> <td>in: term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BSHL</td> <td>Bitshifts a number a specified number of times left</td> <td>in: shift,term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>BSHR</td> <td>Bitshifts a number a specified number of times right</td> <td>in: shift,term<br>out: product</td> <td> </td> </tr>
+	<tr> <td>LAND</td> <td>Evaluates boolean logic AND on 2 variables</td> <td>in: term,term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>LOR</td> <td>Evaluates boolean logic OR on 2 variables</td> <td>in: term,term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>LXOR</td> <td>Evaluates boolean logic XOR on 2 variables</td> <td>in: term,term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>LNOT</td> <td>Evaluates boolean logic NOT on 1 variable</td> <td>in: term<br>out: truth</td> <td> </td> </tr>
+	<tr> <td>EQL</td> <td>Evaluates if 2 variables are equal</td> <td>in: variable, variable<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>NEQ</td> <td>Evaluates if 2 variables are not equal</td> <td>in: variable, variable<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>GRT</td> <td>Evaluates if 1 number is greater than another</td> <td>in: lesser, greater<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>LET</td> <td>Evaluates if 1 number is less than another</td> <td>in: greater, lesser<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>GTE</td> <td>Evaluates if 1 number is greater than or equal to another</td> <td>in: lesser, greater<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>LTE</td> <td>Evaluates if 1 number is less than or equal to another</td> <td>in: greater, lesser<br>out: equality</td> <td> </td> </tr>
+	<tr> <td>SENV</td> <td>Sets an environmental value</td> <td>in: key,value<br>out:</td> <td> </td> </tr>
+	<tr> <td>GENV</td> <td>Gets an environmental value</td> <td>in: key<br>out: value</td> <td> </td> </tr>
+	<tr> <td>SET</td> <td>Sets a structure value</td> <td>in: key,structure,value<br>out:</td> <td> </td> </tr>
+	<tr> <td>GET</td> <td>Gets a structure value</td> <td>in: key,structure<br>out: value</td> <td> </td> </tr>
+	<tr> <td>SREG</td> <td>Unused</td> <td>in: value<br>out:</td> <td>number </td> </tr>
+	<tr> <td>GREG</td> <td>Unused</td> <td>in: <br>out: value</td> <td>number </td> </tr>
+	<tr> <td>NINT</td> <td>Pushes an integer onto the stack</td> <td>in:<br>out: integer</td> <td>integer</td> </tr>
+	<tr> <td>NFLO</td> <td>Pushes a float onto the stack</td> <td>in:<br>out: float</td> <td>float</td> </tr>
+	<tr> <td>NTRU</td> <td>Pushes a true boolean onto the stack</td> <td>in:<br>out: bool</td> <td></td> </tr>
+	<tr> <td>NFAL</td> <td>Pushes a false boolean onto the stack</td> <td>in:<br>out: bool</td> <td></td> </tr>
+	<tr> <td>NNIL</td> <td>Pushes a nil value onto the stack</td> <td>in:<br>out: nil</td> <td></td> </tr>
+	<tr> <td>NSTR</td> <td>Pushes a string onto the stack</td> <td>in:<br>out: string</td> <td>length, chars</td> </tr>
+	<tr> <td>NFUN</td> <td>Pushes a function onto the stack</td> <td>in:<br>out: string</td> <td>length, instructions</td> </tr>
+	<tr> <td>NTAB</td> <td>Pushes an empty table onto the stack</td> <td>in:<br>out: table</td> <td> </td> </tr>
+	<tr> <td>NARR</td> <td>Pushes an empty array onto the stack</td> <td>in:<br>out: table</td> <td> </td> </tr>
+	<tr> <td>JMP</td> <td>Unused</td> <td>in:<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JMPR</td> <td>Moves the program counter by a specified amount</td> <td>in:<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JIF</td> <td>Unused</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JNIF</td> <td>Unused</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JRIF</td> <td>Moves the program counter by a specified amount if the value is true</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>JRNI</td> <td>Moves the program counter by a specified amount if the value is false</td> <td>in: condition<br>out:</td> <td> offset</td> </tr>
+	<tr> <td>CALL</td> <td>Calls a function</td> <td>in: function, ...<br>out: ...</td> <td>args in, args out</td> </tr>
+	<tr> <td>EXIT</td> <td>ends state execution</td> <td>in: <br>out: </td> <td></td> </tr>
+	<tr> <td>LEN</td> <td>gets the length of a variable</td> <td>in: variable <br>out: length</td> <td></td> </tr>
+	<tr> <td>CNCT</td> <td>concatenates 2 values, converting to strings if needed.</td> <td>in: variable, variable <br>out: string</td> <td></td> </tr>
+	<tr> <td>CLS</td> <td>clears the stack</td> <td>in:  <br>out: </td> <td></td> </tr>
+	<tr> <td>GETL</td> <td>gets a value of the bottom-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
+	<tr> <td>SETL</td> <td>gets a value of the bottom-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
+	<tr> <td>GETG</td> <td>gets a value of the top-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
+	<tr> <td>SETG</td> <td>gets a value of the top-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
+	<tr> <td>CPYT</td> <td>copies the topmost stack value</td> <td>in: <br>out: variable</td> <td></td> </tr>
+	<tr> <td>SWPT</td> <td>swaps the topmost stack value with the second topmost value</td> <td>in: <br>out: </td> <td></td> </tr>
+	<tr> <td>CPYX</td> <td>copies the top specified number of stack values</td> <td>in: <br>out: ...</td> <td>number to copy</td> </tr>
+	<tr> <td>UNM</td> <td>Unary minus (negation) on 1 number</td> <td>in: number<br>out: negated</td> <td> </td> </tr>
+	<tr> <td>INC</td> <td>increments 1 number</td> <td>in: number<br>out: number</td> <td> </td> </tr>
+	<tr> <td>DEC</td> <td>decrements 1 number</td> <td>in: number<br>out: number</td> <td> </td> </tr>
+	<tr> <td>SCON</td> <td>sets a state constant value</td> <td>in: value<br>out:</td> <td>constant number </td> </tr>
+	<tr> <td>GCON</td> <td>gets a state constant value</td> <td>in: <br>out: value</td> <td>constant number </td> </tr>
+	<tr> <td>SWXY</td> <td>swaps 2 stack variables, relative to the top (last element) of stack</td> <td>in: <br>out: </td> <td>element number, element number </td> </tr>
+	</table>
+
+</div>
+
+</body>
+</html>

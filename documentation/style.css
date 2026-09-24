@@ -42,6 +42,12 @@ a{
 	list-style-type:none;
 }
 
+/*use with divs or paragraphs*/
+.codeblock{
+	font-family:monospace;
+	border: 2px solid black;
+	padding:0.5em;
+}
 
 .centertable td{
 	text-align:center;
@@ -51,12 +57,26 @@ a{
 	font-family:monospace;
 }
 
-/*use with divs or paragraphs*/
-.codeblock{
-	font-family:monospace;
-	border: 2px solid black;
-	padding:0.5em;
+
+
+.borderless table, .borderless tbody{
+	padding:0.5em !important;
 }
+.borderless th, .borderless td{
+	border: none;
+	padding-left:.25em;
+	padding-right:.25em;
+}
+.borderless td{
+	padding-top:0;
+	padding-bottom:0;
+}
+.borderless th{
+	padding-top:0;
+	padding-bottom:.25em;
+}
+
+
 
 .m_comment{
 	color:DarkGreen;
