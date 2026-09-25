@@ -47,10 +47,10 @@
 		<h4>notes on thread safety</h4>
 	
 		privative datatypes can be safely read, but their values can potentially change mid-read<br>
-		referenced types are unsafe to read, as the reference counter can be modified by multiple threads, leading to memory use-after-free crash.<br>
-		reading variables from the environment is safe, with the same caveats as primitive datatypes<br>
-		however, writing to an environment can lead to a data race where the table is being read mid-reallocation<br>
-		C functions are completely safe to use, barring other type complications, as they are immutable, however some are not thread safe.<br>
+		referenced types can be read with the same data race issues, but if a reference is removed, the variable may potentially free while still in use, leading to a crash.<br>
+		accessing variables from structures (including the environment) has the same caveats as referenced type reading.<br>
+		setting variables in structures should not be done, as the internal pointers will change, resulting in the program reading memory no longer in use, which can lead to data corruption or a crash.<br>
+		C functions are completely safe to use, barring other type complications, as they are immutable, however some are not thread safe to execute.<br>
 		<br>
 		it is recommended to not use global variables while in a thread, including standard library tables.<br>
 		If you are unsure, it is best advised to set the environment parameter to an empty table, and pipe in everything you need in a dedicated single level table, or individual parameters<br>
