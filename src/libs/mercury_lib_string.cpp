@@ -207,6 +207,7 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 		mercury_popstack(M,&max_replacments);
 		if (max_replacments.type != M_TYPE_INT) {
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &max_replacments, M_TYPE_INT, 4);
+			mercury_release_var(&max_replacments);
 			return;
 		}
 	}

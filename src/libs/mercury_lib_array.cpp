@@ -136,7 +136,6 @@ void mercury_lib_array_flush(mercury_state* const M_CPP_restrict M, const mercur
 	arr->values = intermediate.values;
 	mercury_destroyarray(newarr); //then free the array with the old data in it.
 
-	mercury_decrement_variable_refrence_count(&arr_var);
 	mercury_release_var(&arr_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -264,7 +263,6 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 	}
 
 
-	mercury_decrement_variable_refrence_count(&arr_var);
 	mercury_release_var(&arr_var);
 
 	arr_var.type = M_TYPE_ARRAY;
@@ -323,7 +321,6 @@ void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercu
 		placed_at = cur_len;
 	}
 
-	mercury_decrement_variable_refrence_count(&arr_var);
 	mercury_release_var(&arr_var);
 
 	if (args_out) {
@@ -449,7 +446,6 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 	//mercury_destroystate(M);
 	mercury_clearstate(M);
 	int out = (int)mercury_checkint(&var_o);
-	mercury_decrement_variable_refrence_count(&var_o);
 	mercury_release_var(&var_o);
 	return out;
 }
