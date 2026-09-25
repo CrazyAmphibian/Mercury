@@ -77,6 +77,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	mercury_function previous = SubM->bytecode;
 
+	mercury_increment_variable_refrence_count(&function);
+	mercury_increment_variable_refrence_count(&listlike);
 	
 	if (function.type == M_TYPE_FUNCTION) {
 		SubM->bytecode = *((mercury_function*)function.data.p);
@@ -230,6 +232,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 
 	SubM->bytecode= previous;
 	mercury_clearstate(SubM);
+
+	mercury_decrement_variable_refrence_count(&function);
+	mercury_decrement_variable_refrence_count(&listlike);
 
 	mercury_release_var(&function);
 	mercury_release_var(&listlike);
