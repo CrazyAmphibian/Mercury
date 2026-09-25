@@ -250,12 +250,12 @@ bool mercury_getkey(const mercury_table* const table, mercury_variable* const ke
 	const mercury_subtable subt=table->data[key->type];
 	for (mercury_int i = 0; i < subt.size; i++) {
 		if (mercury_vars_equal(subt.keys+i, key)) {
-			mercury_release_var(key);
+			//mercury_release_var(key);
 			*out = subt.values[i];
 			return true;
 		}
 	}
-	mercury_release_var(key);
+	//mercury_release_var(key);
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
 	return false;
@@ -268,7 +268,7 @@ mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const k
 			mercury_increment_variable_refrence_count(value);
 			mercury_decrement_variable_refrence_count(subt.values + i);
 			mercury_release_var(subt.values+i);
-			mercury_release_var(key);
+			//mercury_release_var(key);
 			subt.values[i] = *value;
 			return i;
 		}
