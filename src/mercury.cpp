@@ -637,7 +637,6 @@ void mercury_release_var(mercury_variable* const M_CPP_restrict var) {
 	case M_TYPE_FILE:
 		{
 			mercury_filewrapper* fw = (mercury_filewrapper*)var->data.p;
-			fw->refrences--;
 			if (!fw->refrences) {
 				if (fw->modeflags)fclose(fw->file);
 				free(fw);
@@ -647,7 +646,6 @@ void mercury_release_var(mercury_variable* const M_CPP_restrict var) {
 	case M_TYPE_THREAD:
 		{
 			mercury_threadholder* t = (mercury_threadholder*)var->data.p;
-			t->refrences--;
 			if (!t->refrences) {
 				if (!t->finished) { //you stupid son of a bitch why are you like this?
 	#if defined(_WIN32) || defined(_WIN64)
