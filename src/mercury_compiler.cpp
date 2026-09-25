@@ -2801,7 +2801,7 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 		free(tokens);
 
 		nmf->enviromental = false;
-		nmf->refrences = 1;
+		nmf->refrences = 0;
 		nmf->instructions = func->instructions;
 		nmf->numberofinstructions = func->number_instructions;
 		
