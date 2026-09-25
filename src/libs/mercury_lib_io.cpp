@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <climits>
+#include <errno.h>
 
 #ifdef _WIN32
 #include <Windows.h>
