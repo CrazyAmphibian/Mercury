@@ -533,6 +533,7 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 		}
 		else {
 			M->enviroment->enviromental = false;
+			mercury_cleartable(M->enviroment);
 			M->enviroment->refrences--;
 			if(!M->enviroment->refrences)mercury_destroytable(M->enviroment);
 			M->enviroment = nullptr;
