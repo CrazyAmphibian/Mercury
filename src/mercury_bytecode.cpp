@@ -1192,7 +1192,7 @@ void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
 		mercury_release_var(&table);
 		return;
 	}
-	mercury_release_var(&table);
+	//mercury_release_var(&table); this breaks tables defined like a={1,2,3}
 }
 
 void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
@@ -1330,8 +1330,6 @@ void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M) { //New STRing
 	mercury_variable out;
 	
 	mercury_string* so=mercury_cstring_to_mstring( (char*)(M->bytecode.instructions + M->programcounter), string_size);
-
-	mercury_string* const so = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!so) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
