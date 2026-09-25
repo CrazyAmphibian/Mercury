@@ -1665,45 +1665,28 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 			continue;
 		}
 
-		if (lib->table) {
-			mercury_variable k;
-			k.type = M_TYPE_STRING;
-			k.data.p = mercury_cstring_to_mstring(lib->key, strlen(lib->key));
-			if (!k.data.p)continue;
-
-			mercury_variable tidx;
-			tidx.type = M_TYPE_STRING;
-			mercury_string* tidxstr= mercury_cstring_to_mstring(lib->table, strlen(lib->table));
-			tidxstr->refrences++;
-			tidx.data.p = tidxstr;
+		if (lib->table) {		
 			mercury_variable t;
-			mercury_getkey(M->enviroment, &tidx,&t);
+			mercury_table_get_cstring_keyvalue(M->enviroment, lib->table, &t);
 
 			if (t.type == M_TYPE_TABLE) {
-				mercury_decrement_variable_refrence_count(&tidx);
-				mercury_release_var(&tidx);
-				mercury_setkey((mercury_table*)t.data.p,&k,&v);
+				mercury_table_set_cstring_keyvalue((mercury_table*)t.data.p, lib->key, &v);
 			}
 			else {
 				mercury_table* nt=mercury_newtable();
-
-				mercury_setkey(nt, &k, &v);
+				mercury_table_set_cstring_keyvalue(nt, lib->key, &v);
 
 				mercury_variable vv;
 				vv.type = M_TYPE_TABLE;
 				vv.data.p = nt;
 
-				mercury_setkey(M->enviroment, &tidx, &vv);
+				mercury_table_set_cstring_keyvalue(M->enviroment, lib->table, &vv);
 			}
 
 
 		}
 		else {
-			mercury_variable k;
-			k.type = M_TYPE_STRING;
-			k.data.p = mercury_cstring_to_mstring((char*)lib->key,strlen(lib->key) );
-
-			mercury_setkey(M->enviroment, &k, &v);
+			mercury_table_set_cstring_keyvalue(M->enviroment, lib->key, &v);
 		}
 
 
