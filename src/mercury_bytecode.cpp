@@ -1233,8 +1233,9 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		mercury_release_var(&table);
 		return;
 	}
-	
+	mercury_increment_variable_refrence_count(&value); //so the value cannot be freed before it is sent out
 	mercury_release_var(&table);
+	mercury_decrement_variable_refrence_count(&value);
 	mercury_pushstack_unrefed(M, &value);
 }
 

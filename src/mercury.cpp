@@ -528,16 +528,8 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 
 	if (M->enviroment) {
 		if (!for_deletion) {
-			if (M->enviroment->refrences > 1) { //if something else is using the table
-				M->enviroment=mercury_newtable(); //we have to make a new table
-				M->enviroment->refrences = 1;
-				M->enviroment->enviromental = true;
-				mercury_prepare_table_for_state(M->enviroment, M);
-			}
-			else {
-				mercury_cleartable(M->enviroment);
-				mercury_prepare_table_for_state(M->enviroment, M);
-			}
+			mercury_cleartable(M->enviroment);
+			mercury_prepare_table_for_state(M->enviroment, M);
 		}
 		else {
 			M->enviroment->enviromental = false;
