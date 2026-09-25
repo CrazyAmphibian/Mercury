@@ -618,7 +618,6 @@ void mercury_release_var(mercury_variable* const M_CPP_restrict var) {
 	case M_TYPE_FUNCTION:
 		{
 			mercury_function* ffunction = (mercury_function*)var->data.p;
-			ffunction->refrences--;
 			if (!ffunction->refrences) {
 				free(ffunction->instructions); //this causes a heap issue. dunno why.
 				if (ffunction->instruction_dbg_lookup) {
