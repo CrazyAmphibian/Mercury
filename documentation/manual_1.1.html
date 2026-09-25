@@ -236,5 +236,21 @@
 </div>
 <br>
 
+<div>
+	<h3 class="function"><span class="type">void</span> addlibs  (<span class="type">table</span> table)</h3>
+	<p>
+		adds all libraries to the supplied table. to be used for manual library permission setting for substates, such as with rcall or threads.<Br>
+		overwrites any variable that shares a name with a library or library table.
+	</p>
+	<p class="codeblock">
+		t={"math"=20}<br>
+		addlibs(t)<br>
+		t.print("hello, world!")<br>
+		print(t.math) //table 0x12345678, since the math variable is overwritten by the math library<br>
+	</p>
+</div>
+<br>
+
+
 </body>
 </html>

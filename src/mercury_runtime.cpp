@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 	at_v.data.p = arg_arr;
 	mercury_table_set_cstring_keyvalue(M->enviroment,"_ARGS",&at_v);
 
-	mercury_populate_enviroment_with_libs(M);
+	mercury_populate_table_with_libs(M->enviroment);
 
 #ifdef MERCURY_DEBUG
 	mercury_debugdumptable(M->enviroment);

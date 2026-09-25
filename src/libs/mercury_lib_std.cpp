@@ -269,11 +269,13 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 
 	if (tab.type != M_TYPE_TABLE) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab, M_TYPE_TABLE, 2);
+		mercury_release_var(&tab);
 		free(argt);
 		return;
 	}
 	if (func.type != M_TYPE_CFUNC && func.type != M_TYPE_FUNCTION) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED, &func, 1);
+		mercury_release_var(&func);
 		free(argt);
 		return;
 	}
@@ -1134,4 +1136,19 @@ void mercury_lib_std_error(mercury_state* const M_CPP_restrict M, const mercury_
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,0);
 }
 
+void mercury_lib_std_addlibs(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
+	mercury_variable in;
+	if (args_in)mercury_popstack(M, &in);
+
+	if (in.type != M_TYPE_TABLE) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_TABLE, 1);
+		mercury_release_var(&in);
+		return;
+	}
+
+	mercury_populate_table_with_libs((mercury_table*)in.data.p);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+}
 

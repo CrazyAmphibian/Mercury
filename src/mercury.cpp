@@ -1642,7 +1642,7 @@ mercury_int M_NUM_LIBS = 0;
 
 
 
-void mercury_populate_enviroment_with_libs(mercury_state* M) {
+void mercury_populate_table_with_libs(mercury_table* T) {
 
 	for (mercury_int i = 0; i < M_NUM_LIBS; i++) {
 		mercury_libdef* lib = M_LIBS[i];
@@ -1670,7 +1670,7 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 
 		if (lib->table) {		
 			mercury_variable t;
-			mercury_table_get_cstring_keyvalue(M->enviroment, lib->table, &t);
+			mercury_table_get_cstring_keyvalue(T, lib->table, &t);
 
 			if (t.type == M_TYPE_TABLE) {
 				mercury_table_set_cstring_keyvalue((mercury_table*)t.data.p, lib->key, &v);
@@ -1683,13 +1683,13 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 				vv.type = M_TYPE_TABLE;
 				vv.data.p = nt;
 
-				mercury_table_set_cstring_keyvalue(M->enviroment, lib->table, &vv);
+				mercury_table_set_cstring_keyvalue(T, lib->table, &vv);
 			}
 
 
 		}
 		else {
-			mercury_table_set_cstring_keyvalue(M->enviroment, lib->key, &v);
+			mercury_table_set_cstring_keyvalue(T, lib->key, &v);
 		}
 
 
@@ -1727,6 +1727,7 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_std_dynamic_library_load, "loadlibrary", nullptr);
 	mercury_register_library(mercury_lib_std_deepcopy, "deepcopy", nullptr);
 	mercury_register_library(mercury_lib_std_error, "error", nullptr);
+	mercury_register_library(mercury_lib_std_addlibs, "addlibs", nullptr);
 
 
 	mercury_register_library((void*)&m_const_type_nil, "TYPE_NIL", nullptr, M_TYPE_INT);
