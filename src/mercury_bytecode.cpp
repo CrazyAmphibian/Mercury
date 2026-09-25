@@ -1099,6 +1099,7 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 			sz--;
 			if (mercury_vars_equal(st->keys + sz, &key)) {
 				mercury_increment_variable_refrence_count(&value);
+				mercury_increment_variable_refrence_count(st->keys + sz);
 				mercury_decrement_variable_refrence_count(st->values + sz);
 				mercury_release_var(&key);
 				mercury_release_var(st->values + sz);

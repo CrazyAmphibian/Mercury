@@ -412,6 +412,7 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
+	memset(st, 0, sizeof(mercury_string));
 	st->ptr=(char*)malloc(len * sizeof(char));
 	if (!st->ptr) {
 		free(st);
