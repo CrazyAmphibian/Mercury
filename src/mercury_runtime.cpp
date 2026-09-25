@@ -220,10 +220,8 @@ int main(int argc, char** argv) {
 
 			
 
-			for (mercury_uint i = 0; i < M->sizeofstack;i++) {
-				mercury_variable v;
-				mercury_popstack(M, &v);
-				mercury_free_var(&v); //clean up the stack
+			while (M->sizeofstack) {
+				mercury_discard_top_of_stack(M);
 			}
 		}
 		goto start;
