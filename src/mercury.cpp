@@ -266,10 +266,13 @@ mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const k
 	for (mercury_int i = 0; i < subt.size; i++) {
 		if (mercury_vars_equal(subt.keys+i,key)) {
 			mercury_increment_variable_refrence_count(value);
+			mercury_increment_variable_refrence_count(key);
 			mercury_decrement_variable_refrence_count(subt.values + i);
+			mercury_decrement_variable_refrence_count(subt.keys + i);
 			mercury_release_var(subt.values+i);
-			//mercury_release_var(key);
+			mercury_release_var(subt.keys+i);
 			subt.values[i] = *value;
+			subt.keys[i] = *key;
 			return i;
 		}
 	}
