@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+	<td><a href="manual_3.0.html"></a> </td>
+</tr>
+<tr>
+	<td><a href="manual_2.4.html">2.4 making C++ function</a></td>
+	<td><a href="manual_2.5.html">2.5 refcounting</a></td>
+	<td><a href="manual_2.6.html"></a></td>
+</tr>
+</table>
+
+
+
+
+<div>
+	<h3>what is a reference, anyways?</h3>
+
+	<p>
+		all complex variables (variables that cannot be expressed as a single datapoint) are dynamically allocated, meaning that their use has to be tracked, so that they may be properly freed.<br>
+		freeing too early means accessing memory that no longer belongs to the program, which may result in garbage data or a crash.<br>
+		freeing too late means that resource use will accumulate in a memory leak scenario.<br>
+		<br>
+		to circumvent this, mercury attaches reference counts to every variable that is dynamically allocated.<br>
+		a variable starts with 0 references.<br>
+		when a variable leaves a function, it should be checked for references, and if 0, freed. this is done with <span style="font-family:monospace;">mercury_release_var</span>, which handles the ref checking, as well as free logic.<br>
+		this means that if you want to store a variable for later, you must add a reference, and remove it when the variable leaves storage. this is done with <span style="font-family:monospace;">mercury_increment_variable_refrence_count</span> and <span style="font-family:monospace;">mercury_decrement_variable_refrence_count</span> respectively.<br>
+		when adding a reference, calling <span style="font-family:monospace;">mercury_release_var</span> is redundant, and can be skipped.<br>
+		and when you can guarantee a type is a primitive, this can be skipped as well, since they are an unrefed type.<br>
+		
+	</p>
+	<p>
+		mercury's structures qualify under this, and require reference counting to values placed in them.<br>
+		for arrays, <span style="font-family:monospace;">mercury_setarray</span> can be used, which will automatically manage the reference count of both the variable being supplied, as well as the variable already at the index. this means that once you set an array value, you can keep using it afterwards, and not worry about releasing the variable.<Br>
+		<br>
+		similarly, tables have an equivalent <span style="font-family:monospace;">mercury_setkey</span> function. values and keys are both managed by the function. the function will guarantee that the key supplied will be increased in reference (and lower the refcount of the existing key, potentially freeing it). this means that you can pass a value and key to this function, and keep using both variables afterwards, at least for the duration of your function, and assuming you are setting different keys. likewise with arrays, releasing variables passed into this isn't required.<br>
+		<br>
+		getting values is a bit different. for arrays, <span style="font-family:monospace;">mercury_getarray</span> can be used. the returned variable does not need to be released, or have its refrence count changed so long as it remains in the array.<br>
+		<br>
+		for tables, the same is true of the value, when you use <span style="font-family:monospace;">mercury_getkey</span>. however, the supplied key needs to be treated like a normal variable, as its references are unchanged, meaning calling <span style="font-family:monospace;">mercury_release_var</span> before function closure.
+	</p>
+	
+</div>
+
+
+</body>
+</html>

@@ -15,7 +15,7 @@
 <tr>
 	<td><a href="manual_2.3.html">2.3 bytecode and ops</a></td>
 	<td><a href="manual_2.4.html">2.4 making C++ function</a></td>
-	<td><a href="manual_2.5.html"></a></td>
+	<td><a href="manual_2.5.html">2.5 refcounting</a></td>
 </tr>
 </table>
 
@@ -46,7 +46,7 @@
 		if you're paying attention, you will notice 2 big issues. one is that we are completely ignoring the arg variables, the other is that we are not performing any type checking.<br>
 		<br>
 		let's get to type checking later, for now let's just go over the arg variables.<br>
-		fortunately, the error header comes with some functions to make this easy, so simply including it will make your life easier.
+		fortunately, the mercury_error header comes with some functions to make this easy, so simply including it will make your life easier.
 	</p>
 	<p class="codeblock">
 		#include "mercury.hpp"<br>
@@ -82,6 +82,7 @@
 		&emsp;&emsp;mercury_popstack(M,&in);<br>
 		&emsp;&emsp;if(in.type!=M_TYPE_INT){<br>
 			&emsp;&emsp;&emsp;&emsp;mercury_raise_error_nonpointer(M,M_ERROR_WRONG_TYPE,in.type,M_TYPE_INT,1);<br>
+			&emsp;&emsp;&emsp;&emsp;mercury_release_var(&in); //since it may be a complex refrenced type<Br>
 			&emsp;&emsp;&emsp;&emsp;return;<br>
 		&emsp;&emsp;}<br>
 		&emsp;&emsp;in.data.i+=10;<br>

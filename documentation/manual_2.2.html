@@ -78,6 +78,21 @@
 			&nbsp;M->sizeofstack--;<br>
 			&nbsp;*out=  M->stack[M->sizeofstack];<br>
 		}<br>
+		<br>
+		<br>
+		bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {<br>
+		&nbsp;if (!(M->allocatedstacksize > M->sizeofstack)) {<br>
+			&nbsp;&nbsp;void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable));<br>
+			&nbsp;&nbsp;if (nstackptr == nullptr) return false;<br>
+			&nbsp;&nbsp;M->stack = (mercury_variable*)nstackptr;<br>
+<br>
+			&nbsp;&nbsp;M->allocatedstacksize = M->sizeofstack + 1;<br>
+		&nbsp;}<br>
+
+		&nbsp;M->stack[M->sizeofstack] = *var;<br>
+		&nbsp;M->sizeofstack++;<br>
+		&nbsp;return true;<br>
+		}<br>
 	</p>
 	
 	<p>

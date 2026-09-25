@@ -46,6 +46,10 @@
 		_G="hello" //valid, as the value associated with "_G" is changed, since _G is usually just a table being stored like any other<br>
 	</p>
 	
+	<p>
+	do note that, while these are tables are tables like any other, they are treated differently, and should be considered volatile storage, and no guarantee is made that the contents of the table won't be changed by the runtime. environmental tables (especilly _ENV) should not be used for persistent storage.
+	</p>
+	
 </div>
 
 <div>
