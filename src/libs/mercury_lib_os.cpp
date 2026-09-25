@@ -22,7 +22,7 @@ void mercury_lib_os_time(mercury_state* const M_CPP_restrict M, const mercury_in
 	out.data.i = t;
 	
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -97,7 +97,7 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_release_var(&cvar);
 	cvar.type = M_TYPE_STRING;
 	cvar.data.p= mercury_cstring_const_to_mstring(out_c, size_c);
-	mercury_pushstack_unrefed(M, &cvar);
+	mercury_pushstack(M, &cvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -137,7 +137,7 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_release_var(&cvar);
 	cvar.type = M_TYPE_INT;
 	cvar.data.i = r;
-	mercury_pushstack_unrefed(M, &cvar);
+	mercury_pushstack(M, &cvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -156,7 +156,7 @@ void mercury_lib_os_clock(mercury_state* const M_CPP_restrict M, const mercury_i
 	out.data.f = t;
 	
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -253,7 +253,7 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable outv;
 	outv.type = M_TYPE_TABLE;
 	outv.data.p = outt;
-	mercury_pushstack_unrefed(M, &outv);
+	mercury_pushstack(M, &outv);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -325,7 +325,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 #else
 	out.data.i = timegm(&timedata);
 #endif
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }

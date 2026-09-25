@@ -55,7 +55,7 @@ void mercury_lib_table_copy(mercury_state* const M_CPP_restrict M, const mercury
 
 	new_tab_var.type = M_TYPE_TABLE;
 	new_tab_var.data.p = newtab;
-	mercury_pushstack_unrefed(M, &new_tab_var);
+	mercury_pushstack(M, &new_tab_var);
 
 	mercury_release_var(&tab_var);
 

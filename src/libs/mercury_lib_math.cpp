@@ -57,7 +57,7 @@ void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_i
 		mercury_release_var(&var);
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -114,7 +114,7 @@ void mercury_lib_math_max(mercury_state* const M_CPP_restrict M, const mercury_i
 		mercury_release_var(&var);
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -147,7 +147,7 @@ void mercury_lib_math_floor(mercury_state* const M_CPP_restrict M, const mercury
 		return;
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
@@ -181,7 +181,7 @@ void mercury_lib_math_ceil(mercury_state* const M_CPP_restrict M, const mercury_
 		return;
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -218,7 +218,7 @@ void mercury_lib_math_to_radians(mercury_state* const M_CPP_restrict M, const me
 
 	out.data.f = (m_math_pi*out.data.f)/180.0;
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -253,7 +253,7 @@ void mercury_lib_math_to_degrees(mercury_state* const M_CPP_restrict M, const me
 
 	out.data.f = (180.0 * out.data.f) / m_math_pi;
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -314,7 +314,7 @@ void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_i
 		out.data.f = log(num.data.f);
 	}
 
-	mercury_pushstack_unrefed(M,&out);
+	mercury_pushstack(M,&out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
@@ -353,7 +353,7 @@ void mercury_lib_math_to_absolute(mercury_state* const M_CPP_restrict M, const m
 		return;
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -390,7 +390,7 @@ void mercury_lib_math_to_sin(mercury_state* const M_CPP_restrict M, const mercur
 
 	out.data.f = sin( out.data.f);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -424,7 +424,7 @@ void mercury_lib_math_to_cos(mercury_state* const M_CPP_restrict M, const mercur
 
 	out.data.f = cos(out.data.f);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -459,7 +459,7 @@ void mercury_lib_math_to_tan(mercury_state* const M_CPP_restrict M, const mercur
 
 	out.data.f = tan(out.data.f);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -493,7 +493,7 @@ void mercury_lib_math_to_asin(mercury_state* const M_CPP_restrict M, const mercu
 
 	out.data.f = asin(out.data.f);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -527,7 +527,7 @@ void mercury_lib_math_to_acos(mercury_state* const M_CPP_restrict M, const mercu
 
 	out.data.f = acos(out.data.f);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -562,7 +562,7 @@ void mercury_lib_math_to_atan(mercury_state* const M_CPP_restrict M, const mercu
 
 	out.data.f = atan(out.data.f);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -611,7 +611,7 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 
 	out.data.f = atan2(y.data.f,out.data.f);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -698,7 +698,7 @@ void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercur
 		out.data.f = (f*(max-min)) + min;
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -741,7 +741,7 @@ void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mer
 
 	out.data.i = ((r) % (max - min + 1)) + min;
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -772,7 +772,7 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 		mercury_variable o;
 		o.type = M_TYPE_INT;
 		o.data.u = (M_RANDOM_STATE & 0x0000FFFFFFFF0000) >> 16;
-		mercury_pushstack_unrefed(M, &o);
+		mercury_pushstack(M, &o);
 	}
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 
@@ -807,7 +807,7 @@ void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	mercury_release_var(&val);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
@@ -901,7 +901,7 @@ void mercury_lib_math_min_array(mercury_state* const M_CPP_restrict M, const mer
 
 	mercury_release_var(&in);
 	
-	mercury_pushstack_unrefed(M,&out);
+	mercury_pushstack(M,&out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -996,7 +996,7 @@ void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mer
 
 	mercury_release_var(&in);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1031,7 +1031,7 @@ void mercury_lib_math_mean(mercury_state* const M_CPP_restrict M, const mercury_
 
 	out.data.f /= args_in;
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
@@ -1116,7 +1116,7 @@ void mercury_lib_math_mean_array(mercury_state* const M_CPP_restrict M, const me
 
 	mercury_release_var(&in);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }

@@ -694,8 +694,7 @@ void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 }
 
 
-//does not increment the refcounter of the variable.
-bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
+bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
 	if (!(M->allocatedstacksize > M->sizeofstack)) {
 		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable));
 		if (nstackptr == nullptr) return false;

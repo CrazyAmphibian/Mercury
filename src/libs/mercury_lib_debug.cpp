@@ -327,7 +327,7 @@ void mercury_lib_debug_get_traceback(mercury_state* const M_CPP_restrict M, cons
 		mercury_raise_error_nonpointer(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }

@@ -267,7 +267,7 @@ void mercury_lib_array_copy(mercury_state* const M_CPP_restrict M, const mercury
 
 	arr_var.type = M_TYPE_ARRAY;
 	arr_var.data.p = arr2;
-	mercury_pushstack_unrefed(M, &arr_var);
+	mercury_pushstack(M, &arr_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
@@ -326,7 +326,7 @@ void mercury_lib_array_insert(mercury_state* const M_CPP_restrict M, const mercu
 	if (args_out) {
 		arr_var.data.i = placed_at;
 		arr_var.type = M_TYPE_INT;
-		mercury_pushstack_unrefed(M, &arr_var);
+		mercury_pushstack(M, &arr_var);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
@@ -369,7 +369,7 @@ void mercury_lib_array_remove(mercury_state* const M_CPP_restrict M, const mercu
 	}
 
 	if (args_out) {
-		mercury_pushstack_unrefed(M, &v);
+		mercury_pushstack(M, &v);
 	}
 	else {
 		mercury_release_var(&v);
@@ -437,8 +437,8 @@ int mercury_sort_use_mercury_function(const void* a, const void* b) {
 	//M->bytecode.numberofinstructions = SORTING_M_FUNCTION->numberofinstructions;
 	mercury_function oldf = M->bytecode;
 	M->bytecode = *SORTING_M_FUNCTION;
-	mercury_pushstack_unrefed(M,&var_b);
-	mercury_pushstack_unrefed(M,&var_a);
+	mercury_pushstack(M,&var_b);
+	mercury_pushstack(M,&var_a);
 	while (mercury_stepstate(M));
 	mercury_variable var_o;
 	mercury_popstack(M,&var_o);
@@ -759,7 +759,7 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 	var_str.type = M_TYPE_STRING;
 	var_str.data.p = out_str;
 
-	mercury_pushstack_unrefed(M, &var_str);
+	mercury_pushstack(M, &var_str);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }

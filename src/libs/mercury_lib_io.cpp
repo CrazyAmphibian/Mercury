@@ -129,7 +129,7 @@ void mercury_lib_io_open(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_release_var(&file_var);
 	mercury_release_var(&mode_var);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
@@ -231,7 +231,7 @@ void mercury_lib_io_read(mercury_state* const M_CPP_restrict M, const mercury_in
 
 	mercury_release_var(&file_var);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -314,7 +314,7 @@ void mercury_lib_io_write(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_release_var(&data_var);
 	mercury_release_var(&file_var);
 
-	if (args_out)mercury_pushstack_unrefed(M, &out);
+	if (args_out)mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
@@ -411,7 +411,7 @@ void mercury_lib_io_getfiles(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_release_var(&dir_var);
 	dir_var.data.p = arr;
 	dir_var.type = M_TYPE_ARRAY;
-	mercury_pushstack_unrefed(M, &dir_var);
+	mercury_pushstack(M, &dir_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
@@ -510,7 +510,7 @@ void mercury_lib_io_getdirs(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_release_var(&dir_var);
 	dir_var.data.p = arr;
 	dir_var.type = M_TYPE_ARRAY;
-	mercury_pushstack_unrefed(M, &dir_var);
+	mercury_pushstack(M, &dir_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -607,7 +607,7 @@ void mercury_lib_io_lines(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_release_var(&fil_var);
 	fil_var.type = M_TYPE_ARRAY;
 	fil_var.data.p = arr;
-	mercury_pushstack_unrefed(M, &fil_var);
+	mercury_pushstack(M, &fil_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -674,7 +674,7 @@ void mercury_lib_io_prompt(mercury_state* const M_CPP_restrict M, const mercury_
 		
 		v.type = M_TYPE_STRING;
 		v.data.p = s;
-		mercury_pushstack_unrefed(M, &v);
+		mercury_pushstack(M, &v);
 	}
 	free(c);
 
@@ -710,7 +710,7 @@ void mercury_lib_io_remove(mercury_state* const M_CPP_restrict M, const mercury_
 		mercury_variable out;
 		out.type = M_TYPE_BOOL;
 		out.data.i = r == 0 ? 1 : 0;
-		mercury_pushstack_unrefed(M, &out);
+		mercury_pushstack(M, &out);
 	}
 
 	mercury_release_var(&dir_var);
@@ -752,7 +752,7 @@ void mercury_lib_io_removedir(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_variable out;
 		out.type = M_TYPE_BOOL;
 		out.data.i = r == 0 ? 1 : 0;
-		mercury_pushstack_unrefed(M, &out);
+		mercury_pushstack(M, &out);
 	}
 
 	mercury_release_var(&dir_var);
@@ -797,7 +797,7 @@ void mercury_lib_io_createdir(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_variable out;
 		out.type = M_TYPE_BOOL;
 		out.data.i = r == 0 ? 1 : 0;
-		mercury_pushstack_unrefed(M, &out);
+		mercury_pushstack(M, &out);
 	}
 
 	mercury_release_var(&dir_var);
@@ -848,7 +848,7 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 		
 		v.type = M_TYPE_STRING;
 		v.data.p = s;
-		mercury_pushstack_unrefed(M, &v);
+		mercury_pushstack(M, &v);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -1233,7 +1233,7 @@ void mercury_lib_io_serialize(mercury_state* const M_CPP_restrict M, const mercu
 		out.data.i = 0;
 	}
 
-	mercury_pushstack_unrefed(M,&out);
+	mercury_pushstack(M,&out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1525,7 +1525,7 @@ void mercury_lib_io_deserialize(mercury_state* const M_CPP_restrict M, const mer
 
 
 	mercury_release_var(&in);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1565,7 +1565,7 @@ void mercury_lib_io_cwd(mercury_state* const M_CPP_restrict M, const mercury_int
 		mercury_variable nvar;
 		nvar.type = M_TYPE_STRING;
 		nvar.data.p = str;
-		mercury_pushstack_unrefed(M, &nvar);
+		mercury_pushstack(M, &nvar);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -1621,7 +1621,7 @@ void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, c
 		mercury_variable nvar;
 		nvar.type = M_TYPE_STRING;
 		nvar.data.p = str;
-		mercury_pushstack_unrefed(M, &nvar);
+		mercury_pushstack(M, &nvar);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -1661,7 +1661,7 @@ void mercury_lib_io_filelength(mercury_state* const M_CPP_restrict M, const merc
 
 	mercury_release_var(&file_var);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }

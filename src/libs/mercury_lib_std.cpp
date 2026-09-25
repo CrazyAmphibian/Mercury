@@ -126,9 +126,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 							idxvar.type = M_TYPE_INT;
 
 							if (function.type == M_TYPE_CFUNC) {
-								mercury_pushstack_unrefed(SubM, &idxvar);
-								mercury_pushstack_unrefed(SubM, &var);
-								mercury_pushstack_unrefed(SubM, &listlike);
+								mercury_pushstack(SubM, &idxvar);
+								mercury_pushstack(SubM, &var);
+								mercury_pushstack(SubM, &listlike);
 								((mercury_cfunc)function.data.p)(SubM, 3, 1);
 
 								mercury_variable o;
@@ -144,9 +144,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 								mercury_clearstate(SubM);
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
-								mercury_pushstack_unrefed(SubM, &listlike);
-								mercury_pushstack_unrefed(SubM, &var);
-								mercury_pushstack_unrefed(SubM, &idxvar);
+								mercury_pushstack(SubM, &listlike);
+								mercury_pushstack(SubM, &var);
+								mercury_pushstack(SubM, &idxvar);
 								while (mercury_stepstate(SubM));
 
 								mercury_variable o;
@@ -193,9 +193,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 				mercury_variable v = subt.values[i];
 				
 				if (function.type == M_TYPE_CFUNC) {
-					mercury_pushstack_unrefed(SubM, &k);
-					mercury_pushstack_unrefed(SubM, &v);
-					mercury_pushstack_unrefed(SubM, &listlike);
+					mercury_pushstack(SubM, &k);
+					mercury_pushstack(SubM, &v);
+					mercury_pushstack(SubM, &listlike);
 					((mercury_cfunc)function.data.p)(SubM, 3, 1);
 					mercury_variable o;
 					mercury_pullstack(SubM, &o);
@@ -207,9 +207,9 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					
 				}
 				else {
-					mercury_pushstack_unrefed(SubM, &listlike);
-					mercury_pushstack_unrefed(SubM, &v);
-					mercury_pushstack_unrefed(SubM, &k);
+					mercury_pushstack(SubM, &listlike);
+					mercury_pushstack(SubM, &v);
+					mercury_pushstack(SubM, &k);
 					
 					while (mercury_stepstate(SubM));
 					SubM->programcounter = 0; //reset position to start so we can run it again if it's a M func.
@@ -289,7 +289,7 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	iso_M->enviroment = (mercury_table*)tab.data.p;
 
 	for (mercury_int i = 0; i < args_in - 2; i++) {
-		mercury_pushstack_unrefed(iso_M, argt+i);
+		mercury_pushstack(iso_M, argt+i);
 	}
 	if (func.type == M_TYPE_FUNCTION) {
 		mercury_function* func2 = (mercury_function*)func.data.p;
@@ -320,13 +320,13 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	if (iso_M->errorcode)out.data.i = 0;
 
 	if (args_out) {
-		mercury_pushstack_unrefed(M, &out);
+		mercury_pushstack(M, &out);
 	}
 
 	if (out.data.i) {
 		for (mercury_int i = 1; i < args_out; i++) {
 			mercury_pullstack(iso_M, &out);
-			mercury_pushstack_unrefed(M, &out);
+			mercury_pushstack(M, &out);
 		}
 	}
 	else {
@@ -610,7 +610,7 @@ void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_release_var(&vartodump);
 	vartodump.type = M_TYPE_STRING;
 	vartodump.data.p = dmp_str;
-	mercury_pushstack_unrefed(M, &vartodump);
+	mercury_pushstack(M, &vartodump);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -634,7 +634,7 @@ void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercur
 	mercury_variable out;
 	mercury_compile_mstring((mercury_string*)codestr.data.p, &out);
 	mercury_release_var(&codestr);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 1, 1);
 }
@@ -652,7 +652,7 @@ void mercury_lib_std_type(mercury_state* const M_CPP_restrict M, const mercury_i
 	mercury_release_var(&var);
 	var.data.i = var.type;
 	var.type = M_TYPE_INT;
-	mercury_pushstack_unrefed(M, &var);
+	mercury_pushstack(M, &var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -673,7 +673,7 @@ void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_release_var(&i); //we can just re-use the variable struct. saves time, probly
 	i.type = M_TYPE_STRING;
 	i.data.p = l;
-	mercury_pushstack_unrefed(M, &i);
+	mercury_pushstack(M, &i);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -732,7 +732,7 @@ void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercu
 	}
 
 	mercury_release_var(&i);
-	mercury_pushstack_unrefed(M, &o);
+	mercury_pushstack(M, &o);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -782,7 +782,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 	free(c);
 	
 
-	if(args_out)mercury_pushstack_unrefed(M, &o);
+	if(args_out)mercury_pushstack(M, &o);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -804,10 +804,10 @@ void mercury_lib_std_toint(mercury_state* const M_CPP_restrict M, const mercury_
 	case M_TYPE_FLOAT:
 		i.type = M_TYPE_INT;
 		i.data.i = (mercury_int)i.data.f;
-		mercury_pushstack_unrefed(M, &i);
+		mercury_pushstack(M, &i);
 		break;
 	default:
-		mercury_pushstack_unrefed(M, &i);
+		mercury_pushstack(M, &i);
 		break;
 	}
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -830,10 +830,10 @@ void mercury_lib_std_tofloat(mercury_state* const M_CPP_restrict M, const mercur
 	case M_TYPE_INT:
 		i.type = M_TYPE_FLOAT;
 		i.data.f = (mercury_float)i.data.i;
-		mercury_pushstack_unrefed(M, &i);
+		mercury_pushstack(M, &i);
 		break;
 	default:
-		mercury_pushstack_unrefed(M, &i);
+		mercury_pushstack(M, &i);
 		break;
 	}
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -1106,7 +1106,7 @@ void mercury_lib_std_deepcopy(mercury_state* const M_CPP_restrict M, const mercu
 		out.type = M_TYPE_NIL;
 	}
 	mercury_increment_variable_refrence_count(&out);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);

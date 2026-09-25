@@ -149,7 +149,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 		if (vart) {
 			for (mercury_int i = 0; i < args_in - 2; i++) {
-				mercury_pushstack_unrefed(t->state, vart+i);
+				mercury_pushstack(t->state, vart+i);
 			}
 			free(vart);
 			vart = nullptr;
@@ -192,7 +192,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -220,7 +220,7 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 1 : 0;
 
 	mercury_release_var(&in);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -257,7 +257,7 @@ void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const me
 	mercury_release_var(&in);
 	mercury_variable out;
 	mercury_pullstack(t->state, &out); //take the bottom of stack. it's the proper order with returns.
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -323,7 +323,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, cons
 	}
 	
 	mercury_release_var(&in);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -382,7 +382,7 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 0 : 1;
 
 	mercury_release_var(&in);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -433,7 +433,7 @@ void mercury_lib_thread_check_error(mercury_state* const M_CPP_restrict M, const
 
 	in.type = M_TYPE_BOOL;
 	in.data.i = ec != 0;
-	mercury_pushstack_unrefed(M,&in);
+	mercury_pushstack(M,&in);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);

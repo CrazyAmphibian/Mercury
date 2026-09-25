@@ -45,7 +45,7 @@ void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury
 	out.type = M_TYPE_STRING;
 	out.data.p = os;
 	mercury_release_var(&var_string);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -91,7 +91,7 @@ void mercury_lib_string_reverse(mercury_state* const M_CPP_restrict M, const mer
 	out.type = M_TYPE_STRING;
 	out.data.p = os;
 	mercury_release_var(&var_string);
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -165,7 +165,7 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 		out.data.i = 0;
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 	
 	//second one is end char.
 	if (args_out > 1) {
@@ -180,7 +180,7 @@ void mercury_lib_string_find(mercury_state* const M_CPP_restrict M, const mercur
 			out2.type = M_TYPE_NIL;
 			out2.data.i = 0;
 		}
-		mercury_pushstack_unrefed(M, &out2);
+		mercury_pushstack(M, &out2);
 	}
 
 	mercury_release_var(&searchforvar);
@@ -282,14 +282,14 @@ void mercury_lib_string_replace(mercury_state* const M_CPP_restrict M, const mer
 	out.type = M_TYPE_STRING;
 	out.data.p = outstr;
 
-	mercury_pushstack_unrefed(M,&out);
+	mercury_pushstack(M,&out);
 
 	if (args_out > 1) {
 		mercury_variable out2;
 		
 		out2.type = M_TYPE_INT;
 		out2.data.i = replacments;
-		mercury_pushstack_unrefed(M, &out2);
+		mercury_pushstack(M, &out2);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 2);
@@ -345,7 +345,7 @@ void mercury_lib_string_count(mercury_state* const M_CPP_restrict M, const mercu
 	search_var.type = M_TYPE_INT;
 	search_var.data.i = replacments;
 
-	mercury_pushstack_unrefed(M, &search_var);
+	mercury_pushstack(M, &search_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -384,7 +384,7 @@ void mercury_lib_string_toarray(mercury_state* const M_CPP_restrict M, const mer
 	
 	str_var.type = M_TYPE_ARRAY;
 	str_var.data.p = arr;
-	mercury_pushstack_unrefed(M, &str_var);
+	mercury_pushstack(M, &str_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -436,7 +436,7 @@ void mercury_lib_string_fromarray(mercury_state* const M_CPP_restrict M, const m
 	
 	str_var.type = M_TYPE_STRING;
 	str_var.data.p = st;
-	mercury_pushstack_unrefed(M, &str_var);
+	mercury_pushstack(M, &str_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -523,7 +523,7 @@ void mercury_lib_string_separate(mercury_state* const M_CPP_restrict M, const me
 	
 	sep_var.type = M_TYPE_ARRAY;
 	sep_var.data.p = arr;
-	mercury_pushstack_unrefed(M, &sep_var);
+	mercury_pushstack(M, &sep_var);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -577,7 +577,7 @@ void mercury_lib_string_upper(mercury_state* const M_CPP_restrict M, const mercu
 	var_string.type = M_TYPE_STRING;
 	var_string.data.p = os;
 
-	mercury_pushstack_unrefed(M, &var_string);
+	mercury_pushstack(M, &var_string);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -630,7 +630,7 @@ void mercury_lib_string_lower(mercury_state* const M_CPP_restrict M, const mercu
 	var_string.type = M_TYPE_STRING;
 	var_string.data.p = os;
 
-	mercury_pushstack_unrefed(M, &var_string);
+	mercury_pushstack(M, &var_string);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1081,7 +1081,7 @@ void mercury_lib_string_format(mercury_state* const M_CPP_restrict M, const merc
 	
 	strvar.type = M_TYPE_STRING;
 	strvar.data.p = outstr; //mercury_cstring_to_mstring(buffer, cc);
-	mercury_pushstack_unrefed(M, &strvar);
+	mercury_pushstack(M, &strvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1588,9 +1588,9 @@ void mercury_lib_string_p_find(mercury_state* const M_CPP_restrict M, const merc
 		strvar.data.i = 0;
 	}
 
-	mercury_pushstack_unrefed(M, &searchforvar);
+	mercury_pushstack(M, &searchforvar);
 	if (args_out > 1) {
-		mercury_pushstack_unrefed(M, &strvar);
+		mercury_pushstack(M, &strvar);
 	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 2);
@@ -1654,7 +1654,7 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 	
 	matchvar.type = M_TYPE_ARRAY;
 	matchvar.data.p = arr;
-	mercury_pushstack_unrefed(M,&matchvar);
+	mercury_pushstack(M,&matchvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1748,7 +1748,7 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 	
 	matchvar.type = M_TYPE_STRING;
 	matchvar.data.p = outstr;
-	mercury_pushstack_unrefed(M, &matchvar);
+	mercury_pushstack(M, &matchvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1801,7 +1801,7 @@ void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mer
 	
 	matchvar.type = M_TYPE_INT;
 	matchvar.data.i = count;
-	mercury_pushstack_unrefed(M, &matchvar);
+	mercury_pushstack(M, &matchvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1854,7 +1854,7 @@ void mercury_lib_string_escape_mercury(mercury_state* const M_CPP_restrict M, co
 	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
-	mercury_pushstack_unrefed(M, &instr);
+	mercury_pushstack(M, &instr);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -1924,7 +1924,7 @@ void mercury_lib_string_escape_url(mercury_state* const M_CPP_restrict M, const 
 	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
-	mercury_pushstack_unrefed(M, &instr);
+	mercury_pushstack(M, &instr);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -2010,7 +2010,7 @@ void mercury_lib_string_escape_c(mercury_state* const M_CPP_restrict M, const me
 	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
-	mercury_pushstack_unrefed(M, &instr);
+	mercury_pushstack(M, &instr);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -2071,7 +2071,7 @@ void mercury_lib_string_escape_html(mercury_state* const M_CPP_restrict M, const
 	
 	instr.type = M_TYPE_STRING;
 	instr.data.p = os;
-	mercury_pushstack_unrefed(M, &instr);
+	mercury_pushstack(M, &instr);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -2116,7 +2116,7 @@ void mercury_lib_string_copy_string(mercury_state* const M_CPP_restrict M, const
 
 	mercury_release_var(&in);
 	in.data.p = nstr;
-	mercury_pushstack_unrefed(M, &in);
+	mercury_pushstack(M, &in);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
