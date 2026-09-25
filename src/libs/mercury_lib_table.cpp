@@ -45,6 +45,8 @@ void mercury_lib_table_copy(mercury_state* const M_CPP_restrict M, const mercury
 		st_n.size = st_o.size;
 
 		for (mercury_int i = 0; i < st_o.size; i++) {
+			mercury_increment_variable_refrence_count(st_o.keys + i);
+			mercury_increment_variable_refrence_count(st_o.values + i);
 			st_n.keys[i] = st_o.keys[i];
 			st_n.values[i] = st_o.values[i];
 		}
