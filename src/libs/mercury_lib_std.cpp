@@ -30,7 +30,7 @@ void mercury_lib_std_print(mercury_state* const M_CPP_restrict M, const mercury_
 	for (mercury_int a = 0; a < args_in; a++) {
 
 		mercury_string* mstrv = mercury_tostring(vartable+a);
-		mercury_free_var(vartable+a);
+		mercury_release_var(vartable+a);
 		if (mstrv) {
 			for (mercury_int c = 0; c < mstrv->size; c++) {
 				putchar(mstrv->ptr[c]);
@@ -119,17 +119,14 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 						const mercury_int index = mercury_reconstruct_array_index(i1, i2, i3);
 #endif
 						if (var.type) {
-							mercury_variable v;
-							mercury_clonevariable(&var,&v);
-
 							mercury_variable idxvar;
 							idxvar.data.i = index;
 							idxvar.type = M_TYPE_INT;
 
 							if (function.type == M_TYPE_CFUNC) {
-								mercury_pushstack(SubM, &idxvar);
-								mercury_pushstack_unrefed(SubM, &v);
-								mercury_pushstack(SubM, &listlike);
+								mercury_pushstack_unrefed(SubM, &idxvar);
+								mercury_pushstack_unrefed(SubM, &var);
+								mercury_pushstack_unrefed(SubM, &listlike);
 								((mercury_cfunc)function.data.p)(SubM, 3, 1);
 
 								mercury_variable o;
@@ -141,13 +138,13 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 									i1 = i2 = i3 = INT_MAX-1;
 #endif
 								}
-								mercury_free_var(&o);
+								mercury_release_var(&o);
 								mercury_clearstate(SubM);
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
-								mercury_pushstack(SubM, &listlike);
-								mercury_pushstack_unrefed(SubM, &v);
-								mercury_pushstack(SubM, &idxvar);
+								mercury_pushstack_unrefed(SubM, &listlike);
+								mercury_pushstack_unrefed(SubM, &var);
+								mercury_pushstack_unrefed(SubM, &idxvar);
 								while (mercury_stepstate(SubM));
 
 								mercury_variable o;
@@ -159,7 +156,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 									i1 = i2 = i3 = INT_MAX-1;
 #endif
 								}
-								mercury_free_var(&o);
+								mercury_release_var(&o);
 								mercury_clearstate(SubM);
 							}
 						}
@@ -190,15 +187,13 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 		for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
 			mercury_subtable subt = tab->data[t];
 			for (mercury_int i = 0; i < subt.size; i++) {
-				mercury_variable k;
-				mercury_clonevariable(subt.keys+i,&k); //because strings are not refed, we need to copy them to avoid using a freed pointer.
-				mercury_variable v;
-				mercury_clonevariable(subt.values + i, &v);
+				mercury_variable k = subt.keys[i];
+				mercury_variable v = subt.values[i];
 				
 				if (function.type == M_TYPE_CFUNC) {
 					mercury_pushstack_unrefed(SubM, &k);
 					mercury_pushstack_unrefed(SubM, &v);
-					mercury_pushstack(SubM, &listlike);
+					mercury_pushstack_unrefed(SubM, &listlike);
 					((mercury_cfunc)function.data.p)(SubM, 3, 1);
 					mercury_variable o;
 					mercury_pullstack(SubM, &o);
@@ -206,11 +201,11 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 						t = M_NUMBER_OF_TYPES; //soft break from both loops.
 						i = subt.size;
 					}
-					mercury_free_var(&o);
+					mercury_release_var(&o);
 					
 				}
 				else {
-					mercury_pushstack(SubM, &listlike);
+					mercury_pushstack_unrefed(SubM, &listlike);
 					mercury_pushstack_unrefed(SubM, &v);
 					mercury_pushstack_unrefed(SubM, &k);
 					
@@ -223,7 +218,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 						t = M_NUMBER_OF_TYPES;
 						i = subt.size;
 					}
-					mercury_free_var(&o);
+					mercury_release_var(&o);
 				}
 				mercury_clearstate(SubM);
 			}
@@ -236,8 +231,8 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 	SubM->bytecode= previous;
 	mercury_clearstate(SubM);
 
-	mercury_free_var(&function);
-	mercury_free_var(&listlike);
+	mercury_release_var(&function);
+	mercury_release_var(&listlike);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
@@ -289,7 +284,7 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	iso_M->enviroment = (mercury_table*)tab.data.p;
 
 	for (mercury_int i = 0; i < args_in - 2; i++) {
-		mercury_pushstack(iso_M, argt+i);
+		mercury_pushstack_unrefed(iso_M, argt+i);
 	}
 	if (func.type == M_TYPE_FUNCTION) {
 		mercury_function* func2 = (mercury_function*)func.data.p;
@@ -320,7 +315,7 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	if (iso_M->errorcode)out.data.i = 0;
 
 	if (args_out) {
-		mercury_pushstack(M, &out);
+		mercury_pushstack_unrefed(M, &out);
 	}
 
 	if (out.data.i) {
@@ -338,8 +333,8 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	iso_M->enviroment=nullptr; //clear it before we free so that we don't discard the enviroment table.
 	mercury_destroystate(iso_M);
 
-	mercury_free_var(&func);
-	mercury_free_var(&tab);
+	mercury_release_var(&func);
+	mercury_release_var(&tab);
 
 	//MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M,args_out, 1);
 }
@@ -607,10 +602,10 @@ void mercury_lib_std_dump(mercury_state* const M_CPP_restrict M, const mercury_i
 	}
 	free(ptrs);
 
-	mercury_free_var(&vartodump);
+	mercury_release_var(&vartodump);
 	vartodump.type = M_TYPE_STRING;
 	vartodump.data.p = dmp_str;
-	mercury_pushstack(M, &vartodump);
+	mercury_pushstack_unrefed(M, &vartodump);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -633,7 +628,7 @@ void mercury_lib_std_compile(mercury_state* const M_CPP_restrict M, const mercur
 
 	mercury_variable out;
 	mercury_compile_mstring((mercury_string*)codestr.data.p, &out);
-	mercury_free_var(&codestr);
+	mercury_release_var(&codestr);
 	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 1, 1);
@@ -649,10 +644,10 @@ void mercury_lib_std_type(mercury_state* const M_CPP_restrict M, const mercury_i
 
 	mercury_variable var;
 	mercury_popstack(M,&var);
-	mercury_free_var(&var);
+	mercury_release_var(&var);
 	var.data.i = var.type;
 	var.type = M_TYPE_INT;
-	mercury_pushstack(M, &var);
+	mercury_pushstack_unrefed(M, &var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -670,10 +665,10 @@ void mercury_lib_std_tostring(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_variable i;
 	mercury_popstack(M,&i);
 	mercury_string* l = mercury_tostring(&i);
-	mercury_free_var(&i); //we can just re-use the variable struct. saves time, probly
+	mercury_release_var(&i); //we can just re-use the variable struct. saves time, probly
 	i.type = M_TYPE_STRING;
 	i.data.p = l;
-	mercury_pushstack(M, &i);
+	mercury_pushstack_unrefed(M, &i);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -731,8 +726,8 @@ void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercu
 		o.data.i = 0;
 	}
 
-	mercury_free_var(&i);
-	mercury_pushstack(M, &o);
+	mercury_release_var(&i);
+	mercury_pushstack_unrefed(M, &o);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -753,7 +748,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 
 	char* c=mercury_mstring_to_cstring((mercury_string*)i.data.p);
 
-	mercury_free_var(&i);
+	mercury_release_var(&i);
 
 	mercury_variable o;
 	o.type = M_TYPE_BOOL;
@@ -782,7 +777,7 @@ void mercury_lib_std_dynamic_library_load(mercury_state* const M_CPP_restrict M,
 	free(c);
 	
 
-	if(args_out)mercury_pushstack(M, &o);
+	if(args_out)mercury_pushstack_unrefed(M, &o);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -804,10 +799,10 @@ void mercury_lib_std_toint(mercury_state* const M_CPP_restrict M, const mercury_
 	case M_TYPE_FLOAT:
 		i.type = M_TYPE_INT;
 		i.data.i = (mercury_int)i.data.f;
-		mercury_pushstack(M, &i);
+		mercury_pushstack_unrefed(M, &i);
 		break;
 	default:
-		mercury_pushstack(M, &i);
+		mercury_pushstack_unrefed(M, &i);
 		break;
 	}
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -830,10 +825,10 @@ void mercury_lib_std_tofloat(mercury_state* const M_CPP_restrict M, const mercur
 	case M_TYPE_INT:
 		i.type = M_TYPE_FLOAT;
 		i.data.f = (mercury_float)i.data.i;
-		mercury_pushstack(M, &i);
+		mercury_pushstack_unrefed(M, &i);
 		break;
 	default:
-		mercury_pushstack(M, &i);
+		mercury_pushstack_unrefed(M, &i);
 		break;
 	}
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -952,7 +947,7 @@ int m_variable_deepcopy(mercury_variable* var_in, mercury_variable* var_out,merc
 							continue;
 						}
 						if(m_variable_deepcopy(&value,&newvalue,num_pointers_converted,pointer_conversions_in,pointer_conversions_out) != DEEPCOPY_SUCCES) {
-							mercury_free_var(&newkey);
+							mercury_release_var(&newkey);
 							continue;
 						}
 						mercury_increment_variable_refrence_count(&newkey);
@@ -1099,14 +1094,14 @@ void mercury_lib_std_deepcopy(mercury_state* const M_CPP_restrict M, const mercu
 	int code=m_variable_deepcopy(&in, &out, &nc, &cpi, &cpo);
 	free(cpi);
 	free(cpo);
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 
 	if (code != DEEPCOPY_SUCCES) {
 		out.data.i = 0;
 		out.type = M_TYPE_NIL;
 	}
 	mercury_increment_variable_refrence_count(&out);
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -1128,7 +1123,7 @@ void mercury_lib_std_error(mercury_state* const M_CPP_restrict M, const mercury_
 		}
 		mercury_mstring_delete(str);
 	}
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,0);

@@ -22,7 +22,7 @@ void mercury_lib_os_time(mercury_state* const M_CPP_restrict M, const mercury_in
 	out.data.i = t;
 	
 
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -34,6 +34,7 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_popstack(M,&cvar);
 	if (cvar.type != M_TYPE_STRING) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, M_TYPE_STRING, 1);
+		mercury_release_var(&cvar);
 		return;
 	}
 	mercury_string* code = (mercury_string*)cvar.data.p;
@@ -93,10 +94,10 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 		return;
 	}
 
-	mercury_free_var(&cvar);
+	mercury_release_var(&cvar);
 	cvar.type = M_TYPE_STRING;
 	cvar.data.p= mercury_cstring_const_to_mstring(out_c, size_c);
-	mercury_pushstack(M, &cvar);
+	mercury_pushstack_unrefed(M, &cvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -109,6 +110,7 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 	mercury_popstack(M, &cvar);
 	if (cvar.type != M_TYPE_STRING) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, M_TYPE_STRING, 1);
+		mercury_release_var(&cvar);
 		return;
 	}
 	mercury_string* code = (mercury_string*)cvar.data.p;
@@ -132,10 +134,10 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 	}
 
 
-	mercury_free_var(&cvar);
+	mercury_release_var(&cvar);
 	cvar.type = M_TYPE_INT;
 	cvar.data.i = r;
-	mercury_pushstack(M, &cvar);
+	mercury_pushstack_unrefed(M, &cvar);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -154,7 +156,7 @@ void mercury_lib_os_clock(mercury_state* const M_CPP_restrict M, const mercury_i
 	out.data.f = t;
 	
 
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -179,9 +181,10 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, M_TYPE_INT, 1);
+		mercury_release_var(&tvar);
 		return;
 	}
-	mercury_free_var(&tvar);
+	
 
 	tm timedata;
 #ifdef WIN32
@@ -250,7 +253,7 @@ void mercury_lib_os_getdate(mercury_state* const M_CPP_restrict M, const mercury
 	mercury_variable outv;
 	outv.type = M_TYPE_TABLE;
 	outv.data.p = outt;
-	mercury_pushstack(M, &outv);
+	mercury_pushstack_unrefed(M, &outv);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -280,11 +283,9 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 
 	mercury_table_get_cstring_keyvalue(tab, "seconds", &var);
 	timedata.tm_sec= (int)mercury_checkint(&var);
-	mercury_free_var(&var);
 
 	mercury_table_get_cstring_keyvalue(tab, "minutes", &var);
 	timedata.tm_min= (int)mercury_checkint(&var);
-	mercury_free_var(&var);
 	
 	mercury_table_get_cstring_keyvalue(tab, "hours", &var);
 	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
@@ -293,7 +294,6 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	else {
 		timedata.tm_hour = 0;
 	}
-	mercury_free_var(&var);
 
 	mercury_table_get_cstring_keyvalue(tab, "year", &var);
 	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
@@ -302,7 +302,6 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	else {
 		timedata.tm_year = 0;
 	}
-	mercury_free_var(&var);
 
 	mercury_table_get_cstring_keyvalue(tab, "month", &var);
 	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
@@ -311,15 +310,12 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 	else {
 		timedata.tm_mon = 0;
 	}
-	mercury_free_var(&var);
 
 	mercury_table_get_cstring_keyvalue(tab, "dayofmonth", &var);
 	timedata.tm_mday = (int)mercury_checkint(&var);
-	mercury_free_var(&var);
 	
 	mercury_table_get_cstring_keyvalue(tab, "daylightsavings", &var);
 	timedata.tm_isdst = (int)mercury_checkint(&var);
-	mercury_free_var(&var);
 
 	mercury_variable out;
 	
@@ -329,7 +325,7 @@ void mercury_lib_os_gettime(mercury_state* const M_CPP_restrict M, const mercury
 #else
 	out.data.i = timegm(&timedata);
 #endif
-	mercury_pushstack(M, &out);
+	mercury_pushstack_unrefed(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -349,7 +345,7 @@ void mercury_lib_os_exit(mercury_state* const M_CPP_restrict M, const mercury_in
 			exitcode = (int)v.data.i;
 		}
 
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 	}
 
 	exit(exitcode);
