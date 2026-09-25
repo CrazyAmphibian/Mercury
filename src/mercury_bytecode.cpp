@@ -36,10 +36,9 @@ void M_BYTECODE_ADD(mercury_state* const M_CPP_restrict M) {
 			break;
 		default:
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-			mercury_free_var(&v);
+			mercury_release_var(&v);
 			return;
 		}
-	mercury_free_var(&v);
 		
 
 	mercury_popstack(M,&v);
@@ -54,10 +53,9 @@ void M_BYTECODE_ADD(mercury_state* const M_CPP_restrict M) {
 			break;
 		default:
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-			mercury_free_var(&v);
+			mercury_release_var(&v);
 			return;
 		}
-	mercury_free_var(&v);
 
 	
 	switch (argsfloat) {
@@ -105,10 +103,9 @@ void M_BYTECODE_SUB(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -123,10 +120,9 @@ void M_BYTECODE_SUB(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	switch (argsfloat) {
@@ -174,10 +170,9 @@ void M_BYTECODE_MUL(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -192,10 +187,9 @@ void M_BYTECODE_MUL(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	switch (argsfloat) {
@@ -238,10 +232,9 @@ void M_BYTECODE_DIV(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -255,10 +248,9 @@ void M_BYTECODE_DIV(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.type = M_TYPE_FLOAT;
@@ -286,10 +278,9 @@ void M_BYTECODE_POW(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -303,10 +294,9 @@ void M_BYTECODE_POW(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.type = M_TYPE_FLOAT;
@@ -335,10 +325,9 @@ void M_BYTECODE_IDIV(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -352,10 +341,9 @@ void M_BYTECODE_IDIV(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.type = M_TYPE_INT;
@@ -388,10 +376,9 @@ void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -406,10 +393,9 @@ void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	switch (argsfloat) {
@@ -456,10 +442,9 @@ void M_BYTECODE_BAND(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	mercury_popstack(M, &v);
 	switch (v.type)
@@ -471,10 +456,9 @@ void M_BYTECODE_BAND(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.data.i = i2 & i1;
@@ -503,10 +487,9 @@ void M_BYTECODE_BOR(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	mercury_popstack(M, &v);
 	switch (v.type)
@@ -518,10 +501,9 @@ void M_BYTECODE_BOR(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.data.i = i2 | i1;
@@ -550,10 +532,9 @@ void M_BYTECODE_BXOR(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	mercury_popstack(M, &v);
 	switch (v.type)
@@ -565,10 +546,9 @@ void M_BYTECODE_BXOR(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.data.i = i2 ^ i1;
@@ -596,10 +576,9 @@ void M_BYTECODE_BNOT(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 	
 
 	
@@ -633,10 +612,9 @@ void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	mercury_popstack(M, &v);
 	switch (v.type)
@@ -648,10 +626,9 @@ void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.data.i = i2 << i1;
@@ -680,10 +657,9 @@ void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	mercury_popstack(M, &v);
 	switch (v.type)
@@ -695,10 +671,9 @@ void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.data.i = i2 >> i1;
@@ -718,24 +693,22 @@ void M_BYTECODE_LAND(mercury_state* const M_CPP_restrict M) {
 	mercury_popstack(M,&v1);
 
 	if (!mercury_checkbool(&v1)) {
-		mercury_free_var(&v1);
-		mercury_free_var(&v2);
-		
+		mercury_release_var(&v1);
+		mercury_release_var(&v2);
 		v2.data.i = 0;
 		v2.type = M_TYPE_BOOL; //false.
 		mercury_pushstack(M,&v2);
 		return;
 	}
-	if (!mercury_checkbool(&v2)) {
-		mercury_free_var(&v1);
-		mercury_free_var(&v2);
-		
+	if (!mercury_checkbool(&v2)) {	
+		mercury_release_var(&v1);
+		mercury_release_var(&v2);
 		v2.data.i = 0;
 		v2.type = M_TYPE_BOOL; //false.
 		mercury_pushstack(M, &v2);
 		return;
 	}
-	mercury_free_var(&v1);
+	mercury_release_var(&v1);
 	mercury_pushstack(M, &v2);
 }
 
@@ -746,11 +719,11 @@ void M_BYTECODE_LOR(mercury_state* const M_CPP_restrict M) {
 	mercury_popstack(M, &v1);
 
 	if (mercury_checkbool(&v1)) {
-		mercury_free_var(&v2);
+		mercury_release_var(&v2);
 		mercury_pushstack(M, &v1);
 		return;
 	}
-	mercury_free_var(&v1);
+	mercury_release_var(&v1);
 	mercury_pushstack(M, &v2);
 }
 
@@ -762,27 +735,25 @@ void M_BYTECODE_LXOR(mercury_state* const M_CPP_restrict M) {
 
 	if (mercury_checkbool(&v1)) {
 		if (mercury_checkbool(&v2)) {
-			mercury_free_var(&v1);
-			mercury_free_var(&v2);
-			
+			mercury_release_var(&v1);
+			mercury_release_var(&v2);
 			v2.data.i = 0;
 			v2.type = M_TYPE_BOOL; //false.
 			mercury_pushstack(M, &v2);
 		}
 		else {
-			mercury_free_var(&v2);
+			mercury_release_var(&v2);
 			mercury_pushstack(M, &v1);
 		}
 	}
 	else {
 		if (mercury_checkbool(&v2)) {
-			mercury_free_var(&v1);
+			mercury_release_var(&v1);
 			mercury_pushstack(M, &v2);
 		}
-		else {
-			mercury_free_var(&v1);
-			mercury_free_var(&v2);
-			
+		else {		
+			mercury_release_var(&v1);
+			mercury_release_var(&v2);
 			v2.data.i = 0;
 			v2.type = M_TYPE_BOOL; //false.
 			mercury_pushstack(M, &v2);
@@ -795,15 +766,13 @@ void M_BYTECODE_LNOT(mercury_state* const M_CPP_restrict M) {
 	mercury_popstack(M, &v1);
 
 	if (mercury_checkbool(&v1)) {
-		mercury_free_var(&v1);
-		
+		mercury_release_var(&v1);
 		v1.data.i = 0;
 		v1.type = M_TYPE_BOOL; //false.
 		mercury_pushstack(M, &v1);
 		return;
 	}
-	mercury_free_var(&v1);
-	
+	mercury_release_var(&v1);
 	v1.data.i = 1;
 	v1.type = M_TYPE_BOOL; //false.
 	mercury_pushstack(M, &v1);
@@ -817,20 +786,16 @@ void M_BYTECODE_EQL(mercury_state* const M_CPP_restrict M) {
 	mercury_popstack(M, &v1);
 
 	if (mercury_vars_equal(&v1, &v2)) {
-		mercury_free_var(&v1);
-		mercury_free_var(&v2);
-
-		
+		mercury_release_var(&v1);
+		mercury_release_var(&v2);
 		v1.data.i = 1;
 		v1.type = M_TYPE_BOOL; //true.
 		mercury_pushstack(M, &v1);
 		return;
 	}
 	else {
-		mercury_free_var(&v1);
-		mercury_free_var(&v2);
-
-		
+		mercury_release_var(&v1);
+		mercury_release_var(&v2);
 		v1.data.i = 0;
 		v1.type = M_TYPE_BOOL; //false.
 		mercury_pushstack(M, &v1);
@@ -845,20 +810,16 @@ void M_BYTECODE_NEQ(mercury_state* const M_CPP_restrict M) {
 	mercury_popstack(M, &v1);
 
 	if (mercury_vars_equal(&v1, &v2)) {
-		mercury_free_var(&v1);
-		mercury_free_var(&v2);
-
-		
+		mercury_release_var(&v1);
+		mercury_release_var(&v2);
 		v1.data.i = 0;
 		v1.type = M_TYPE_BOOL; //true.
 		mercury_pushstack(M, &v1);
 		return;
 	}
 	else {
-		mercury_free_var(&v1);
-		mercury_free_var(&v2);
-
-		
+		mercury_release_var(&v1);
+		mercury_release_var(&v2);
 		v1.data.i = 1;
 		v1.type = M_TYPE_BOOL; //false.
 		mercury_pushstack(M, &v1);
@@ -890,10 +851,9 @@ void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -908,10 +868,9 @@ void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.type = M_TYPE_BOOL;
@@ -956,11 +915,9 @@ void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
-
 
 	mercury_popstack(M, &v);
 	switch (v.type)
@@ -974,10 +931,9 @@ void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	
 	v.type = M_TYPE_BOOL;
@@ -1022,10 +978,9 @@ void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -1040,10 +995,9 @@ void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 	v.type = M_TYPE_BOOL;
 	
@@ -1088,10 +1042,9 @@ void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
 
 
 	mercury_popstack(M, &v);
@@ -1106,10 +1059,10 @@ void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_free_var(&v);
+		mercury_release_var(&v);
 		return;
 	}
-	mercury_free_var(&v);
+
 
 	v.type = M_TYPE_BOOL;
 	
@@ -1145,8 +1098,11 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 		while (sz) {
 			sz--;
 			if (mercury_vars_equal(st->keys + sz, &key)) {
-				mercury_free_var(&key);
-				mercury_free_var(st->values + sz);
+				mercury_increment_variable_refrence_count(&value);
+				mercury_increment_variable_refrence_count(st->keys + sz);
+				mercury_decrement_variable_refrence_count(st->values + sz);
+				mercury_release_var(&key);
+				mercury_release_var(st->values + sz);
 				st->values[sz] = value;
 				return;
 			}
@@ -1170,6 +1126,9 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 	}
 	st.values = (mercury_variable*)nptr;
 
+	mercury_increment_variable_refrence_count(&key);
+	mercury_increment_variable_refrence_count(&value);
+
 	st.keys[st.size] = key;
 	st.values[st.size] = value;
 
@@ -1184,25 +1143,13 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 
 	mercury_state* check_state = M;
 	while (check_state) {
-		/*
-		mercury_int pos = mercury_tablehaskey(check_state->enviroment, &key);
-		if (pos != -1) {
-			mercury_subtable* st = check_state->enviroment->data[key.type];
-			mercury_free_var(&key);
-			mercury_clonevariable(st->values+pos, &value);
-			mercury_pushstack_unrefed(M, &value);
-			return;
-		}
-		*/
-
 		mercury_subtable st= check_state->enviroment->data[key.type];
 		mercury_int sz=st.size;
 		while (sz){
 			sz--;
 			if (mercury_vars_equal(st.keys+ sz, &key)) {
-				mercury_free_var(&key);
-				mercury_clonevariable(st.values + sz, &value);
-				mercury_pushstack_unrefed(M, &value);
+				mercury_release_var(&key);
+				mercury_pushstack(M, st.values + sz);
 				return;
 			}
 		}
@@ -1232,23 +1179,21 @@ void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
 	case M_TYPE_ARRAY:
 		if (key.type != M_TYPE_INT) {
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table,M_TYPE_INT, 2);
-			mercury_free_var(&value);
-			mercury_free_var(&key);
-			mercury_free_var(&table);
+			mercury_release_var(&value);
+			mercury_release_var(&key);
+			mercury_release_var(&table);
 			return;
 		}
 		mercury_setarray((mercury_array*)table.data.p, &value, key.data.i);
-		mercury_free_var(&key);
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
-		mercury_free_var(&value);
-		mercury_free_var(&key);
-		mercury_free_var(&table);
+		mercury_release_var(&value);
+		mercury_release_var(&key);
+		mercury_release_var(&table);
 		return;
 	}
-
-	mercury_free_var(&table);	
+	//mercury_release_var(&table); this breaks tables defined like a={1,2,3}
 }
 
 void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
@@ -1266,18 +1211,17 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 	case M_TYPE_ARRAY:
 		if (key.type != M_TYPE_INT) {
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table, M_TYPE_INT, 2);
-			mercury_free_var(&key);
-			mercury_free_var(&table);
+			mercury_release_var(&key);
+			mercury_release_var(&table);
 			return;
 		}
 		mercury_getarray((mercury_array*)table.data.p, key.data.i,&value);
-		mercury_free_var(&key);
 		break;
 	case M_TYPE_STRING:
 		if (key.type != M_TYPE_INT) {
 			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, table.type, M_TYPE_INT,2);
-			mercury_free_var(&key);
-			mercury_free_var(&table);
+			mercury_release_var(&key);
+			mercury_release_var(&table);
 			return;
 		}
 		
@@ -1286,13 +1230,14 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
-		mercury_free_var(&key);
-		mercury_free_var(&table);
+		mercury_release_var(&key);
+		mercury_release_var(&table);
 		return;
 	}
-	
-	mercury_free_var(&table);
-	mercury_pushstack_unrefed(M, &value);
+	mercury_increment_variable_refrence_count(&value); //so the value cannot be freed before it is sent out
+	mercury_release_var(&table);
+	mercury_decrement_variable_refrence_count(&value);
+	mercury_pushstack(M, &value);
 }
 
 
@@ -1308,8 +1253,7 @@ void M_BYTECODE_SREG(mercury_state* const M_CPP_restrict M) {
 		M->registers[regnum] = v;
 	}
 	else {
-		mercury_popstack(M,&v);
-		mercury_free_var(&v);
+		mercury_discard_top_of_stack(M);
 	}
 
 }
@@ -1387,31 +1331,16 @@ void M_BYTECODE_NSTR(mercury_state* const M_CPP_restrict M) { //New STRing
 
 	mercury_variable out;
 	
-
-	mercury_string* const so = (mercury_string*)malloc(sizeof(mercury_string));
+	mercury_string* so=mercury_cstring_to_mstring( (char*)(M->bytecode.instructions + M->programcounter), string_size);
 	if (!so) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	if (string_size) {
-		char* str=(char*)malloc(sizeof(char) * string_size);
-		if (!str) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			return;
-		}
-		memcpy(str, M->bytecode.instructions + M->programcounter, string_size);
-		so->ptr = str;// (char*)(M->bytecode.instructions + M->programcounter);
-		so->constant = false;
-	}
-	else so->ptr = nullptr;
-
-	so->size = string_size;
-	so->refrences = 1;
 	out.data.p = so;
 	out.type = M_TYPE_STRING;
 	M->programcounter += (string_size+ sizeof(mercury_opcode)-1)/sizeof(mercury_opcode);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 }
 
 void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / No FUN
@@ -1429,7 +1358,7 @@ void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / N
 		return;
 	}
 
-	fptr->refrences = 1;
+	fptr->refrences = 0;
 	fptr->numberofinstructions = function_size;
 	fptr->instructions = (mercury_opcode*)malloc(function_size * sizeof(mercury_opcode));
 	fptr->enviromental = false;
@@ -1487,7 +1416,7 @@ void M_BYTECODE_NFUN(mercury_state* const M_CPP_restrict M) { //New FUNction / N
 	out.data.p = fptr;
 	M->programcounter += function_size;
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 }
 
 void M_BYTECODE_NTAB(mercury_state* const M_CPP_restrict M) { //New TABle
@@ -1501,7 +1430,7 @@ void M_BYTECODE_NTAB(mercury_state* const M_CPP_restrict M) { //New TABle
 	
 	out.type = M_TYPE_TABLE;
 	out.data.p = (void*)ntab;
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 }
 
 void M_BYTECODE_NARR(mercury_state* const M_CPP_restrict M) { //New ARRay
@@ -1515,7 +1444,7 @@ void M_BYTECODE_NARR(mercury_state* const M_CPP_restrict M) { //New ARRay
 	
 	out.type = M_TYPE_ARRAY;
 	out.data.p = (void*)narr;
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 }
 
 void M_BYTECODE_JMP(mercury_state* const M_CPP_restrict M) { //JuMP
@@ -1535,7 +1464,7 @@ void M_BYTECODE_JIF(mercury_state* const M_CPP_restrict M) { //Jump IF
 	else {
 		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	}
-	mercury_free_var(&ck);
+	mercury_release_var(&ck);
 }
 
 void M_BYTECODE_JNIF(mercury_state* const M_CPP_restrict M) { //Jump Not IF
@@ -1547,7 +1476,7 @@ void M_BYTECODE_JNIF(mercury_state* const M_CPP_restrict M) { //Jump Not IF
 	else {
 		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	}
-	mercury_free_var(&ck);
+	mercury_release_var(&ck);
 }
 
 void M_BYTECODE_JRIF(mercury_state* const M_CPP_restrict M) { //Jump Relative IF
@@ -1559,7 +1488,7 @@ void M_BYTECODE_JRIF(mercury_state* const M_CPP_restrict M) { //Jump Relative IF
 	else {
 		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	}
-	mercury_free_var(&ck);
+	mercury_release_var(&ck);
 }
 
 void M_BYTECODE_JRNI(mercury_state* const M_CPP_restrict M) { //Jump Relative Not If
@@ -1571,7 +1500,7 @@ void M_BYTECODE_JRNI(mercury_state* const M_CPP_restrict M) { //Jump Relative No
 	else {
 		M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	}
-	mercury_free_var(&ck);
+	mercury_release_var(&ck);
 }
 
 void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
@@ -1602,12 +1531,12 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 		mercury_variable tmp;
 		for (mercury_int i = 0; i < args_in;i++) {
 			mercury_popstack(M, &tmp);
-			mercury_pushstack_unrefed(FM, &tmp);
+			mercury_pushstack(FM, &tmp);
 		}
 		while (mercury_stepstate(FM)) {};
 		for (mercury_int i = 0; i < args_out; i++) {
 			mercury_pullstack(FM, &tmp);
-			mercury_pushstack_unrefed(M, &tmp);
+			mercury_pushstack(M, &tmp);
 		}
 		//FM->bytecode.instructions = nullptr; //so the bytecode isn't freed
 		FM->bytecode = previous;
@@ -1622,10 +1551,10 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, &ck, 0);
-		mercury_free_var(&ck);
+		mercury_release_var(&ck);
 		return;
 	}
-	mercury_free_var(&ck);
+	mercury_release_var(&ck);
 }
 
 void M_BYTECODE_END(mercury_state* const M_CPP_restrict M) { //end state execution
@@ -1660,10 +1589,10 @@ void M_BYTECODE_LEN(mercury_state* const M_CPP_restrict M) { //LENgth
 		break;
 	default:
 		mercury_raise_error_nonpointer(M, M_ERROR_INDEX_INVALID_TYPE, var.type);
-		mercury_free_var(&var);
+		mercury_release_var(&var);
 		return;
 	}
-	mercury_free_var(&var);
+	mercury_release_var(&var);
 	mercury_pushstack(M,&out);
 }
 
@@ -1698,19 +1627,19 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 	
 	v.data.p=mercury_mstrings_concat(s1, s2);
 
-	mercury_free_var(&v1);
-	mercury_free_var(&v2);
+	mercury_release_var(&v1);
+	mercury_release_var(&v2);
 
 	if (s1_shouldfree)mercury_mstring_delete(s1);
 	if (s2_shouldfree)mercury_mstring_delete(s2);
-	mercury_pushstack_unrefed(M, &v);
+	mercury_pushstack(M, &v);
 }
 
 
 void M_BYTECODE_CLS(mercury_state* const M_CPP_restrict M) { // CLear Stack
 	//as simple as it gets, really.
 	for (mercury_uint i = 0; i < M->sizeofstack;i++) {
-		mercury_free_var(M->stack + i);
+		mercury_release_var(M->stack + i);
 	}
 	M->sizeofstack = 0;
 
@@ -1721,22 +1650,20 @@ void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 	//yeah, this is pretty simple.
 	mercury_variable k;
 	mercury_popstack(M, &k);
-	mercury_variable v;
 	mercury_subtable st = M->enviroment->data[k.type];
 	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
 		if (mercury_vars_equal(st.keys+sz,&k)) {
-			mercury_free_var(&k);
-			mercury_clonevariable(st.values + sz, &v);
-			mercury_pushstack_unrefed(M, &v);
+			mercury_release_var(&k);
+			mercury_pushstack(M, st.values + sz);
 			return;
 		}
 	}
-	
+	mercury_variable v;
 	v.data.i = 0;
 	v.type = M_TYPE_NIL;
-	mercury_pushstack_unrefed(M,&v);
+	mercury_pushstack(M,&v);
 }
 
 void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
@@ -1752,8 +1679,10 @@ void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	while (sz) {
 		sz--;
 		if (mercury_vars_equal(st.keys + sz, &key)) {
-			mercury_free_var(&key);
-			mercury_free_var(st.values+sz);
+			mercury_increment_variable_refrence_count(&value);
+			mercury_decrement_variable_refrence_count(st.values + sz);
+			mercury_release_var(&key);
+			mercury_release_var(st.values + sz);
 			st.values[sz] = value;
 			return;
 		}
@@ -1772,6 +1701,8 @@ void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	}
 	st.values = (mercury_variable*)nptr;
 
+	mercury_increment_variable_refrence_count(&key);
+	mercury_increment_variable_refrence_count(&value);
 	st.keys[st.size] = key;
 	st.values[st.size] = value;
 
@@ -1783,22 +1714,20 @@ void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
 	//ditto.
 	mercury_variable k;
 	mercury_popstack(M, &k);
-	mercury_variable v;
 	mercury_subtable st = M->masterstate->enviroment->data[k.type];
 	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
 		if (mercury_vars_equal(st.keys + sz, &k)) {
-			mercury_free_var(&k);
-			mercury_clonevariable(st.values + sz, &v);
-			mercury_pushstack_unrefed(M, &v);
+			mercury_release_var(&k);
+			mercury_pushstack(M, st.values + sz);
 			return;
 		}
 	}
-	
+	mercury_variable v;
 	v.data.i = 0;
 	v.type = M_TYPE_NIL;
-	mercury_pushstack_unrefed(M, &v);
+	mercury_pushstack(M, &v);
 }
 
 void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
@@ -1814,8 +1743,10 @@ void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 	while (sz) {
 		sz--;
 		if (mercury_vars_equal(st.keys + sz, &key)) {
-			mercury_free_var(&key);
-			mercury_free_var(st.values + sz);
+			mercury_increment_variable_refrence_count(&value);
+			mercury_decrement_variable_refrence_count(st.values + sz);
+			mercury_release_var(&key);
+			mercury_release_var(st.values + sz);
 			st.values[sz] = value;
 			return;
 		}
@@ -1834,6 +1765,8 @@ void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 	}
 	st.values = (mercury_variable*)nptr;
 
+	mercury_increment_variable_refrence_count(&key);
+	mercury_increment_variable_refrence_count(&value);
 	st.keys[st.size] = key;
 	st.values[st.size] = value;
 
@@ -1844,12 +1777,8 @@ void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M) { // CoPY Top (of stack)
 	if (!M->sizeofstack)return; //nothing on stack, nothing to copy.
 
-	mercury_variable val= M->stack[M->sizeofstack - 1];
-	mercury_variable out;
-	
-	mercury_clonevariable(&val,&out);
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, M->stack+(M->sizeofstack - 1) );
 }
 
 
@@ -1886,11 +1815,7 @@ void M_BYTECODE_CPYX(mercury_state* const M_CPP_restrict M) { // CoPY X elements
 			continue;
 		}
 
-		const mercury_variable val = M->stack[index];
-		mercury_variable out;
-		mercury_clonevariable(&val, &out);
-
-		mercury_pushstack(M, &out);
+		mercury_pushstack(M, M->stack+index);
 	}
 
 }
@@ -1989,8 +1914,7 @@ void M_BYTECODE_SCON(mercury_state* const M_CPP_restrict M) { //Set CONstant
 	
 	mercury_variable v;
 	mercury_popstack(M,&v);
-	//printf("added a new constant (num %i) at %p. type: %i data:%i\n",con_num ,v,v->type,v->data.i );
-	//v.constant = 1;
+	mercury_increment_variable_refrence_count(&v);
 	M->constants[con_num] = v;
 }
 
@@ -2001,10 +1925,7 @@ void M_BYTECODE_GCON(mercury_state* const M_CPP_restrict M) { //Get CONstant
 		M_BYTECODE_NNIL(M);
 		return;
 	}
-	//printf("got a new constant (num %i) at %p. type:%i data:%i\n", con_num, M->constants[con_num], M->constants[con_num]->type, M->constants[con_num]->data.i);
-	mercury_variable v;
-	//mercury_clonevariable(M->constants+con_num, &v);
-	//mercury_pushstack_unrefed(M, &v);
+
 	mercury_pushstack(M, M->constants + con_num);
 }
 

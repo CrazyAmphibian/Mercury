@@ -54,7 +54,7 @@ void mercury_lib_math_min(mercury_state* const M_CPP_restrict M, const mercury_i
 			}
 		}
 
-		mercury_free_var(&var);
+		mercury_release_var(&var);
 	}
 
 	mercury_pushstack(M, &out);
@@ -111,7 +111,7 @@ void mercury_lib_math_max(mercury_state* const M_CPP_restrict M, const mercury_i
 			}
 		}
 
-		mercury_free_var(&var);
+		mercury_release_var(&var);
 	}
 
 	mercury_pushstack(M, &out);
@@ -143,9 +143,9 @@ void mercury_lib_math_floor(mercury_state* const M_CPP_restrict M, const mercury
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-	mercury_free_var(&val);
 
 	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
@@ -177,9 +177,9 @@ void mercury_lib_math_ceil(mercury_state* const M_CPP_restrict M, const mercury_
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-	mercury_free_var(&val);
 
 	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -212,10 +212,9 @@ void mercury_lib_math_to_radians(mercury_state* const M_CPP_restrict M, const me
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = (m_math_pi*out.data.f)/180.0;
 
@@ -248,10 +247,9 @@ void mercury_lib_math_to_degrees(mercury_state* const M_CPP_restrict M, const me
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = (180.0 * out.data.f) / m_math_pi;
 
@@ -292,6 +290,7 @@ void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_i
 		}
 		else if (base.type != M_TYPE_FLOAT) {
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &base, 2);
+			mercury_release_var(&base);
 			return;
 		}
 		mercury_popstack(M, &num);
@@ -303,21 +302,19 @@ void mercury_lib_math_log(mercury_state* const M_CPP_restrict M, const mercury_i
 	}
 	else if (num.type != M_TYPE_FLOAT) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &num, 1);
-		
+		mercury_release_var(&num);
 		return;
 	}
 
 
 	if (base.type) {
 		out.data.f = log(num.data.f) / log(base.data.f);
-		mercury_free_var(&base);
 	}
 	else {
 		out.data.f = log(num.data.f);
 	}
 
 	mercury_pushstack(M,&out);
-	mercury_free_var(&num);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
 }
 
@@ -352,10 +349,9 @@ void mercury_lib_math_to_absolute(mercury_state* const M_CPP_restrict M, const m
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -388,10 +384,9 @@ void mercury_lib_math_to_sin(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = sin( out.data.f);
 
@@ -423,10 +418,9 @@ void mercury_lib_math_to_cos(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = cos(out.data.f);
 
@@ -459,10 +453,9 @@ void mercury_lib_math_to_tan(mercury_state* const M_CPP_restrict M, const mercur
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = tan(out.data.f);
 
@@ -494,10 +487,9 @@ void mercury_lib_math_to_asin(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = asin(out.data.f);
 
@@ -529,10 +521,9 @@ void mercury_lib_math_to_acos(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = acos(out.data.f);
 
@@ -565,10 +556,9 @@ void mercury_lib_math_to_atan(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 1);
+		mercury_release_var(&val);
 		return;
 	}
-
-	mercury_free_var(&val);
 
 	out.data.f = atan(out.data.f);
 
@@ -601,6 +591,7 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &val, 2);
+		mercury_release_var(&val);
 		return;
 	}
 
@@ -614,13 +605,11 @@ void mercury_lib_math_to_atan2(mercury_state* const M_CPP_restrict M, const merc
 	}
 	else {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &y, 1);
+		mercury_release_var(&y);
 		return;
 	}
 
 	out.data.f = atan2(y.data.f,out.data.f);
-
-	mercury_free_var(&val);
-	mercury_free_var(&y);
 
 	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -668,11 +657,13 @@ void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercur
 
 	if (args_in && (v1.type != M_TYPE_INT) && (v1.type != M_TYPE_FLOAT) ) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v1,1);
+		mercury_release_var(&v1);
 		return;
 	}
 
 	if (args_in &&  (v2.type != M_TYPE_INT) && (v2.type != M_TYPE_FLOAT)) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v2, 2);
+		mercury_release_var(&v2);
 		return;
 	}
 
@@ -707,9 +698,6 @@ void mercury_lib_math_random(mercury_state* const M_CPP_restrict M, const mercur
 		out.data.f = (f*(max-min)) + min;
 	}
 
-	mercury_free_var(&v1);
-	mercury_free_var(&v2);
-
 	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -729,11 +717,13 @@ void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mer
 
 	if ( (v1.type != M_TYPE_INT)) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v1, M_TYPE_INT, 1);
+		mercury_release_var(&v1);
 		return;
 	}
 
 	if ( (v2.type != M_TYPE_INT)) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v2, M_TYPE_INT, 2);
+		mercury_release_var(&v2);
 		return;
 	}
 
@@ -750,9 +740,6 @@ void mercury_lib_math_randomint(mercury_state* const M_CPP_restrict M, const mer
 	mercury_int max = v2.data.i;
 
 	out.data.i = ((r) % (max - min + 1)) + min;
-
-	mercury_free_var(&v1);
-	mercury_free_var(&v2);
 
 	mercury_pushstack(M, &out);
 
@@ -773,11 +760,11 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 
 		if ((v1.type != M_TYPE_INT)) {
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v1, M_TYPE_INT, 1);
+			mercury_release_var(&v1);
 			return;
 		}
 
-		M_RANDOM_STATE = (v1.data.u&0xFFFFFFFF)<<16;
-		mercury_free_var(&v1);
+		M_RANDOM_STATE = ((uint64_t)v1.data.u&0xFFFFFFFF)<<16;
 	}
 
 
@@ -818,7 +805,7 @@ void mercury_lib_math_isnan(mercury_state* const M_CPP_restrict M, const mercury
 		out.data.i = (val.data.i & 0x7f800000)== 0x7f800000;
 #endif
 	}
-	mercury_free_var(&val);
+	mercury_release_var(&val);
 
 	mercury_pushstack(M, &out);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
@@ -836,6 +823,7 @@ void mercury_lib_math_min_array(mercury_state* const M_CPP_restrict M, const mer
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_ARRAY) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_ARRAY, 1);
+		mercury_release_var(&in);
 	}
 
 	mercury_variable out;
@@ -911,7 +899,7 @@ void mercury_lib_math_min_array(mercury_state* const M_CPP_restrict M, const mer
 	}
 
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	
 	mercury_pushstack(M,&out);
 
@@ -930,6 +918,7 @@ void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mer
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_ARRAY) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_ARRAY, 1);
+		mercury_release_var(&in);
 	}
 
 	mercury_variable out;
@@ -1005,7 +994,7 @@ void mercury_lib_math_max_array(mercury_state* const M_CPP_restrict M, const mer
 	}
 
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 
 	mercury_pushstack(M, &out);
 
@@ -1037,7 +1026,7 @@ void mercury_lib_math_mean(mercury_state* const M_CPP_restrict M, const mercury_
 			out.data.f += (mercury_float)var.data.i;
 		}
 
-		mercury_free_var(&var);
+		mercury_release_var(&var);
 	}
 
 	out.data.f /= args_in;
@@ -1058,6 +1047,7 @@ void mercury_lib_math_mean_array(mercury_state* const M_CPP_restrict M, const me
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_ARRAY) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_ARRAY, 1);
+		mercury_release_var(&in);
 	}
 
 	mercury_variable out;
@@ -1124,7 +1114,7 @@ void mercury_lib_math_mean_array(mercury_state* const M_CPP_restrict M, const me
 
 	out.data.f /= (mercury_float)elements_traversed;
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 
 	mercury_pushstack(M, &out);
 

@@ -318,12 +318,11 @@ MERCURY_DYNAMIC_LIBRARY void mercury_destroystate(mercury_state* const M_CPP_res
 
 //stack
 MERCURY_DYNAMIC_LIBRARY void mercury_popstack(mercury_state* const M_CPP_restrict M, mercury_variable* out);
-MERCURY_DYNAMIC_LIBRARY bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
 MERCURY_DYNAMIC_LIBRARY void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* out);
-MERCURY_DYNAMIC_LIBRARY bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
+MERCURY_DYNAMIC_LIBRARY bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var);
 
-MERCURY_DYNAMIC_LIBRARY void mercury_free_var(mercury_variable* const M_CPP_restrict var);
-MERCURY_DYNAMIC_LIBRARY void mercury_clonevariable(const mercury_variable* const var, mercury_variable* out);
+MERCURY_DYNAMIC_LIBRARY void mercury_release_var(mercury_variable* const M_CPP_restrict var);
+
 
 //misc
 MERCURY_DYNAMIC_LIBRARY bool mercury_checkbool(const mercury_variable* const M_CPP_restrict var);
@@ -348,11 +347,11 @@ inline void mercury_clear_variable(mercury_variable* var) {
 	var->type = M_TYPE_NIL;
 }
 
-//frees the top stack and decrements the stack size. analagous to popstack freevar, albeit a bit faster.
+//frees the top stack and decrements the stack size. analagous to popstack releasevar, albeit a bit faster.
 inline void mercury_discard_top_of_stack(mercury_state* const M_CPP_restrict M) {
 	if (M->sizeofstack) {
 		M->sizeofstack--;
-		mercury_free_var(M->stack + M->sizeofstack);
+		mercury_release_var(M->stack + M->sizeofstack);
 	}
 }
 

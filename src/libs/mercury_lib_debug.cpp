@@ -181,7 +181,7 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const
 		else {
 			printf("variable (type %hhu) is not a function (type %hhu). failed to dump bytecode.",in.type,M_TYPE_FUNCTION);
 		}
-		mercury_free_var(&in);
+		mercury_release_var(&in);
 	}
 	else {
 
@@ -214,7 +214,7 @@ void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restric
 		else {
 			printf("variable (type %hhu) is not a function (type %hhu). failed to dump bytecode.", in.type, M_TYPE_FUNCTION);
 		}
-		mercury_free_var(&in);
+		mercury_release_var(&in);
 	}
 	else {
 
@@ -257,7 +257,7 @@ void mercury_lib_debug_refcount_dbg(mercury_state* const M_CPP_restrict M, const
 		default:
 			printf("type is not refcounted.\n");
 	}
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
@@ -292,7 +292,7 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 		else {
 			printf("variable (type %hhu) is not a function (type %hhu). failed to dump bytecode.",in.type, M_TYPE_FUNCTION);
 		}
-		mercury_free_var(&in);
+		mercury_release_var(&in);
 	}
 	else {
 

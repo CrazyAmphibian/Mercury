@@ -198,8 +198,8 @@ int main(int argc, char** argv) {
 	}
 
 	if (interactivemode) {
-		if (funcy.type == M_TYPE_FUNCTION) {
-			M->programcounter = 0;
+		if (funcy.type == M_TYPE_FUNCTION) { //cleanup the state partially
+			M->programcounter = 0; //clear bytecode
 			free(code);
 			M->bytecode.numberofinstructions = 0;
 
@@ -220,11 +220,15 @@ int main(int argc, char** argv) {
 
 			
 
-			for (mercury_uint i = 0; i < M->sizeofstack;i++) {
-				mercury_variable v;
-				mercury_popstack(M, &v);
-				mercury_free_var(&v); //clean up the stack
+			while (M->sizeofstack) { //clear stack
+				mercury_discard_top_of_stack(M);
 			}
+
+			for (mercury_uint i = 0; i < M->num_constants; i++) { //clear constants
+				mercury_decrement_variable_refrence_count(M->constants + i);
+				mercury_release_var(M->constants + i);
+			}
+			M->num_constants = 0;
 		}
 		goto start;
 	}

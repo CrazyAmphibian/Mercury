@@ -36,22 +36,23 @@ mercury_string* mercury_cstring_to_mstring(const char* const M_CPP_restrict str 
 	if (!nstr) return nullptr;
 	char* nad = (char*)malloc(sizeof(char) * size);
 	if (!nad) return nullptr;
+	memcpy(nad, str, size * sizeof(char));
+
+	memset(nstr, 0, sizeof(mercury_string));
+
 	nstr->size = size;
-	
-	memcpy(nad,str,size*sizeof(char));
 	nstr->ptr = nad;
-	nstr->constant = false;
-	nstr->refrences = 1;
 	return nstr;
 }
 
 mercury_string* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size) {
 	mercury_string* nstr = (mercury_string*)malloc(sizeof(mercury_string));
 	if (!nstr) return nullptr;
+
 	nstr->size = size;
 	nstr->ptr = (char*)str;
 	nstr->constant = true;
-	nstr->refrences = 1;
+	nstr->refrences = 0;
 	return nstr;
 }
 
@@ -105,7 +106,7 @@ mercury_string* mercury_mstrings_concat(const mercury_string* const str1, const 
 	memcpy(nstr->ptr+str1->size, str2->ptr, str2->size * sizeof(char));
 	nstr->constant = false;
 	nstr->size = str1->size + str2->size;
-	nstr->refrences = 1;
+	nstr->refrences = 0;
 	return nstr;
 }
 
@@ -177,7 +178,7 @@ mercury_string* mercury_mstring_substring(mercury_string* str, mercury_int start
 
 	nstr->size = 1l+end - start;
 	nstr->ptr=(char*)malloc(sizeof(char)*nstr->size);
-	nstr->refrences = 1;
+	nstr->refrences = 0;
 	nstr->constant = false;
 	if (!nstr->ptr) {
 		nstr->size = 0;
@@ -202,7 +203,7 @@ mercury_table* mercury_newtable() {
 	}
 	*/
 	newt->enviromental = false;
-	newt->refrences = 1;
+	newt->refrences = 0;
 
 	return newt;
 }
@@ -211,8 +212,10 @@ void mercury_destroytable(mercury_table* const table) { //not ideal, but it work
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st.size; i2++) {
-			mercury_free_var(st.keys+i2);
-			mercury_free_var(st.values+i2);
+			mercury_decrement_variable_refrence_count(st.keys + i2);
+			mercury_decrement_variable_refrence_count(st.values + i2);
+			mercury_release_var(st.keys + i2);
+			mercury_release_var(st.values + i2);
 		}
 		free(st.keys);
 		free(st.values);
@@ -225,8 +228,10 @@ void mercury_cleartable(const mercury_table* const table) {
 	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
 		mercury_subtable st = table->data[i];
 		for (mercury_int i2 = 0; i2 < st.size; i2++) {
-			mercury_free_var(st.keys+i2);
-			mercury_free_var(st.values+i2);
+			mercury_decrement_variable_refrence_count(st.keys + i2);
+			mercury_decrement_variable_refrence_count(st.values + i2);
+			mercury_release_var(st.keys + i2);
+			mercury_release_var(st.values + i2);
 		}
 		table->data[i].size = 0;
 	}
@@ -245,12 +250,12 @@ bool mercury_getkey(const mercury_table* const table, mercury_variable* const ke
 	const mercury_subtable subt=table->data[key->type];
 	for (mercury_int i = 0; i < subt.size; i++) {
 		if (mercury_vars_equal(subt.keys+i, key)) {
-			mercury_free_var(key);
-			mercury_clonevariable(subt.values+i, out);
+			mercury_release_var(key);
+			*out = subt.values[i];
 			return true;
 		}
 	}
-	mercury_free_var(key);
+	mercury_release_var(key);
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
 	return false;
@@ -260,8 +265,10 @@ mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const k
 	mercury_subtable subt = table->data[key->type];
 	for (mercury_int i = 0; i < subt.size; i++) {
 		if (mercury_vars_equal(subt.keys+i,key)) {
-			mercury_free_var(subt.values+i);
-			mercury_free_var(key);
+			mercury_increment_variable_refrence_count(value);
+			mercury_decrement_variable_refrence_count(subt.values + i);
+			mercury_release_var(subt.values+i);
+			mercury_release_var(key);
 			subt.values[i] = *value;
 			return i;
 		}
@@ -274,6 +281,8 @@ mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const k
 	if (nptr == nullptr) return -1;
 	subt.values = (mercury_variable*)nptr;
 
+	mercury_increment_variable_refrence_count(key);
+	mercury_increment_variable_refrence_count(value);
 	subt.keys[subt.size] = *key;
 	subt.values[subt.size] = *value;
 
@@ -310,7 +319,7 @@ bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const 
 	const mercury_subtable* const subt = table->data+M_TYPE_STRING;
 	for (mercury_int i = 0; i < subt->size; i++) {
 		if(mercury_mstring_equal_cstring((mercury_string*)subt->keys[i].data.p,key)){
-			mercury_clonevariable(subt->values+i, out);
+			*out = subt->values[i];
 			return true;
 		}
 	}
@@ -324,7 +333,9 @@ mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const
 	mercury_subtable subt = table->data[M_TYPE_STRING];
 	for (mercury_int i = 0; i < subt.size; i++) {
 		if (mercury_mstring_equal_cstring((mercury_string*)subt.keys[i].data.p,key)) {		
-			mercury_free_var(subt.values+i);
+			mercury_increment_variable_refrence_count(value);
+			mercury_decrement_variable_refrence_count(subt.values + i);
+			mercury_release_var(subt.values+i);
 			subt.values[i] = *value;
 		}
 	}
@@ -338,7 +349,13 @@ mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const
 
 	mercury_variable kv;
 	kv.type = M_TYPE_STRING;
-	kv.data.p = mercury_cstring_const_to_mstring(key,strlen(key));
+
+	mercury_string* nstr= mercury_cstring_const_to_mstring(key,strlen(key));
+	if (!nstr)return -1;
+
+	nstr->refrences = 1;
+	mercury_increment_variable_refrence_count(value);
+	kv.data.p = nstr;
 	subt.keys[subt.size] = kv;
 	subt.values[subt.size] = *value;
 
@@ -448,6 +465,7 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 	newstate->bytecode.instruction_dbg_lookup = nullptr;
 
 	newstate->enviroment = mercury_newtable();
+	newstate->enviroment->refrences = 1;
 	if (!newstate->enviroment)return nullptr;
 	mercury_prepare_table_for_state(newstate->enviroment,newstate);
 	
@@ -492,7 +510,7 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 	}
 
 	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
-		mercury_free_var(M->stack+i);
+		mercury_release_var(M->stack+i);
 	}
 	M->sizeofstack = 0;
 	
@@ -502,7 +520,7 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 	if (M->masterstate == M && M->registers) {
 		for (mercury_uint i = 0; i < register_max; i++) {
 			if (M->registers[i].type) {
-				mercury_free_var(M->registers+i);
+				mercury_release_var(M->registers+i);
 				M->registers[i].type = M_TYPE_NIL;
 			}
 		}
@@ -514,15 +532,18 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 			mercury_prepare_table_for_state(M->enviroment, M);
 		}
 		else {
-			mercury_destroytable(M->enviroment);
+			M->enviroment->enviromental = false;
+			mercury_cleartable(M->enviroment);
+			M->enviroment->refrences--;
+			if(!M->enviroment->refrences)mercury_destroytable(M->enviroment);
 			M->enviroment = nullptr;
 		}
 	}
 
 
 	for (mercury_uint i = 0; i < M->num_constants; i++) {
-		mercury_variable v = M->constants[i];
-		mercury_free_var(&v);
+		mercury_decrement_variable_refrence_count(M->constants+i);
+		mercury_release_var(M->constants+i);
 	}
 	M->num_constants = 0;
 
@@ -563,100 +584,83 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 	free(M);
 }
 
-
-void mercury_free_var(mercury_variable* const M_CPP_restrict var) {
+void mercury_release_var(mercury_variable* const M_CPP_restrict var) {
 	switch (var->type)
 	{
+	case M_TYPE_NIL:
+	case M_TYPE_INT:
+	case M_TYPE_FLOAT:
+	case M_TYPE_BOOL:
+	case M_TYPE_CFUNC:
+		return;
 	case M_TYPE_TABLE:
-	{
-		mercury_table* ftab = (mercury_table*)var->data.p;
-		ftab->refrences--;
-		if (!ftab->refrences && !ftab->enviromental) {
-
-#ifdef MERCURY_DEBUG
-			if (ftab->enviromental) {
-				printf("enviromental table %p marked for freeing. something has gone terribly worng. probably.\n",ftab);
-			}
-#endif
-			mercury_destroytable(ftab);
+		if (!((mercury_table*)var->data.p)->refrences) {
+			mercury_destroytable((mercury_table*)var->data.p);
 		}
-	}
-		break;
+		return;
 	case M_TYPE_STRING:
-	{
-		mercury_string* str = (mercury_string*)var->data.p;
-		str->refrences--;
-		if (!str->refrences) {
-			mercury_mstring_delete(str);
+		if (!((mercury_string*)var->data.p)->refrences) {
+			mercury_mstring_delete((mercury_string*)var->data.p);
 		}
-	}
-		break;
+		return;
 	case M_TYPE_ARRAY:
-		{
-		mercury_array* farray = (mercury_array*)var->data.p; //get the array
-		farray->refrences--;
-		if (!farray->refrences) { //if this is the last refrence, destroy all
-			mercury_destroyarray(farray);
+		if (!((mercury_array*)var->data.p)->refrences) {
+			mercury_destroyarray((mercury_array*)var->data.p);
 		}
-		}
-		break;
+		return;
 	case M_TYPE_FUNCTION:
 		{
-		mercury_function* ffunction = (mercury_function*)var->data.p;
-		ffunction->refrences--;
-		if (!ffunction->refrences) {
-			free(ffunction->instructions); //this causes a heap issue. dunno why.
-			if (ffunction->instruction_dbg_lookup) {
-				free(ffunction->instruction_dbg_lookup);
-			}
-			if (ffunction->dbg_tokens) {
-				for (mercury_uint i = 0; i < ffunction->num_dbg_tokens; i++) {
-					free(ffunction->dbg_tokens[i].chars);
+			mercury_function* ffunction = (mercury_function*)var->data.p;
+			if (!ffunction->refrences) {
+				free(ffunction->instructions); //this causes a heap issue. dunno why.
+				if (ffunction->instruction_dbg_lookup) {
+					free(ffunction->instruction_dbg_lookup);
 				}
-				free(ffunction->dbg_tokens);
+				if (ffunction->dbg_tokens) {
+					for (mercury_uint i = 0; i < ffunction->num_dbg_tokens; i++) {
+						free(ffunction->dbg_tokens[i].chars);
+					}
+					free(ffunction->dbg_tokens);
+				}
+				free(ffunction);
 			}
-			free(ffunction);
 		}
-		}
-		break;
+		return;
 	case M_TYPE_FILE:
-	{
-		mercury_filewrapper* fw = (mercury_filewrapper*)var->data.p;
-		fw->refrences--;
-		if (!fw->refrences) {
-			if (fw->modeflags)fclose(fw->file);
-			free(fw);
+		{
+			mercury_filewrapper* fw = (mercury_filewrapper*)var->data.p;
+			if (!fw->refrences) {
+				if (fw->modeflags)fclose(fw->file);
+				free(fw);
+			}
 		}
-	}
-		break;
+		return;
 	case M_TYPE_THREAD:
-	{
-		mercury_threadholder* t = (mercury_threadholder*)var->data.p;
-		t->refrences--;
-		if (!t->refrences) {
-			if (!t->finished) { //you stupid son of a bitch why are you like this?
-#if defined(_WIN32) || defined(_WIN64)
-				WaitForSingleObject(t->threadobject, INFINITE);
-				CloseHandle(t->threadobject);
-				t->threadobject = NULL;
-#else
-				pthread_join(t->threadobject, NULL);
-				t->threadobject = NULL;
-#endif
+		{
+			mercury_threadholder* t = (mercury_threadholder*)var->data.p;
+			if (!t->refrences) {
+				if (!t->finished) { //you stupid son of a bitch why are you like this?
+	#if defined(_WIN32) || defined(_WIN64)
+					WaitForSingleObject(t->threadobject, INFINITE);
+					CloseHandle(t->threadobject);
+					t->threadobject = NULL;
+	#else
+					pthread_join(t->threadobject, NULL);
+					t->threadobject = NULL;
+	#endif
+				}
+				if (t->customenv) {
+					t->state->enviroment = nullptr;
+				}
+				//t->state->bytecode.instructions = nullptr;
+				mercury_destroystate(t->state);
+				free(t);
 			}
-			if (t->customenv) {
-				t->state->enviroment = nullptr;
-			}
-			//t->state->bytecode.instructions = nullptr;
-			mercury_destroystate(t->state);
-			free(t);
-		}
 
-		
-	}
-		break;
+		}
+		return;
 	default:
-		break;
+		return;
 	}
 }
 
@@ -691,23 +695,6 @@ void mercury_pullstack(mercury_state* const M_CPP_restrict M, mercury_variable* 
 
 
 bool mercury_pushstack(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
-	if (!(M->allocatedstacksize >M->sizeofstack)) {
-		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable));
-		if (nstackptr == nullptr) return false;
-		M->stack = (mercury_variable*)nstackptr;
-
-		M->allocatedstacksize = M->sizeofstack + 1;
-	}
-
-	M->stack[M->sizeofstack] = *var;
-	M->sizeofstack++;
-	mercury_increment_variable_refrence_count(var);
-
-	return true;
-}
-
-//does not increment the refcounter of the variable.
-bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_variable* const var) {
 	if (!(M->allocatedstacksize > M->sizeofstack)) {
 		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(mercury_variable));
 		if (nstackptr == nullptr) return false;
@@ -721,45 +708,11 @@ bool mercury_pushstack_unrefed(mercury_state* const M_CPP_restrict M, mercury_va
 	return true;
 }
 
-void mercury_clonevariable(const mercury_variable* const var, mercury_variable* out) {
-	out->type = var->type;
-	switch (out->type) {
-		case M_TYPE_STRING:
-			//out->data.p = mercury_copystring((mercury_string*)var->data.p);
-			((mercury_string*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_TABLE:
-			((mercury_table*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_ARRAY:
-			((mercury_array*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_FILE:
-			((mercury_filewrapper*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_THREAD:
-			((mercury_threadholder*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		case M_TYPE_FUNCTION:
-			((mercury_function*)var->data.p)->refrences++;
-			out->data = var->data;
-			break;
-		default:
-			out->data = var->data;
-	}
-}
-
-
 mercury_array* mercury_newarray() {
 	mercury_array* nar = (mercury_array*)malloc(sizeof(mercury_array));
 	if (nar == nullptr)return nullptr;
 
-	nar->refrences = 1;
+	nar->refrences = 0;
 	nar->values = nullptr;
 
 	return nar;
@@ -786,7 +739,7 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 							if (!st5)continue;
 							for (int i6 = (MERCURY_SIZE_SUBARRAY_6 - 1); i6 >= 0; i6--) {
 								mercury_variable* var = st5+i6;
-								if (var->type)mercury_free_var(var);
+								if (var->type) { mercury_decrement_variable_refrence_count(var); mercury_release_var(var); }
 							}
 							free(st5);
 						}
@@ -808,7 +761,7 @@ void mercury_destroyarray(mercury_array* const M_CPP_restrict arr) {
 				if (!st2)continue;
 				for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 >= 0; i3--) {
 					mercury_variable* const var = st2+i3;
-					if (var->type)mercury_free_var(var);
+					if (var->type) { mercury_decrement_variable_refrence_count(var); mercury_release_var(var); }
 				}
 				free(st2);
 			}
@@ -881,8 +834,10 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 
 	current_subindex = get_array_index_from_mint_6(pos);
 	mercury_variable* arrvar = sa5+current_subindex;
+	mercury_increment_variable_refrence_count(var);
 	if (arrvar->type) {
-		mercury_free_var(arrvar);
+		mercury_decrement_variable_refrence_count(arrvar);
+		mercury_release_var(arrvar);
 	}
 	sa5[current_subindex] = *var;
 #else
@@ -915,8 +870,10 @@ bool mercury_setarray(mercury_array* const array, const mercury_variable* const 
 
 	current_subindex = get_array_index_from_mint_3(pos);
 	mercury_variable* arrvar = sa2+current_subindex;
+	mercury_increment_variable_refrence_count(var);
 	if (arrvar->type) {
-		mercury_free_var(arrvar);
+		mercury_decrement_variable_refrence_count(arrvar);
+		mercury_release_var(arrvar);
 	}
 	sa2[current_subindex] = *var;
 #endif
@@ -989,7 +946,8 @@ bool mercury_cleararrayindex(mercury_array* const array, const mercury_int pos) 
 	current_subindex = get_array_index_from_mint_6(pos);
 	mercury_variable* arrvar = sa5 + current_subindex;
 	if (arrvar->type) {
-		mercury_free_var(arrvar);
+		mercury_decrement_variable_refrence_count(arrvar);
+		mercury_release_var(arrvar);
 	}
 	sa5[current_subindex] = cleared_var;
 #else
@@ -1023,7 +981,8 @@ bool mercury_cleararrayindex(mercury_array* const array, const mercury_int pos) 
 	current_subindex = get_array_index_from_mint_3(pos);
 	mercury_variable* arrvar = sa2 + current_subindex;
 	if (arrvar->type) {
-		mercury_free_var(arrvar);
+		//mercury_decrement_variable_refrence_count(arrvar);
+		//mercury_release_var(arrvar);
 	}
 	sa2[current_subindex] = cleared_var;
 #endif
@@ -1052,7 +1011,7 @@ void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury
 		current_subindex = get_array_index_from_mint_6(pos);
 		mercury_variable* var = sa5+current_subindex;
 		if (var->type) {
-			mercury_clonevariable(var, out);
+			*out = *var;
 			return;
 		}
 	}
@@ -1067,7 +1026,7 @@ void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury
 		current_subindex = get_array_index_from_mint_3(pos);
 		mercury_variable* var = sa2+current_subindex;
 		if (var) { 
-			mercury_clonevariable(var, out); 
+			*out = *var;
 			return; 
 		}
 	}
@@ -1108,13 +1067,13 @@ mercury_int mercury_array_len(const mercury_array* const M_CPP_restrict arr) {
 	}
 #else
 	//it's less shit here but still not great.
-	for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 > 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
+	for (int i1 = (MERCURY_SIZE_SUBARRAY_1 - 1) >> 1; i1 >= 0; i1--) { //bitshift right once because we are ignoring negative values, and those start with 1
 		mercury_variable** const st1 = arr->values[i1];
 		if (!st1)continue;
-		for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 > 0; i2--) {
+		for (int i2 = (MERCURY_SIZE_SUBARRAY_2 - 1); i2 >= 0; i2--) {
 			mercury_variable* const st2 = st1[i2];
 			if (!st2)continue;
-			for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 > 0; i3--) {
+			for (int i3 = (MERCURY_SIZE_SUBARRAY_3 - 1); i3 >= 0; i3--) {
 				const mercury_variable* const var = st2+i3;
 				if (var->type)return mercury_reconstruct_array_index(i1, i2, i3);
 			}
@@ -1414,7 +1373,7 @@ void mercury_debugdumptable(mercury_table* tab,int level) {
 
 void mercury_clone_function(mercury_function* in, mercury_function* out) {
 	out->numberofinstructions = in->numberofinstructions - 1;// guard value. this will be overwritten later as long as the function executes correctly and these should be the same number.
-	out->refrences = 1;
+	out->refrences = 0;
 	if (in->instruction_dbg_lookup) {
 		out->instruction_dbg_lookup = (mercury_uint*)malloc(sizeof(mercury_uint) * in->numberofinstructions);
 		if (!out->instruction_dbg_lookup)return;
@@ -1721,7 +1680,8 @@ void mercury_populate_enviroment_with_libs(mercury_state* M) {
 			mercury_getkey(M->enviroment, &tidx,&t);
 
 			if (t.type == M_TYPE_TABLE) {
-				mercury_free_var(&tidx);
+				mercury_decrement_variable_refrence_count(&tidx);
+				mercury_release_var(&tidx);
 				mercury_setkey((mercury_table*)t.data.p,&k,&v);
 			}
 			else {

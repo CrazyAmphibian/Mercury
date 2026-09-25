@@ -1517,6 +1517,9 @@ mercury_int m_compile_read_binary_op(compiler_function* f, compiler_token** toke
 	}else if(cur_tok->token_flags & TOKEN_BINARY_OP && !(cur_tok->token_flags & TOKEN_SELFMODIFY_OP) ){
 		add_instruction(f, m_compile_get_operator_opcode_from_token(cur_tok), token_offset);
 		token_offset++;
+	}
+	else if (cur_tok->token_flags & TOKEN_STATIC_NUMBER && cur_tok->chars[0] == '-') {
+		add_instruction(f, M_OPCODE_ADD, token_offset); //do not increment the token count, as we need to read it again to know what number we are adding.
 	}else{
 		return 0;
 	}
@@ -2801,7 +2804,7 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 		free(tokens);
 
 		nmf->enviromental = false;
-		nmf->refrences = 1;
+		nmf->refrences = 0;
 		nmf->instructions = func->instructions;
 		nmf->numberofinstructions = func->number_instructions;
 		

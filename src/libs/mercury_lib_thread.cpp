@@ -25,7 +25,7 @@ DWORD WINAPI threadfunction(LPVOID param) {
 		while (threadvar->state->sizeofstack) {
 			mercury_variable v;
 			mercury_popstack(threadvar->state, &v);
-			mercury_free_var(&v);
+			mercury_release_var(&v);
 		}
 	}
 
@@ -43,7 +43,7 @@ void* threadfunction(void* param) {
 		while (threadvar->state->sizeofstack) {
 			mercury_variable v;
 			mercury_popstack(threadvar->state, &v);
-			mercury_free_var(&v);
+			mercury_release_var(&v);
 }
 	}
 
@@ -98,11 +98,13 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 	if ( func_var.type != M_TYPE_FUNCTION) {
 		free(vart);
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &func_var, M_TYPE_FUNCTION, 1);
+		mercury_release_var(&func_var);
 		return;
 	}
 	if ((table_var.type && table_var.type != M_TYPE_TABLE)) {
 		free(vart);
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table_var, M_TYPE_TABLE, 2);
+		mercury_release_var(&table_var);
 		return;
 	}
 
@@ -163,7 +165,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		}
 		else {
 			if (table_var.type)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
-			mercury_free_var(&table_var);
+			mercury_release_var(&table_var);
 			//t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
 			mercury_destroystate(t->state);
 			free(t);
@@ -179,7 +181,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 		else {
 			if (table_var.type)t->state->enviroment = nullptr; //if we set a custom env, don't destroy the data.
 			//t->state->bytecode.instructions = nullptr; //don't mess with the host function's data
-			mercury_free_var(&table_var);
+			mercury_release_var(&table_var);
 			mercury_destroystate(t->state);
 			free(t);
 		}
@@ -190,7 +192,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 
 	}
 
-	mercury_pushstack_unrefed(M, &out);
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
@@ -209,6 +211,7 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 
@@ -216,7 +219,7 @@ void mercury_lib_thread_checkfinish(mercury_state* const M_CPP_restrict M, const
 	out.type = M_TYPE_BOOL;
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 1 : 0;
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -236,6 +239,7 @@ void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const me
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 
@@ -250,7 +254,7 @@ void mercury_lib_thread_getvalue(mercury_state* const M_CPP_restrict M, const me
 		t->threadobject = NULL;
 #endif
 	}
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	mercury_variable out;
 	mercury_pullstack(t->state, &out); //take the bottom of stack. it's the proper order with returns.
 	mercury_pushstack(M, &out);
@@ -268,6 +272,7 @@ void mercury_lib_thread_abort(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 
@@ -285,7 +290,7 @@ void mercury_lib_thread_abort(mercury_state* const M_CPP_restrict M, const mercu
 	}
 	t->finished = true;
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 }
 
@@ -303,6 +308,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, cons
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 
@@ -316,7 +322,7 @@ void mercury_lib_thread_getnumvalues(mercury_state* const M_CPP_restrict M, cons
 		out.data.i = t->state->sizeofstack;
 	}
 	
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	mercury_pushstack(M, &out);
 
 
@@ -333,6 +339,7 @@ void mercury_lib_thread_waitfor(mercury_state* const M_CPP_restrict M, const mer
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 
@@ -348,7 +355,7 @@ void mercury_lib_thread_waitfor(mercury_state* const M_CPP_restrict M, const mer
 #endif
 	}
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 }
@@ -366,6 +373,7 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 	mercury_popstack(M,&in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 
@@ -373,7 +381,7 @@ void mercury_lib_thread_checkrunning(mercury_state* const M_CPP_restrict M, cons
 	out.type = M_TYPE_BOOL;
 	out.data.i = ((mercury_threadholder*)in.data.p)->finished ? 0 : 1;
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -388,6 +396,7 @@ void mercury_lib_thread_break(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 
@@ -397,7 +406,7 @@ void mercury_lib_thread_break(mercury_state* const M_CPP_restrict M, const mercu
 		t->state->programcounter = t->state->bytecode.numberofinstructions;
 	}
 
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
@@ -414,11 +423,12 @@ void mercury_lib_thread_check_error(mercury_state* const M_CPP_restrict M, const
 	mercury_popstack(M, &in);
 	if (in.type != M_TYPE_THREAD) {
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+		mercury_release_var(&in);
 		return;
 	}
 	mercury_threadholder* t = (mercury_threadholder*)in.data.p;
 	uint32_t ec = t->state->errorcode;
-	mercury_free_var(&in);
+	mercury_release_var(&in);
 	if (!args_out)return;
 
 	in.type = M_TYPE_BOOL;
