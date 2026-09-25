@@ -764,7 +764,7 @@ void mercury_lib_math_randomseed(mercury_state* const M_CPP_restrict M, const me
 			return;
 		}
 
-		M_RANDOM_STATE = (v1.data.u&0xFFFFFFFF)<<16;
+		M_RANDOM_STATE = ((uint64_t)v1.data.u&0xFFFFFFFF)<<16;
 	}
 
 
