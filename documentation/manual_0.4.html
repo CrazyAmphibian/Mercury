@@ -25,27 +25,27 @@
 	<p>if statements allow for conditional running of code segments. the basic if statement is quite simple.</p>
 	<p class="codeblock">
 	if condition then<br>
-	//code to run<br>
+	&nbsp;//code to run<br>
 	end<br>
 	</p>
 	
 	<p>the else keyword can be used in conjunction, and runs code if the condition is false. only one else can be used in a block.</p>
 	<p class="codeblock">
 	if a>5 then<br>
-	print("a is more than 5")<br>
+	&nbsp;print("a is more than 5")<br>
 	else<br>
-	print("a is not more than 5")<br>
+	&nbsp;print("a is not more than 5")<br>
 	end<br>
 	</p>
 	
 	<p>the final piece is the elseif keyword, which acts as a secondary check. you can use as many elseif blocks in a statment as you want, however elseif must come before else.</p>
 	<p class="codeblock">
 	if a>0 then<br>
-	print("a is positive")<br>
+	&nbsp;print("a is positive")<br>
 	elseif a&lt;0 then<br>
-	print("a is negative")<br>
+	&nbsp;print("a is negative")<br>
 	else<br>
-	print("a is 0")<br>
+	&nbsp;print("a is 0")<br>
 	end<br>
 	</p>
 	
@@ -58,7 +58,7 @@
 	<p>while loops continually execute their body as long as the condition is true</p>
 	<p class="codeblock">
 	while condition do<br>
-	//code to run<br>
+	&nbsp;//code to run<br>
 	end<br>
 	</p>
 	
@@ -66,8 +66,8 @@
 	<p class="codeblock">
 	a=10<br>
 	while a do<br>
-	a--<br>
-	if should_exit() then break end<br>
+	&nbsp;a--<br>
+	&nbsp;if should_exit() then break end<br>
 	end<br>
 	</p>
 	
@@ -75,9 +75,9 @@
 	<p class="codeblock">
 	a=10<br>
 	while a do<br>
-	a--<br>
-	if a%2==0 then continue end<br>
-	print(a)<br>
+	&nbsp;a--<br>
+	&nbsp;if a%2==0 then continue end<br>
+	&nbsp;print(a)<br>
 	end<br>
 	</p>
 	
@@ -89,7 +89,7 @@
 	<p>functions exist to segment portions of code, and to make re-use easier. functions are defined by the function keyword, followed by parenthesis containing args. afterwards, the code body, then end keyword.<br><br>unlike other languages, mercury functions are not given a name, rather they are directly assigned to variables. this means that technically speaking, every function is a lambda/anonymous. return can be used to push values back.</p>
 	<p class="codeblock">
 	add_2_numbers=function(a,b)<br>
-	return a+b<br>
+	&nbsp;return a+b<br>
 	end<br>
 	<br>
 	sum = add_2_numbers(5,10) //15<br>
@@ -114,7 +114,7 @@
 	add_2_numbers(1,2) //a is still 10, as the function makes its own version of the variable a when it is called<br>
 	<br>
 	add_a_number=function(b)<br>
-		return a+b<br>
+		&nbsp;return a+b<br>
 	end<br>
 	add_a_number(5) // returns 15, as the function searches outwards to find a, which is 10.
 	</p>
@@ -125,7 +125,7 @@
 	print(sum,c) //3 nil <br>
 	<br>
 	add_numbers=function(a,b)<br>
-		return a+b,a,b<br>
+		&nbsp;return a+b,a,b<br>
 	end<br>
 	<br>
 	sum,first,second = add_numbers(10,20)// output: 30 10 20<br>
@@ -145,7 +145,7 @@
 	print(a) //nil, because a's defenition was jumped over<br>
 	</p>
 	
-	<p>goto can jump into or out of if statments, or for loops.</p>
+	<p>goto can jump into or out of if statments, or while loops.</p>
 	<p class="codeblock">
 	if a&lt;=0 then<br>
 		&nbsp;a=10<br>
@@ -162,10 +162,10 @@
 	<p>goto cannot jump into or out of a function body. trying to do so will result in nothing happening, as the compiler cannot see the label, and never sets the goto jump to any position.</p>
 	<p class="codeblock">
 	stuff=function()<br>
-		label:<br>
-		goto label2: //invalid. the only visible label is label<br>
+		&nbsp;label:<br>
+		&nbsp;goto label2: //invalid. the only visible label is label<br>
 	end<br>
-	
+	<br>
 	goto label: //invalid. the only visible label is label2<br>
 	label2:<br>
 	</p>
