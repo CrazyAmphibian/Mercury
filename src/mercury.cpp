@@ -653,6 +653,7 @@ void mercury_release_var(mercury_variable* const M_CPP_restrict var) {
 	#endif
 				}
 				if (t->customenv) {
+					t->state->enviroment->refrences--;
 					t->state->enviroment = nullptr;
 				}
 				//t->state->bytecode.instructions = nullptr;

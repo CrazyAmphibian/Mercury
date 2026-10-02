@@ -117,13 +117,14 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 	}
 
 	t->finished = false;
-	t->refrences = 1;
+	t->refrences = 0;
 	if (table_var.type) {
 		t->state = mercury_newstate();
 		t->customenv = true;
 		if (t->state) {
 			mercury_destroytable(t->state->enviroment);
 			t->state->enviroment = (mercury_table*)table_var.data.p;
+			t->state->enviroment->refrences++;
 			//printf("making with custom\n");
 		}
 	}
