@@ -654,6 +654,7 @@ void mercury_release_var(mercury_variable* const M_CPP_restrict var) {
 				}
 				if (t->customenv) {
 					t->state->enviroment->refrences--;
+					if (!t->state->enviroment->refrences)mercury_destroytable(t->state->enviroment);
 					t->state->enviroment = nullptr;
 				}
 				//t->state->bytecode.instructions = nullptr;
