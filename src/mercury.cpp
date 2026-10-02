@@ -397,8 +397,7 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 		free(newstate);
 		return nullptr;
 	}
-	newstate->enviroment->enviromental = true;
-	newstate->enviroment->refrences = 0xFFFF;
+	newstate->enviroment->refrences = 1;
 
 	/*
 	mercury_variable* envvarkey = (mercury_variable*)malloc(sizeof(mercury_variable));
@@ -435,6 +434,8 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 	}
 	newstate->childstate = nullptr;
 
+	mercury_prepare_table_for_state(newstate->enviroment, newstate);
+
 	newstate->constants = nullptr;
 	newstate->num_constants = 0;
 
@@ -466,12 +467,6 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 	newstate->bytecode.dbg_tokens = nullptr;
 	newstate->bytecode.num_dbg_tokens = 0;
 	newstate->bytecode.instruction_dbg_lookup = nullptr;
-
-	newstate->enviroment = mercury_newtable();
-	newstate->enviroment->refrences = 1;
-	if (!newstate->enviroment)return nullptr;
-	mercury_prepare_table_for_state(newstate->enviroment,newstate);
-	
 
 	//newstate->numberofinstructions = 0;
 	//newstate->instructions = nullptr;
