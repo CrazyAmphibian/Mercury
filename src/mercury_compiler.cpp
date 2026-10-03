@@ -461,6 +461,9 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 	if (cur_tok->num_chars) {
 		if (add_token_or_destroy_array(&out, num_out, cur_tok))return nullptr;
 	}
+	else {
+		free(cur_tok);
+	}
 
 	//tokens extracted from string. now we need to run a processing step to get more useful data out of it.
 	for(mercury_int i=0;i<(const mercury_int)*num_out;i++){
@@ -1746,8 +1749,11 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 			merge_compiler_functions(func_complete, func_var);
 			merge_compiler_functions(func_complete, func_index);
 		}
-		else if(firstpass){
-			i->args_out--;
+		else{
+			delete_compiler_function(func_call);
+			delete_compiler_function(func_index);
+			delete_compiler_function(func_complete);
+			if(firstpass)i->args_out--;
 		}
 		firstpass = false;
 		//after reading a function call, read ahead a bit more to check for a chained function call, or further indexing. do this here because function calls are looked at last, and the compiler will throw and error trying to read a call as its own statment. for example, a()() (call the result of calling a), or a()[1] (index the result of calling a)
