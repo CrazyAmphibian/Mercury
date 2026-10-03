@@ -560,20 +560,7 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 	free(M->stack);
 
 	//if (M->enviroment)mercury_destroytable(M->enviroment);
-
-	if (M->bytecode.instructions) {
-		free(M->bytecode.instructions);
-	}
-
-	if (M->bytecode.instruction_dbg_lookup) {
-		free(M->bytecode.instruction_dbg_lookup);
-	}
-	if (M->bytecode.dbg_tokens) {
-		for (mercury_uint i = 0; i < M->bytecode.num_dbg_tokens; i++) {
-			free(M->bytecode.dbg_tokens[i].chars);
-		}
-		free(M->bytecode.dbg_tokens);
-	}
+	mercury_clear_function(&M->bytecode);
 
 	if (M->masterstate == M && M->registers) {
 		free(M->registers);
@@ -610,16 +597,7 @@ void mercury_release_var(mercury_variable* const M_CPP_restrict var) {
 		{
 			mercury_function* ffunction = (mercury_function*)var->data.p;
 			if (!ffunction->refrences) {
-				free(ffunction->instructions); //this causes a heap issue. dunno why.
-				if (ffunction->instruction_dbg_lookup) {
-					free(ffunction->instruction_dbg_lookup);
-				}
-				if (ffunction->dbg_tokens) {
-					for (mercury_uint i = 0; i < ffunction->num_dbg_tokens; i++) {
-						free(ffunction->dbg_tokens[i].chars);
-					}
-					free(ffunction->dbg_tokens);
-				}
+				mercury_clear_function(ffunction);
 				free(ffunction);
 			}
 		}
@@ -1401,6 +1379,19 @@ void mercury_clone_function(mercury_function* in, mercury_function* out) {
 	out->numberofinstructions = in->numberofinstructions;
 	out->enviromental = false;
 	out->refrences = 1;
+}
+
+//takes a mercury_function* and frees the data associated at the pointer, but does NOT free the pointer itself.
+void mercury_clear_function(mercury_function* in) {
+	if (in->dbg_tokens) {
+		for (mercury_uint i = 0; i < in->num_dbg_tokens; i++) {
+			free(in->dbg_tokens[i].chars);
+		}
+		free(in->dbg_tokens);
+	}
+	if (in->instruction_dbg_lookup)free(in->instruction_dbg_lookup);
+	free(in->instructions);
+	memset(in, 0, sizeof(mercury_function));
 }
 
 inline const char* m_get_opcode_str(mercury_opcode instruction) {
