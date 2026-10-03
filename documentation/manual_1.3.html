@@ -359,5 +359,19 @@ pattern sequences are always 2 characters wide, and start with a % to make them 
 </div>
 <br>
 
+
+<div>
+	<h3 class="function"> <span class="type">string</span> pmatch (<span class="type">string</span> string, <span class="type">string</span> match, <span class="type">function</span> function)</h3>
+	<p>
+		the same principal as string.match, but uses pattern matching instead of a direct substring.
+	</p>
+	<p class="codeblock">
+		string.match("user connected from 127.0.0.1","%n%+.%n%+.%n%+.%n%+",function(original,substring,start,end)<br>
+		&emsp;return "[IP REDACTED]"<br>
+		end) //returns "user connected from [IP REDACTED]"<br>
+	</p>
+</div>
+<br>
+
 </body>
 </html>
