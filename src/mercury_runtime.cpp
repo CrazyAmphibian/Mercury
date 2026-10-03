@@ -154,9 +154,13 @@ int main(int argc, char** argv) {
 	}
 
 
-	mercury_string* tstr = mercury_cstring_const_to_mstring((char*)code, strlen(code));
+	mercury_string tstr;// = mercury_cstring_const_to_mstring((char*)code, strlen(code));
+	tstr.ptr = code;
+	tstr.size = strlen(code);
 	mercury_variable funcy;
-	mercury_compile_mstring(tstr,&funcy);
+	mercury_compile_mstring(&tstr,&funcy);
+	free(code);
+	code = nullptr;
 	if (funcy.type != M_TYPE_FUNCTION) {
 		if (funcy.type == M_TYPE_STRING) {
 			mercury_string* s = (mercury_string*)funcy.data.p;
@@ -182,15 +186,20 @@ int main(int argc, char** argv) {
 				putchar(str[c]);
 			}
 		}
+		mercury_mstring_delete(rs);
 #endif
 
 		M->programcounter = 0;
-
+		compiled->refrences = 1;
+		M->bytecode = *compiled;
+		free(compiled);
+		/*
 		M->bytecode.instructions = compiled->instructions;
 		M->bytecode.numberofinstructions = compiled->numberofinstructions;
 		M->bytecode.dbg_tokens = compiled->dbg_tokens;
 		M->bytecode.num_dbg_tokens = compiled->num_dbg_tokens;
 		M->bytecode.instruction_dbg_lookup = compiled->instruction_dbg_lookup;
+		*/
 
 		//printf("current stack: %i\n", M->sizeofstack);
 
