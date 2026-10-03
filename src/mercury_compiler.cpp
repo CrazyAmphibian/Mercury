@@ -2765,6 +2765,7 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 				}
 				nmf->instruction_dbg_lookup[i] = toknum;
 			}
+			free(func->instruction_tokens);
 
 			nmf->dbg_tokens = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * num_tokens);
 			for (mercury_int i = 0; i < num_tokens; i++) {
