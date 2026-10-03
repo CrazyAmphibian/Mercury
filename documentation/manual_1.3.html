@@ -338,6 +338,26 @@ pattern sequences are always 2 characters wide, and start with a % to make them 
 </div>
 <br>
 
+<div>
+	<h3 class="function"> <span class="type">string</span> match (<span class="type">string</span> string, <span class="type">string</span> match, <span class="type">function</span> function)</h3>
+	<p>
+		takes a string. for each instance of the match substring found, the function is called.<br>
+		the function is given the base string, substring, start position, and end position<br>
+		the returned value from the function replaces the match substring if the returned type is a string. otherwise, the substring will be removed from the output string.<Br>
+		the output string is the sum concatenation of all function returns, as well as non-matched chars.<br>
+		the function's state's enviroment is not cleared between calls.
+	</p>
+	<p class="codeblock">
+		string.match("this is a test, and it should be good.","is",function(original,substring,start,end)<br>
+			&emsp;if original[start-1]==" " then //if the letter before the match is a space<br>
+				&emsp;&emsp;return string.reverse(substring) //reverse the substring<br>
+			&emsp;else<br>
+				&emsp;&emsp;return substring //otherwise, do nothing<br>
+			&emsp;end<br>
+		end) //returns "this si a test, and it should be good."<br>
+	</p>
+</div>
+<br>
 
 </body>
 </html>

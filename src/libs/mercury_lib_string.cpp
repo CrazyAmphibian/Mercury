@@ -2,10 +2,9 @@
 #include "../mercury.hpp"
 #include "../mercury_error.hpp"
 
-#include "malloc.h"
-#ifndef _WIN32
+#include <malloc.h>
 #include <string.h>
-#endif
+
 
 void mercury_lib_string_sub(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
@@ -1486,6 +1485,7 @@ bool m_evaluate_patterns(mercury_string* str, M_PATTERN* patterns, mercury_int n
 		}
 		if (c+1 == str->size && p->match_type&MATCH_AT_LEAST_ONE) {
 			current_pattern++;
+			if (current_pattern == num_patterns)break;
 			c = p->first_good_char;
 		}
 
@@ -2117,6 +2117,259 @@ void mercury_lib_string_copy_string(mercury_state* const M_CPP_restrict M, const
 	mercury_release_var(&in);
 	in.data.p = nstr;
 	mercury_pushstack(M, &in);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+//iterates all matches in a function and lets you do things to them
+void mercury_lib_string_match_function(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
+	mercury_variable var_str;
+	mercury_variable var_match;
+	mercury_variable var_func;
+
+	mercury_popstack(M, &var_func);
+	if (var_func.type != M_TYPE_FUNCTION) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, M_TYPE_FUNCTION, 3);
+		mercury_release_var(&var_func);
+		return;
+	}
+
+	mercury_popstack(M, &var_match);
+	if (var_match.type != M_TYPE_STRING) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_match, M_TYPE_STRING, 2);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+
+	mercury_popstack(M, &var_str);
+	if (var_str.type != M_TYPE_STRING) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+		mercury_release_var(&var_str);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+
+	if (!args_out) {
+		mercury_release_var(&var_str);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+	mercury_state* SubM = mercury_get_child_state(M);
+	mercury_string* out_str=(mercury_string*)malloc(sizeof(mercury_string));
+	if (!out_str || !SubM) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_release_var(&var_str);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+	memset(out_str, 0, sizeof(mercury_string));
+
+	mercury_function previous = SubM->bytecode;
+	SubM->bytecode = *((mercury_function*)var_func.data.p);
+	mercury_variable out;
+
+	mercury_string* base_str = (mercury_string*)var_str.data.p;
+	mercury_string* find_str = (mercury_string*)var_match.data.p;
+	mercury_int i = 0;
+	while (true) {
+		next_check:
+		if (i> base_str->size-find_str->size || !find_str->size) {
+			mercury_mstring_addchars(out_str, base_str->ptr + i, base_str->size-i);
+			break;
+		}
+
+		for (mercury_int n = 0; n < find_str->size; n++) {
+			if (base_str->ptr[i + n] != find_str->ptr[n]) {
+				mercury_mstring_addchars(out_str, base_str->ptr + i, n + 1);
+				i++;
+				goto next_check;
+			}
+		}
+		SubM->programcounter = 0;
+
+		mercury_variable push;
+		push.type = M_TYPE_INT;
+		push.data.i = i + find_str->size - 1;
+		mercury_pushstack(SubM, &push);
+		push.type = M_TYPE_INT;
+		push.data.i = i;
+		mercury_pushstack(SubM, &push);
+		push.type = M_TYPE_STRING;
+		push.data.p = mercury_mstring_substring(base_str, i, i + find_str->size - 1);
+		mercury_pushstack(SubM, &push);
+		push.type = M_TYPE_STRING;
+		base_str->refrences++; //add a refrence to prevent freeing in use.
+		push.data.p = base_str;
+		mercury_pushstack(SubM, &push);
+		while (mercury_stepstate(SubM));
+		if (SubM->errorcode) {
+			base_str->refrences--;
+			mercury_mstring_delete(out_str);
+			mercury_release_var(&var_str);
+			mercury_release_var(&var_match);
+			mercury_release_var(&var_func);
+			return;
+		}
+		SubM->programcounter = 0;
+		mercury_popstack(SubM, &push);
+		while (SubM->sizeofstack)mercury_discard_top_of_stack(SubM);
+		base_str->refrences--;
+		if (push.type == M_TYPE_STRING) {
+			mercury_mstrings_append(out_str, (mercury_string*)push.data.p);
+		}
+		mercury_release_var(&push);
+
+		i += find_str->size;
+	}
+
+	SubM->bytecode = previous;
+	mercury_clearstate(SubM);
+
+	mercury_release_var(&var_str);
+	mercury_release_var(&var_match);
+	mercury_release_var(&var_func);
+
+	out.type = M_TYPE_STRING;
+	out.data.p = out_str;
+	mercury_pushstack(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
+}
+
+
+//iterates all matches in a function and lets you do things to them
+void mercury_lib_string_p_match_function(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
+	mercury_variable var_str;
+	mercury_variable var_match;
+	mercury_variable var_func;
+
+	mercury_popstack(M, &var_func);
+	if (var_func.type != M_TYPE_FUNCTION) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, M_TYPE_FUNCTION, 3);
+		mercury_release_var(&var_func);
+		return;
+	}
+
+	mercury_popstack(M, &var_match);
+	if (var_match.type != M_TYPE_STRING) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_match, M_TYPE_STRING, 2);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+
+	mercury_popstack(M, &var_str);
+	if (var_str.type != M_TYPE_STRING) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+		mercury_release_var(&var_str);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+
+	if (!args_out) {
+		mercury_release_var(&var_str);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+	mercury_state* SubM = mercury_get_child_state(M);
+	mercury_string* out_str = (mercury_string*)malloc(sizeof(mercury_string));
+	if (!out_str || !SubM) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_release_var(&var_str);
+		mercury_release_var(&var_match);
+		mercury_release_var(&var_func);
+		return;
+	}
+	memset(out_str, 0, sizeof(mercury_string));
+
+	mercury_function previous = SubM->bytecode;
+	SubM->bytecode = *((mercury_function*)var_func.data.p);
+	mercury_variable out;
+
+	mercury_string* base_str = (mercury_string*)var_str.data.p;
+	mercury_string* find_str = (mercury_string*)var_match.data.p;
+
+	//mercury_int i = 0;
+
+	mercury_int num_pats = 0;
+	M_PATTERN* P = m_patternize_string(find_str, &num_pats);
+	mercury_int start = 0;
+	mercury_int end = 0;
+	mercury_int i = 0;
+	while (true) {
+	next_check:
+		i = end;
+		if (start > base_str->size - find_str->size || !find_str->size) {
+			mercury_mstring_addchars(out_str, base_str->ptr + i, base_str->size - i);
+			break;
+		}
+		
+		if (!m_evaluate_patterns(base_str, P, num_pats, end, &start, &end)) {
+			mercury_mstring_addchars(out_str,base_str->ptr+i,1);
+			i++;
+			start = end = i;
+			goto next_check;
+		}
+		mercury_mstring_addchars(out_str, base_str->ptr + i, start-i);
+
+
+		SubM->programcounter = 0;
+
+		mercury_variable push;
+		push.type = M_TYPE_INT;
+		push.data.i = end;
+		mercury_pushstack(SubM, &push);
+		push.type = M_TYPE_INT;
+		push.data.i = start;
+		mercury_pushstack(SubM, &push);
+		push.type = M_TYPE_STRING;
+		push.data.p = mercury_mstring_substring(base_str, start, end);
+		mercury_pushstack(SubM, &push);
+		push.type = M_TYPE_STRING;
+		base_str->refrences++; //add a refrence to prevent freeing in use.
+		push.data.p = base_str;
+		mercury_pushstack(SubM, &push);
+		while (mercury_stepstate(SubM));
+		if (SubM->errorcode) {
+			base_str->refrences--;
+			mercury_mstring_delete(out_str);
+			mercury_release_var(&var_str);
+			mercury_release_var(&var_match);
+			mercury_release_var(&var_func);
+			return;
+		}
+		SubM->programcounter = 0;
+		mercury_popstack(SubM, &push);
+		while (SubM->sizeofstack)mercury_discard_top_of_stack(SubM);
+		base_str->refrences--;
+		if (push.type == M_TYPE_STRING) {
+			mercury_mstrings_append(out_str, (mercury_string*)push.data.p);
+		}
+		mercury_release_var(&push);
+
+		end++;
+		start = end;
+	}
+	free(P);
+
+	SubM->bytecode = previous;
+	mercury_clearstate(SubM);
+
+	mercury_release_var(&var_str);
+	mercury_release_var(&var_match);
+	mercury_release_var(&var_func);
+
+	out.type = M_TYPE_STRING;
+	out.data.p = out_str;
+	mercury_pushstack(M, &out);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
