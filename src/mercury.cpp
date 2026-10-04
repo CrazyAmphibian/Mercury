@@ -497,22 +497,10 @@ bool mercury_stepstate(mercury_state* const M_CPP_restrict M) {
 }
 
 void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion) {
-	if (M->childstate) {
-		if (for_deletion) {
-			mercury_destroystate(M->childstate);
-			M->childstate = nullptr;
-		}
-		else {
-			mercury_clearstate(M->childstate, for_deletion);
-		}
-	}
-
 	for (mercury_uint i = 0; i < M->sizeofstack; i++) {
 		mercury_release_var(M->stack+i);
 	}
 	M->sizeofstack = 0;
-	
-
 	
 	
 	if (M->masterstate == M && M->registers) {
@@ -549,6 +537,9 @@ void mercury_clearstate(mercury_state* const M_CPP_restrict M, bool for_deletion
 }
 
 void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
+	if (M->childstate) {
+		mercury_destroystate(M->childstate);
+	}
 	mercury_clearstate(M,true);
 
 	if (M->parentstate) {
