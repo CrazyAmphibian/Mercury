@@ -25,4 +25,5 @@ void mercury_lib_io_deserialize(mercury_state* const M_CPP_restrict M, const mer
 void mercury_lib_io_cwd(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_io_executabledirectory(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 void mercury_lib_io_filelength(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+void mercury_lib_io_userdirectory(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
 

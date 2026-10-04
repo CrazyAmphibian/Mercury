@@ -12,12 +12,15 @@
 #include <direct.h>
 #include <conio.h>
 #include <libloaderapi.h>
+#include <Shlobj.h>
+#include <Shlobj_core.h>
 #else
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <pwd.h>
 #endif
 
 
@@ -1663,6 +1666,64 @@ void mercury_lib_io_filelength(mercury_state* const M_CPP_restrict M, const merc
 	mercury_release_var(&file_var);
 
 	mercury_pushstack(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+void mercury_lib_io_userdirectory(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0)) {
+		return;
+	}
+
+	if (args_out) {
+#ifdef _WIN32
+		char* buffer = (char*)malloc(_MAX_PATH + 2);
+#else
+		char* buffer = (char*)malloc(PATH_MAX + 2);
+#endif
+		if (!buffer) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+			return;
+		}
+
+		mercury_string* str = (mercury_string*)malloc(sizeof(mercury_string));
+		if (!str) {
+			free(buffer);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
+			return;
+		}
+		str->refrences = 0;
+
+#ifdef _WIN32
+		str->constant = false;
+		if (SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, buffer) != S_OK) { //on faliure, return relative directory so that a user will see it as ./
+			buffer[0] = '.'; 
+			buffer[1] = '\0';
+		}
+		str->ptr = buffer;
+		str->size = strlen(buffer);
+#else
+		if ((str->ptr=getenv("HOME")) ==nullptr) {
+			str->ptr = getpwuid(getuid())->pw_dir;
+			str->constant = true;
+			str->size = strlen(str->ptr);
+		}
+		else {
+			str->size = strlen(str->ptr);
+			str->constant = true;
+			free(buffer);
+		}
+#endif
+
+	
+		mercury_variable nvar;
+		nvar.type = M_TYPE_STRING;
+		nvar.data.p = str;
+		mercury_pushstack(M, &nvar);
+	}
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
