@@ -348,6 +348,22 @@
 <br>
 
 <div>
+	<h3 class="function"><span class="type">string</span> getuserdir ( )</h3>
+	
+	<p>
+		returns the directory of the system's current user<br>
+		on windows, this will be something such as C:\Users\user<br>
+		on Linux, this will be something such as /home/user<br>
+		if the function fails to find the user folder, the string "." will be returned instead.
+	</p>
+	
+	<p class="codeblock">
+		f=io.open(io.getuserdir().."/Documents/list.txt","w")  
+	</p>
+</div>
+<br>
+
+<div>
 	<h3 class="function"><span class="type">int</span> size ( <span class="type">file</span> file )</h3>
 	
 	<p>
