@@ -717,16 +717,19 @@ void mercury_lib_std_tonumber(mercury_state* const M_CPP_restrict M, const mercu
 		if (*e == '\0') {
 			o.type = M_TYPE_INT;
 			o.data.i = n;
+			free(c);
 			break;
 		}
 		mercury_float f = strtod(c, &e);
 		if (*e == '\0') {
 			o.type = M_TYPE_FLOAT;
 			o.data.f = f;
+			free(c);
 			break;
 		}
 		o.type = M_TYPE_NIL;
 		o.data.i = 0;
+		free(c);
 		}
 		break;
 	default:
