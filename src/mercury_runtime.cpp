@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
 	mercury_array* arg_arr=mercury_newarray();
 	
 	char* code=nullptr;// = (char*)"";
+	mercury_int code_size = 0;
 	const char* fpath = nullptr;
 
 	int arg_offset = 1;
@@ -92,6 +93,7 @@ int main(int argc, char** argv) {
 				s[len] = '\0';
 
 				code = s;
+				code_size = len;
 				//printf("%s", code);
 			}
 		}
@@ -126,7 +128,7 @@ int main(int argc, char** argv) {
 #endif
 
 	start:
-	if (interactivemode) {
+	if (interactivemode && !code) {
 		putchar('>');
 		mercury_int sizec = 200;
 		mercury_int len = 0;
@@ -150,15 +152,13 @@ int main(int argc, char** argv) {
 				}
 		}
 		c[len] = '\0';
+		code_size = len;
 		code = c;
 	}
 
 
-	mercury_string tstr;// = mercury_cstring_const_to_mstring((char*)code, strlen(code));
-	tstr.ptr = code;
-	tstr.size = strlen(code);
 	mercury_variable funcy;
-	mercury_compile_mstring(&tstr,&funcy);
+	mercury_compile_cstring(code,code_size,&funcy);
 	free(code);
 	code = nullptr;
 	if (funcy.type != M_TYPE_FUNCTION) {
@@ -210,6 +210,7 @@ int main(int argc, char** argv) {
 		if (funcy.type == M_TYPE_FUNCTION) { //cleanup the state partially
 			M->programcounter = 0; //clear bytecode
 			free(code);
+			code = nullptr;
 			M->bytecode.numberofinstructions = 0;
 
 			if (M->bytecode.instructions) {
