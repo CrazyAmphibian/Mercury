@@ -1638,6 +1638,7 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			mercury_release_var(&strvar);
 			mercury_release_var(&matchvar);
+			free(P);
 			return;
 		}
 		mercury_variable inter;
@@ -1650,7 +1651,7 @@ void mercury_lib_string_p_extract(mercury_state* const M_CPP_restrict M, const m
 
 	mercury_release_var(&strvar);
 	mercury_release_var(&matchvar);
-
+	free(P);
 	
 	matchvar.type = M_TYPE_ARRAY;
 	matchvar.data.p = arr;
@@ -1730,6 +1731,7 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 		mercury_string* app = mercury_mstring_substring(str, lastendmatch, start - 1);
 		if (!app) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			free(P);
 			return;
 		}
 		mercury_mstrings_append(outstr, app);
@@ -1745,6 +1747,7 @@ void mercury_lib_string_p_replace(mercury_state* const M_CPP_restrict M, const m
 	mercury_release_var(&matchvar);
 	mercury_release_var(&repvar);
 	mercury_release_var(&strvar);
+	free(P);
 	
 	matchvar.type = M_TYPE_STRING;
 	matchvar.data.p = outstr;
@@ -1798,7 +1801,8 @@ void mercury_lib_string_p_count(mercury_state* const M_CPP_restrict M, const mer
 
 	mercury_release_var(&strvar);
 	mercury_release_var(&matchvar);
-	
+	free(P);
+
 	matchvar.type = M_TYPE_INT;
 	matchvar.data.i = count;
 	mercury_pushstack(M, &matchvar);
@@ -2344,6 +2348,7 @@ void mercury_lib_string_p_match_function(mercury_state* const M_CPP_restrict M, 
 			mercury_release_var(&var_str);
 			mercury_release_var(&var_match);
 			mercury_release_var(&var_func);
+			free(P);
 			return;
 		}
 		SubM->programcounter = 0;
