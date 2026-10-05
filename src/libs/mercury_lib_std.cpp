@@ -447,6 +447,7 @@ mercury_string* m_stringify(mercury_rawdata data, uint8_t type,mercury_uint* num
 	case M_TYPE_STRING:
 		str = (mercury_string*)malloc(sizeof(mercury_string));
 		if (str) {
+			memset(str, 0, sizeof(mercury_string));
 			mercury_string* cstr = (mercury_string*)data.p;
 			mercury_int size_total_str = cstr->size;
 			for (mercury_int i = 0; i < cstr->size; i++) {
