@@ -356,6 +356,25 @@ inline void mercury_discard_top_of_stack(mercury_state* const M_CPP_restrict M) 
 	}
 }
 
+inline bool mercury_type_is_complex(const uint8_t type) {
+	switch (type) {
+		case M_TYPE_NIL:
+		case M_TYPE_INT:
+		case M_TYPE_FLOAT:
+		case M_TYPE_BOOL:
+		case M_TYPE_CFUNC:
+			return false;
+		case M_TYPE_STRING:
+		case M_TYPE_ARRAY:
+		case M_TYPE_TABLE:
+		case M_TYPE_FUNCTION:
+		case M_TYPE_THREAD:
+		case M_TYPE_FILE:
+		default:
+			return true;
+	}
+}
+
 inline void mercury_increment_variable_refrence_count(const mercury_variable* const M_CPP_restrict var) {
 	switch (var->type) {
 	case M_TYPE_NIL:

@@ -240,21 +240,44 @@ void mercury_cleartable(const mercury_table* const table) {
 
 mercury_int mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key) {
 	const mercury_subtable subt = table->data[key->type];
-	for (mercury_int i = 0; i < subt.size; i++) {
-		if (mercury_vars_equal(subt.keys+i,key))return i;
+	mercury_int i = subt.size;
+	if (mercury_type_is_complex(key->type)) {
+		while (i) {
+			i--;
+			if (mercury_vars_equal(subt.keys + i, key))return i;
+		}
+	}
+	else {
+		while (i) {
+			i--;
+			if (key->data.i == subt.keys[i].data.i)return i;
+		}
 	}
 	return -1;
 }
 
 bool mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out) {
 	const mercury_subtable subt=table->data[key->type];
-	for (mercury_int i = 0; i < subt.size; i++) {
-		if (mercury_vars_equal(subt.keys+i, key)) {
-			//mercury_release_var(key);
-			*out = subt.values[i];
-			return true;
+	mercury_int i = subt.size;
+	if (mercury_type_is_complex(key->type)) {
+		while (i) {
+			i--;
+			if (mercury_vars_equal(subt.keys + i, key)) {
+				*out = subt.values[i];
+				return true;
+			}
 		}
 	}
+	else {
+		while (i) {
+			i--;
+			if (key->data.i == subt.keys[i].data.i) {
+				*out = subt.values[i];
+				return true;
+			}
+		}
+	}
+	
 	//mercury_release_var(key);
 	out->type = M_TYPE_NIL;
 	out->data.i = 0;
@@ -263,17 +286,37 @@ bool mercury_getkey(const mercury_table* const table, mercury_variable* const ke
 
 mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value) {
 	mercury_subtable subt = table->data[key->type];
-	for (mercury_int i = 0; i < subt.size; i++) {
-		if (mercury_vars_equal(subt.keys+i,key)) {
-			mercury_increment_variable_refrence_count(value);
-			mercury_increment_variable_refrence_count(key);
-			mercury_decrement_variable_refrence_count(subt.values + i);
-			mercury_decrement_variable_refrence_count(subt.keys + i);
-			mercury_release_var(subt.values+i);
-			mercury_release_var(subt.keys+i);
-			subt.values[i] = *value;
-			subt.keys[i] = *key;
-			return i;
+	mercury_int i= subt.size;
+	if (mercury_type_is_complex(key->type)) {
+		while (i) {
+			i--;
+			if (mercury_vars_equal(subt.keys + i, key)) {
+				mercury_increment_variable_refrence_count(value);
+				mercury_increment_variable_refrence_count(key);
+				mercury_decrement_variable_refrence_count(subt.values + i);
+				mercury_decrement_variable_refrence_count(subt.keys + i);
+				mercury_release_var(subt.values + i);
+				mercury_release_var(subt.keys + i);
+				subt.values[i] = *value;
+				subt.keys[i] = *key;
+				return i;
+			}
+		}
+	}
+	else {
+		while (i) {
+			i--;
+			if (key->data.i == subt.keys[i].data.i) {
+				mercury_increment_variable_refrence_count(value);
+				mercury_increment_variable_refrence_count(key);
+				mercury_decrement_variable_refrence_count(subt.values + i);
+				mercury_decrement_variable_refrence_count(subt.keys + i);
+				mercury_release_var(subt.values + i);
+				mercury_release_var(subt.keys + i);
+				subt.values[i] = *value;
+				subt.keys[i] = *key;
+				return i;
+			}
 		}
 	}
 
