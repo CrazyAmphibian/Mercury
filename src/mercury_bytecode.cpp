@@ -1144,12 +1144,11 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 	mercury_state* check_state = M;
 	while (check_state) {
 		mercury_subtable st= check_state->enviroment->data[key.type];
-		mercury_int sz=st.size;
-		while (sz){
-			sz--;
-			if (mercury_vars_equal(st.keys+ sz, &key)) {
+		while (st.size){
+			st.size--;
+			if (mercury_vars_equal(st.keys+ st.size, &key)) {
 				mercury_release_var(&key);
-				mercury_pushstack(M, st.values + sz);
+				mercury_pushstack(M, st.values + st.size);
 				return;
 			}
 		}
@@ -1784,8 +1783,11 @@ void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M) { // CoPY Top (of st
 
 void M_BYTECODE_SWPT(mercury_state* const M_CPP_restrict M) { //SWaP Top. swaps the top and second top of stack.
 	//so basically, 1,2 -> 2,1
-	if (!M->sizeofstack) { //no stack? nothing to do.
-		return;
+
+	if (M->sizeofstack > 1) { //switch the top 2 elements
+		const mercury_variable top = M->stack[M->sizeofstack - 1];
+		M->stack[M->sizeofstack - 1] = M->stack[M->sizeofstack - 2];
+		M->stack[M->sizeofstack - 2] = top;
 	}
 	else if (M->sizeofstack == 1) { //if there's 1 element, pushing nil does the same thing, basically.
 		mercury_variable nn;
@@ -1793,11 +1795,8 @@ void M_BYTECODE_SWPT(mercury_state* const M_CPP_restrict M) { //SWaP Top. swaps 
 		nn.type = M_TYPE_NIL;
 		mercury_pushstack(M, &nn);
 	}
-	else { //otherwise, switch the top 2 elements
-		const mercury_variable top= M->stack[M->sizeofstack - 1];
-		M->stack[M->sizeofstack - 1] = M->stack[M->sizeofstack - 2];
-		M->stack[M->sizeofstack - 2] = top;
-	}
+	//no stack? nothing to do.
+
 }
 
 void M_BYTECODE_CPYX(mercury_state* const M_CPP_restrict M) { // CoPY X elements (from top of stack)
