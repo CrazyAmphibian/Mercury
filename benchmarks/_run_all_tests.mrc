@@ -1,3 +1,4 @@
+local exitcode=0
 local total=0
 local passes=0
 iterate(io.getfiles(""),function(i,v,a)
@@ -12,6 +13,7 @@ iterate(io.getfiles(""),function(i,v,a)
 		local fr=r()
 		if fr then
 			io.post(string.format("script %s encountered an error while running and returned %s\n",v,fr) )
+			exitcode=1
 		else
 			passes++
 		end
@@ -20,3 +22,4 @@ iterate(io.getfiles(""),function(i,v,a)
 end)
 io.post(string.format("\n%i/%i tests passed.\npress any key to exit...",passes,total))
 io.input()
+os.exit(exitcode)
