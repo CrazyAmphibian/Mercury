@@ -141,6 +141,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 #endif
 								}
 								mercury_release_var(&o);
+								if (SubM->errorcode)return;
 								mercury_clearstate(SubM);
 							}
 							else { //M functions get args in the reverse order. confusing, but it works.
@@ -159,6 +160,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 #endif
 								}
 								mercury_release_var(&o);
+								if (SubM->errorcode)return;
 								mercury_clearstate(SubM);
 							}
 						}
@@ -222,6 +224,7 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 					}
 					mercury_release_var(&o);
 				}
+				if (SubM->errorcode)return;
 				mercury_clearstate(SubM);
 			}
 		}
