@@ -213,21 +213,7 @@ int main(int argc, char** argv) {
 			code = nullptr;
 			M->bytecode.numberofinstructions = 0;
 
-			if (M->bytecode.instructions) {
-				free(M->bytecode.instructions);
-			}
-
-			if (M->bytecode.instruction_dbg_lookup) {
-				free(M->bytecode.instruction_dbg_lookup);
-			}
-			if (M->bytecode.dbg_tokens) {
-				for (mercury_uint i = 0; i < M->bytecode.num_dbg_tokens; i++) {
-					free(M->bytecode.dbg_tokens[i].chars);
-				}
-				free(M->bytecode.dbg_tokens);
-			}
-			M->bytecode.num_dbg_tokens = 0;
-
+			mercury_clear_function(&M->bytecode);
 			
 
 			while (M->sizeofstack) { //clear stack
