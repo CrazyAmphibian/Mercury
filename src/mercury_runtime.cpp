@@ -69,35 +69,38 @@ int main(int argc, char** argv) {
 		FILE* f=fopen(fpath,"rb");
 		if (!f) {
 			printf("error opening file %s\n",fpath);
-			return 1;
+			if (!interactivemode)return 1;
 		}
-		if (fseek(f, 0, SEEK_END)) {
+		else if (fseek(f, 0, SEEK_END)) {
 			printf("error reading file (1).\n");
-			return 1;
+			fclose(f);
+			if (!interactivemode)return 1;
 		}
 		else {
 			mercury_int len = ftell(f);
 			//printf("length is %lli\n",len);
 			if (len == -1) {
 				printf("error reading file (2).\n");
-				return 1;
+				if (!interactivemode)return 1;
 			}
 			else {
 				char* s = (char*)malloc(sizeof(char) * (len+1) );
 				if (!s) {
 					printf("error reading file %s: unable to allocate memory.\n",fpath);
-					return 1;
+					if(!interactivemode)return 1;
 				}
-				rewind(f);
-				fread(s, 1, len, f);
-				s[len] = '\0';
+				else {
+					rewind(f);
+					fread(s, 1, len, f);
+					s[len] = '\0';
 
-				code = s;
-				code_size = len;
-				//printf("%s", code);
+					code = s;
+					code_size = len;
+				}
 			}
+			fclose(f);
 		}
-		fclose(f);
+		
 
 	}
 	else {
