@@ -624,6 +624,12 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
 					}else if(token_matches_chars(t,">>=")){
 						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if (token_matches_chars(t, "&&=")) {
+						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if (token_matches_chars(t, "||=")) {
+						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if (token_matches_chars(t, "~~=")) {
+						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
 					}
 				}
 				break;
@@ -1104,6 +1110,12 @@ mercury_opcode m_compile_get_operator_opcode_from_token(compiler_token* t,int tt
 			return M_OPCODE_BSHL;
 		}else if(token_matches_chars(t,">>=")){
 			return M_OPCODE_BSHR;
+		}else if (token_matches_chars(t, "&&=")) {
+			return M_OPCODE_LAND;
+		}else if (token_matches_chars(t, "||=")) {
+			return M_OPCODE_LOR;
+		}else if (token_matches_chars(t, "~~=")) {
+			return M_OPCODE_LXOR;
 		}
 	}
 	return M_OPCODE_NOP;
