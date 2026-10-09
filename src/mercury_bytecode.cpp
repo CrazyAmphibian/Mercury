@@ -1137,7 +1137,6 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 }
 
 void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
-	mercury_variable value;
 	mercury_variable key;
 	mercury_popstack(M, &key);
 
@@ -1156,10 +1155,11 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 
 		check_state = check_state->parentstate;
 	}
-	
+	mercury_variable value;
 	value.data.i = 0;
 	value.type = M_TYPE_NIL;
 	mercury_pushstack(M, &value);
+	mercury_release_var(&key);
 }
 
 
