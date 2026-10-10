@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+	<td><a href="manual_3.0.html"></a> </td>
+</tr>
+<tr>
+	<td><a href="manual_2.6.html">2.6 language embedding</a></td>
+	<td><a href="manual_2.7.html">2.7 error throwing</a></td>
+	<td><a href="manual_2.8.html"></a></td>
+</tr>
+</table>
+
+
+
+
+<div>
+	<h3>when to throw</h3>
+	<p>
+		throwing errors is useful, for if the user makes an unrecoverable mistake.<br>
+		when writing your own functions, it is up to you to decide when to throw an error, though it is useful to stick to mercury's conventions to make it feel cohesive.<br>
+		<br>
+		in general, mercury errors are almost always thrown because of a wrong type being provided, with other behavior either resulting in a nil or default value.<br>
+		errors are also reserved for behavior that cannot reasonably be recovered from, such as running out of memory, or trying to divide an integer by 0.<br>
+		other than that, providing too few function args is another common error reason.<br>
+		<br>
+		errors for implicit behavior is generally discouraged due to the dynamic nature of mercury's code.<br>
+		for example, string.sub will never throw an error if the provided range doesn't exist - as long as integers are provided, a string of some kind will be returned.<br>
+		or string patterns, which will simply default to implicit behavior or ignore characters if the pattern is invalid.<br>
+	</p>	
+</div>
+
+<div>
+	<h3>upon a throw.</h3>
+	<p>
+		when an error is thrown, the following occurs:<br>
+		<ol>
+			<li>a relevant error message is put into stdout</li>
+			<li>the current state's program counter is set to the end of the instructions</li>
+			<li>the current state's errorcode variable is set</li>
+			<li>steps 2 and 3 are repeated for each parent state of the current.</li>
+		</ol>
+		this means that throwing an error is quite disruptive, as it means halting execution of all code (unless you restrict the parent variable of a state, such as with rcall).<br>
+		<br>
+		it is important to note that states will still need function variables unassigned manually when exiting, otherwise they will leak. the states themselves are cleared with every call, and so remaining stack or environment data will be properly freed.<br>
+	</p>
+</div>
+
+<div>
+	<h3>how to throw</h3>
+	all error throwing code is contained in mercury_error.hpp/.cpp<br>
+	the most basic error throwing function takes pointers as the error arguments.
+	<p class="codeblock">
+	void mercury_raise_error(mercury_state* M, const uint32_t errorcode, const mercury_int* data1 = nullptr, const mercury_int* data2 = nullptr, const mercury_int* data3 = nullptr);
+	</p>
+	do note that while the data args are typed as mercury_int*, the type they take can vary with the error code, and it is important to keep that in mind to not derefrence bad memory.<br>
+	<br>
+	
+	<table class="tablefirstcollummono">
+		<tr> <th>error enum</th> <th>message</th> <th>arg 1</th> <th>arg 2</th> <th>arg 3</th> </tr>
+		<tr> <td>M_ERROR_NONE</td> <td> <i>none. placeholder value of 0 to denote there is no error.</i></td> <td></td> <td></td> <td></td> </tr>
+		<tr> <td>M_ERROR_ALLOCATION</td> <td> memory allocation failiure.</td> <td></td> <td></td> <td></td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE</td> <td> arg [number] wrong type. expected [type], got [type].</td> <td>pointer to mercury int of the provided type</td> <td>pointer to mercury int of the expected type</td> <td>pointer to mercury int of which arg number the error occured at.</td> </tr>
+		<tr> <td>M_ERROR_DIV_ZERO</td> <td> integer division by 0.</td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_INVALID_INDEX</td> <td> <i>unused.</i></td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_INSTRUCTION_FAILIURE</td> <td> failiure to execute instruction.</td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_CALL_NOT_FUNCTION</td> <td> attempt to call non-function value [type].</td> <td> pointer to mercury int of the provided type</td> <td> </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_INDEX_INVALID_TYPE</td> <td> attempt to index invalid variable type [type].</td> <td>pointer to mercury int of the provided type </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_NOT_ENOUGH_ARGS</td> <td>incorrect number of args. expected [num], got [num].</td> <td>pointer to mercury int of how many args were provided </td> <td> pointer to mercury int of how many args were expected</td> <td> </td> </tr>
+		<tr> <td>M_ERROR_CUSTOM_STRING</td> <td> [user defined]</td> <td>pointer to a null-terminated character array. should end with a newline. </td> <td> </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER</td> <td>arg [number] wrong type. expected a number, got [type].</td> <td> pointer to mercury int of the provided type </td> <td> pointer to mercury int of which arg the error occured at </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION</td> <td>arg [number] wrong type. expected any function type, got [type].</td> <td> pointer to mercury int of the provided type </td> <td> pointer to mercury int of which arg the error occured at </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE</td> <td>arg [number] wrong type. expected an array or table, got [type].</td> <td> pointer to mercury int of the provided type </td> <td> pointer to mercury int of which arg the error occured at </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_EXECUTION_ABORT</td> <td> <i>error is used internally to denote stopped code, should not be manually thrown.</i> </td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected [type], got [type] value [data]</td> <td>pointer to mercury_variable of the variable that was received</td> <td>pointer to mercury int of the expected type</td> <td>pointer to mercury int of which arg the error occurred at</td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected a number, got [type] value [data]</td> <td>pointer to mercury_variable of the variable that was received</td> <td>pointer to mercury int of which arg the error occurred at</td> <td></td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected any function type, got [type] value [data]</td> <td>pointer to mercury_variable of the variable that was received</td> <td>pointer to mercury int of which arg the error occurred at</td> <td></td> </tr>
+		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected an array or table, got [type] value [data]</td> <td>pointer to mercury_variable of the variable that was received</td> <td>pointer to mercury int of which arg the error occurred at</td> <td></td> </tr>
+	</table>
+</div>
+
+<div>
+	<h3>more throwing options</h3>
+	because some error codes want fairly static and consistent numbers as input, some variants of the error raising function were created
+	<p class="codeblock">
+		void mercury_raise_error_nonpointer(mercury_state* M, const uint32_t errorcode, const mercury_int data1 = 0, const mercury_int data2 = 0, const mercury_int data3 = 0);
+	</p>
+	<p class="codeblock">
+		void mercury_raise_error_firstargpointeronly(mercury_state* M, const uint32_t errorcode, void* data1 = 0, const mercury_int data2 = 0, const mercury_int data3 = 0);
+	</p>
+</div>
+
+</body>
+</html>
