@@ -630,8 +630,11 @@ void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M) {
 		return;
 	}
 
-	
-	v.data.i = i2 << i1;
+#ifdef MERCURY_64BIT
+	v.data.i = i2 << (i1&63);
+#else
+	v.data.i = i2 << (i1&31);
+#endif
 	v.type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
 
 	mercury_pushstack(M, &v);
@@ -676,7 +679,11 @@ void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M) {
 	}
 
 	
-	v.data.i = i2 >> i1;
+#ifdef MERCURY_64BIT
+	v.data.i = i2 >> (i1 & 63);
+#else
+	v.data.i = i2 >> (i1 & 31);
+#endif
 	v.type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
 
 	mercury_pushstack(M, &v);
