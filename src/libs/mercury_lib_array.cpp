@@ -361,13 +361,13 @@ void mercury_lib_array_remove(mercury_state* const M_CPP_restrict M, const mercu
 
 	mercury_variable v;
 	mercury_getarray(arr, target, &v);
-	
+	mercury_increment_variable_refrence_count(&v);//protect variable from freeing
 	mercury_variable inter;
 	for (mercury_int i = target; i <= cur_len; i++) {
 		mercury_getarray(arr, i + 1, &inter);
 		mercury_setarray(arr, &inter, i);
 	}
-
+	mercury_decrement_variable_refrence_count(&v);
 	if (args_out) {
 		mercury_pushstack(M, &v);
 	}
