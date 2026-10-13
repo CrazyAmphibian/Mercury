@@ -16,7 +16,7 @@ print(global string.format("%i local loop iterations took %.5f seconds",global I
 
 local start=global os.clock()
 local a=global ITT_COUNT
-while a do
+while local a do
 	local a--
 end
 print(global string.format("%i max optimized iterations took %.5f seconds",global ITT_COUNT,global os.clock()-local start))
