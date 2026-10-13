@@ -820,18 +820,26 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 	//got rid of it. should just be raw input. on the coder to not read it in a while loop (you can also manually check for ctrl+c)
 	//mercury_variable* ck = mercury_popstack(M);
 
-	char c;
-
+	unsigned char c[2];
+	int desired_length = 1;
+	int o;
 #ifdef _WIN32
-	c = _getch();
+	o = _getch();
+	c[0] = o;
+	if (o == 0xE0 || 01 == 0x00) {
+		desired_length = 2;
+		o = _getch(); //this is a mess
+		c[1] = o;
+	}
 #else
 	termios oldt, newt;
 	tcgetattr(STDIN_FILENO, &oldt);
 	newt = oldt;
 	newt.c_lflag &= ~(ICANON | ECHO);
 	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	c = getchar();
+	o = getchar();
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+	c[0] = o;
 
 #endif
 
@@ -843,7 +851,7 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 	//mercury_free_var(ck);
 
 	if (args_out) {
-		mercury_string* s = mercury_cstring_to_mstring(&c, 1);
+		mercury_string* s = mercury_cstring_to_mstring((const char*)c, desired_length);
 		if (!s) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
