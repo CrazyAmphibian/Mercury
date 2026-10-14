@@ -631,9 +631,8 @@ void mercury_lib_io_post(mercury_state* const M_CPP_restrict M, const mercury_in
 	}
 
 	mercury_string* s = (mercury_string*)str_var.data.p;
-	for (mercury_int c = 0; c < s->size; c++) {
-		putchar(s->ptr[c]);
-	}
+	fwrite(s->ptr, 1, s->size, stdout);
+
 	mercury_release_var(&str_var);
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
