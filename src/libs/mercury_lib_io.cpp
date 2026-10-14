@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <pwd.h>
+#include <poll.h>
 #endif
 
 
@@ -834,13 +835,22 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 	termios oldt, newt;
 	tcgetattr(STDIN_FILENO, &oldt);
 	newt = oldt;
-	newt.c_lflag &= ~(ICANON | ECHO);
+	newt.c_lflag &= ~(ICANON | ECHO | ISIG);
 	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	while (desired_length<0xff) {
-		o = getchar();
-		c[desired_length - 1] = o;
-		if (!feof(stdin))break;
-		desired_length++;
+	o = getchar();
+	c[0] = o;
+	if (c[0] == '\e') {
+		pollfd pfd = {
+		.fd = STDIN_FILENO,
+		.events = POLLIN
+		};
+		int n = poll(&pfd, 1, 50);
+		while (n > 0) {
+			n--;
+			o = getchar();
+			c[desired_length] = o;
+			desired_length++;
+		}
 	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 
