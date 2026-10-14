@@ -2790,8 +2790,10 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 				compiler_token* t = tokens[i];
 
 				if (t->token_type == TOKEN_TYPE_STRING) { //because the quote marks are lost in tokenization, we must add them back
-					nmf->dbg_tokens[i].chars = (char*)realloc(t->chars,t->num_chars + 2);
-					if (nmf->dbg_tokens[i].chars) {
+					char* ntokcptr = (char*)realloc(t->chars,t->num_chars + 2);
+					if (ntokcptr) {
+						t->chars = ntokcptr;
+						nmf->dbg_tokens[i].chars = t->chars;
 						memmove(nmf->dbg_tokens[i].chars + 1, t->chars, t->num_chars);
 						nmf->dbg_tokens[i].chars[0] = '\"';
 						nmf->dbg_tokens[i].chars[t->num_chars+1] = '\"';
