@@ -1145,8 +1145,10 @@ void mercury_lib_std_addlibs(mercury_state* const M_CPP_restrict M, const mercur
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	mercury_variable in;
 	mercury_table* tab;
-	if (args_in) {
-		mercury_popstack(M, &in);
+	in.type = M_TYPE_NIL;
+	if(args_in)mercury_popstack(M, &in);
+	if (in.type) {
+		
 
 		if (in.type != M_TYPE_TABLE) {
 			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_TABLE, 1);
