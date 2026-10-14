@@ -235,7 +235,9 @@
 	<h3 class="function"><span class="type">string</span> input ( )</h3>
 	
 	<p>
-		awaits a single keypress from stdin. does not require pressing enter. returns the input as a single character.<Br>
+		awaits a single keypress from stdin. does not require pressing enter. returns the input as a string.<Br>
+		behavior on non-ascii characters or keys is platform-dependent.<br>
+		for example, the up arrow on windows is the sequence 0xE0 0x48, while on linux, it is the sequence 0x1B 0x5B 0x41<br>
 		use caution if using this in a loop, as the control+C break sequence will not be captured by the program, and instead be sent as raw input.<br>
 		instead. you should check for the sequence 0x03 
 	</p>
