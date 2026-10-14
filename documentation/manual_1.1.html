@@ -237,10 +237,12 @@
 <br>
 
 <div>
-	<h3 class="function"><span class="type">void</span> addlibs  (<span class="type">table</span> table)</h3>
+	<h3 class="function"><span class="type">table</span> addlibs  ([<span class="type">table</span> table])</h3>
 	<p>
-		adds all libraries to the supplied table. to be used for manual library permission setting for substates, such as with rcall or threads.<Br>
-		overwrites any variable that shares a name with a library or library table.
+		adds all libraries to the supplied table. if no arg is supplied, creates a new table.<br>
+		to be used for manual library permission setting for substates, or for creating a new instance of library tables, such as with rcall or threads.<Br>
+		overwrites any variable that shares a name with a library or library table.<br>
+		returns the table that was given libraries.<br>
 	</p>
 	<p class="codeblock">
 		t={"math"=20}<br>
