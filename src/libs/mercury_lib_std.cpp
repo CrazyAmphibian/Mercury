@@ -32,9 +32,7 @@ void mercury_lib_std_print(mercury_state* const M_CPP_restrict M, const mercury_
 		mercury_string* mstrv = mercury_tostring(vartable+a);
 		mercury_release_var(vartable+a);
 		if (mstrv) {
-			for (mercury_int c = 0; c < mstrv->size; c++) {
-				putchar(mstrv->ptr[c]);
-			}
+			fwrite(mstrv->ptr, 1, mstrv->size, stdout);
 			putchar('\t');
 			fflush(stdout);
 
