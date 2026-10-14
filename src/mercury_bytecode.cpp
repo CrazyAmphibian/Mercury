@@ -1184,7 +1184,7 @@ void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
 		break;
 	case M_TYPE_ARRAY:
 		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table,M_TYPE_INT, 2);
+			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key.type);
 			mercury_release_var(&value);
 			mercury_release_var(&key);
 			mercury_release_var(&table);
@@ -1216,7 +1216,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		break;
 	case M_TYPE_ARRAY:
 		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table, M_TYPE_INT, 2);
+			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key.type);
 			mercury_release_var(&key);
 			mercury_release_var(&table);
 			return;
@@ -1225,7 +1225,7 @@ void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
 		break;
 	case M_TYPE_STRING:
 		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, table.type, M_TYPE_INT,2);
+			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, table.type);
 			mercury_release_var(&key);
 			mercury_release_var(&table);
 			return;

@@ -153,6 +153,10 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 			snprintf(buffer, buffer_size, ": attempt to call non-function value %s.\n", get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
 			break;
+		case M_ERROR_INVALID_INDEX:
+			snprintf(buffer, buffer_size, ": invalid index type %s.\n", get_type_string((uint8_t)*data1));
+			mercury_mstring_addchars(out, buffer, strlen(buffer));
+			break;
 		case M_ERROR_INDEX_INVALID_TYPE:
 			snprintf(buffer, buffer_size, ": attempt to index invalid variable type %s.\n", get_type_string((uint8_t)*data1));
 			mercury_mstring_addchars(out, buffer, strlen(buffer));
