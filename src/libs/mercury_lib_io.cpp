@@ -837,23 +837,8 @@ void mercury_lib_io_input(mercury_state* const M_CPP_restrict M, const mercury_i
 	newt = oldt;
 	newt.c_lflag &= ~(ICANON | ECHO | ISIG);
 	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	o = getchar();
-	c[0] = o;
-	if (c[0] == '\e') {
-		pollfd pfd = {
-		.fd = STDIN_FILENO,
-		.events = POLLIN
-		};
-		int n = poll(&pfd, 1, 50);
-		while (n > 0) {
-			n--;
-			o = getchar();
-			c[desired_length] = o;
-			desired_length++;
-		}
-	}
+	desired_length = read(STDIN_FILENO, c, 0xff);
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-
 #endif
 
 	//ctrl+c interuption.
