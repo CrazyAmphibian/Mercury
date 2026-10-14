@@ -1144,16 +1144,34 @@ void mercury_lib_std_error(mercury_state* const M_CPP_restrict M, const mercury_
 void mercury_lib_std_addlibs(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	mercury_variable in;
-	if (args_in)mercury_popstack(M, &in);
+	mercury_table* tab;
+	if (args_in) {
+		mercury_popstack(M, &in);
 
-	if (in.type != M_TYPE_TABLE) {
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_TABLE, 1);
-		mercury_release_var(&in);
+		if (in.type != M_TYPE_TABLE) {
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_TABLE, 1);
+			mercury_release_var(&in);
+			return;
+		}
+		tab = (mercury_table*)in.data.p;
+	}
+	else if(args_out){
+		tab=mercury_newtable();
+		if (!tab) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+	}
+	else {
 		return;
 	}
+	mercury_populate_table_with_libs(tab);
+	if (args_out) {
+		in.type = M_TYPE_TABLE;
+		in.data.p = tab;
+		mercury_pushstack(M, &in);
+	}
 
-	mercury_populate_table_with_libs((mercury_table*)in.data.p);
-
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
