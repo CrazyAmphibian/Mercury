@@ -1783,8 +1783,8 @@ void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M) { // CoPY Top (of stack)
 	if (!M->sizeofstack)return; //nothing on stack, nothing to copy.
 
-
-	mercury_pushstack(M, M->stack+(M->sizeofstack - 1) );
+	mercury_variable v = *(M->stack + (M->sizeofstack - 1));
+	mercury_pushstack(M, &v );
 }
 
 
