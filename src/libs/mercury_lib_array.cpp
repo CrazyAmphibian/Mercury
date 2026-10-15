@@ -746,7 +746,11 @@ void mercury_lib_array_concat(mercury_state* const M_CPP_restrict M, const mercu
 		mercury_variable var;
 		mercury_getarray((mercury_array*)var_array.data.p, i, &var);
 		if (var.type) {
-			mercury_mstrings_append(out_str, mercury_tostring(&var));
+			mercury_string* s = mercury_tostring(&var);
+			if (s) {
+				mercury_mstrings_append(out_str, s);
+				mercury_mstring_delete(s);
+			}
 		}
 		
 
