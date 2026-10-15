@@ -86,7 +86,7 @@ mercury_string* mercury_copystring(const mercury_string* const M_CPP_restrict st
 		if (nstr->ptr == nullptr) return nullptr;
 		nstr->size = str->size;
 		nstr->constant = false;
-		nstr->refrences = 1;
+		nstr->refrences = 0;
 		memcpy(nstr->ptr, str->ptr, str->size * sizeof(char));
 		return nstr;
 	}
