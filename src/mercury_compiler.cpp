@@ -2386,7 +2386,14 @@ mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token** to
 	add_rawdata_bitwidth_size(f, ci->loop_jumppoint_start-f->number_instructions,token_offset-1);
 
 	for(mercury_int i=0;i<ci->loop_endpoint_ref_count;i++){
-		*(mercury_int*)(f->instructions+ci->loop_endpoint_ref_pos[i]) =f->number_instructions-ci->loop_endpoint_ref_pos[i];
+		if (ci->loop_endpoint_ref_pos[i] > f->number_instructions) { //todo: actually fix whatever part of the compiler causes the jump to point out of bounds
+#ifdef MERCURY_DEBUG
+			printf("compiler: a loop requested a jump to point %zi, but there are only %zi instructions. skipping setting of jump position.\n", ci->loop_endpoint_ref_pos[i],f->number_instructions);
+#endif
+		}
+		else {
+			*(mercury_int*)(f->instructions + ci->loop_endpoint_ref_pos[i]) = f->number_instructions - ci->loop_endpoint_ref_pos[i];
+		}
 	}
 	free(ci->loop_endpoint_ref_pos);
 	
