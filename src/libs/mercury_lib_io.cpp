@@ -669,7 +669,7 @@ void mercury_lib_io_prompt(mercury_state* const M_CPP_restrict M, const mercury_
 	}
 
 	if (args_out) {
-		mercury_string* s=mercury_cstring_to_mstring(c, len);
+		mercury_string* s= mercury_cstring_promote_to_mstring(c, len);
 		if (!s) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			return;
@@ -680,7 +680,10 @@ void mercury_lib_io_prompt(mercury_state* const M_CPP_restrict M, const mercury_
 		v.data.p = s;
 		mercury_pushstack(M, &v);
 	}
-	free(c);
+	else {
+		free(c);
+	}
+	
 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,1);
