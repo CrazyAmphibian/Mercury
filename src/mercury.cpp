@@ -56,6 +56,17 @@ mercury_string* mercury_cstring_const_to_mstring(const char* const M_CPP_restric
 	return nstr;
 }
 
+//similar to mercury_cstring_to_mstring, but reuses the char* provided instead of copying the data
+mercury_string* mercury_cstring_promote_to_mstring(char* const M_CPP_restrict str, const mercury_int size) {
+	mercury_string* nstr = (mercury_string*)malloc(sizeof(mercury_string));
+	if (!nstr) return nullptr;
+	nstr->size = size;
+	nstr->constant = false;
+	nstr->refrences = 0;
+	nstr->ptr = str;
+	return nstr;
+}
+
 char* mercury_mstring_to_cstring(const mercury_string* const M_CPP_restrict str) {
 	//mercury_int sz = strlen(str->ptr); //use this mecause null terminator
 	//printf("%i/%i %s",str->size,sz,str->ptr);

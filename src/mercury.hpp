@@ -279,6 +279,7 @@ extern mercury_int M_NUM_LIBS;
 //string
 MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_cstring_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
 MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_cstring_const_to_mstring(const char* const M_CPP_restrict str, const mercury_int size);
+MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_cstring_promote_to_mstring(char* const M_CPP_restrict str, const mercury_int size);
 MERCURY_DYNAMIC_LIBRARY char* mercury_mstring_to_cstring(const mercury_string* const M_CPP_restrict str);
 MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_mstrings_concat(const mercury_string* const str1, const mercury_string* const str2);
 MERCURY_DYNAMIC_LIBRARY void mercury_mstring_delete(mercury_string* const M_CPP_restrict str);
