@@ -55,7 +55,7 @@ void mercury_lib_os_execute(mercury_state* const M_CPP_restrict M, const mercury
 #else
 	FILE* a = popen(c_code, "r");
 #endif 
-
+	free(c_code);
 	char* out_c = nullptr;
 	mercury_int size_c = 0;
 	mercury_int allocated_c = 0;
@@ -128,7 +128,7 @@ void mercury_lib_os_call(mercury_state* const M_CPP_restrict M, const mercury_in
 	//system(c_code);
 
 	int r=system(c_code);
-
+	free(c_code);
 	if (!args_out) {
 		return;
 	}
