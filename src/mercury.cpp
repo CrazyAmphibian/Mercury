@@ -394,6 +394,7 @@ mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const
 			mercury_decrement_variable_refrence_count(subt.values + i);
 			mercury_release_var(subt.values+i);
 			subt.values[i] = *value;
+			return i;
 		}
 	}
 
@@ -1849,6 +1850,8 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_string_copy_string, "copy", "string");
 	mercury_register_library(mercury_lib_string_match_function, "match", "string");
 	mercury_register_library(mercury_lib_string_p_match_function, "pmatch", "string");
+	mercury_register_library(mercury_lib_string_repeat_chars, "repeat", "string");
+	mercury_register_library(mercury_lib_string_set_chars, "setchars", "string");
 
 #endif
 #ifdef MERCURY_LIB_OS

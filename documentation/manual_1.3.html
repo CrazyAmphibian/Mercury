@@ -373,5 +373,37 @@ pattern sequences are always 2 characters wide, and start with a % to make them 
 </div>
 <br>
 
+
+<div>
+	<h3 class="function"> <span class="type">string</span> repeat (<span class="type">string</span>|<span class="type">int</span> characters, <span class="type">int</span> count)</h3>
+	<p>
+		repeats a provided characters count times, and returns the result as a string.<br>
+		can take an int instead of a string, in which case the lowest 8 bits will be used as a single character.<br>
+	</p>
+	<p class="codeblock">
+		string.repeat("hello ",3) //returns "hello hello hello "
+		string.repeat(51,2) //returns "33"
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"> <span class="type">string</span> setchars (<span class="type">string</span> string, <span class="type">string</span> characters, <span class="type">int</span> offset)</h3>
+	<p>
+		takes a string, and sets its chars to the characters string at the provided offset.<br>
+		will expand a string to fit the demands of the args.<br>
+		empty space will be filled with NULL (0x00)<br>
+		
+	</p>
+	<p class="codeblock">
+		string.setchars("hello","heh",0) //returns "hehlo"
+		string.setchars("hello","heh",-3) //returns "hehhello"
+		string.setchars("hello","heh",2) //returns "heheh"
+		string.setchars("hello","heh",10) //returns "hello\0\0\0\0\0heh"
+	</p>
+</div>
+<br>
+
+
 </body>
 </html>

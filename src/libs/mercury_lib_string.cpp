@@ -2378,3 +2378,179 @@ void mercury_lib_string_p_match_function(mercury_state* const M_CPP_restrict M, 
 
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
+
+//makes a string of input string string times
+void mercury_lib_string_repeat_chars(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
+
+	mercury_variable var_count;
+	mercury_variable var_str;
+
+	mercury_popstack(M, &var_count);
+	if (var_count.type != M_TYPE_INT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_count, M_TYPE_INT, 2);
+		mercury_release_var(&var_count);
+		return;
+	}
+
+	mercury_popstack(M, &var_str);
+	if (var_str.type != M_TYPE_STRING && var_str.type != M_TYPE_INT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+		mercury_release_var(&var_str);
+		return;
+	}
+
+	if (!args_out) {
+		mercury_release_var(&var_str);
+		return;
+	}
+
+	mercury_int sizeneed = 1;
+	if (var_str.type == M_TYPE_STRING) sizeneed = ((mercury_string*)var_str.data.p)->size;
+	if (var_count.data.i < 0)var_count.data.i = 0;
+
+
+	mercury_variable out;
+	if (!sizeneed || !var_count.data.i) { //easy, empty string
+		mercury_release_var(&var_str);
+		mercury_string* outstr=mercury_cstring_const_to_mstring(nullptr, 0);
+		if (!outstr) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		out.data.p = outstr;
+		out.type = M_TYPE_STRING;
+	}
+	else {
+
+		char* buffer = (char*)malloc(sizeof(char) * var_count.data.i * sizeneed);
+		if (!buffer) {
+			mercury_release_var(&var_str);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+
+		mercury_string* outstr = mercury_cstring_promote_to_mstring(buffer, var_count.data.i * sizeneed);
+		if (!outstr) {
+			free(buffer);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+
+
+		if (var_str.type == M_TYPE_STRING) {
+			while (var_count.data.i) {
+				var_count.data.i--;
+				memcpy(buffer+ (sizeneed* var_count.data.i), ((mercury_string*)var_str.data.p)->ptr, sizeneed);
+			}
+		}
+		else {
+			memset(buffer, var_str.data.i & 0xFF, var_count.data.i * sizeneed);
+		}
+		mercury_release_var(&var_str);
+		
+		out.type = M_TYPE_STRING;
+		out.data.p = outstr;
+
+	}
+
+	mercury_pushstack(M, &out);
+
+	
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
+
+
+void mercury_lib_string_set_chars(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
+
+	mercury_variable var_position;
+	mercury_variable var_replace;
+	mercury_variable var_str;
+
+	mercury_popstack(M, &var_position);
+	if (var_position.type != M_TYPE_INT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_position, M_TYPE_INT, 3);
+		mercury_release_var(&var_position);
+		return;
+	}
+
+	mercury_popstack(M, &var_replace);
+	if (var_replace.type != M_TYPE_STRING) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_replace, M_TYPE_STRING, 2);
+		mercury_release_var(&var_replace);
+		return;
+	}
+
+	mercury_popstack(M, &var_str);
+	if (var_str.type != M_TYPE_STRING) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+		mercury_release_var(&var_replace);
+		mercury_release_var(&var_str);
+		return;
+	}
+
+	if (!args_out) {
+		mercury_release_var(&var_replace);
+		mercury_release_var(&var_str);
+		return;
+	}
+
+	mercury_string* instr = ((mercury_string*)var_str.data.p);
+	mercury_string* repstr = ((mercury_string*)var_replace.data.p);
+
+	mercury_int shift = -var_position.data.i;
+	if (shift < 0)shift = 0;
+
+	if (var_position.data.i < 0)var_position.data.i = 0;
+
+	mercury_int additional = repstr->size - instr->size + var_position.data.i;
+	if (additional < 0)additional = 0;
+	additional += shift;
+
+	if (!(instr->size + additional)) { //empty string
+		mercury_release_var(&var_str);
+		mercury_release_var(&var_replace);
+		mercury_string* outstr = mercury_cstring_const_to_mstring(nullptr, 0);
+		if (!outstr) {
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		mercury_variable out;
+		out.data.p = outstr;
+		out.type = M_TYPE_STRING;
+		mercury_pushstack(M, &out);
+		return;
+	}
+
+	char* buffer=(char*)malloc(instr->size + additional);
+
+	if (!buffer) {
+		mercury_release_var(&var_replace);
+		mercury_release_var(&var_str);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+
+	mercury_string* outstr = mercury_cstring_promote_to_mstring(buffer, instr->size + additional);
+	if (!outstr) {
+		free(buffer);
+		mercury_release_var(&var_replace);
+		mercury_release_var(&var_str);
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	memset(buffer, 0, instr->size + additional);
+	memcpy(buffer+ shift, instr->ptr, instr->size);
+	memcpy(buffer + var_position.data.i, repstr->ptr, repstr->size);
+
+	mercury_release_var(&var_replace);
+	mercury_release_var(&var_str);
+
+	mercury_variable out;
+	out.type = M_TYPE_STRING;
+	out.data.p = outstr;
+	mercury_pushstack(M, &out);
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
+}
