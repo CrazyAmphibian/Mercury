@@ -152,9 +152,10 @@ global color_lookups=[
 8=COLOR_WHITE,
 ]
 
-
+randomoffset=0 //so consecutive calls don't go over the same shit
 reseed:
-global gameseed=math.randomseed(os.time())
+global gameseed=math.randomseed(os.time()+randomoffset)
+randomoffset++
 local firstdig=true
 
 global GAMESTATE=STATE_PLAY
