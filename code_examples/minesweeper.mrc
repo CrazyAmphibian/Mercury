@@ -100,6 +100,7 @@ clear_screen()
 print("[1] easy (7x7 10 bombs)")
 print("[2] medium (11x11 20 bombs)")
 print("[3] hard (15x15 40 bombs)")
+print("[4] custom")
 retry:
 global bombs=0
 global size_x=0
@@ -117,6 +118,21 @@ elseif n=="3" then
 	bombs=40
 	size_x=15
 	size_y=15
+elseif n=="4" then
+	while !!size_x do
+		io.post("X board size:")
+		size_x=toint(io.prompt())
+	end
+	
+	while !!size_y do
+		io.post("y board size:")
+		size_y=toint(io.prompt())
+	end
+	
+	while !!bombs do
+		io.post("number of bombs:")
+		bombs=toint(io.prompt())
+	end
 elseif n=="\x03" then
 	os.exit(1)
 else
