@@ -12,6 +12,7 @@
 #include <Windows.h>
 #else
 #include <dlfcn.h>
+#include <time.h>
 #endif
 
 //throws stuff into stdout. adds a newline at the end, seperates with a tab. designed to be variadic.
@@ -1173,7 +1174,41 @@ void mercury_lib_std_addlibs(mercury_state* const M_CPP_restrict M, const mercur
 		in.data.p = tab;
 		mercury_pushstack(M, &in);
 	}
-
+	
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
+void mercury_lib_std_sleep(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
+	mercury_variable in;
+	mercury_popstack(M, &in);
+
+	if (in.type == M_TYPE_INT) {
+		in.data.f = (mercury_float)in.data.i;
+	}
+	else if (in.type == M_TYPE_FLOAT) {
+		;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &in, 1);
+		mercury_release_var(&in);
+		return;
+	}
+
+	if(in.data.f < 0)in.data.f = 0.0;
+#ifdef _WIN32
+	DWORD time = (DWORD)(in.data.f*1000.0);
+	if (time == INFINITE)time--; //thanks, windows
+	Sleep(time);
+#else
+	timespec ts;
+	ts.tv_sec = (time_t)in.data.f;
+	in.data.f -= (mercury_float)ts.tv_sec;
+	in.data.f *= 1000000000.0; //convert to nanoseconds
+	ts.tv_nsec = (long)in.data.f;
+	if (ts.tv_nsec > 999999999)ts.tv_nsec = 999999999; //floating point error might cause an overshoot.
+	nanosleep(&ts,NULL);
+#endif
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
+}
