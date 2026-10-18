@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mercury user manual</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<table id="docuheader">
+<tr>
+	<td><a href="manual_1.0.html">1 Libraries</a></td>
+	<td><a href="manual_2.0.html">2 Behind the Scenes</a> </td>
+	<td><a href="manual_3.0.html"></a> </td>
+</tr>
+<tr>
+	<td><a href="manual_2.7.html">2.7 error throwing</a></td>
+	<td><a href="manual_2.8.html">2.8 complete C++ API</a></td>
+	<td><a href="manual_2.9.html"></a></td>
+</tr>
+</table>
+
+<p>
+this is a complete list of every function or inline provided in mercury.hpp, as well as how they operate.
+</p>
+
+
+<div>
+	<h3>string functions</h3>
+	<p class="codeblock">
+		mercury_string* mercury_cstring_to_mstring(const char* const restrict str, const mercury_int size);
+	</p>
+	<p>
+	creates a new mercury string based on the data from a character array.<br>
+	the resulting mercury_string* will use a unique pointer for its char*, seperate from the provided one.<br>
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		mercury_string* mercury_cstring_const_to_mstring(const char* const restrict str, const mercury_int size);
+	</p>
+	<p>
+	creates a new mercury string marked as constant using a supplied character array.<br>
+	the resulting mercury_string* will use the pointer provided, but will never modify or free the pointer or assocaited data.<br>
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		mercury_string* mercury_cstring_promote_to_mstring(char* const restrict str, const mercury_int size);
+	</p>
+	<p>
+	creates a new mercury string using a supplied character array.<br>
+	the resulting mercury_string* will use the pointer provided, and the mercury runtime will manage and possibly modify the pointer data, as well as freeing or reallocating.<br>
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		char* mercury_mstring_to_cstring(const mercury_string* const restrict str)
+	</p>
+	<p>
+	creates a new character array, based on the supplied mercury string.<br>
+	the resulting array will be null-terminated, but is not guaranteed to only have null occur at the end.<br>
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		mercury_string* mercury_copystring(const mercury_string* const restrict str)
+	</p>
+	<p>
+	creates a new mercury_string which has the same data as the supplied.<br>
+	if the supplied string is marked as constant, the pointer will be copied.<br>
+	otherwise, this will create a new pointer and copy the data from the original<br>
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		mercury_string* mercury_mstrings_concat(const mercury_string* const str1, const mercury_string* const str2)
+	</p>
+	<p>
+	creates a new mercury_string whose data is the concatenation of both input strings, with the first arg being the first portion of the resulting string.
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+
+	<p class="codeblock">
+		bool mercury_mstrings_append(mercury_string* const basestr, const mercury_string* const appstr)
+	</p>
+	<p>
+	modifies the first arg string with the second arg's string affixed to the end.<br>
+	if the first arg is a constant string, a new pointer will be allocated to the string, and it will be unmarked as constant.<br>
+	returns false on a memory allocation failure.<br>
+	</p>	
+	
+	<p class="codeblock">
+		bool mercury_mstring_addchars(mercury_string* const M_CPP_restrict str, const char* const chars, mercury_int len=1)
+	</p>
+	<p>
+	modifies the first arg string with the supplied character array appended to it<br>
+	if the first arg is a constant string, a new pointer will be allocated to the string, and it will be unmarked as constant.<br>
+	returns false on a memory allocation failure.<br>
+	</p>
+	
+	
+	<p class="codeblock">
+		mercury_string* mercury_mstring_substring(mercury_string* str, mercury_int start, mercury_int end)
+	</p>
+	<p>
+	creates a new string composed from the supplied string.
+	the integer args are an offset from the start of the string (0 indexed)<br>
+	may return a zero length (empty) string<br>
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		void mercury_mstring_delete(mercury_string* const restrict str)
+	</p>
+	<p>
+	frees the supplied mercury_string, regardless of reference count.<br>
+	if the pointer is not marked as constant, it will be freed.<br>
+	</p>
+	
+	<p class="codeblock">
+		inline bool mercury_mstrings_equal(const mercury_string* const str1, const mercury_string* const str2)
+	</p>
+	<p>
+		returns a bool if the supplied mercury strings have the same data.
+	</p>
+	
+	<p class="codeblock">
+		inline bool mercury_mstring_equal_cstring(const mercury_string* const mstr, const char* const cstr)
+	</p>
+	<p>
+		returns a bool if the supplied mercury string has the same data as the supplied null-terminated character array.
+	</p>
+	
+</div>
+
+<div>
+	<h3>table functions</h3>
+	
+	<p class="codeblock">
+		mercury_table* mercury_newtable()
+	</p>
+	<p>
+	creates a new, empty table object
+	returns nullptr on a memory allocation failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		mercury_int mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key)
+	</p>
+	<p>
+	searches a table for the supplied key. if found, returns the index in the subtable where it was found.<br>
+	if not, returns -1.<br>
+	</p>	
+	
+	<p class="codeblock">
+		bool mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out)
+	</p>
+	<p>
+	sets the data at the variable pointer out to the value stored by the supplied key. if not found, returns false, and sets out to nil.
+	</p>	
+	
+	<p class="codeblock">
+		mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value)
+	</p>
+	<p>
+	sets a key in the table, and returns the index in the subtable. on allocation failiure, returns -1.<br>
+	both the supplied key and value will have their refrence count incremented and will be stored in the table.<br>
+	the existing stored data will be unrefrenced, and position overwritten, potentially freeing the data.<br>
+	</p>	
+	
+	
+	<p class="codeblock">
+		bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2)
+	</p>
+	<p>
+	evaluates every key in a table against another table. if every value is equal, returns true. otherwise, false
+	</p>	
+	
+	
+	<p class="codeblock">
+		bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out)
+	</p>
+	<p>
+	sets the data at the variable pointer out to the value stored by the supplied key. if not found, returns false, and sets out to nil. Takes a null-terminated character array aas a key instead of a variable.
+	</p>
+	
+	<p class="codeblock">
+		mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value)
+	</p>
+	<p>
+		sets a key in the table, and returns the index in the subtable. on allocation failiure, returns -1.<br>
+		both the value will have its refrence count incremented and will be stored in the table.<br>
+		the existing stored data will be unrefrenced, and position overwritten, potentially freeing the data.<br>
+		the supplied character array must point to a constant point in memory, and should not be freed, and be null terminated<br>
+		
+	</p>
+	
+	<p class="codeblock">
+		mercury_int mercury_table_has_cstring_key(const mercury_table* const table, const char* const key)
+	</p>
+	<p>
+	searches a table for the supplied key. if found, returns the index in the subtable where it was found.<br>
+	if not, returns -1.<br>
+	the supplied character array must be null terminated<br>
+	</p>
+
+
+	<p class="codeblock">
+		void mercury_prepare_table_for_state(mercury_table* table,mercury_state* M)
+	</p>
+	<p>
+	sets the values _G and _ENV given a state and its environment table.<br>
+	additionally, sets the environmental flag of the table.
+	</p>
+	
+	<p class="codeblock">
+		void mercury_cleartable(const mercury_table* const table)
+	</p>
+	<p>
+	goes through all stored variables in the stored table, and unrefrences, and possibly frees them, then removes them from storage.
+	</p>
+	
+	<p class="codeblock">
+		void mercury_destroytable(mercury_table* const table)
+	</p>
+	<p>
+	frees the supplied table. goes through all stored variables, and unrefrences, and possibly frees them.
+	</p>
+	
+	
+</div>
+
+
+<div>
+	<h3>array functions</h3>
+	<p class="codeblock">
+		mercury_array* mercury_newarray()
+	</p>
+	<p>
+	creates a new array object.<br>
+	returns nullptr on failiure.<br>
+	</p>
+	
+	<p class="codeblock">
+		bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos)
+	</p>
+	<p>
+	sets the array's index to the provided value.<br>
+	increases the supplied value's reference count.<br>
+	if the index already stored a value, it will be dereferenced, replaced, and potentially freed.<br>
+	on success, returns true.<br>
+	</p>
+
+	<p class="codeblock">
+		void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_variable* out)
+	</p>
+	<p>
+	sets the data at the provided pointer to the value stored in the array at the index.<br>
+	if the value is not present, nil is set instead.<br>
+	</p>
+	
+	<p class="codeblock">
+		mercury_int mercury_array_len(const mercury_array* const restrict arr)
+	</p>
+	<p>
+	returns the index of the array's value with the highest value.<br>
+	if there are no values, -1 is returned instead.<br>
+	ignores negative indexes.
+	</p>	
+	
+	<p class="codeblock">
+		void mercury_destroyarray(mercury_array* const restrict arr)
+	</p>
+	<p>
+	frees the provided array, and dereferences and potentially frees all stored values.
+	</p>
+	
+	
+</div>
+
+
+<div>
+	<h3>state functions</h3>
+	<p class="codeblock">
+		mercury_state* mercury_newstate(const mercury_state* const parent = nullptr)
+	</p>
+	<p>
+	creates a new state. if parent is provided, this will set the new state's parent to the provided.<br>
+	returns nullptr on failure.<br>
+	</p>
+	
+	<p class="codeblock">
+		bool mercury_stepstate(mercury_state* const restrict M) 
+	</p>
+	<p>
+	executes a single instruction of a state's bytecode.<br>
+	returns true if there are more instructions to execute.
+	</p>
+	
+	<p class="codeblock">
+		void mercury_clearstate(mercury_state* const restrict M, bool for_deletion=false)
+	</p>
+	<p>
+	clears a state into its initial state.<br>
+	the second arg should not be used, as it is an internal designation<br>
+	</p>
+	
+	<p class="codeblock">
+		void mercury_destroystate(mercury_state* const restrict M)
+	</p>
+	<p>
+	frees a state and unreferences or frees all associated data.<br>
+	</p>
+	
+	<p class="codeblock">
+		void mercury_release_var(mercury_variable* const restrict var) 
+	</p>
+	<p>
+	checks a variable's reference count, and frees the data if it is 0<br>
+	</p>
+		
+	<p class="codeblock">
+		void mercury_popstack(mercury_state* const restrict M, mercury_variable* out)
+	</p>
+	<p>
+	sets the data at the pointer out to the provided state's top stack element, and decreases the stack size.<br>
+	if there is no element on the stack, out is set to nil instead.<br>
+	</p>
+	
+	<p class="codeblock">
+		void mercury_pullstack(mercury_state* const restrict M, mercury_variable* out)
+	</p>
+	<p>
+	sets the data at the pointer out to the provided state's bottom stack element, and decreases the stack size then shifts all elements back by 1.<br>
+	if there is no element on the stack, out is set to nil instead.<br>
+	</p>
+	
+	<p class="codeblock">
+		void mercury_pushstack(mercury_state* const restrict M, mercury_variable* var)
+	</p>
+	<p>
+		adds the provided variable onto the top of the provided state's stack.<br>
+		returns true if this occured successfuly, and false if not.
+	</p>
+	
+	<p class="codeblock">
+		inline void mercury_discard_top_of_stack(mercury_state* const restrict M)
+	</p>
+	<p>
+		takes the top variable of the stack of the provided state, and removes it, potentially freeing it.
+	</p>
+	
+	<p class="codeblock">
+		inline void mercury_peek_stack(const mercury_state* restrict M, mercury_variable* out) 
+	</p>
+	<p>
+		sets the data at the pointer out to the variable on the top of the stack if it exists, nil if not.<br>
+		does not change the stack size.
+	</p>
+	
+	<p class="codeblock">
+		inline mercury_state* mercury_get_child_state(mercury_state* const M_CPP_restrict M)
+	</p>
+	<p>
+		returns a pointer to a state's child state, used for function calls.<br>
+		creates the state if none exists.<br>
+		returns nullptr on failure.<br>
+	</p>
+		
+</div>
+
+
+<div>
+	<h3>variable functions</h3>
+
+	<p class="codeblock">
+		mercury_string* mercury_tostring(const mercury_variable* const restrict var)
+	</p>
+	<p>
+		creates a new string that represents the supplied variable's value.<br>
+		if the supplied variable is also a string, a new one is still created<br>
+		returns nullptr on failure<br>
+	</p>
+	
+	<p class="codeblock">
+		bool mercury_checkbool(const mercury_variable* const restrict var)
+	</p>
+	<p>
+		interprets the supplied variable as a boolean, and returns the corresponding value.
+	</p>
+	
+	<p class="codeblock">
+		mercury_int mercury_checkint(const mercury_variable* const restrict var)
+	</p>
+	<p>
+		interprets the supplied variable as an integer, and returns the corresponding value.
+	</p>	
+	
+	<p class="codeblock">
+		mercury_float mercury_checkfloat(const mercury_variable* const restrict var)
+	</p>
+	<p>
+		interprets the supplied variable as a floating-point number, and returns the corresponding value.
+	</p>		
+	
+	<p class="codeblock">
+		mercury_float mercury_checkpointer(const mercury_variable* const restrict var)
+	</p>
+	<p>
+		interprets the supplied variable as a pointer, and returns the corresponding value.<br>
+		for non pointer types, nullptr is returned.
+	</p>		
+	
+	<p class="codeblock">
+		bool mercury_vars_equal(const mercury_variable* const var1, const mercury_variable* const var2)
+	</p>
+	<p>
+		evaluates if the two suppplied variables are equal, using mercury equality rules.
+	</p>	
+
+	<p class="codeblock">
+		inline void mercury_clear_variable(mercury_variable* var)
+	</p>
+	<p>
+		sets the data at the pointer to nil
+	</p>
+	
+	<p class="codeblock">
+		inline bool mercury_type_is_complex(const uint8_t type)
+	</p>
+	<p>
+		returns if the type is complex (referenced)
+	</p>
+	
+	<p class="codeblock">
+		inline void mercury_increment_variable_refrence_count(const mercury_variable* const restrict var)
+	</p>
+	<p>
+		increments a variable's reference count
+	</p>
+	
+	<p class="codeblock">
+		inline void mercury_decrement_variable_refrence_count(const mercury_variable* const restrict var)
+	</p>
+	<p>
+		decrements a variable's reference count
+	</p>	
+	
+	
+</div>
+
+
+
+<div>
+	<h3>other functions</h3>
+	
+	<p class="codeblock">
+		bool mercury_register_library(void* data, char* key, char* table, uint8_t type=M_TYPE_CFUNC)
+	</p>
+	<p>
+		adds data to mercury's global libraries list.<br>
+		data is a pointer to the data<br>
+		key is a null-terminated string<br>
+		table is an optional null terminated string. if supplied with nullptr, will add the library to the table, otherwise, adds it to a sub-table whose key is the supplied string<br>
+		type is the type of the library. supported types: int, float, bool, c function<br>
+		returns false if the library failed to be added<br>
+		not thread safe.<br>
+	</p>	
+	
+	<p class="codeblock">
+		void mercury_populate_table_with_libs(mercury_table* T)
+	</p>
+	<p>
+		adds all libraries into the supplied table.
+	</p>	
+	
+	<p class="codeblock">
+		mercury_string* mercury_get_bytecode_debug(mercury_function* F)
+	</p>
+	<p>
+		generates a string representing a function's bytecode<br>
+		annotates instructions and their bytecode parameters<br>
+		returns nullptr on failiure<br>
+	</p>	
+	
+	<p class="codeblock">
+		mercury_string* mercury_get_bytecode_rawbinary_debug(mercury_function* F)
+	</p>
+	<p>
+		generates a string representing a function's bytecode<br>
+		annotates hex, char, (un)signed int, and opcodes<br>
+		returns nullptr on failiure<br>
+	</p>
+
+	<p class="codeblock">
+		void mercury_debugdumptable(mercury_table* tab, int level = 0)
+	</p>
+	<p>
+		generates a debug string of a supplied table, and sends it to stdout.<br>
+		optional level arg is for internal use only.<br>
+	</p>
+	
+	<p class="codeblock">
+		void mercury_clone_function(mercury_function* in, mercury_function* out)
+	</p>
+	<p>
+		copies a function's data into a new function. the function object must already exist.
+		on failure, the output function's instruction count will not be the same as the input's
+	</p>
+
+	<p class="codeblock">
+		void mercury_clear_function(mercury_function* in)
+	</p>
+	<p>
+		clears all data associated with a function pointer, but does not free the pointer.
+	</p>
+	
+</div>
+
+
+</body>
+</html>
