@@ -114,9 +114,11 @@ inline compiler_token* new_compiler_token(mercury_int col_num, mercury_int line_
 }
 
 inline bool append_char_to_compiler_token(compiler_token* token, char c){
-	char* naddr=(char*)realloc(token->chars,sizeof(char)*(token->num_chars+1));
-	if (!naddr)return false;
-	token->chars=naddr;
+	if (token->num_chars % 0xf == 0) {
+		char* naddr = (char*)realloc(token->chars, sizeof(char) * (0xf + token->num_chars));
+		if (!naddr)return false;
+		token->chars = naddr;
+	}
 	token->chars[token->num_chars]=c;
 	token->num_chars++;
 	return true;
