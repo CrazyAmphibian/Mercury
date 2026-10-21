@@ -673,6 +673,10 @@ struct compiler_info {
 	mercury_int args_out = 1;
 };
 
+inline void init_compiler_info(compiler_info* ci) {
+	memset(ci, 0, sizeof(compiler_info));
+}
+
 inline compiler_info* new_compiler_info(){ //this exists to be used in m_compile_read_keyword_block and mercury_compile_tokens_to_bytecode, and whatnot to dictate keywords and control flow. doesn't need to be propagated to low-end functions like m_compile_read_variable or m_compile_read_statment.
 //haha just kidding. that was the plan, but, well... programming. turns out constant statements need that propagation so... oh well. turns out a compiler with any amount of good features needs to do that, i guess. at least goto should be less compilated... right?
 	compiler_info* out=(compiler_info*)malloc(sizeof(compiler_info));
@@ -705,6 +709,20 @@ inline compiler_info* new_compiler_info(){ //this exists to be used in m_compile
 	out->args_out = 1;
 
 	return out;
+}
+
+inline void clear_compiler_info(compiler_info* i) {
+	free(i->loop_endpoint_ref_pos);
+	free(i->conditional_jumptoend_points);
+	free(i->constants);
+	for (mercury_int n = 0; n < i->num_gotos; n++) {
+		free(i->goto_positions[n]);
+	}
+	free(i->goto_pos_count);
+	free(i->goto_positions);
+	free(i->goto_defined);
+	free(i->goto_alias);
+	free(i->goto_labelpos);
 }
 
 inline void delete_compiler_info(compiler_info* i){
@@ -893,6 +911,11 @@ inline compiler_function* new_compiler_function(){
 	return out;
 }
 
+inline void clear_compiler_function(compiler_function* f) {
+	if (f->instructions)free(f->instructions);
+	if (f->instruction_tokens)free(f->instruction_tokens);
+}
+
 inline void delete_compiler_function(compiler_function* f){
 	if(f->instructions)free(f->instructions);
 	if(f->instruction_tokens)free(f->instruction_tokens);
@@ -922,6 +945,28 @@ inline bool merge_compiler_functions(compiler_function* fbase, compiler_function
 		fbase->token_error_num = fadd->token_error_num;
 	}
 	delete_compiler_function(fadd);
+	return true;
+}
+
+//like above, but does not free fadd
+inline bool merge_compiler_functions_nofree(compiler_function* fbase, const compiler_function* fadd) {
+	mercury_int nsiz = fbase->number_instructions + fadd->number_instructions;
+
+	void* p = realloc(fbase->instructions, sizeof(mercury_opcode) * (nsiz));
+	if (!p)return false;
+	fbase->instructions = (mercury_opcode*)p;
+	p = realloc(fbase->instruction_tokens, sizeof(mercury_int) * (nsiz));
+	if (!p)return false;
+	fbase->instruction_tokens = (mercury_int*)p;
+
+	memcpy(fbase->instructions + fbase->number_instructions, fadd->instructions, sizeof(mercury_opcode) * fadd->number_instructions);
+	memcpy(fbase->instruction_tokens + fbase->number_instructions, fadd->instruction_tokens, sizeof(mercury_int) * fadd->number_instructions);
+
+	fbase->number_instructions = nsiz;
+	if (fadd->errorcode && !fbase->errorcode) {
+		fbase->errorcode = fadd->errorcode;
+		fbase->token_error_num = fadd->token_error_num;
+	}
 	return true;
 }
 
@@ -1010,11 +1055,10 @@ inline bool add_rawdata_bitwidth_size(compiler_function* f, uint32_t data,mercur
 #endif
 
 inline compiler_token* m_compile_get_next_token(compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset){
-	compiler_token* out=nullptr;
 	if( token_offset < num_tokens && token_offset>=0 ){ //OOB
-		out=tokens[token_offset];
+		return tokens[token_offset];
 	}
-	return out;
+	return nullptr;
 }
 
 mercury_opcode m_compile_get_operator_opcode_from_token(compiler_token* t,int ttype=0){
@@ -1261,14 +1305,16 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 			}
 				
 			//read a variable. this could be implicit index value or an index.
-			compiler_function* idxfunc=new_compiler_function();
+			compiler_function idxfunc;
+			memset(&idxfunc, 0, sizeof(compiler_function));
+			
 			mercury_int oao = i->args_out;
 			i->args_out = 1;
-			token_offset+= m_compile_read_var_statment(idxfunc,tokens,num_tokens,token_offset,i);
+			token_offset+= m_compile_read_var_statment(&idxfunc,tokens,num_tokens,token_offset,i);
 			i->args_out = oao;
-			if(idxfunc->errorcode){
-				f->errorcode = idxfunc->errorcode;
-				f->token_error_num = idxfunc->token_error_num;
+			if(idxfunc.errorcode){
+				f->errorcode = idxfunc.errorcode;
+				f->token_error_num = idxfunc.token_error_num;
 				return 0;
 			}
 				
@@ -1295,8 +1341,8 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 					
 					add_instruction(f, M_OPCODE_SWPT, token_offset);
 
-					merge_compiler_functions(f, idxfunc);
-					idxfunc = nullptr;
+					merge_compiler_functions_nofree(f, &idxfunc);
+					clear_compiler_function(&idxfunc);
 
 					if(f->errorcode){
 						return 0;
@@ -1325,8 +1371,8 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 				}else if(cur_tok->chars[0]==',' || is_array ? ']' : '}'){ //implicit index
 					add_instruction(f,M_OPCODE_CPYT,token_offset);
 					
-					merge_compiler_functions(f, idxfunc);
-					idxfunc = nullptr;
+					merge_compiler_functions_nofree(f, &idxfunc);
+					clear_compiler_function(&idxfunc);
 
 					add_instruction(f, M_OPCODE_SWPT, token_offset);
 
@@ -1430,7 +1476,8 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 		
 		token_offset++;
 		
-		compiler_function* funcargreadf = new_compiler_function();
+		compiler_function funcargreadf;
+		memset(&funcargreadf, 0, sizeof(compiler_function));
 
 		while(true){ //reading args
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -1445,10 +1492,10 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 			
 			if(cur_tok->token_flags & TOKEN_ENV_VAR){
 
-				add_string_onto_stack(funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
+				add_string_onto_stack(&funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
 				//token_offset+=m_compile_read_variable(funcargreadf,tokens,num_tokens,token_offset, nullptr); //load the var name onto the stack
 				//add_instruction(funcargreadf,M_OPCODE_SWPT,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key
-				add_instruction(funcargreadf,M_OPCODE_SETL,token_offset);
+				add_instruction(&funcargreadf,M_OPCODE_SETL,token_offset);
 				token_offset++;
 			}else{
 				f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
@@ -1482,7 +1529,7 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 		}
 		token_offset++;
 
-		add_instruction(funcargreadf,M_OPCODE_CLS,0); //discards extra args in
+		add_instruction(&funcargreadf,M_OPCODE_CLS,0); //discards extra args in
 		mercury_int toks_consumed=0;
 		compiler_function* ff = mercury_compile_tokens_to_bytecode(tokens, num_tokens, token_offset,&toks_consumed);
 		if (!ff) {
@@ -1496,7 +1543,8 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 			return 0;
 		}
 		token_offset += toks_consumed;
-		merge_compiler_functions(f, funcargreadf);
+		merge_compiler_functions_nofree(f, &funcargreadf);
+		clear_compiler_function(&funcargreadf);
 		merge_compiler_functions(f,ff);
 		add_instruction(f, M_OPCODE_EXIT, token_offset);
 		//*sizeoffunction = f->number_instructions-initial_bytecode_size;
@@ -1688,57 +1736,68 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 		//f->token_error_num=token_offset;
 		return 0;
 	}
-	compiler_function* func_var = new_compiler_function();
-	compiler_function* func_index=nullptr;
-	compiler_function* func_call= nullptr;
-	compiler_function* func_unary = new_compiler_function();
-	compiler_function* func_binary = new_compiler_function();
+	compiler_function func_var;
+	memset(&func_var, 0, sizeof(compiler_function));
+	compiler_function func_index;
+	compiler_function func_call;
+	compiler_function func_unary;
+	memset(&func_unary, 0, sizeof(compiler_function));
+	compiler_function func_binary;
+	memset(&func_binary, 0, sizeof(compiler_function));
 	
-	token_offset+=m_compile_read_unary_op(func_unary,tokens,num_tokens,token_offset);
-	if(func_unary->errorcode){
-		delete_compiler_function(func_var); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
-		f->errorcode=func_unary->errorcode;
-		f->token_error_num=func_unary->token_error_num;
+	token_offset+=m_compile_read_unary_op(&func_unary,tokens,num_tokens,token_offset);
+	if(func_unary.errorcode){
+		clear_compiler_function(&func_unary);
+		f->errorcode=func_unary.errorcode;
+		f->token_error_num=func_unary.token_error_num;
 		return 0;
 	}
 	
-	token_offset+=m_compile_read_variable(func_var,tokens,num_tokens,token_offset,i);
-	if(func_var->errorcode){
-		f->errorcode = func_var->errorcode;
-		f->token_error_num = func_var->token_error_num;
-		delete_compiler_function(func_var); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+	token_offset+=m_compile_read_variable(&func_var,tokens,num_tokens,token_offset,i);
+	if(func_var.errorcode){
+		f->errorcode = func_var.errorcode;
+		f->token_error_num = func_var.token_error_num;
+		clear_compiler_function(&func_unary);
+		clear_compiler_function(&func_var);
 		return 0;
-	}else if(!func_var->number_instructions){
-		delete_compiler_function(func_var); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
+	}else if(!func_var.number_instructions){
+		clear_compiler_function(&func_unary);
+		clear_compiler_function(&func_var);
 		f->errorcode=M_COMPERR_NO_VARIABLE;
 		f->token_error_num=token_offset;
 		return 0;
 	}
 	
-	compiler_function* func_complete=nullptr;
+	compiler_function func_complete;
 	
 	bool firstpass = true;
 	while (true) {
-		func_complete = new_compiler_function();
-		func_index = new_compiler_function();
-		func_call = new_compiler_function();
+		memset(&func_complete, 0, sizeof(compiler_function));
+		memset(&func_index, 0, sizeof(compiler_function));
+		memset(&func_call, 0, sizeof(compiler_function));
 
-		mercury_int vitokc = m_compile_read_var_indexing(func_index, tokens, num_tokens, token_offset, i);
+		mercury_int vitokc = m_compile_read_var_indexing(&func_index, tokens, num_tokens, token_offset, i);
 		token_offset += vitokc;
-		if (func_index->errorcode) {
-			delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
-			f->errorcode = func_index->errorcode;
-			f->token_error_num = func_index->token_error_num;
+		if (func_index.errorcode) {
+			clear_compiler_function(&func_unary);
+			clear_compiler_function(&func_var);
+			clear_compiler_function(&func_call);
+			clear_compiler_function(&func_index);
+			f->errorcode = func_index.errorcode;
+			f->token_error_num = func_index.token_error_num;
 			return 0;
 		}
 
 		mercury_int f_args_in = 0;
-		mercury_int fctokc = m_compile_read_call_func(func_call, tokens, num_tokens, token_offset, &f_args_in, i);
+		mercury_int fctokc = m_compile_read_call_func(&func_call, tokens, num_tokens, token_offset, &f_args_in, i);
 		token_offset += fctokc;
-		if (func_call->errorcode) {
-			delete_compiler_function(func_var); delete_compiler_function(func_index); delete_compiler_function(func_call); delete_compiler_function(func_unary); delete_compiler_function(func_binary);
-			f->errorcode = func_call->errorcode;
-			f->token_error_num = func_call->token_error_num;
+		if (func_call.errorcode) {
+			clear_compiler_function(&func_unary);
+			clear_compiler_function(&func_var);
+			clear_compiler_function(&func_call);
+			clear_compiler_function(&func_index);
+			f->errorcode = func_call.errorcode;
+			f->token_error_num = func_call.token_error_num;
 			return 0;
 		}
 
@@ -1747,26 +1806,26 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 
 
 		if (fctokc) {
-			merge_compiler_functions(func_complete, func_call);
+			merge_compiler_functions_nofree(&func_complete, &func_call); clear_compiler_function(&func_call);
 
-			merge_compiler_functions(func_complete, func_var);
-			merge_compiler_functions(func_complete, func_index);
+			merge_compiler_functions_nofree(&func_complete, &func_var); clear_compiler_function(&func_var);
+			merge_compiler_functions_nofree(&func_complete, &func_index); clear_compiler_function(&func_index);
 
-			add_instruction(func_complete, M_OPCODE_CALL, token_offset - 1);
-			add_rawdata_bitwidth_size(func_complete, f_args_in, token_offset - 1);
-			add_rawdata_bitwidth_size(func_complete, i->args_out, token_offset - 1); //args out
+			add_instruction(&func_complete, M_OPCODE_CALL, token_offset - 1);
+			add_rawdata_bitwidth_size(&func_complete, f_args_in, token_offset - 1);
+			add_rawdata_bitwidth_size(&func_complete, i->args_out, token_offset - 1); //args out
 			i->args_out=0;
 		}
 		else if(vitokc){
-			delete_compiler_function(func_call);
+			clear_compiler_function(&func_call);
 			i->args_out--;
-			merge_compiler_functions(func_complete, func_var);
-			merge_compiler_functions(func_complete, func_index);
+			merge_compiler_functions_nofree(&func_complete, &func_var); clear_compiler_function(&func_var);
+			merge_compiler_functions_nofree(&func_complete, &func_index); clear_compiler_function(&func_index);
 		}
 		else{
-			delete_compiler_function(func_call);
-			delete_compiler_function(func_index);
-			delete_compiler_function(func_complete);
+			clear_compiler_function(&func_call);
+			clear_compiler_function(&func_index);
+			clear_compiler_function(&func_complete);
 			if(firstpass)i->args_out--;
 		}
 		firstpass = false;
@@ -1781,29 +1840,31 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 		}
 	}
 
-	merge_compiler_functions(func_complete, func_unary);
+	merge_compiler_functions_nofree(&func_complete, &func_unary); clear_compiler_function(&func_unary);
 
 
-	if(postfix_function)merge_compiler_functions(func_complete,postfix_function);
+	if (postfix_function) { merge_compiler_functions_nofree(&func_complete, postfix_function); clear_compiler_function(postfix_function); }
 	
 	
-	token_offset+=m_compile_read_binary_op(func_binary,tokens,num_tokens,token_offset);
-	if(func_binary->errorcode){
-		delete_compiler_function(func_complete); delete_compiler_function(func_binary);
-		f->errorcode=func_binary->errorcode;
-		f->token_error_num=func_binary->token_error_num;
+	token_offset+=m_compile_read_binary_op(&func_binary,tokens,num_tokens,token_offset);
+	if(func_binary.errorcode){
+		clear_compiler_function(&func_complete);
+		clear_compiler_function(&func_binary);
+		f->errorcode=func_binary.errorcode;
+		f->token_error_num=func_binary.token_error_num;
 		return 0;
 	}
-	if(func_binary->number_instructions){ //if we registered a binary operator, then we need to read ahead to get the other statement, which means we get to do this whole thing again.
+	if(func_binary.number_instructions){ //if we registered a binary operator, then we need to read ahead to get the other statement, which means we get to do this whole thing again.
 		mercury_int oao = i->args_out;
 		i->args_out = 1;
-		token_offset+=m_compile_read_var_statment(func_complete,tokens,num_tokens,token_offset,i,func_binary);
+		token_offset+=m_compile_read_var_statment(&func_complete,tokens,num_tokens,token_offset,i,&func_binary);
 		i->args_out = oao;
 	}else{
-		delete_compiler_function(func_binary);
+		clear_compiler_function(&func_binary);
 	}
 
-	merge_compiler_functions(f, func_complete);
+	merge_compiler_functions_nofree(f, &func_complete);
+	clear_compiler_function(&func_complete);
 	
 	return token_offset-initial_offset;
 }
@@ -1823,23 +1884,25 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 		//well actually, having said that, i've used jump after return in this code so uh... you go get that 1% speed improvment, king!
 		token_offset++;
 		while(true){
-			compiler_function* n=new_compiler_function();
+			compiler_function n;
+			memset(&n, 0, sizeof(compiler_function));
 			mercury_int oao = i->args_out;
 			i->args_out = 1;
-			mercury_int o=m_compile_read_var_statment(n,tokens,num_tokens,token_offset,i);
+			mercury_int o=m_compile_read_var_statment(&n,tokens,num_tokens,token_offset,i);
 			i->args_out = oao;
 			cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset + o);
 			if(!cur_tok || (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='=')){
-				delete_compiler_function(n);
+				clear_compiler_function(&n);
 				break;
 			}
-			if(n->errorcode){
+			if(n.errorcode){
 				//f->errorcode=n->errorcode;
 				//f->token_error_num=n->token_error_num;
-				delete_compiler_function(n);
+				clear_compiler_function(&n);
 				break; //we want to break instead, because reading an arg is optional, and m_compile_read_var_statment will error if there's no arg.
 			}
-			merge_compiler_functions(f,n);
+			merge_compiler_functions_nofree(f,&n);
+			clear_compiler_function(&n);
 			token_offset+=o;
 			if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==',')){
 				break;
@@ -2656,15 +2719,46 @@ compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens,me
 				}
 			}
 		}
-		compiler_function* con_app = new_compiler_function();
+		
+		mercury_int spaceneeded = 0; //track space needed so we can preallocate it in a big block
 		for (mercury_int i = 0; i < ci->num_constants; i++) {
 			mercury_string s = ci->constants[i];
-			add_string_onto_stack(con_app, s.ptr, s.size, 0);
-			add_instruction(con_app, M_OPCODE_SCON, 0);
-			add_rawdata_bitwidth_size(con_app, i, 0);
+			spaceneeded += (s.size + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+			spaceneeded += 2;
+			spaceneeded += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE*2;
 		}
-		merge_compiler_functions(con_app, out);
-		out = con_app;
+		void* nptr=realloc(out->instructions, sizeof(mercury_opcode) * (spaceneeded + out->number_instructions));
+		if (!nptr) {
+			out->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			return out;
+		}
+		out->instructions = (mercury_opcode*)nptr;
+		memmove(out->instructions + spaceneeded, out->instructions, out->number_instructions * sizeof(mercury_opcode));
+		
+		nptr = realloc(out->instruction_tokens, sizeof(mercury_int) * (spaceneeded + out->number_instructions));
+		if (!nptr) {
+			out->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			return out;
+		}
+		out->instruction_tokens = (mercury_int*)nptr;
+		memmove(out->instruction_tokens + spaceneeded, out->instruction_tokens, out->number_instructions * sizeof(mercury_int));
+		memset(out->instruction_tokens,0,sizeof(mercury_int)*spaceneeded); //zero the tokens at the constant string assignment
+		mercury_int offset = 0;
+		for (mercury_int i = 0; i < ci->num_constants; i++) {
+			mercury_string s = ci->constants[i];
+			out->instructions[offset] = M_OPCODE_NSTR;
+			offset++;
+			*((mercury_int*)(out->instructions + offset)) = s.size;
+			offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+			memcpy(out->instructions + offset, s.ptr, s.size);
+			offset += (s.size + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+			out->instructions[offset] = M_OPCODE_SCON;
+			offset++;
+			*((mercury_int*)(out->instructions + offset)) = i;
+			offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+		}
+		out->number_instructions += spaceneeded;
+		
 		delete_compiler_info(ci);
 	}
 	return out;
