@@ -112,6 +112,11 @@ inline compiler_token* new_compiler_token(mercury_int col_num, mercury_int line_
 	}
 	return out;
 }
+inline void init_compiler_token(compiler_token* t,mercury_int col_num, mercury_int line_num) {
+	memset(t, 0, sizeof(compiler_token));
+	t->line_col = col_num;
+	t->line_num = line_num;
+}
 
 inline bool append_char_to_compiler_token(compiler_token* token, char c){
 	if (token->num_chars % 0xf == 0) {
@@ -132,26 +137,27 @@ inline void advance_position_from_char(char c,char c_prev,mercury_int* col,mercu
 	}
 }
 
-inline bool add_token_or_destroy_array(compiler_token*** array,mercury_int* size,compiler_token* toadd){
+inline bool add_token_or_destroy_array(compiler_token** array,mercury_int* size,compiler_token* toadd){
 	if (!toadd->num_chars && toadd->token_type!=TOKEN_TYPE_STRING) {
 		free(toadd->chars);
-		free(toadd);
 		return false;
 	}
-	compiler_token** nptr=(compiler_token**)realloc(*array,sizeof(compiler_token*)*(*size+1) );
-	if(!nptr){
-		for(mercury_int i=0;i<(const mercury_int)*size;i++){
-			free((*array)[i]);
+	if (*size % 0x1f == 0) {
+		compiler_token* nptr = (compiler_token*)realloc(*array, sizeof(compiler_token) * (*size + 0x1f));
+		if (!nptr) {
+			for (mercury_int i = 0; i < (const mercury_int)*size; i++) {
+				free((*array)[i].chars);
+			}
+			free(array);
+			*size = 0;
+			return true;
 		}
-		free(array);
-		*size=0;
-		return true;
-	}else{
-		*array=nptr;
-		(*array)[*size]=toadd;
-		(*size)++;
-		return false;
+		*array = nptr;
 	}
+	(*array)[*size]=*toadd;
+	(*size)++;
+	return false;
+	
 }
 
 
@@ -250,12 +256,13 @@ inline bool char_is_bin(char c) {
 	return c == '1' || c == '0';
 }
 
-compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_int* num_out){
+compiler_token* mercury_compile_tokenize_mstring(mercury_string* str,mercury_int* num_out){
 	
 	*num_out = 0;
 
-	compiler_token* cur_tok=new_compiler_token(1,1);
-	compiler_token** out=nullptr;
+	compiler_token cur_tok;
+	init_compiler_token(&cur_tok, 1, 1);
+	compiler_token* out=nullptr;
 	
 	bool reading_string=false;
 	int8_t comment_mode=COMMENT_NONE;
@@ -280,21 +287,13 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 			}
 		}
 		else{
-			if(!cur_tok){
-				for(mercury_int i=0;i<(const mercury_int)*num_out;i++){
-					free(out[i]);
-				}
-				free(out);
-				*num_out=0;
-				return nullptr;
-			}
 				
-			switch(cur_tok->token_type){
+			switch(cur_tok.token_type){
 				case TOKEN_TYPE_STRING:
 					if(c=='\"'){ //end string reading.
-						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
+						if(add_token_or_destroy_array(&out,num_out,&cur_tok))return nullptr;
 						advance_position_from_char(c, c_prev, &col_num, &line_num);
-						cur_tok=new_compiler_token(col_num, line_num);
+						init_compiler_token(&cur_tok, col_num, line_num);
 						i++;
 					}else if(c=='\\'){ //escapes.
 						advance_position_from_char(c, c_prev, &col_num, &line_num);
@@ -304,34 +303,34 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 						i++; //chars used: 2
 						switch(nc){
 							case 'a':
-								append_char_to_compiler_token(cur_tok,'\a');
+								append_char_to_compiler_token(&cur_tok,'\a');
 								break;
 							case 'b':
-								append_char_to_compiler_token(cur_tok,'\b');
+								append_char_to_compiler_token(&cur_tok,'\b');
 								break;
 							case 'e':
-								append_char_to_compiler_token(cur_tok,'\x1B'); //ASCII escape character
+								append_char_to_compiler_token(&cur_tok,'\x1B'); //ASCII escape character
 								break;
 							case 'f':
-								append_char_to_compiler_token(cur_tok,'\f');
+								append_char_to_compiler_token(&cur_tok,'\f');
 								break;
 							case 'n':
-								append_char_to_compiler_token(cur_tok,'\n');
+								append_char_to_compiler_token(&cur_tok,'\n');
 								break;
 							case 'r':
-								append_char_to_compiler_token(cur_tok,'\r');
+								append_char_to_compiler_token(&cur_tok,'\r');
 								break;
 							case 't':
-								append_char_to_compiler_token(cur_tok,'\t');
+								append_char_to_compiler_token(&cur_tok,'\t');
 								break;	
 							case 'v':
-								append_char_to_compiler_token(cur_tok,'\v');
+								append_char_to_compiler_token(&cur_tok,'\v');
 								break;
 							case '\\':
-								append_char_to_compiler_token(cur_tok,'\\');
+								append_char_to_compiler_token(&cur_tok,'\\');
 								break;
 							case '\"':
-								append_char_to_compiler_token(cur_tok,'\"');
+								append_char_to_compiler_token(&cur_tok,'\"');
 								break;
 							case 'x':
 							case 'X': //raw hex char reading
@@ -344,13 +343,13 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 									if(char_is_hex(hc1) && char_is_hex(hc2)){
 										advance_position_from_char(hc1, nc, &col_num, &line_num);
 										advance_position_from_char(hc2, hc1, &col_num, &line_num);
-										append_char_to_compiler_token(cur_tok,read_hex_string_as_num(hc1,hc2));
+										append_char_to_compiler_token(&cur_tok,read_hex_string_as_num(hc1,hc2));
 									}else if(char_is_hex(hc1)){
-										append_char_to_compiler_token(cur_tok,read_hex_string_as_num('0',hc1));
+										append_char_to_compiler_token(&cur_tok,read_hex_string_as_num('0',hc1));
 										advance_position_from_char(hc1, nc, &col_num, &line_num);
 										i--;
 									}else{
-										append_char_to_compiler_token(cur_tok,'\0');
+										append_char_to_compiler_token(&cur_tok,'\0');
 										i-=2;
 									}
 								}
@@ -374,83 +373,83 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 									if(char_is_dec(nc) && char_is_dec(dc2) && char_is_dec(dc3)){
 										advance_position_from_char(dc2, nc, &col_num, &line_num);
 										advance_position_from_char(dc3, dc2, &col_num, &line_num);
-										append_char_to_compiler_token(cur_tok,read_dec_string_as_num(nc,dc2,dc3));
+										append_char_to_compiler_token(&cur_tok,read_dec_string_as_num(nc,dc2,dc3));
 									}else if(char_is_hex(nc) && char_is_hex(dc2)){
 										advance_position_from_char(dc2, nc, &col_num, &line_num);
-										append_char_to_compiler_token(cur_tok,read_dec_string_as_num('0',nc,dc2));
+										append_char_to_compiler_token(&cur_tok,read_dec_string_as_num('0',nc,dc2));
 										i--;
 									}else{
-										append_char_to_compiler_token(cur_tok, read_dec_string_as_num('0','0',nc));
+										append_char_to_compiler_token(&cur_tok, read_dec_string_as_num('0','0',nc));
 										i-=2;
 									}
 									
 								}
 								break;
 							default: //UB: if we can't recognize the escape, just give the two chars themselves.
-								append_char_to_compiler_token(cur_tok,'\\');
-								append_char_to_compiler_token(cur_tok,nc);
+								append_char_to_compiler_token(&cur_tok,'\\');
+								append_char_to_compiler_token(&cur_tok,nc);
 						}
 						
 					}else{ //add char to string.
 						advance_position_from_char(c, c_prev, &col_num, &line_num);
-						append_char_to_compiler_token(cur_tok,c);
+						append_char_to_compiler_token(&cur_tok,c);
 						i++;
 					}
 					break;
 				case TOKEN_TYPE_NUMBER:
 					if(!char_is_number(c) && c!='.' && c!='x' && !char_is_hex(c) && c!='b') { //for decimal and hex
-						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
-						cur_tok=new_compiler_token(col_num, line_num);
+						if(add_token_or_destroy_array(&out,num_out,&cur_tok))return nullptr;
+						init_compiler_token(&cur_tok, col_num, line_num);
 					}else{
-						append_char_to_compiler_token(cur_tok,c);
+						append_char_to_compiler_token(&cur_tok,c);
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
 						i++;
 					}
 					break;
 				case TOKEN_TYPE_OPERATOR:
 					if(c=='/' && c_prev=='/'){
-						cur_tok->num_chars--; //remove the previous /
+						cur_tok.num_chars--; //remove the previous /
 						comment_mode=COMMENT_LINE;
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
 						i++;
 					}else if(c=='*' && c_prev=='/'){
-						cur_tok->num_chars--; //remove the previous /
+						cur_tok.num_chars--; //remove the previous /
 						comment_mode=COMMENT_MULTI;
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
 						i++;
 					}else if(char_is_number(c) && (c_prev=='.' || c_prev=='-') ) { //numbers like .1 and -4
-						cur_tok->token_type = TOKEN_TYPE_NUMBER;
-					}else if(char_is_symbol(c) && symbol_can_merge_token(cur_tok,c) ){
-						append_char_to_compiler_token(cur_tok,c);
+						cur_tok.token_type = TOKEN_TYPE_NUMBER;
+					}else if(char_is_symbol(c) && symbol_can_merge_token(&cur_tok,c) ){
+						append_char_to_compiler_token(&cur_tok,c);
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
 						i++;
 					}else{
-						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
-						cur_tok=new_compiler_token(col_num, line_num);
+						if(add_token_or_destroy_array(&out,num_out,&cur_tok))return nullptr;
+						init_compiler_token(&cur_tok, col_num, line_num);
 					}
 					break;
 				case TOKEN_TYPE_KEYWORD:
 					if(char_is_character(c) || char_is_number(c) ){
-						append_char_to_compiler_token(cur_tok,c);
+						append_char_to_compiler_token(&cur_tok,c);
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
 						i++;
 					}else{
-						if(add_token_or_destroy_array(&out,num_out,cur_tok))return nullptr;
-						cur_tok=new_compiler_token(col_num, line_num);
+						if(add_token_or_destroy_array(&out,num_out,&cur_tok))return nullptr;
+						init_compiler_token(&cur_tok, col_num, line_num);
 					}
 					break;
 				default:
 					if(char_is_character(c)){
-						cur_tok->token_type=TOKEN_TYPE_KEYWORD;
+						cur_tok.token_type=TOKEN_TYPE_KEYWORD;
 					}else if(char_is_number(c)){
-						cur_tok->token_type=TOKEN_TYPE_NUMBER;
+						cur_tok.token_type=TOKEN_TYPE_NUMBER;
 					}else if(char_is_symbol(c)){
 						if(c=='\"'){
-							cur_tok->token_type=TOKEN_TYPE_STRING;
+							cur_tok.token_type=TOKEN_TYPE_STRING;
 							advance_position_from_char(c, c_prev, &col_num, &line_num);
 							i++;
 						}else{
-							cur_tok->token_type=TOKEN_TYPE_OPERATOR;
+							cur_tok.token_type=TOKEN_TYPE_OPERATOR;
 						}
 					}else{
 						advance_position_from_char(c,c_prev,&col_num,&line_num);
@@ -460,83 +459,80 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 		}
 		
 	}
-	if (cur_tok->num_chars) {
-		if (add_token_or_destroy_array(&out, num_out, cur_tok))return nullptr;
-	}
-	else {
-		free(cur_tok);
+	if (cur_tok.num_chars) {
+		if (add_token_or_destroy_array(&out, num_out, &cur_tok))return nullptr;
 	}
 
 	//tokens extracted from string. now we need to run a processing step to get more useful data out of it.
 	for(mercury_int i=0;i<(const mercury_int)*num_out;i++){
-		compiler_token* t = out[i];
-		switch(t->token_type){
+		compiler_token t = out[i];
+		switch(t.token_type){
 			case TOKEN_TYPE_STRING:
-				t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_STRING;
+				t.token_flags = TOKEN_VARIABLE | TOKEN_STATIC_STRING;
 				break;
 			case TOKEN_TYPE_NUMBER:
-				t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NUMBER;
+				t.token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NUMBER;
 				break;
 			case TOKEN_TYPE_KEYWORD:
-				if(t->num_chars==2){
-					if(token_matches_chars(t,"if")){
-						t->token_flags = TOKEN_KEYWORD;
-					}else if(token_matches_chars(t,"do")){
-						t->token_flags = TOKEN_KEYWORD;
+				if(t.num_chars==2){
+					if(token_matches_chars(&t,"if")){
+						t.token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(&t,"do")){
+						t.token_flags = TOKEN_KEYWORD;
 					}
-				}else if(t->num_chars==3){
-					if(token_matches_chars(t,"nil")){
-						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NIL;
-					}else if(token_matches_chars(t,"end")){
-						t->token_flags = TOKEN_KEYWORD;
-					}else if(token_matches_chars(t,"inf")){
-						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NUMBER;
+				}else if(t.num_chars==3){
+					if(token_matches_chars(&t,"nil")){
+						t.token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NIL;
+					}else if(token_matches_chars(&t,"end")){
+						t.token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(&t,"inf")){
+						t.token_flags = TOKEN_VARIABLE | TOKEN_STATIC_NUMBER;
 					}
-				}else if(t->num_chars==4){
-					if(token_matches_chars(t,"then")){
-						t->token_flags = TOKEN_KEYWORD;
-					}else if(token_matches_chars(t,"true")){
-						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_BOOLEAN;
-					}else if(token_matches_chars(t,"else")){
-						t->token_flags = TOKEN_KEYWORD;
-					}else if(token_matches_chars(t,"goto")){
-						t->token_flags = TOKEN_KEYWORD;
+				}else if(t.num_chars==4){
+					if(token_matches_chars(&t,"then")){
+						t.token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(&t,"true")){
+						t.token_flags = TOKEN_VARIABLE | TOKEN_STATIC_BOOLEAN;
+					}else if(token_matches_chars(&t,"else")){
+						t.token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(&t,"goto")){
+						t.token_flags = TOKEN_KEYWORD;
 					}
-				}else if(t->num_chars==5){
-					if(token_matches_chars(t,"false")){
-						t->token_flags = TOKEN_VARIABLE | TOKEN_STATIC_BOOLEAN;
-					}else if(token_matches_chars(t,"while")){
-						t->token_flags = TOKEN_KEYWORD;
-					}else if(token_matches_chars(t,"local")){
-						t->token_flags = TOKEN_SCOPESPECIFIER;
-					}else if (token_matches_chars(t, "break")) {
-						t->token_flags = TOKEN_LOOP_MODIFIER;
+				}else if(t.num_chars==5){
+					if(token_matches_chars(&t,"false")){
+						t.token_flags = TOKEN_VARIABLE | TOKEN_STATIC_BOOLEAN;
+					}else if(token_matches_chars(&t,"while")){
+						t.token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(&t,"local")){
+						t.token_flags = TOKEN_SCOPESPECIFIER;
+					}else if (token_matches_chars(&t, "break")) {
+						t.token_flags = TOKEN_LOOP_MODIFIER;
 					}
-				}else if(t->num_chars==6){
-					if(token_matches_chars(t,"global")){
-						t->token_flags = TOKEN_SCOPESPECIFIER;
-					}else if(token_matches_chars(t,"elseif")){
-						t->token_flags = TOKEN_KEYWORD;
-					}else if(token_matches_chars(t,"return")){
-						t->token_flags = TOKEN_KEYWORD;
+				}else if(t.num_chars==6){
+					if(token_matches_chars(&t,"global")){
+						t.token_flags = TOKEN_SCOPESPECIFIER;
+					}else if(token_matches_chars(&t,"elseif")){
+						t.token_flags = TOKEN_KEYWORD;
+					}else if(token_matches_chars(&t,"return")){
+						t.token_flags = TOKEN_KEYWORD;
 					}
-				}else if(t->num_chars==8){
-					if(token_matches_chars(t,"function")){
-						t->token_flags = TOKEN_KEYWORD | TOKEN_VARIABLE;
-					}else if(token_matches_chars(t,"continue")){
-						t->token_flags = TOKEN_LOOP_MODIFIER;
+				}else if(t.num_chars==8){
+					if(token_matches_chars(&t,"function")){
+						t.token_flags = TOKEN_KEYWORD | TOKEN_VARIABLE;
+					}else if(token_matches_chars(&t,"continue")){
+						t.token_flags = TOKEN_LOOP_MODIFIER;
 					}
 				}
-				if(!t->token_flags)t->token_flags = TOKEN_VARIABLE | TOKEN_ENV_VAR;
+				if(!t.token_flags)t.token_flags = TOKEN_VARIABLE | TOKEN_ENV_VAR;
 				break;
 			case TOKEN_TYPE_OPERATOR:
-				if(t->num_chars==1){
-					switch(t->chars[0]){
+				if(t.num_chars==1){
+					switch(t.chars[0]){
 						case '=':
-							t->token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP;
+							t.token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP;
 							break;
 						case '-':
-							t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_UNARY_OP; //unary minus, too
+							t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_UNARY_OP; //unary minus, too
 							break;
 						case '+':
 						case '*':
@@ -549,17 +545,17 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 						case '~':
 						case '>':
 						case '<':
-							t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_TAKES_STATIC_NUM;
+							t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_TAKES_STATIC_NUM;
 							break;
 						case '!':
-							t->token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP | TOKEN_TAKES_STATIC_NUM;
+							t.token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP | TOKEN_TAKES_STATIC_NUM;
 							break;
 						case '#':
-							t->token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP;
+							t.token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP;
 							break;
 						case '[':
 						case '{':
-							t->token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP | TOKEN_VARIABLE;
+							t.token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP | TOKEN_VARIABLE;
 							break;
 						case '(':
 						case ')':
@@ -568,22 +564,22 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 						case ':':
 						case '.':
 						case ',':
-							t->token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP;
+							t.token_flags = TOKEN_OPERATOR | TOKEN_MISC_OP;
 							break;
 					}
-				}else if(t->num_chars==2){
-					switch(t->chars[0]){
+				}else if(t.num_chars==2){
+					switch(t.chars[0]){
 						case '&':
 						case '~':
 						case '|':
-							if(t->chars[0]==t->chars[1]){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+							if(t.chars[0]==t.chars[1]){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
 								break;
 							}
 						case '+':
 						case '-':
-							if(t->chars[0]==t->chars[1]){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_TAKES_STATIC_NUM | TOKEN_UNARY_OP | TOKEN_SELFMODIFY_OP;
+							if(t.chars[0]==t.chars[1]){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_TAKES_STATIC_NUM | TOKEN_UNARY_OP | TOKEN_SELFMODIFY_OP;
 								break;
 							}
 						case '%':
@@ -591,51 +587,52 @@ compiler_token** mercury_compile_tokenize_mstring(mercury_string* str,mercury_in
 						case '*':
 						case '\\':
 						case '^':
-							if(t->chars[1]=='='){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_TAKES_STATIC_NUM | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+							if(t.chars[1]=='='){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_TAKES_STATIC_NUM | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
 							}
 							break;
 						case '!':
-							if(t->chars[1]=='!'){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP;
-							}else if(t->chars[1]=='='){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+							if(t.chars[1]=='!'){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_UNARY_OP;
+							}else if(t.chars[1]=='='){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
 							}
 							break;
 						case '>':
 						case '<':
-							if(t->chars[0]==t->chars[1] || t->chars[1]=='='){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_TAKES_STATIC_NUM;
+							if(t.chars[0]==t.chars[1] || t.chars[1]=='='){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_TAKES_STATIC_NUM;
 							}
 							break;
 						case '.':
-							if(t->chars[1]=='.'){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+							if(t.chars[1]=='.'){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
 							}
 							break;
 						case '=':
-							if(t->chars[1]=='='){
-								t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
+							if(t.chars[1]=='='){
+								t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP;
 							}
 							break;
 					}
-				}else if(t->num_chars==3){
-					if(token_matches_chars(t,"..=")){
-						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
-					} else if(token_matches_chars(t,"<<=")){
-						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
-					}else if(token_matches_chars(t,">>=")){
-						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
-					}else if (token_matches_chars(t, "&&=")) {
-						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
-					}else if (token_matches_chars(t, "||=")) {
-						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
-					}else if (token_matches_chars(t, "~~=")) {
-						t->token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+				}else if(t.num_chars==3){
+					if(token_matches_chars(&t,"..=")){
+						t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					} else if(token_matches_chars(&t,"<<=")){
+						t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if(token_matches_chars(&t,">>=")){
+						t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if (token_matches_chars(&t, "&&=")) {
+						t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if (token_matches_chars(&t, "||=")) {
+						t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
+					}else if (token_matches_chars(&t, "~~=")) {
+						t.token_flags = TOKEN_OPERATOR | TOKEN_BINARY_OP | TOKEN_SELFMODIFY_OP;
 					}
 				}
 				break;
 		}
+		out[i]=t;
 	}
 	return out;
 }
@@ -1054,9 +1051,9 @@ inline bool add_rawdata_bitwidth_size(compiler_function* f, uint32_t data,mercur
 }
 #endif
 
-inline compiler_token* m_compile_get_next_token(compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset){
+inline compiler_token* m_compile_get_next_token(compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset){
 	if( token_offset < num_tokens && token_offset>=0 ){ //OOB
-		return tokens[token_offset];
+		return tokens+token_offset;
 	}
 	return nullptr;
 }
@@ -1197,11 +1194,11 @@ inline void add_string_onto_stack(compiler_function* f,char* s,mercury_int len,m
 
 
 //forward refrences for other complex functions
-mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** tokens, mercury_int num_tokens, mercury_int token_offset, compiler_info* i, compiler_function* postfix_function = nullptr);
-compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens, mercury_int num_tokens, mercury_int token_offset = 0, mercury_int* tokens_used = nullptr, compiler_info* ci = nullptr);
+mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token* tokens, mercury_int num_tokens, mercury_int token_offset, compiler_info* i, compiler_function* postfix_function = nullptr);
+compiler_function* mercury_compile_tokens_to_bytecode(compiler_token* tokens, mercury_int num_tokens, mercury_int token_offset = 0, mercury_int* tokens_used = nullptr, compiler_info* ci = nullptr);
 
 
-mercury_int m_compile_read_variable(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
+mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
 	mercury_int initial_offset=token_offset;
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	//if(!(cur_tok &&(cur_tok->token_flags & (TOKEN_VARIABLE | TOKEN_SCOPESPECIFIER) ))) {
@@ -1557,7 +1554,7 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token** token
 
 
 
-mercury_int m_compile_read_unary_op(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset){
+mercury_int m_compile_read_unary_op(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset){
 	mercury_int initial_offset=token_offset;
 	while(true){
 		compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -1574,7 +1571,7 @@ mercury_int m_compile_read_unary_op(compiler_function* f, compiler_token** token
 	return token_offset-initial_offset;
 }
 
-mercury_int m_compile_read_binary_op(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset){
+mercury_int m_compile_read_binary_op(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset){
 	mercury_int initial_offset=token_offset;
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	if(!cur_tok){
@@ -1593,7 +1590,7 @@ mercury_int m_compile_read_binary_op(compiler_function* f, compiler_token** toke
 }
 
 
-mercury_int m_compile_read_var_indexing(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
+mercury_int m_compile_read_var_indexing(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
 	mercury_int initial_offset=token_offset;
 	
 	while(true){
@@ -1657,7 +1654,7 @@ mercury_int m_compile_read_var_indexing(compiler_function* f, compiler_token** t
 
 
 
-mercury_int m_compile_read_call_func(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* args_in,compiler_info* i){
+mercury_int m_compile_read_call_func(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* args_in,compiler_info* i){
 	mercury_int initial_offset=token_offset;
 
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -1713,7 +1710,7 @@ mercury_int m_compile_read_call_func(compiler_function* f, compiler_token** toke
 }
 
 //a var statment is something like 5+5
-mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i,compiler_function* postfix_function){
+mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i,compiler_function* postfix_function){
 	mercury_int initial_offset=token_offset;
 	/*bytecode op order:
 	1. get variable from environment
@@ -1871,7 +1868,7 @@ mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token** t
 
 
 //a statement is something like a=5, a[1]=5, a(5), or a[1](5)
-mercury_int m_compile_read_statment(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
+mercury_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
 	mercury_int initial_offset=token_offset;
 	
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -2379,7 +2376,7 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token** token
 
 
 
-mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
+mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
 	mercury_int initial_offset=token_offset;
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	
@@ -2473,7 +2470,7 @@ mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token** to
 	return token_offset-initial_offset;
 }
 
-mercury_int m_compile_parse_if_statement(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
+mercury_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
 	mercury_int initial_offset=token_offset;
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	
@@ -2609,7 +2606,7 @@ mercury_int m_compile_parse_if_statement(compiler_function* f, compiler_token** 
 }
 
 
-mercury_int m_compile_read_keyword_block(compiler_function* f, compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
+mercury_int m_compile_read_keyword_block(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* ci){
 	mercury_int initial_offset=token_offset;
 	
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -2654,7 +2651,7 @@ mercury_int m_compile_read_keyword_block(compiler_function* f, compiler_token** 
 
 
 
-compiler_function* mercury_compile_tokens_to_bytecode(compiler_token** tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* tokens_used, compiler_info* ci){
+compiler_function* mercury_compile_tokens_to_bytecode(compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* tokens_used, compiler_info* ci){
 	compiler_function* out = new_compiler_function();
 	if(!out)return nullptr;
 	mercury_int initial_offset=token_offset;
@@ -2770,7 +2767,7 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 	out->data.i = 0;
 	
 	mercury_int num_tokens;
-	compiler_token** tokens = mercury_compile_tokenize_mstring(str,&num_tokens);
+	compiler_token* tokens = mercury_compile_tokenize_mstring(str,&num_tokens);
 	compiler_function* func = mercury_compile_tokens_to_bytecode(tokens,num_tokens,0);
 
 	if (func->errorcode) {
@@ -2792,7 +2789,7 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 			func->token_error_num = 0;
 		}
 
-		compiler_token* etok = tokens[func->token_error_num];
+		compiler_token* etok = tokens+func->token_error_num;
 		char* ts=(char*)malloc(etok->num_chars+1);
 		if (!ts)return;
 		memcpy(ts, etok->chars, etok->num_chars);
@@ -2890,7 +2887,7 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 
 			nmf->dbg_tokens = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * num_tokens);
 			for (mercury_int i = 0; i < num_tokens; i++) {
-				compiler_token* t = tokens[i];
+				compiler_token* t = tokens+i;
 
 				if (t->token_type == TOKEN_TYPE_STRING) { //because the quote marks are lost in tokenization, we must add them back
 					char* ntokcptr = (char*)realloc(t->chars,t->num_chars + 2);
@@ -2909,16 +2906,13 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 				}	
 				nmf->dbg_tokens[i].col = t->line_col;
 				nmf->dbg_tokens[i].line = t->line_num;
-				free(t);
 			}
 			nmf->num_dbg_tokens = num_tokens;
 
 		}
 		else {
 			for (mercury_int i = 0; i < num_tokens; i++) {
-				compiler_token* t = tokens[i];
-				free(t->chars);
-				free(t);
+				free(tokens[i].chars);
 			}
 			nmf->dbg_tokens = nullptr;
 			nmf->num_dbg_tokens = 0;
