@@ -14,1080 +14,738 @@ void M_BYTECODE_NOP(mercury_state* const M_CPP_restrict M) {
 
 
 void M_BYTECODE_ADD(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M,&v);
-	switch (v.type)
-		{
-		case M_TYPE_INT:
-			i1 = v.data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f1 = v.data.f;
-			argsfloat |= 1;
-			break;
-		default:
-			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-			mercury_release_var(&v);
-			return;
-		}
-		
-
-	mercury_popstack(M,&v);
-	switch (v.type)
-		{
-		case M_TYPE_INT:
-			i2 = v.data.i;
-			break;
-		case M_TYPE_FLOAT:
-			f2= v.data.f;
-			argsfloat |= 2;
-			break;
-		default:
-			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-			mercury_release_var(&v);
-			return;
-		}
-
-	
-	switch (argsfloat) {
-	case 0:
-		v.type = M_TYPE_INT;
-		v.data.i = i2 + i1;
-		break;
-	case 1:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = (mercury_float)i2 + f1;
-		break;
-	case 2:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = f2 + (mercury_float)i1;
-		break;
-	case 3:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = f2 + f1;
-		break;
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
 	}
-	mercury_pushstack(M, &v);
+
+	mercury_variable* st = M->stack + M->sizeofstack -1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->type = M_TYPE_FLOAT;
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		return;
+	}
+
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.f += st->data.f;
+	}
+	else if (st->type == M_TYPE_INT) {
+		ss->data.i += st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		return;
+	}
+
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_SUB(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		argsfloat |= 1;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		argsfloat |= 2;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}
+	else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->type = M_TYPE_FLOAT;
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
-	
-	switch (argsfloat) {
-	case 0:
-		v.type = M_TYPE_INT;
-		v.data.i = i2 - i1;
-		break;
-	case 1:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = (mercury_float)i2 - f1;
-		break;
-	case 2:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = f2 - (mercury_float)i1;
-		break;
-	case 3:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = f2 - f1;
-		break;
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.f -= st->data.f;
 	}
-	mercury_pushstack(M, &v);
+	else if (st->type == M_TYPE_INT) {
+		ss->data.i -= st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		return;
+	}
+
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_MUL(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		argsfloat |= 1;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		argsfloat |= 2;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}
+	else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->type = M_TYPE_FLOAT;
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
-	
-	switch (argsfloat) {
-	case 0:
-		v.type = M_TYPE_INT;
-		v.data.i = i2 * i1;
-		break;
-	case 1:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = (mercury_float)i2 * f1;
-		break;
-	case 2:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = f2 * (mercury_float)i1;
-		break;
-	case 3:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = f2 * f1;
-		break;
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.f *= st->data.f;
 	}
-	mercury_pushstack(M, &v);
+	else if (st->type == M_TYPE_INT) {
+		ss->data.i *= st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		return;
+	}
+
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_DIV(mercury_state* const M_CPP_restrict M) {
-	mercury_float f1;
-	mercury_float f2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		f1 = (mercury_float)v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		f2 = (mercury_float)v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+	}
+	else if (ss->type == M_TYPE_INT) {
+		ss->data.f = ss->data.i;
+		ss->type = M_TYPE_FLOAT;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
-	
-	v.type = M_TYPE_FLOAT;
-	v.data.f = f2 / f1;
-	
-	mercury_pushstack(M, &v);
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.f /= st->data.f;
+	}
+	else if (st->type == M_TYPE_INT) {
+		ss->data.f /= (mercury_float)st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		return;
+	}
+
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_POW(mercury_state* const M_CPP_restrict M) {
-	mercury_float f1;
-	mercury_float f2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		f1 = (mercury_float)v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		f2 = (mercury_float)v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+	}
+	else if (ss->type == M_TYPE_INT) {
+		ss->data.f = ss->data.i;
+		ss->type = M_TYPE_FLOAT;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
-	
-	v.type = M_TYPE_FLOAT;
-	v.data.f = pow(f2, f1);
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.f = pow(ss->data.f,st->data.f);
+	}
+	else if (st->type == M_TYPE_INT) {
+		ss->data.f = pow(ss->data.f, (mercury_float)st->data.i);
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		return;
+	}
 
-	mercury_pushstack(M, &v);
+	M->sizeofstack--;
 	return;
 }
 
 
 void M_BYTECODE_IDIV(mercury_state* const M_CPP_restrict M) {
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		i1 = (mercury_int)v.data.f;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		i2 = (mercury_int)v.data.f;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+		ss->type = M_TYPE_INT;
+		ss->data.i = (mercury_int)ss->data.f;
+	}
+	else if (ss->type == M_TYPE_INT) {
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
-	
-	v.type = M_TYPE_INT;
-	v.data.i = i2 / i1;
+	if (st->type == M_TYPE_FLOAT) {
+		st->data.i = (mercury_int)st->data.f;
+		if (!st->data.i) {
+			mercury_raise_error(M, M_ERROR_DIV_ZERO);
+			return;
+		}
+		ss->data.i /= st->data.i;
+	}
+	else if (st->type == M_TYPE_INT) {
+		if (!st->data.i) {
+			mercury_raise_error(M, M_ERROR_DIV_ZERO);
+			return;
+		}
+		ss->data.i /= st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		return;
+	}
 
-	mercury_pushstack(M, &v);
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_MOD(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		argsfloat |= 1;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		argsfloat |= 2;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}
+	else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->type = M_TYPE_FLOAT;
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
-	
-	switch (argsfloat) {
-	case 0:
-		if (i1 == 0) {
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.f = fmod(ss->data.f,st->data.f);
+	}
+	else if (st->type == M_TYPE_INT) {
+		if (!st->data.i) {
 			mercury_raise_error(M, M_ERROR_DIV_ZERO);
 			return;
 		}
-		v.type = M_TYPE_INT;
-		v.data.i = i2 % i1;
-		break;
-	case 1:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = fmod((mercury_float)i2 , f1);
-		break;
-	case 2:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = fmod(f2 , (mercury_float)i1);
-		break;
-	case 3:
-		v.type = M_TYPE_FLOAT;
-		v.data.f = fmod(f2 , f1);
-		break;
+		ss->data.i %= st->data.i;
 	}
-	mercury_pushstack(M, &v);
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		return;
+	}
+
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_BAND(mercury_state* const M_CPP_restrict M) {
-	bool outfloat = 0;
-
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M,&v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-		i1 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_FLOAT:
-		outfloat = true;
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	if(ss->type != M_TYPE_INT && ss->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
-	
-	v.data.i = i2 & i1;
-	v.type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
+	if (st->type != M_TYPE_INT && st->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		return;
+	}
+	ss->data.i &= st->data.i;
 
-	mercury_pushstack(M, &v);
-
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_BOR(mercury_state* const M_CPP_restrict M) {
-	bool outfloat = 0;
-
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-		i1 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_FLOAT:
-		outfloat = true;
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	if (ss->type != M_TYPE_INT && ss->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
-	
-	v.data.i = i2 | i1;
-	v.type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
+	if (st->type != M_TYPE_INT && st->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		return;
+	}
+	ss->data.i |= st->data.i;
 
-	mercury_pushstack(M, &v);
-
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_BXOR(mercury_state* const M_CPP_restrict M) {
-	bool outfloat = 0;
-
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-		i1 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_FLOAT:
-		outfloat = true;
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	if (ss->type != M_TYPE_INT && ss->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
-	
-	v.data.i = i2 ^ i1;
-	v.type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
+	if (st->type != M_TYPE_INT && st->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		return;
+	}
+	ss->data.i ^= st->data.i;
 
-	mercury_pushstack(M, &v);
-
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_BNOT(mercury_state* const M_CPP_restrict M) {
-	bool outfloat = 0;
-
-	mercury_int i1;
-
-	mercury_variable v;
-
-	mercury_popstack(M,&v);
-	switch (v.type)
-	{
-	case M_TYPE_FLOAT:
-		outfloat = true;
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 1) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
-	
-
-	
-	v.type = outfloat?M_TYPE_FLOAT: M_TYPE_INT;
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	if (st->type != M_TYPE_INT && st->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		return;
+	}
 #ifdef MERCURY_64BIT
-	v.data.i = 0xffffffffffffffff ^ i1;
+	st->data.i ^= 0xffffffffffffffff;
 #else
-	v.data.i = 0xffffffff ^ i1;
+	st->data.i ^= 0xffffffff;
 #endif
-
-	mercury_pushstack(M, &v);
-
 	return;
 }
 
 void M_BYTECODE_BSHL(mercury_state* const M_CPP_restrict M) {
-	bool outfloat = 0;
-
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-		i1 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_FLOAT:
-		outfloat = true;
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	if (ss->type != M_TYPE_INT && ss->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
+		return;
+	}
+
+	if (st->type != M_TYPE_INT && st->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
 		return;
 	}
 
 #ifdef MERCURY_64BIT
-	v.data.i = i2 << (i1&63);
+	ss->data.i <<= (st->data.i & 63);
 #else
-	v.data.i = i2 << (i1&31);
+	ss->data.i <<= (st->data.i & 31);
 #endif
-	v.type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
 
-	mercury_pushstack(M, &v);
-
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_BSHR(mercury_state* const M_CPP_restrict M) {
-	bool outfloat = 0;
-
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-		i1 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_FLOAT:
-		outfloat = true;
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	if (ss->type != M_TYPE_INT && ss->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
-	
+	if (st->type != M_TYPE_INT && st->type != M_TYPE_FLOAT) {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		return;
+	}
+
 #ifdef MERCURY_64BIT
-	v.data.i = i2 >> (i1 & 63);
+	ss->data.i >>= (st->data.i & 63);
 #else
-	v.data.i = i2 >> (i1 & 31);
+	ss->data.i >>= (st->data.i & 31);
 #endif
-	v.type = outfloat ? M_TYPE_FLOAT : M_TYPE_INT;
 
-	mercury_pushstack(M, &v);
-
+	M->sizeofstack--;
 	return;
 }
 
 
 
 void M_BYTECODE_LAND(mercury_state* const M_CPP_restrict M) {
-	mercury_variable v1;
-	mercury_variable v2;
-	mercury_popstack(M,&v2);
-	mercury_popstack(M,&v1);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	if (!mercury_checkbool(&v1)) {
-		mercury_release_var(&v1);
-		mercury_release_var(&v2);
-		v2.data.i = 0;
-		v2.type = M_TYPE_BOOL; //false.
-		mercury_pushstack(M,&v2);
-		return;
+	bool c1 = mercury_checkbool(st);
+	bool c2 = mercury_checkbool(ss);
+
+	if (c1 && c2) {
+		mercury_release_var(ss);
+		*ss = *st;
 	}
-	if (!mercury_checkbool(&v2)) {	
-		mercury_release_var(&v1);
-		mercury_release_var(&v2);
-		v2.data.i = 0;
-		v2.type = M_TYPE_BOOL; //false.
-		mercury_pushstack(M, &v2);
-		return;
+	else {
+		mercury_release_var(st);
+		mercury_release_var(ss);
+		ss->data.i = 0;
+		ss->type = M_TYPE_BOOL;
 	}
-	mercury_release_var(&v1);
-	mercury_pushstack(M, &v2);
+
+	M->sizeofstack--;
+	return;
 }
 
 void M_BYTECODE_LOR(mercury_state* const M_CPP_restrict M) {
-	mercury_variable v1;
-	mercury_variable v2;
-	mercury_popstack(M, &v2);
-	mercury_popstack(M, &v1);
-
-	if (mercury_checkbool(&v1)) {
-		mercury_release_var(&v2);
-		mercury_pushstack(M, &v1);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
-	mercury_release_var(&v1);
-	mercury_pushstack(M, &v2);
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	bool c1 = mercury_checkbool(st);
+	bool c2 = mercury_checkbool(ss);
+
+	if (c2) {
+		mercury_release_var(st);
+	}
+	else {
+		if (c1) {
+			mercury_release_var(ss);
+			*ss = *st;
+		}
+		else {
+			mercury_release_var(st);
+			mercury_release_var(ss);
+			ss->data.i = 0;
+			ss->type = M_TYPE_BOOL;
+		}
+	}
+
+	M->sizeofstack--;
+	return;
 }
 
 void M_BYTECODE_LXOR(mercury_state* const M_CPP_restrict M) {
-	mercury_variable v1;
-	mercury_variable v2;
-	mercury_popstack(M, &v2);
-	mercury_popstack(M, &v1);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
 
-	if (mercury_checkbool(&v1)) {
-		if (mercury_checkbool(&v2)) {
-			mercury_release_var(&v1);
-			mercury_release_var(&v2);
-			v2.data.i = 0;
-			v2.type = M_TYPE_BOOL; //false.
-			mercury_pushstack(M, &v2);
-		}
-		else {
-			mercury_release_var(&v2);
-			mercury_pushstack(M, &v1);
-		}
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	bool c1=mercury_checkbool(st);
+	bool c2=mercury_checkbool(ss);
+	
+	if ((c1 && c2) || (!c1 && !c2)) {
+		mercury_release_var(st);
+		mercury_release_var(ss);
+		ss->data.i = 0;
+		ss->type = M_TYPE_BOOL;
+	}
+	else if (c1) {
+		mercury_release_var(ss);
+		*ss = *st;
 	}
 	else {
-		if (mercury_checkbool(&v2)) {
-			mercury_release_var(&v1);
-			mercury_pushstack(M, &v2);
-		}
-		else {		
-			mercury_release_var(&v1);
-			mercury_release_var(&v2);
-			v2.data.i = 0;
-			v2.type = M_TYPE_BOOL; //false.
-			mercury_pushstack(M, &v2);
-		}
+		mercury_release_var(st);
 	}
+
+	M->sizeofstack--;
+	return;
 }
 
 void M_BYTECODE_LNOT(mercury_state* const M_CPP_restrict M) {
-	mercury_variable v1;
-	mercury_popstack(M, &v1);
-
-	if (mercury_checkbool(&v1)) {
-		mercury_release_var(&v1);
-		v1.data.i = 0;
-		v1.type = M_TYPE_BOOL; //false.
-		mercury_pushstack(M, &v1);
+	if (M->sizeofstack < 1) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
-	mercury_release_var(&v1);
-	v1.data.i = 1;
-	v1.type = M_TYPE_BOOL; //false.
-	mercury_pushstack(M, &v1);
+
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	bool c= !mercury_checkbool(st);
+	mercury_release_var(st);
+	st->data.i = c;
+	st->type = M_TYPE_BOOL;
+
+	return;
 }
 
 
 void M_BYTECODE_EQL(mercury_state* const M_CPP_restrict M) {
-	mercury_variable v1;
-	mercury_variable v2;
-	mercury_popstack(M, &v2);
-	mercury_popstack(M, &v1);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	if (mercury_vars_equal(&v1, &v2)) {
-		mercury_release_var(&v1);
-		mercury_release_var(&v2);
-		v1.data.i = 1;
-		v1.type = M_TYPE_BOOL; //true.
-		mercury_pushstack(M, &v1);
-		return;
-	}
-	else {
-		mercury_release_var(&v1);
-		mercury_release_var(&v2);
-		v1.data.i = 0;
-		v1.type = M_TYPE_BOOL; //false.
-		mercury_pushstack(M, &v1);
-		return;
-	}
+	bool c = mercury_vars_equal(ss, st);
+	mercury_release_var(st);
+	mercury_release_var(ss);
+	ss->data.i = c;
+	ss->type = M_TYPE_BOOL;
+
+	M->sizeofstack--;
+	return;
 }
 
 void M_BYTECODE_NEQ(mercury_state* const M_CPP_restrict M) {
-	mercury_variable v1;
-	mercury_variable v2;
-	mercury_popstack(M, &v2);
-	mercury_popstack(M, &v1);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	if (mercury_vars_equal(&v1, &v2)) {
-		mercury_release_var(&v1);
-		mercury_release_var(&v2);
-		v1.data.i = 0;
-		v1.type = M_TYPE_BOOL; //true.
-		mercury_pushstack(M, &v1);
-		return;
-	}
-	else {
-		mercury_release_var(&v1);
-		mercury_release_var(&v2);
-		v1.data.i = 1;
-		v1.type = M_TYPE_BOOL; //false.
-		mercury_pushstack(M, &v1);
-		return;
-	}
+	bool c= !mercury_vars_equal(ss, st);
+	mercury_release_var(st);
+	mercury_release_var(ss);
+	ss->data.i = c;
+	ss->type = M_TYPE_BOOL;
+
+	M->sizeofstack--;
+	return;
 }
 
 
 void M_BYTECODE_GRT(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		argsfloat |= 1;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		argsfloat |= 2;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}
+	else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		return;
+	}
+	ss->type = M_TYPE_BOOL;
+
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.i = ss->data.f > st->data.f;
+	}
+	else if (st->type == M_TYPE_INT) {
+		ss->data.i = ss->data.i > st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
-	
-	v.type = M_TYPE_BOOL;
-	switch (argsfloat) {
-	case 0:
-		v.data.i = i2 > i1;
-		break;
-	case 1:
-		v.data.f = (mercury_float)i2 > f1;
-		break;
-	case 2:
-		v.data.f = f2 > (mercury_float)i1;
-		break;
-	case 3:
-		v.data.f = f2 > f1;
-		break;
-	}
-	mercury_pushstack(M, &v);
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_LET(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		argsfloat |= 1;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		argsfloat |= 2;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
+
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}
+	else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		return;
+	}
+	ss->type = M_TYPE_BOOL;
+
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.i = ss->data.f < st->data.f;
+	}
+	else if (st->type == M_TYPE_INT) {
+		ss->data.i = ss->data.i < st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
-	
-	v.type = M_TYPE_BOOL;
-	switch (argsfloat) {
-	case 0:
-		v.data.i = i2 < i1;
-		break;
-	case 1:
-		v.data.f = (mercury_float)i2 < f1;
-		break;
-	case 2:
-		v.data.f = f2 < (mercury_float)i1;
-		break;
-	case 3:
-		v.data.f = f2 < f1;
-		break;
-	}
-	mercury_pushstack(M, &v);
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_GTE(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		argsfloat |= 1;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		argsfloat |= 2;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}
+	else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		return;
+	}
+	ss->type = M_TYPE_BOOL;
+
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.i = ss->data.f >= st->data.f;
+	}
+	else if (st->type == M_TYPE_INT) {
+		ss->data.i = ss->data.i >= st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
-	v.type = M_TYPE_BOOL;
-	
-	switch (argsfloat) {
-	case 0:
-		v.data.i = i2 >= i1;
-		break;
-	case 1:
-		v.data.f = (mercury_float)i2 >= f1;
-		break;
-	case 2:
-		v.data.f = f2 >= (mercury_float)i1;
-		break;
-	case 3:
-		v.data.f = f2 >= f1;
-		break;
-	}
-	mercury_pushstack(M, &v);
+	M->sizeofstack--;
 	return;
 }
 
 void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
-	uint8_t argsfloat = 0;
-
-	mercury_float f1;
-	mercury_float f2;
-	mercury_int i1;
-	mercury_int i2;
-
-	mercury_variable v;
-
-
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i1 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f1 = v.data.f;
-		argsfloat |= 1;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 2);
-		mercury_release_var(&v);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
 
+	mercury_variable* st = M->stack + M->sizeofstack - 1;
+	mercury_variable* ss = M->stack + M->sizeofstack - 2;
 
-	mercury_popstack(M, &v);
-	switch (v.type)
-	{
-	case M_TYPE_INT:
-		i2 = v.data.i;
-		break;
-	case M_TYPE_FLOAT:
-		f2 = v.data.f;
-		argsfloat |= 2;
-		break;
-	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v, 1);
-		mercury_release_var(&v);
+	if (ss->type == M_TYPE_FLOAT) {
+		if (st->type == M_TYPE_INT) {
+			st->type = M_TYPE_FLOAT;
+			st->data.f = (mercury_float)st->data.i;
+		}
+	}
+	else if (ss->type == M_TYPE_INT) {
+		if (st->type == M_TYPE_FLOAT) {
+			ss->data.f = (mercury_float)ss->data.i;
+		}
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		return;
+	}
+	ss->type = M_TYPE_BOOL;
+
+	if (st->type == M_TYPE_FLOAT) {
+		ss->data.i = ss->data.f <= st->data.f;
+	}
+	else if (st->type == M_TYPE_INT) {
+		ss->data.i = ss->data.i <= st->data.i;
+	}
+	else {
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
-
-	v.type = M_TYPE_BOOL;
-	
-	switch (argsfloat) {
-	case 0:
-		v.data.i = i2 <= i1;
-		break;
-	case 1:
-		v.data.f = (mercury_float)i2 <= f1;
-		break;
-	case 2:
-		v.data.f = f2 <= (mercury_float)i1;
-		break;
-	case 3:
-		v.data.f = f2 <= f1;
-		break;
-	}
-	mercury_pushstack(M, &v);
+	M->sizeofstack--;
 	return;
 }
 

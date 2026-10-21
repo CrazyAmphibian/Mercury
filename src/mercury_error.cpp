@@ -221,6 +221,9 @@ mercury_string* mercury_generate_error_string(mercury_state* M, const uint32_t e
 			mercury_mstring_addchars(out, ".\n", 2);
 			}
 			break;
+		case M_ERROR_STACK_CORRUPT:
+			mercury_mstring_addchars(out, ": stack has been corrupted.\n", 28);
+			break;
 		default:
 			mercury_mstring_addchars(out, ": unknown error.",16);
 			break;
