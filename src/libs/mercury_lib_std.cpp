@@ -46,7 +46,7 @@ void mercury_lib_std_print(mercury_state* const M_CPP_restrict M, const mercury_
 	putchar('\n');
 	fflush(stdout);
 
-	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, 0);
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
