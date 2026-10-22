@@ -1685,6 +1685,403 @@ void M_BYTECODE_NNSE(mercury_state* const M_CPP_restrict M) { //New Nil if Stack
 	}
 }
 
+
+void M_BYTECODE_SETL_KCS(mercury_state* const M_CPP_restrict M) { //SET Local, Key is Constant String
+	if (!M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* value = M->stack + M->sizeofstack - 1;
+
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	mercury_subtable st = M->enviroment->data[M_TYPE_STRING];
+	mercury_int sz = st.size;
+	while (sz) {
+		sz--;
+		mercury_string* s = (mercury_string*)st.keys[sz].data.p;
+		if (s->size != length)continue;
+		for (mercury_int n = 0; n < length; n++) {
+			if (chars[n] != s->ptr[n])goto nextstring;
+		}
+		mercury_increment_variable_refrence_count(value);
+		mercury_decrement_variable_refrence_count(st.values + sz);
+		mercury_release_var(st.values + sz);
+		st.values[sz] = *value;
+		M->sizeofstack--;
+		return;
+		nextstring:
+		{}
+	}
+
+	void* nptr = realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.keys = (mercury_variable*)nptr;
+	nptr = realloc(st.values, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.values = (mercury_variable*)nptr;
+
+	mercury_variable key;
+	key.type = M_TYPE_STRING;
+	mercury_string* keystr = mercury_cstring_to_mstring(chars, length);
+	if (!keystr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	keystr->refrences = 1;
+	key.data.p = keystr;
+
+	mercury_increment_variable_refrence_count(value);
+	st.keys[st.size] = key;
+	st.values[st.size] = *value;
+
+	st.size++;
+	M->enviroment->data[M_TYPE_STRING] = st;
+	M->sizeofstack --;
+}
+
+void M_BYTECODE_GETL_KCS(mercury_state* const M_CPP_restrict M) { //GET Local, Key is Constant String
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	mercury_subtable st = M->enviroment->data[M_TYPE_STRING];
+	mercury_int sz = st.size;
+	while (sz) {
+		sz--;
+		mercury_string* s = (mercury_string*)st.keys[sz].data.p;
+		if (s->size != length)continue;
+		for (mercury_int n = 0; n < length; n++) {
+			if (chars[n] != s->ptr[n])goto nextstring;
+		}
+		mercury_pushstack(M, st.values + sz);
+		return;
+		nextstring:
+		{}
+	}
+	mercury_variable k;
+	k.type = M_TYPE_NIL;
+	k.data.i = 0;
+	mercury_pushstack(M, &k);
+}
+
+void M_BYTECODE_SETG_KCS(mercury_state* const M_CPP_restrict M) { //SET Global, Key is Constant String
+	if (!M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* value = M->stack + M->sizeofstack - 1;
+
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	mercury_subtable st = M->masterstate->enviroment->data[M_TYPE_STRING];
+	mercury_int sz = st.size;
+	while (sz) {
+		sz--;
+		mercury_string* s = (mercury_string*)st.keys[sz].data.p;
+		if (s->size != length)continue;
+		for (mercury_int n = 0; n < length; n++) {
+			if (chars[n] != s->ptr[n])goto nextstring;
+		}
+		mercury_increment_variable_refrence_count(value);
+		mercury_decrement_variable_refrence_count(st.values + sz);
+		mercury_release_var(st.values + sz);
+		st.values[sz] = *value;
+		M->sizeofstack--;
+		return;
+	nextstring:
+		{}
+	}
+
+	void* nptr = realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.keys = (mercury_variable*)nptr;
+	nptr = realloc(st.values, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.values = (mercury_variable*)nptr;
+
+	mercury_variable key;
+	key.type = M_TYPE_STRING;
+	mercury_string* keystr = mercury_cstring_to_mstring(chars, length);
+	if (!keystr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	keystr->refrences = 1;
+	key.data.p = keystr;
+
+	mercury_increment_variable_refrence_count(value);
+	st.keys[st.size] = key;
+	st.values[st.size] = *value;
+
+	st.size++;
+	M->masterstate->enviroment->data[M_TYPE_STRING] = st;
+	M->sizeofstack--;
+}
+
+void M_BYTECODE_GETG_KCS(mercury_state* const M_CPP_restrict M) { //GET Global, Key is Constant String
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	mercury_subtable st = M->masterstate->enviroment->data[M_TYPE_STRING];
+	mercury_int sz = st.size;
+	while (sz) {
+		sz--;
+		mercury_string* s = (mercury_string*)st.keys[sz].data.p;
+		if (s->size != length)continue;
+		for (mercury_int n = 0; n < length; n++) {
+			if (chars[n] != s->ptr[n])goto nextstring;
+		}
+		mercury_pushstack(M, st.values + sz);
+		return;
+	nextstring:
+		{}
+	}
+	mercury_variable k;
+	k.type = M_TYPE_NIL;
+	k.data.i = 0;
+	mercury_pushstack(M, &k);
+}
+
+void M_BYTECODE_SENV_KCS(mercury_state* const M_CPP_restrict M) {
+	if (!M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* value = M->stack + M->sizeofstack - 1;
+
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	mercury_state* check_state = M;
+	while (check_state) {
+		mercury_subtable* st = check_state->enviroment->data + M_TYPE_STRING;
+		mercury_int sz = st->size;
+		while (sz) {
+			sz--;
+			mercury_string* s = (mercury_string*)st->keys[sz].data.p;
+			if (s->size != length)continue;
+			for (mercury_int n = 0; n < length; n++) {
+				if (chars[n] != s->ptr[n])goto nextstring;
+			}
+			mercury_increment_variable_refrence_count(value);
+			mercury_decrement_variable_refrence_count(st->values + sz);
+			mercury_release_var(st->values + sz);
+			st->values[sz] = *value;
+			M->sizeofstack--;
+			return;
+			nextstring:
+			{}
+		}
+
+
+		check_state = check_state->parentstate;
+	}
+
+	mercury_subtable st = M->enviroment->data[M_TYPE_STRING];
+	void* nptr = realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.keys = (mercury_variable*)nptr;
+	nptr = realloc(st.values, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.values = (mercury_variable*)nptr;
+
+	mercury_variable key;
+	key.type = M_TYPE_STRING;
+	mercury_string* keystr = mercury_cstring_to_mstring(chars, length);
+	if (!keystr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	keystr->refrences = 1;
+	key.data.p = keystr;
+
+	mercury_increment_variable_refrence_count(value);
+
+	st.keys[st.size] = key;
+	st.values[st.size] = *value;
+
+	st.size++;
+	M->enviroment->data[M_TYPE_STRING] = st;
+	M->sizeofstack --;
+}
+
+void M_BYTECODE_GENV_KCS(mercury_state* const M_CPP_restrict M) {
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	mercury_state* check_state = M;
+	while (check_state) {
+		mercury_subtable st = check_state->enviroment->data[M_TYPE_STRING];
+		while (st.size) {
+			st.size--;
+			mercury_string* s = (mercury_string*)st.keys[st.size].data.p;
+			if (s->size != length)continue;
+			for (mercury_int n = 0; n < length; n++) {
+				if (chars[n] != s->ptr[n])goto nextstring;
+			}
+			mercury_pushstack(M, st.values + st.size);
+			return;
+			nextstring:
+			{}
+		}
+
+
+		check_state = check_state->parentstate;
+	}
+	mercury_variable k;
+	k.type = M_TYPE_NIL;
+	k.data.i = 0;
+	mercury_pushstack(M, &k);
+}
+
+
+void M_BYTECODE_SET_KCS(mercury_state* const M_CPP_restrict M) {
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	mercury_variable* table = M->stack + M->sizeofstack - 1;
+	mercury_variable* value = M->stack + M->sizeofstack - 2;
+
+	if (table->type != M_TYPE_TABLE) {
+		if (table->type != M_TYPE_STRING && table->type != M_TYPE_ARRAY) {
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table, 1);
+			return;
+		}
+		mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, M_TYPE_STRING);
+		return;
+	}
+
+	mercury_subtable st = ((mercury_table*)table->data.p)->data[M_TYPE_STRING];
+	mercury_int sz = st.size;
+	while (sz) {
+		sz--;
+		mercury_string* s = (mercury_string*)st.keys[sz].data.p;
+		if (s->size != length)continue;
+		for (mercury_int n = 0; n < length; n++) {
+			if (chars[n] != s->ptr[n])goto nextstring;
+		}
+		mercury_increment_variable_refrence_count(value);
+		mercury_decrement_variable_refrence_count(st.values + sz);
+		mercury_release_var(st.values + sz);
+		st.values[sz] = *value;
+		M->sizeofstack--;
+		return;
+	nextstring:
+		{}
+	}
+
+	void* nptr = realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.keys = (mercury_variable*)nptr;
+	nptr = realloc(st.values, sizeof(mercury_variable) * (st.size + 1));
+	if (!nptr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	st.values = (mercury_variable*)nptr;
+
+	mercury_variable key;
+	key.type = M_TYPE_STRING;
+	mercury_string* keystr = mercury_cstring_to_mstring(chars, length);
+	if (!keystr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		return;
+	}
+	keystr->refrences = 1;
+	key.data.p = keystr;
+
+	mercury_increment_variable_refrence_count(value);
+	st.keys[st.size] = key;
+	st.values[st.size] = *value;
+
+	st.size++;
+	((mercury_table*)table->data.p)->data[M_TYPE_STRING] = st;
+
+	M->sizeofstack -= 2;
+}
+
+void M_BYTECODE_GET_KCS(mercury_state* const M_CPP_restrict M) {
+	const mercury_int length = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+	char* chars = (char*)(M->bytecode.instructions + M->programcounter);
+	M->programcounter += (length + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+
+	if (!M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* table = M->stack + M->sizeofstack - 1;
+	if (table->type != M_TYPE_TABLE) {
+		if (table->type != M_TYPE_STRING && table->type != M_TYPE_ARRAY) {
+			mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table, 1);
+			return;
+		}
+		mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, M_TYPE_STRING);
+		return;
+	}
+
+	mercury_subtable st = ((mercury_table*)table->data.p)->data[M_TYPE_STRING];
+	mercury_int sz = st.size;
+	while (sz) {
+		sz--;
+		mercury_string* s = (mercury_string*)st.keys[sz].data.p;
+		if (s->size != length)continue;
+		for (mercury_int n = 0; n < length; n++) {
+			if (chars[n] != s->ptr[n])goto nextstring;
+		}
+		mercury_release_var(table);
+		*table = st.values[sz];
+		return;
+	nextstring:
+		{}
+	}
+	mercury_release_var(table);
+	table->data.i = 0;
+	table->type = M_TYPE_NIL;
+}
+
+
 mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_NOP, //0
 	//arithmetic
@@ -1764,5 +2161,14 @@ mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_SWXY, //62
 
 	M_BYTECODE_NNSE, //63
+
+	M_BYTECODE_SETL_KCS, //64
+	M_BYTECODE_GETL_KCS,
+	M_BYTECODE_SETG_KCS,
+	M_BYTECODE_GETG_KCS,
+	M_BYTECODE_SENV_KCS,
+	M_BYTECODE_GENV_KCS,
+	M_BYTECODE_SET_KCS,
+	M_BYTECODE_GET_KCS, //71
 };
 

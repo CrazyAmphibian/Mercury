@@ -1164,6 +1164,33 @@ mercury_opcode m_compile_get_operator_opcode_from_token(compiler_token* t,int tt
 	return M_OPCODE_NOP;
 }
 
+inline bool add_raw_string_onto_stack(compiler_function* f, char* s, mercury_int len, mercury_int dbg_toknum) { //no additional opcode, just raw length and chars.
+	mercury_int required_space = (len + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+	add_rawdata_bitwidth_size(f, len, dbg_toknum);
+	void* nptr = realloc(f->instructions, sizeof(mercury_opcode) * (f->number_instructions + required_space));
+	if (!nptr) {
+		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+		f->token_error_num = dbg_toknum;
+		return false;
+	}
+	f->instructions = (mercury_opcode*)nptr;
+	nptr = realloc(f->instruction_tokens, sizeof(mercury_int) * (f->number_instructions + required_space));
+	if (!nptr) {
+		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+		f->token_error_num = dbg_toknum;
+		return false;
+	}
+	f->instruction_tokens = (mercury_int*)nptr;
+
+	memcpy(f->instructions + f->number_instructions, s, sizeof(char) * len);
+	for (mercury_int i = 0; i < required_space; i++) {
+		f->instruction_tokens[f->number_instructions + i] = dbg_toknum;
+	}
+	f->number_instructions += required_space;
+	return true;
+}
+
+
 inline void add_string_onto_stack(compiler_function* f,char* s,mercury_int len,mercury_int dbg_toknum){
 	mercury_int required_space = (len + sizeof(mercury_opcode)-1) / sizeof(mercury_opcode);
 	add_instruction(f, M_OPCODE_NSTR,dbg_toknum);
@@ -1393,12 +1420,12 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens
 		};
 		
 	}else if(cur_tok->token_flags & (TOKEN_ENV_VAR | TOKEN_SCOPESPECIFIER) ){
-		mercury_opcode g_op= M_OPCODE_GENV;
+		mercury_opcode g_op= M_OPCODE_GENV_KCS;
 		if(cur_tok->token_flags & TOKEN_SCOPESPECIFIER){
 			if(token_matches_chars(cur_tok,"local")){
-				g_op = M_OPCODE_GETL;
+				g_op = M_OPCODE_GETL_KCS;
 			}else if(token_matches_chars(cur_tok,"global")){
-				g_op = M_OPCODE_GETG;
+				g_op = M_OPCODE_GETG_KCS;
 			}
 			token_offset++;
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -1416,6 +1443,13 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens
 			
 		}
 		
+		add_instruction(f, g_op, token_offset);
+		if (!add_raw_string_onto_stack(f, cur_tok->chars, cur_tok->num_chars, token_offset)) {
+			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->token_error_num = token_offset;
+			return 0;
+		}
+		/*
 		mercury_int ci=compiler_info_add_constant_string_from_token(i,cur_tok);
 		if (ci==-1){
 			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
@@ -1426,6 +1460,8 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens
 		add_rawdata_bitwidth_size(f,ci, token_offset);
 		//add_string_onto_stack(f,cur_tok->chars,cur_tok->num_chars,token_offset);
 		add_instruction(f, g_op,token_offset);
+		*/
+		
 		token_offset++;
 	}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='('){ //parenthesis statement reading. we read (b+c) as a variable because it makes things easier on the compiler, and helps further segment the code to be more clean. after all, a+(b+c) is functionally equivalent to computing (b+c) then doing a+.
 		token_offset++;
@@ -1489,10 +1525,12 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens
 			
 			if(cur_tok->token_flags & TOKEN_ENV_VAR){
 				add_instruction(&funcargreadf, M_OPCODE_NNSE, token_offset);
-				add_string_onto_stack(&funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
+				add_instruction(&funcargreadf, M_OPCODE_SETL_KCS, token_offset);
+				add_raw_string_onto_stack(&funcargreadf, cur_tok->chars, cur_tok->num_chars, token_offset);
+				//add_string_onto_stack(&funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
 				//token_offset+=m_compile_read_variable(funcargreadf,tokens,num_tokens,token_offset, nullptr); //load the var name onto the stack
 				//add_instruction(funcargreadf,M_OPCODE_SWPT,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key
-				add_instruction(&funcargreadf,M_OPCODE_SETL,token_offset);
+				//add_instruction(&funcargreadf,M_OPCODE_SETL,token_offset);
 				token_offset++;
 			}else{
 				f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
@@ -1611,9 +1649,12 @@ mercury_int m_compile_read_var_indexing(compiler_function* f, compiler_token* to
 				f->token_error_num=token_offset;
 				return 0;
 			}else{
-				token_offset+=m_compile_read_variable(f,tokens,num_tokens,token_offset,i);
-				f->number_instructions--; //truncate the GENV instruction that will be added.
-				add_instruction(f, M_OPCODE_GET, token_offset);
+				//token_offset+=m_compile_read_variable(f,tokens,num_tokens,token_offset,i);
+				//f->number_instructions--; //truncate the GENV instruction that will be added.
+				//add_instruction(f, M_OPCODE_GET, token_offset);
+				add_instruction(f, M_OPCODE_GET_KCS, token_offset);
+				add_raw_string_onto_stack(f, cur_tok->chars, cur_tok->num_chars, token_offset);
+				token_offset++;
 			}
 		}else if(cur_tok->chars[0]=='['){ //specific indexing
 			token_offset++;
@@ -2102,8 +2143,19 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token* tokens
 						free(set_instructs);
 						return 0;
 					}
-					token_offset += m_compile_read_variable(getvarfunc, tokens, num_tokens, token_offset, i);
-					getvarfunc->number_instructions--; //remove the last instruction, which would be GENV. hacky, i know.
+					//token_offset += m_compile_read_variable(getvarfunc, tokens, num_tokens, token_offset, i);
+					//getvarfunc->number_instructions--; //remove the last instruction, which would be GENV. hacky, i know.
+					//add_instruction(getvarfunc, M_OPCODE_GET_KCS,token_offset);
+					//add_raw_string_onto_stack(getvarfunc, cur_tok->chars, cur_tok->num_chars, token_offset);
+					mercury_int ci = compiler_info_add_constant_string_from_token(i, cur_tok);
+					if (ci == -1) {
+						f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+						f->token_error_num = token_offset;
+						return 0;
+					}
+					add_instruction(getvarfunc, M_OPCODE_GCON, token_offset);
+					add_rawdata_bitwidth_size(getvarfunc, ci, token_offset);
+					token_offset++;
 				}
 
 			}

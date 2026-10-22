@@ -88,6 +88,15 @@ void M_BYTECODE_SWXY(mercury_state* const M_CPP_restrict M);
 
 void M_BYTECODE_NNSE(mercury_state* const M_CPP_restrict M);
 
+void M_BYTECODE_SETL_KCS(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GETL_KCS(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SETG_KCS(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GETG_KCS(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SENV_KCS(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GENV_KCS(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_SET_KCS(mercury_state* const M_CPP_restrict M);
+void M_BYTECODE_GET_KCS(mercury_state* const M_CPP_restrict M);
+
 extern mercury_instruction mercury_bytecode_list[];
 
 
@@ -169,4 +178,13 @@ enum mercury_opcodes:mercury_opcode {
 	M_OPCODE_SWXY = 62,
 
 	M_OPCODE_NNSE = 63,
+
+	M_OPCODE_SETL_KCS=64,
+	M_OPCODE_GETL_KCS=65,
+	M_OPCODE_SETG_KCS=66,
+	M_OPCODE_GETG_KCS=67,
+	M_OPCODE_SENV_KCS = 68,
+	M_OPCODE_GENV_KCS = 69,
+	M_OPCODE_SET_KCS = 70,
+	M_OPCODE_GET_KCS = 71,
 };

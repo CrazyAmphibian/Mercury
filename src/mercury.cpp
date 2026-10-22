@@ -1442,7 +1442,7 @@ void mercury_clear_function(mercury_function* in) {
 
 inline const char* m_get_opcode_str(mercury_opcode instruction) {
 
-	if (instruction > M_OPCODE_NNSE) {
+	if (instruction > M_OPCODE_GET_KCS) {
 		return "????";
 	}
 	static const char* lookup[0xFFFF] = {
@@ -1523,6 +1523,15 @@ inline const char* m_get_opcode_str(mercury_opcode instruction) {
 		"SWXY", //62
 
 		"NNSE", //63
+
+		"SETL_KCS", //64
+		"GETL_KCS", //65
+		"SETG_KCS", //66
+		"GETG_KCS", //67
+		"SENV_KCS", //68
+		"GENV_KCS", //69
+		"SET_KCS", //70
+		"GET_KCS", //71
 	};
 	return lookup[instruction];
 }
@@ -1613,6 +1622,30 @@ mercury_string* mercury_get_bytecode_debug(mercury_function* F) {
 				snprintf(buffer, 0x2FFF, " %zu ", *(mercury_int*)(F->instructions + offset));
 				mercury_mstring_addchars(out, buffer, strlen(buffer));
 				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				break;
+			case M_OPCODE_SETL_KCS:
+			case M_OPCODE_GETL_KCS:
+			case M_OPCODE_SETG_KCS:
+			case M_OPCODE_GETG_KCS:
+			case M_OPCODE_SENV_KCS:
+			case M_OPCODE_GENV_KCS:
+			case M_OPCODE_SET_KCS:
+			case M_OPCODE_GET_KCS:
+				{
+				mercury_int size = *(mercury_int*)(F->instructions + offset);
+				snprintf(buffer, 0x2FFF, " size:%zi ", size);
+				mercury_mstring_addchars(out, buffer, strlen(buffer));
+				offset += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
+				size = size >= 0x2FFF ? 0x2FFF : size;
+				for (mercury_int i = 0; i < size; i++) {
+					char c = *(((char*)(F->instructions + offset)) + i);
+					buffer[i] = c;
+				}
+				offset += (size + sizeof(mercury_opcode) - 1) / sizeof(mercury_opcode);
+				mercury_mstring_addchars(out, (char*)"\"", 1);
+				mercury_mstring_addchars(out, buffer, size);
+				mercury_mstring_addchars(out, (char*)"\"", 1);
+				}
 				break;
 		}
 
