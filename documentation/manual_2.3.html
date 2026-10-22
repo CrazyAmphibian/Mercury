@@ -178,9 +178,9 @@
 	<tr> <td>CNCT</td> <td>concatenates 2 values, converting to strings if needed.</td> <td>in: variable, variable <br>out: string</td> <td></td> </tr>
 	<tr> <td>CLS</td> <td>clears the stack</td> <td>in:  <br>out: </td> <td></td> </tr>
 	<tr> <td>GETL</td> <td>gets a value of the bottom-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
-	<tr> <td>SETL</td> <td>gets a value of the bottom-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
+	<tr> <td>SETL</td> <td>sets a value of the bottom-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
 	<tr> <td>GETG</td> <td>gets a value of the top-most environment</td> <td>in: key  <br>out: value</td> <td></td> </tr>
-	<tr> <td>SETG</td> <td>gets a value of the top-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
+	<tr> <td>SETG</td> <td>sets a value of the top-most environment</td> <td>in: key,value  <br>out: </td> <td></td> </tr>
 	<tr> <td>CPYT</td> <td>copies the topmost stack value</td> <td>in: <br>out: variable</td> <td></td> </tr>
 	<tr> <td>SWPT</td> <td>swaps the topmost stack value with the second topmost value</td> <td>in: <br>out: </td> <td></td> </tr>
 	<tr> <td>CPYX</td> <td>copies the top specified number of stack values</td> <td>in: <br>out: ...</td> <td>number to copy</td> </tr>
@@ -190,7 +190,15 @@
 	<tr> <td>SCON</td> <td>sets a state constant value</td> <td>in: value<br>out:</td> <td>constant number </td> </tr>
 	<tr> <td>GCON</td> <td>gets a state constant value</td> <td>in: <br>out: value</td> <td>constant number </td> </tr>
 	<tr> <td>SWXY</td> <td>swaps 2 stack variables, relative to the top (last element) of stack</td> <td>in: <br>out: </td> <td>element number, element number </td> </tr>
-	<tr> <td>NNSE</td> <td>pushes nil onto the stack if the stack is empty</td> <td>in: <br>out: nil (potentially)</td> <td>element number, element number </td> </tr>
+	<tr> <td>NNSE</td> <td>pushes nil onto the stack if the stack is empty</td> <td>in: <br>out: nil (potentially)</td> <td> </td> </tr>
+	<tr> <td>SETL_KCS</td> <td>sets a value of the bottom-most environment</td> <td>in: value<br>out: </td> <td>key (length, chars)</td> </tr>
+	<tr> <td>GETL_KCS</td> <td>gets a value of the bottom-most environment</td> <td>in: <br>out: value</td> <td>key (length, chars)</td> </tr>
+	<tr> <td>SETG_KCS</td> <td>sets a value of the top-most environment</td> <td>in: value<br>out: </td> <td>key (length, chars)</td> </tr>
+	<tr> <td>GETG_KCS</td> <td>gets a value of the top-most environment</td> <td>in: <br>out: value</td> <td>key (length, chars)</td> </tr>
+	<tr> <td>SENV_KCS</td> <td>sets an environment variable</td> <td>in: value<br>out: </td> <td>key (length, chars)</td> </tr>
+	<tr> <td>GENV_KCS</td> <td>gets an environment variable</td> <td>in: <br>out: value</td> <td>key (length, chars)</td> </tr>
+	<tr> <td>SET_KCS</td> <td>sets a structure value</td> <td>in: structure, value<br>out: </td> <td>key (length, chars)</td> </tr>
+	<tr> <td>GET_KCS</td> <td>gets a structure value</td> <td>in: structure<br>out: value</td> <td>key (length, chars)</td> </tr>
 	</table>
 
 </div>
