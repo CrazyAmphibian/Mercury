@@ -1488,7 +1488,7 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens
 			}
 			
 			if(cur_tok->token_flags & TOKEN_ENV_VAR){
-
+				add_instruction(&funcargreadf, M_OPCODE_NNSE, token_offset);
 				add_string_onto_stack(&funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
 				//token_offset+=m_compile_read_variable(funcargreadf,tokens,num_tokens,token_offset, nullptr); //load the var name onto the stack
 				//add_instruction(funcargreadf,M_OPCODE_SWPT,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key

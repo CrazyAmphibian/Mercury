@@ -1442,7 +1442,7 @@ void mercury_clear_function(mercury_function* in) {
 
 inline const char* m_get_opcode_str(mercury_opcode instruction) {
 
-	if (instruction > M_OPCODE_SWXY) {
+	if (instruction > M_OPCODE_NNSE) {
 		return "????";
 	}
 	static const char* lookup[0xFFFF] = {
@@ -1521,6 +1521,8 @@ inline const char* m_get_opcode_str(mercury_opcode instruction) {
 		"GCON", //61
 
 		"SWXY", //62
+
+		"NNSE", //63
 	};
 	return lookup[instruction];
 }

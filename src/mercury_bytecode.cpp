@@ -1382,22 +1382,13 @@ void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 
 void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	//ditto.
-	mercury_variable* value=nullptr;
-	if (M->sizeofstack<1) {
+	
+	if (M->sizeofstack < 2) {
 		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
-	else if(M->sizeofstack<2) { //requires snowflake code, because mercury function calls use SETL with potentially 1 stack element, if the arg is not given when called. should probably just make an instruction for this.
-		mercury_variable nil;
-		nil.type = M_TYPE_NIL;
-		nil.data.i = 0;
-		value = &nil;
-	}
-	else {
-		value = M->stack + M->sizeofstack - 2;
-	}
 	mercury_variable* key = M->stack + M->sizeofstack - 1;
-	
+	mercury_variable* value = M->stack + M->sizeofstack - 2;
 
 	mercury_subtable st = M->enviroment->data[key->type];
 	mercury_int sz = st.size;
@@ -1434,12 +1425,7 @@ void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 
 	st.size++;
 	M->enviroment->data[key->type] = st;
-	if (M->sizeofstack == 1) {
-		M->sizeofstack--;
-	}
-	else {
-		M->sizeofstack -= 2;
-	}
+	M->sizeofstack -= 2;
 }
 
 void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
@@ -1683,6 +1669,22 @@ void M_BYTECODE_SWXY(mercury_state* const M_CPP_restrict M) { //SWap stack X and
 	M->stack[Y] = v_X;
 }
 
+void M_BYTECODE_NNSE(mercury_state* const M_CPP_restrict M) { //New Nil if Stack Empty
+	if (!M->sizeofstack) {
+		if (!M->allocatedstacksize) {
+			void* nptr=realloc(M->stack, sizeof(mercury_variable));
+			if (!nptr) {
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
+				return;
+			}
+			M->stack = (mercury_variable*)nptr;
+		}
+		M->stack[0].type = M_TYPE_NIL;
+		M->stack[0].data.i = 0;
+		M->sizeofstack++;
+	}
+}
+
 mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_NOP, //0
 	//arithmetic
@@ -1760,5 +1762,7 @@ mercury_instruction mercury_bytecode_list[] = {
 	M_BYTECODE_GCON, //61
 
 	M_BYTECODE_SWXY, //62
+
+	M_BYTECODE_NNSE, //63
 };
 
