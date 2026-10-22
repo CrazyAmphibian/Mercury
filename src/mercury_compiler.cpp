@@ -1953,6 +1953,20 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token* tokens
 		return 0;
 	}
 	
+	if (cur_tok->token_flags & TOKEN_ENV_VAR) {//goto labels
+		compiler_token* nt = m_compile_get_next_token(tokens, num_tokens, token_offset + 1); 
+		if (nt && nt->token_flags & TOKEN_MISC_OP && nt->num_chars == 1 && nt->chars[0] == ':') {
+			if (!compiler_info_add_goto_label(i, cur_tok, f->number_instructions + i->additional_instructions)) {
+				f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+				f->token_error_num = token_offset;
+				return 0;
+			}
+			return 2;
+		}
+	}
+
+
+
 	i->args_out = 0;
 	mercury_opcode* set_instructs = nullptr;
 	mercury_opcode get_instruction = M_OPCODE_GENV;
@@ -2021,30 +2035,6 @@ mercury_int m_compile_read_statment(compiler_function* f, compiler_token* tokens
 			return 0;
 		}
 
-		compiler_token* nt = m_compile_get_next_token(tokens, num_tokens, token_offset + 1); //goto labels
-		if (get_instruction == M_OPCODE_GENV && nt && nt->token_flags & TOKEN_MISC_OP && nt->num_chars == 1 && nt->chars[0] == ':') {
-			if (i->args_out) {
-				f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
-				f->token_error_num = token_offset;
-				for (mercury_int n = 0; n < i->args_out; n++) {
-					delete_compiler_function(varfuncs[n]);
-				}
-				free(varfuncs);
-				free(set_instructs);
-				return 0;
-			}
-			if (!compiler_info_add_goto_label(i, cur_tok, f->number_instructions + i->additional_instructions)) {
-				f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-				f->token_error_num = token_offset;
-				for (mercury_int n = 0; n < i->args_out; n++) {
-					delete_compiler_function(varfuncs[n]);
-				}
-				free(varfuncs);
-				free(set_instructs);
-				return 0;
-			}
-			return 2;
-		}
 
 		compiler_function* getvarfunc = new_compiler_function();
 		if (!getvarfunc) {
