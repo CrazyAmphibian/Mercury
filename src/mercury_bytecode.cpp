@@ -750,24 +750,26 @@ void M_BYTECODE_LTE(mercury_state* const M_CPP_restrict M) {
 }
 
 void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
-	mercury_variable key;
-	mercury_popstack(M, &key);
-	mercury_variable value;
-	mercury_popstack(M,&value);
-
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* key = M->stack + M->sizeofstack -1;
+	mercury_variable* value = M->stack + M->sizeofstack - 2;
 
 	mercury_state* check_state = M;
 	while (check_state) {
-		mercury_subtable* st = check_state->enviroment->data+key.type;
+		mercury_subtable* st = check_state->enviroment->data+key->type;
 		mercury_int sz = st->size;
 		while (sz) {
 			sz--;
-			if (mercury_vars_equal(st->keys + sz, &key)) {
-				mercury_increment_variable_refrence_count(&value);
+			if (mercury_vars_equal(st->keys + sz, key)) {
+				mercury_increment_variable_refrence_count(value);
 				mercury_decrement_variable_refrence_count(st->values + sz);
-				mercury_release_var(&key);
+				mercury_release_var(key);
 				mercury_release_var(st->values + sz);
-				st->values[sz] = value;
+				st->values[sz] = *value;
+				M->sizeofstack -= 2;
 				return;
 			}
 		}
@@ -776,7 +778,7 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 		check_state = check_state->parentstate;
 	}
 
-	mercury_subtable st = M->enviroment->data[key.type];
+	mercury_subtable st = M->enviroment->data[key->type];
 	void* nptr = realloc(st.keys, sizeof(mercury_variable) * (st.size + 1));
 	if (!nptr) {
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
@@ -790,28 +792,32 @@ void M_BYTECODE_SENV(mercury_state* const M_CPP_restrict M) {
 	}
 	st.values = (mercury_variable*)nptr;
 
-	mercury_increment_variable_refrence_count(&key);
-	mercury_increment_variable_refrence_count(&value);
+	mercury_increment_variable_refrence_count(key);
+	mercury_increment_variable_refrence_count(value);
 
-	st.keys[st.size] = key;
-	st.values[st.size] = value;
+	st.keys[st.size] = *key;
+	st.values[st.size] = *value;
 
 	st.size++;
-	M->enviroment->data[key.type] = st;
+	M->enviroment->data[key->type] = st;
+	M->sizeofstack -= 2;
 }
 
 void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
-	mercury_variable key;
-	mercury_popstack(M, &key);
+	if (!M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* key = M->stack + M->sizeofstack - 1;
 
 	mercury_state* check_state = M;
 	while (check_state) {
-		mercury_subtable st= check_state->enviroment->data[key.type];
+		mercury_subtable st= check_state->enviroment->data[key->type];
 		while (st.size){
 			st.size--;
-			if (mercury_vars_equal(st.keys+ st.size, &key)) {
-				mercury_release_var(&key);
-				mercury_pushstack(M, st.values + st.size);
+			if (mercury_vars_equal(st.keys+ st.size, key)) {
+				mercury_release_var(key);
+				*key = st.values[st.size];
 				return;
 			}
 		}
@@ -819,88 +825,77 @@ void M_BYTECODE_GENV(mercury_state* const M_CPP_restrict M) {
 
 		check_state = check_state->parentstate;
 	}
-	mercury_variable value;
-	value.data.i = 0;
-	value.type = M_TYPE_NIL;
-	mercury_pushstack(M, &value);
-	mercury_release_var(&key);
+	mercury_release_var(key);
+	key->data.i = 0;
+	key->type = M_TYPE_NIL;
 }
 
 
 void M_BYTECODE_SET(mercury_state* const M_CPP_restrict M) {
-	mercury_variable key;
-	mercury_popstack(M, &key);
-	mercury_variable table;
-	mercury_popstack(M, &table);
-	mercury_variable value;
-	mercury_popstack(M, &value);
+	if (M->sizeofstack<3) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* key = M->stack + M->sizeofstack - 1;
+	mercury_variable* table = M->stack + M->sizeofstack - 2;
+	mercury_variable* value = M->stack + M->sizeofstack - 3;
 
-	switch (table.type) {
+	switch (table->type) {
 	case M_TYPE_TABLE:
-		mercury_setkey((mercury_table*)table.data.p, &key, &value);
+		mercury_setkey((mercury_table*)table->data.p, key, value);
 		break;
 	case M_TYPE_ARRAY:
-		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key.type);
-			mercury_release_var(&value);
-			mercury_release_var(&key);
-			mercury_release_var(&table);
+		if (key->type != M_TYPE_INT) {
+			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key->type);
 			return;
 		}
-		mercury_setarray((mercury_array*)table.data.p, &value, key.data.i);
+		mercury_setarray((mercury_array*)table->data.p, value, key->data.i);
 		break;
 	default:
 		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
-		mercury_release_var(&value);
-		mercury_release_var(&key);
-		mercury_release_var(&table);
 		return;
 	}
+	M->sizeofstack -= 3;
 	//mercury_release_var(&table); this breaks tables defined like a={1,2,3}
 }
 
 void M_BYTECODE_GET(mercury_state* const M_CPP_restrict M) {
-	mercury_variable key;
-	mercury_popstack(M, &key);
-	mercury_variable table;
-	mercury_popstack(M, &table);
-
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* key = M->stack + M->sizeofstack - 1;
+	mercury_variable* table = M->stack + M->sizeofstack - 2;
 	mercury_variable value;
-
-	switch (table.type) {
+	switch (table->type) {
 	case M_TYPE_TABLE:
-		mercury_getkey((mercury_table*)table.data.p, &key, &value);
+		mercury_getkey((mercury_table*)table->data.p, key, &value);
 		break;
 	case M_TYPE_ARRAY:
-		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key.type);
-			mercury_release_var(&key);
-			mercury_release_var(&table);
+		if (key->type != M_TYPE_INT) {
+			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key->type);
 			return;
 		}
-		mercury_getarray((mercury_array*)table.data.p, key.data.i,&value);
+		mercury_getarray((mercury_array*)table->data.p, key->data.i, &value);
 		break;
 	case M_TYPE_STRING:
-		if (key.type != M_TYPE_INT) {
-			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, table.type);
-			mercury_release_var(&key);
-			mercury_release_var(&table);
+		if (key->type != M_TYPE_INT) {
+			mercury_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key->type);
 			return;
 		}
 		
 		value.type = M_TYPE_STRING;
-		value.data.p = mercury_mstring_substring((mercury_string*)table.data.p, key.data.i, key.data.i);
+		value.data.p = mercury_mstring_substring((mercury_string*)table->data.p, key->data.i, key->data.i);
 		break;
 	default:
-		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
-		mercury_release_var(&key);
-		mercury_release_var(&table);
+		mercury_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, table, 1);
 		return;
 	}
 	mercury_increment_variable_refrence_count(&value); //so the value cannot be freed before it is sent out
-	mercury_release_var(&table);
+	mercury_release_var(table);
 	mercury_decrement_variable_refrence_count(&value);
-	mercury_pushstack(M, &value);
+	*table = value;
+	M->sizeofstack--;
 }
 
 
@@ -1313,52 +1308,56 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 
 void M_BYTECODE_CLS(mercury_state* const M_CPP_restrict M) { // CLear Stack
 	//as simple as it gets, really.
-	for (mercury_uint i = 0; i < M->sizeofstack;i++) {
-		mercury_release_var(M->stack + i);
+	while (M->sizeofstack) {
+		M->sizeofstack--;
+		mercury_release_var(M->stack + M->sizeofstack);
 	}
-	M->sizeofstack = 0;
-
 }
 
 
 void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 	//yeah, this is pretty simple.
-	mercury_variable k;
-	mercury_popstack(M, &k);
-	mercury_subtable st = M->enviroment->data[k.type];
+	if (!M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* k = M->stack + M->sizeofstack - 1;
+
+	mercury_subtable st = M->enviroment->data[k->type];
 	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st.keys+sz,&k)) {
-			mercury_release_var(&k);
-			mercury_pushstack(M, st.values + sz);
+		if (mercury_vars_equal(st.keys+sz,k)) {
+			mercury_release_var(k);
+			*k=st.values[sz];
 			return;
 		}
 	}
-	mercury_variable v;
-	v.data.i = 0;
-	v.type = M_TYPE_NIL;
-	mercury_pushstack(M,&v);
+	mercury_release_var(k);
+	k->type = M_TYPE_NIL;
+	k->data.i = 0;
 }
 
 void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	//ditto.
-	mercury_variable key;
-	mercury_popstack(M, &key);
-	mercury_variable value;
-	mercury_popstack(M, &value);
+	if (M->sizeofstack<2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* key = M->stack + M->sizeofstack - 1;
+	mercury_variable* value = M->stack + M->sizeofstack - 2;
 
-
-	mercury_subtable st = M->enviroment->data[key.type];
+	mercury_subtable st = M->enviroment->data[key->type];
 	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st.keys + sz, &key)) {
-			mercury_increment_variable_refrence_count(&value);
+		if (mercury_vars_equal(st.keys + sz, key)) {
+			mercury_increment_variable_refrence_count(value);
 			mercury_decrement_variable_refrence_count(st.values + sz);
-			mercury_release_var(&key);
+			mercury_release_var(key);
 			mercury_release_var(st.values + sz);
-			st.values[sz] = value;
+			st.values[sz] = *value;
+			M->sizeofstack -= 2;
 			return;
 		}
 	}
@@ -1376,53 +1375,59 @@ void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	}
 	st.values = (mercury_variable*)nptr;
 
-	mercury_increment_variable_refrence_count(&key);
-	mercury_increment_variable_refrence_count(&value);
-	st.keys[st.size] = key;
-	st.values[st.size] = value;
+	mercury_increment_variable_refrence_count(key);
+	mercury_increment_variable_refrence_count(value);
+	st.keys[st.size] = *key;
+	st.values[st.size] = *value;
 
 	st.size++;
-	M->enviroment->data[key.type] = st;
+	M->enviroment->data[key->type] = st;
+	M->sizeofstack -= 2;
 }
 
 void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
 	//ditto.
-	mercury_variable k;
-	mercury_popstack(M, &k);
-	mercury_subtable st = M->masterstate->enviroment->data[k.type];
+	if (!M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* k = M->stack + M->sizeofstack - 1;
+
+	mercury_subtable st = M->masterstate->enviroment->data[k->type];
 	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st.keys + sz, &k)) {
-			mercury_release_var(&k);
-			mercury_pushstack(M, st.values + sz);
+		if (mercury_vars_equal(st.keys + sz, k)) {
+			mercury_release_var(k);
+			*k = st.values[sz];
 			return;
 		}
 	}
-	mercury_variable v;
-	v.data.i = 0;
-	v.type = M_TYPE_NIL;
-	mercury_pushstack(M, &v);
+	mercury_release_var(k);
+	k->type = M_TYPE_NIL;
+	k->data.i = 0;
 }
 
 void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 		//ditto.
-	mercury_variable key;
-	mercury_popstack(M, &key);
-	mercury_variable value;
-	mercury_popstack(M, &value);
+	if (M->sizeofstack < 2) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+	mercury_variable* key = M->stack + M->sizeofstack - 1;
+	mercury_variable* value = M->stack + M->sizeofstack - 2;
 
-
-	mercury_subtable st = M->masterstate->enviroment->data[key.type];
+	mercury_subtable st = M->masterstate->enviroment->data[key->type];
 	mercury_int sz = st.size;
 	while (sz) {
 		sz--;
-		if (mercury_vars_equal(st.keys + sz, &key)) {
-			mercury_increment_variable_refrence_count(&value);
+		if (mercury_vars_equal(st.keys + sz, key)) {
+			mercury_increment_variable_refrence_count(value);
 			mercury_decrement_variable_refrence_count(st.values + sz);
-			mercury_release_var(&key);
+			mercury_release_var(key);
 			mercury_release_var(st.values + sz);
-			st.values[sz] = value;
+			st.values[sz] = *value;
+			M->sizeofstack -= 2;
 			return;
 		}
 	}
@@ -1440,13 +1445,14 @@ void M_BYTECODE_SETG(mercury_state* const M_CPP_restrict M) { //SET Global
 	}
 	st.values = (mercury_variable*)nptr;
 
-	mercury_increment_variable_refrence_count(&key);
-	mercury_increment_variable_refrence_count(&value);
-	st.keys[st.size] = key;
-	st.values[st.size] = value;
+	mercury_increment_variable_refrence_count(key);
+	mercury_increment_variable_refrence_count(value);
+	st.keys[st.size] = *key;
+	st.values[st.size] = *value;
 
 	st.size++;
-	M->masterstate->enviroment->data[key.type] = st;
+	M->masterstate->enviroment->data[key->type] = st;
+	M->sizeofstack -= 2;
 }
 
 void M_BYTECODE_CPYT(mercury_state* const M_CPP_restrict M) { // CoPY Top (of stack)
