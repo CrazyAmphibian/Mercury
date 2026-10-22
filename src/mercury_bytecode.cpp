@@ -1164,7 +1164,11 @@ void M_BYTECODE_JRNI(mercury_state* const M_CPP_restrict M) { //Jump Relative No
 void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 	const mercury_int args_in = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
-	
+	mercury_int initial_stack_size = M->sizeofstack;
+	if (M->sizeofstack < (args_in+1) ) { //we need 1 extra arg for the function on the stack.
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
 	const mercury_int args_out = *(mercury_int*)(M->bytecode.instructions + M->programcounter);
 	M->programcounter += MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	
@@ -1186,18 +1190,50 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 		//memcpy(&FM->bytecode, ck->data.p, sizeof(mercury_function));
 		FM->bytecode = *((mercury_function*)ck.data.p);
 
-		mercury_variable tmp;
-		for (mercury_int i = 0; i < args_in;i++) {
-			mercury_popstack(M, &tmp);
-			mercury_pushstack(FM, &tmp);
+		
+		if (FM->allocatedstacksize < FM->sizeofstack+args_in) {
+			void* nptr=realloc(FM->stack, sizeof(mercury_variable) * (FM->sizeofstack + args_in));
+			if (!nptr) {
+				mercury_release_var(&ck);
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
+				return;
+			}
+			FM->stack = (mercury_variable*)nptr;
+			FM->allocatedstacksize = FM->sizeofstack + args_in;
 		}
+		for (mercury_int i = 0; i < args_in; i++) {
+			FM->stack[FM->sizeofstack + i] = M->stack[M->sizeofstack - i - 1];
+		}
+		FM->sizeofstack += args_in;
+		M->sizeofstack -= args_in;
+
+
 		while (mercury_stepstate(FM)) {};
-		for (mercury_int i = 0; i < args_out; i++) {
-			mercury_pullstack(FM, &tmp);
-			mercury_pushstack(M, &tmp);
+
+		if (M->allocatedstacksize < M->sizeofstack + args_out) {
+			void* nptr = realloc(M->stack, sizeof(mercury_variable) * (M->sizeofstack + args_out));
+			if (!nptr) {
+				mercury_release_var(&ck);
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
+				return;
+			}
+			M->stack = (mercury_variable*)nptr;
+			M->allocatedstacksize = M->sizeofstack + args_out;
 		}
-		//FM->bytecode.instructions = nullptr; //so the bytecode isn't freed
-		FM->bytecode = previous;
+		mercury_int arg_defecit = args_out - FM->sizeofstack;
+		if (arg_defecit < 0)arg_defecit = 0;
+		memcpy(M->stack + M->sizeofstack, FM->stack, (args_out- arg_defecit) * sizeof(mercury_variable));
+		mercury_int i = arg_defecit;
+		while (i) {
+			M->stack[M->sizeofstack + args_out - i].type = M_TYPE_NIL;
+			M->stack[M->sizeofstack + args_out - i].data.i = 0;
+			i--;
+		}
+		FM->sizeofstack -= args_out - arg_defecit;
+		M->sizeofstack += args_out;
+		
+
+		FM->bytecode = previous;//so the bytecode isn't freed
 		mercury_clearstate(FM);
 
 
@@ -1213,6 +1249,12 @@ void M_BYTECODE_CALL(mercury_state* const M_CPP_restrict M) { //CALL function
 		return;
 	}
 	mercury_release_var(&ck);
+
+	if (initial_stack_size + args_out - args_in - 1 !=M->sizeofstack) {
+		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
+		return;
+	}
+
 }
 
 void M_BYTECODE_END(mercury_state* const M_CPP_restrict M) { //end state execution
@@ -1340,12 +1382,22 @@ void M_BYTECODE_GETL(mercury_state* const M_CPP_restrict M) { //GET Local
 
 void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 	//ditto.
-	if (M->sizeofstack<2) {
+	mercury_variable* value=nullptr;
+	if (M->sizeofstack<1) {
 		mercury_raise_error(M, M_ERROR_STACK_CORRUPT);
 		return;
 	}
+	else if(M->sizeofstack<2) { //requires snowflake code, because mercury function calls use SETL with potentially 1 stack element, if the arg is not given when called. should probably just make an instruction for this.
+		mercury_variable nil;
+		nil.type = M_TYPE_NIL;
+		nil.data.i = 0;
+		value = &nil;
+	}
+	else {
+		value = M->stack + M->sizeofstack - 2;
+	}
 	mercury_variable* key = M->stack + M->sizeofstack - 1;
-	mercury_variable* value = M->stack + M->sizeofstack - 2;
+	
 
 	mercury_subtable st = M->enviroment->data[key->type];
 	mercury_int sz = st.size;
@@ -1382,7 +1434,12 @@ void M_BYTECODE_SETL(mercury_state* const M_CPP_restrict M) { //SET Local
 
 	st.size++;
 	M->enviroment->data[key->type] = st;
-	M->sizeofstack -= 2;
+	if (M->sizeofstack == 1) {
+		M->sizeofstack--;
+	}
+	else {
+		M->sizeofstack -= 2;
+	}
 }
 
 void M_BYTECODE_GETG(mercury_state* const M_CPP_restrict M) { //GET Global
