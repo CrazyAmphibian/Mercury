@@ -47,5 +47,92 @@
 </div>
 <br>
 
+<div>
+	<h3 class="function"><span class="type">void</span> flush ( <span class="type">table</span> table )</h3>
+	
+	<p>
+		removes all nil values from a table's storage, shifting around elements to fill in the space, and will free up memory.<br>
+		if used on an environmental table (such as _G or _ENV), implicit lexical scoping may potentially break, as the variables will no longer be seen as defined.
+	</p>
+	
+	<p class="codeblock">
+		a=function(n) table.flush(_ENV) print(n) end<br>
+		<br>
+		n=100<br>
+		a(10) //prints 10, as the flush call does nothing.<br>
+		a(nil) //prints 100, as the variable n is nil, and becomes undefined. the print call will search upward for a variable named n, since it is not given an explicit location with scope keywords.<br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span>, <span class="type">int</span> getkeys ( <span class="type">table</span> table )</h3>
+	
+	<p>
+		returns an array of all keys in the table, as well as the number of keys.<br>
+		array is not guaranteed to be in any particular order. though practically speaki
+ng, they will be in order of first type number, then by order of insertion.<br>
+	array elements will be in the same pair order as elements returned by getvalues.<br>
+		includes the nil key, as well as any keys associated with a nil value.<br>
+	</p>
+	
+	<p class="codeblock">
+		a={"hello"=1,3=6,false=nil}<br>
+		table.getkeys(a) //returns [3,false,"hello"], 3<br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">array</span>, <span class="type">int</span> getvalues ( <span class="type">table</span> table )</h3>
+	
+	<p>
+		returns an array of all values in the table, as well as the number of values.<br>
+		array is not guaranteed to be in any particular order. though practically speaking, they will be in order of first type number, then by order of insertion.<br>
+		array elements will be in the same pair order as elements returned by getkeys.<br>
+		includes the nil key, as well as any nil values.<br>
+	</p>
+	
+	<p class="codeblock">
+		a={"hello"=1,3=6,false=nil}<br>
+		table.getvalues(a) //returns [6,nil,1], 3<br>
+	</p>
+</div>
+<br>
+
+
+<div>
+	<h3 class="function"><span class="type">bool</span>, <span class="type">variable</span>|<span class="type">nil</span> haskey ( <span class="type">table</span> table, <span class="type">variable</span> key )</h3>
+	
+	<p>
+		returns if a table has a value associated with the provided key, even if that value is nil.<br>
+		returns a boolean if it exists, as well as the value associated with the key or nil if it wasn't found.<br>
+	</p>
+	
+	<p class="codeblock">
+		global a=nil<br>
+		table.haskey(_G,"a") //returns true, nil<br>
+	</p>
+</div>
+<br>
+
+<div>
+	<h3 class="function"><span class="type">bool</span>, <span class="type">variable</span>|<span class="type">nil</span> hasvalue ( <span class="type">table</span> table, <span class="type">variable</span> value )</h3>
+	
+	<p>
+		returns if a table has a key associated with the provided value, even if that key or value is nil.<br>
+		returns a boolean if it exists, as well as the value associated with the key or nil if it wasn't found.<br>
+		only returns the first found occurrence of the variable.<br>
+	</p>
+	
+	<p class="codeblock">
+		global a=nil<br>
+		table.hasvalue(_G,nil) //returns true, "a"<br>
+		global b=nil<br>
+		table.hasvalue(_G,nil) //still returns true, "a" as a will (probably) be found first<br>
+	</p>
+</div>
+<br>
+
 </body>
 </html>
