@@ -1689,23 +1689,21 @@ mercury_string* mercury_get_bytecode_rawbinary_debug(mercury_function* F) {
 
 
 bool mercury_register_library(void* data, const char* key, const char* table,uint8_t type) {
-	void* nreg=realloc(M_LIBS,sizeof(mercury_libdef*)*(M_NUM_LIBS+1) );
+	void* nreg=realloc(M_LIBS,sizeof(mercury_libdef)*(M_NUM_LIBS+1) );
 	if (!nreg)return false;
-	M_LIBS = (mercury_libdef**)nreg;
+	M_LIBS = (mercury_libdef*)nreg;
 
-	mercury_libdef* ndef = (mercury_libdef*)malloc(sizeof(mercury_libdef));
-	if (!ndef)return false;
+	mercury_libdef* ndef = M_LIBS + M_NUM_LIBS;
 	ndef->dataptr = data;
 	ndef->key = key;
 	ndef->table = table;
 	ndef->type = type;
 
-	M_LIBS[M_NUM_LIBS] = ndef;
 	M_NUM_LIBS++;
 	return true;
 }
 
-mercury_libdef** M_LIBS = nullptr;
+mercury_libdef* M_LIBS = nullptr;
 mercury_int M_NUM_LIBS = 0;
 
 
@@ -1714,7 +1712,7 @@ mercury_int M_NUM_LIBS = 0;
 void mercury_populate_table_with_libs(mercury_table* T) {
 
 	for (mercury_int i = 0; i < M_NUM_LIBS; i++) {
-		mercury_libdef* lib = M_LIBS[i];
+		mercury_libdef* lib = M_LIBS+i;
 		
 		mercury_variable v;
 		v.type = lib->type;

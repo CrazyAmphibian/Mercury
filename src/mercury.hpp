@@ -271,7 +271,7 @@ struct mercury_libdef {
 	const char* table = nullptr;
 };
 
-extern mercury_libdef** M_LIBS;
+extern mercury_libdef* M_LIBS;
 extern mercury_int M_NUM_LIBS;
 
 //functions defined in the .cpp
