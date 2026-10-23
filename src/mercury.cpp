@@ -1688,7 +1688,7 @@ mercury_string* mercury_get_bytecode_rawbinary_debug(mercury_function* F) {
 }
 
 
-bool mercury_register_library(void* data, const char* key, const char* table,uint8_t type=M_TYPE_CFUNC) {
+bool mercury_register_library(void* data, const char* key, const char* table,uint8_t type) {
 	void* nreg=realloc(M_LIBS,sizeof(mercury_libdef*)*(M_NUM_LIBS+1) );
 	if (!nreg)return false;
 	M_LIBS = (mercury_libdef**)nreg;

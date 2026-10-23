@@ -333,7 +333,7 @@ MERCURY_DYNAMIC_LIBRARY void* mercury_checkpointer(const mercury_variable* const
 MERCURY_DYNAMIC_LIBRARY bool mercury_vars_equal(const mercury_variable* const var1, const mercury_variable* const var2);
 
 
-MERCURY_DYNAMIC_LIBRARY bool mercury_register_library(void* data, char* key, char* table, uint8_t type=M_TYPE_CFUNC);
+MERCURY_DYNAMIC_LIBRARY bool mercury_register_library(void* data,const char* key, const char* table, uint8_t type=M_TYPE_CFUNC);
 MERCURY_DYNAMIC_LIBRARY void mercury_populate_table_with_libs(mercury_table* T);
 
 MERCURY_DYNAMIC_LIBRARY mercury_string* mercury_get_bytecode_debug(mercury_function* F);
