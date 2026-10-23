@@ -170,7 +170,7 @@ void mercury_lib_table_getkeys(mercury_state* const M_CPP_restrict M, const merc
 	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,2);
 }
 
-void mercury_lib_table_getvalues(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //array of all keys
+void mercury_lib_table_getvalues(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //array of all values
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		mercury_discard_top_of_stack(M);
@@ -224,7 +224,7 @@ void mercury_lib_table_getvalues(mercury_state* const M_CPP_restrict M, const me
 }
 
 
-void mercury_lib_table_haskey(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //array of all keys
+void mercury_lib_table_haskey(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //if has a key
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		mercury_discard_top_of_stack(M);
@@ -269,7 +269,7 @@ void mercury_lib_table_haskey(mercury_state* const M_CPP_restrict M, const mercu
 }
 
 
-void mercury_lib_table_hasvalue(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //array of all keys
+void mercury_lib_table_hasvalue(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //if has a value
 	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		mercury_discard_top_of_stack(M);
@@ -307,6 +307,53 @@ void mercury_lib_table_hasvalue(mercury_state* const M_CPP_restrict M, const mer
 	mercury_pushstack(M, &out);
 	if (args_out > 1) {
 		out.type = M_TYPE_NIL;
+		mercury_pushstack(M, &out);
+	}
+
+	MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 2);
+}
+
+void mercury_lib_table_keyswithvalue(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) { //all keys with a value
+	if (MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
+	if (!args_out) {
+		mercury_discard_top_of_stack(M);
+		mercury_discard_top_of_stack(M);
+		return;
+	}
+
+	mercury_array* arr = mercury_newarray();
+	if (!arr) {
+		mercury_raise_error(M, M_ERROR_ALLOCATION);
+		mercury_discard_top_of_stack(M);
+		return;
+	}
+
+	mercury_variable key_var;
+	mercury_popstack(M, &key_var);
+
+	mercury_variable tab_var;
+	mercury_popstack(M, &tab_var);
+
+	mercury_variable out;
+	mercury_int elements = 0;
+	mercury_table* tab = (mercury_table*)tab_var.data.p;
+	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+		mercury_subtable st = tab->data[t];
+		if (!st.size)continue;
+		for (mercury_int i = 0; i < st.size; i++) {
+			if (mercury_vars_equal(st.values + i, &key_var)) {
+				mercury_setarray(arr, st.keys + i, elements);
+				elements++;
+			}
+		}
+	}
+
+	out.type = M_TYPE_ARRAY;
+	out.data.p = arr;
+	mercury_pushstack(M, &out);
+	if (args_out > 1) {
+		out.type = M_TYPE_INT;
+		out.data.i = elements;
 		mercury_pushstack(M, &out);
 	}
 

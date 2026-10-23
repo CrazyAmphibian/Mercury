@@ -134,5 +134,23 @@ ng, they will be in order of first type number, then by order of insertion.<br>
 </div>
 <br>
 
+<div>
+	<h3 class="function"><span class="type">array</span>, <span class="type">int</span> keyswithvalue ( <span class="type">table</span> table, <span class="type">variable</span> value )</h3>
+	
+	<p>
+		returns an array of keys (including nil) from the supplied table that are associated with the provided value, as well as how many keys had that value.<br>
+		returns an empty array if none were found.<br>
+		rray is not guaranteed to be in any particular order. though practically speaking, they will be in order of first type number, then by order of insertion.<br>
+	</p>
+	
+	<p class="codeblock">
+		a={1=20, 3=2, "test"=20, true=5, 15.2=0, inf=20}<br>
+		table.keyswithvalue(a,20) //returns [1,"test",inf], 3<br>
+	</p>
+</div>
+<br>
+
+
+
 </body>
 </html>

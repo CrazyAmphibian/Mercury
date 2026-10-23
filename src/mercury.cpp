@@ -1943,6 +1943,7 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	mercury_register_library(mercury_lib_table_getvalues, "getvalues", "table");
 	mercury_register_library(mercury_lib_table_haskey, "haskey", "table");
 	mercury_register_library(mercury_lib_table_hasvalue, "hasvalue", "table");
+	mercury_register_library(mercury_lib_table_keyswithvalue, "keyswithvalue", "table");
 #endif
 #ifdef MERCURY_LIB_DEBUG
 	mercury_register_library(mercury_lib_debug_stack_dbg, "dumpstack", "debug");
