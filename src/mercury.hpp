@@ -462,11 +462,12 @@ inline bool mercury_mstrings_equal(const mercury_string* const str1, const mercu
 	return true;
 }
 
-inline bool mercury_mstring_equal_cstring(const mercury_string* const mstr, const char* const cstr) {
+inline bool mercury_mstring_equal_cstring(const mercury_string* const mstr, const char* cstr) {
 	if (mstr->ptr == cstr)return true;
-	if (strlen(cstr) != mstr->size)return false;
 	for (mercury_int i = 0; i < mstr->size; i++) {
+		if (!cstr[i])return false; //no point in running strlen if we're going to traverse it anyways.
 		if (mstr->ptr[i] != cstr[i])return false;
 	}
+	if (cstr[mstr->size])return false; //should be null terminator here if they are the same.
 	return true;
 }
