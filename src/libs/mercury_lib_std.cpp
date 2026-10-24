@@ -291,25 +291,12 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	}
 	mercury_destroytable(iso_M->enviroment);
 	iso_M->enviroment = (mercury_table*)tab.data.p;
-
+	mercury_function oldfunc = iso_M->bytecode;
 	for (mercury_int i = 0; i < args_in - 2; i++) {
 		mercury_pushstack(iso_M, argt+i);
 	}
 	if (func.type == M_TYPE_FUNCTION) {
-		mercury_function* func2 = (mercury_function*)func.data.p;
-		void* nbl = realloc(iso_M->bytecode.instructions, func2->numberofinstructions * sizeof(mercury_opcode));
-		if (!nbl) {
-			mercury_raise_error(M, M_ERROR_ALLOCATION);
-			mercury_destroystate(iso_M);
-			free(argt);
-			return;
-		}
-		iso_M->bytecode.instructions = (mercury_opcode*)nbl;
-		iso_M->bytecode.numberofinstructions = func2->numberofinstructions;
-		iso_M->bytecode.instruction_dbg_lookup = nullptr;
-		iso_M->bytecode.num_dbg_tokens = 0;
-		iso_M->bytecode.dbg_tokens = nullptr;
-		memcpy(iso_M->bytecode.instructions, func2->instructions, func2->numberofinstructions * sizeof(mercury_opcode));
+		iso_M->bytecode = *(mercury_function*)func.data.p;
 	}
 
 	mercury_variable out;
@@ -322,6 +309,7 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 		while (mercury_stepstate(iso_M));
 	}
 	if (iso_M->errorcode)out.data.i = 0;
+	iso_M->bytecode = oldfunc;
 
 	if (args_out) {
 		mercury_pushstack(M, &out);

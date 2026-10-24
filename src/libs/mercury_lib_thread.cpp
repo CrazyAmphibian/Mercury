@@ -147,7 +147,7 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 			return;
 		}
-
+		t->state->bytecode.refrences = 1;
 		if (vart) {
 			for (mercury_int i = 0; i < args_in - 2; i++) {
 				mercury_pushstack(t->state, vart+i);

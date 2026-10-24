@@ -606,7 +606,8 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 	free(M->stack);
 
 	//if (M->enviroment)mercury_destroytable(M->enviroment);
-	mercury_clear_function(&M->bytecode);
+	M->bytecode.refrences--;
+	if(!M->bytecode.refrences)mercury_clear_function(&M->bytecode);
 
 	if (M->masterstate == M && M->registers) {
 		free(M->registers);
@@ -1424,7 +1425,7 @@ void mercury_clone_function(mercury_function* in, mercury_function* out) {
 	memcpy(out->instructions, in->instructions, sizeof(mercury_opcode) * in->numberofinstructions);
 	out->numberofinstructions = in->numberofinstructions;
 	out->enviromental = false;
-	out->refrences = 1;
+	out->refrences = 0;
 }
 
 //takes a mercury_function* and frees the data associated at the pointer, but does NOT free the pointer itself.
