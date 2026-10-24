@@ -141,6 +141,12 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 	if (t->state) {
 		//t->state->bytecode.numberofinstructions = ((mercury_function*)func_var.data.p)->numberofinstructions;
 		//t->state->bytecode.instructions = ((mercury_function*)func_var.data.p)->instructions;
+		t->state->bytecode=(mercury_function*)malloc(sizeof(mercury_function));
+		if (!t->state->bytecode) {
+			mercury_destroystate(t->state);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
 		mercury_clone_function((mercury_function*)func_var.data.p,t->state->bytecode);
 		if (((mercury_function*)func_var.data.p)->numberofinstructions != t->state->bytecode->numberofinstructions) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
