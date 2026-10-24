@@ -40,10 +40,10 @@
 	mercury_uint num_constants = 0;<br>
 <br>
 	mercury_uint programcounter = 0;<br>
-	mercury_function bytecode;<br>
-	uint32_t errorcode;<br>
+	mercury_function* bytecode = nullptr;<br>
+	uint32_t errorcode = 0;<br>
 <br>
-	mercury_table* enviroment;<br>
+	mercury_table* enviroment = nullptr;<br>
 	};<br>
 	</p>
 	
@@ -65,7 +65,7 @@
 	statements are always stack neutral, meaning that by the end of a statement, there should be no elements on the stack.<br>
 	the runtime cannot see statements, as it's a concept that the compiler is designed around, but it's important to know nonetheless.<br>
 	<br>
-	the stack array is dynamically reallocated when it needs to be, meaning that a stack overflow isn't possible in pure mercury code.<br>
+	the stack array is dynamically reallocated when it needs to be, meaning that a stack overflow isn't possible in the mercury interpreter (though your system can still overflow if too many calls are nested).<br>
 	</p>
 	
 	<p class="codeblock">

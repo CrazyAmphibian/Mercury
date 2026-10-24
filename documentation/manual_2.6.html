@@ -45,17 +45,15 @@
 		mercury_state* M=mercury_newstate(); //creates the state<Br>
 		mercury_populate_table_with_libs(M->enviroment); //adds mercury libraries into the environment<Br>
 		<Br>
-		mercury_string intermediate; //function takes a mercury_string, not a char*<Br>
-		intermediate.ptr = code_to_execute;<Br>
-		intermediate.size = strlen(code_to_execute);<Br>
+		const char* code_to_execute = "print(\"hello, world!\")";<Br>
 		mercury_variable compile_output; //function outputs into a variable, since there's multiple return types.<Br>
-		mercury_compile_mstring(&intermediate,&compile_output); //compile a string as code.<Br>
+		mercury_compile_cstring(code_to_execute,strlen(code_to_execute),&compile_output);<Br>
 		<Br>
 		if(compile_output.type!=M_TYPE_FUNCTION){<Br>
 			&emsp;&emsp;//handle comipler error here<Br>
 		}else{<Br>
-			&emsp;&emsp;M->bytecode = *((mercury_function*)compile_output.data.p);//set the state's bytecode to the function we just compiled<Br>
-			&emsp;&emsp;free(compile_output.data.p); //we no longer need the original struct pointer, but still need its data.<Br>
+			&emsp;&emsp;M->bytecode = ((mercury_function*)compile_output.data.p);//set the state's bytecode to the function we just compiled<Br>
+			&emsp;&emsp;M->bytecode->refrences++; //since the function is being stored by the state.<Br>
 			&emsp;&emsp;while (mercury_stepstate(M)); //run the state's code<Br>
 			&emsp;&emsp;mercury_destroystate(M); //destroy the state once finished. do not do this if you want to keep the data.<Br>
 		}<Br>
