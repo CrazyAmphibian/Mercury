@@ -925,19 +925,21 @@ inline void delete_compiler_function(compiler_function* f){
 
 //appends the bytecode of fadd to fbase, and frees fadd.
 inline bool merge_compiler_functions(compiler_function* fbase, compiler_function* fadd){
-	mercury_int nsiz=fbase->number_instructions + fadd->number_instructions;
-	
-	void* p=realloc(fbase->instructions,sizeof(mercury_opcode)*(nsiz) );
-	if(!p)return false;
-	fbase->instructions = (mercury_opcode*)p;
-	p=realloc(fbase->instruction_tokens,sizeof(mercury_int)*(nsiz) );
-	if(!p)return false;
-	fbase->instruction_tokens = (mercury_int*)p;
-	
-	memcpy(fbase->instructions+fbase->number_instructions,fadd->instructions,sizeof(mercury_opcode)*fadd->number_instructions );
-	memcpy(fbase->instruction_tokens+fbase->number_instructions,fadd->instruction_tokens,sizeof(mercury_int)*fadd->number_instructions );
-	
-	fbase->number_instructions = nsiz;
+	if (fadd->number_instructions) {
+		mercury_int nsiz = fbase->number_instructions + fadd->number_instructions;
+
+		void* p = realloc(fbase->instructions, sizeof(mercury_opcode) * (nsiz));
+		if (!p)return false;
+		fbase->instructions = (mercury_opcode*)p;
+		p = realloc(fbase->instruction_tokens, sizeof(mercury_int) * (nsiz));
+		if (!p)return false;
+		fbase->instruction_tokens = (mercury_int*)p;
+
+		memcpy(fbase->instructions + fbase->number_instructions, fadd->instructions, sizeof(mercury_opcode) * fadd->number_instructions);
+		memcpy(fbase->instruction_tokens + fbase->number_instructions, fadd->instruction_tokens, sizeof(mercury_int) * fadd->number_instructions);
+
+		fbase->number_instructions = nsiz;
+	}
 	if (fadd->errorcode && !fbase->errorcode) {
 		fbase->errorcode = fadd->errorcode;
 		fbase->token_error_num = fadd->token_error_num;
@@ -948,19 +950,21 @@ inline bool merge_compiler_functions(compiler_function* fbase, compiler_function
 
 //like above, but does not free fadd
 inline bool merge_compiler_functions_nofree(compiler_function* fbase, const compiler_function* fadd) {
-	mercury_int nsiz = fbase->number_instructions + fadd->number_instructions;
+	if (fadd->number_instructions) {
+		mercury_int nsiz = fbase->number_instructions + fadd->number_instructions;
 
-	void* p = realloc(fbase->instructions, sizeof(mercury_opcode) * (nsiz));
-	if (!p)return false;
-	fbase->instructions = (mercury_opcode*)p;
-	p = realloc(fbase->instruction_tokens, sizeof(mercury_int) * (nsiz));
-	if (!p)return false;
-	fbase->instruction_tokens = (mercury_int*)p;
+		void* p = realloc(fbase->instructions, sizeof(mercury_opcode) * (nsiz));
+		if (!p)return false;
+		fbase->instructions = (mercury_opcode*)p;
+		p = realloc(fbase->instruction_tokens, sizeof(mercury_int) * (nsiz));
+		if (!p)return false;
+		fbase->instruction_tokens = (mercury_int*)p;
 
-	memcpy(fbase->instructions + fbase->number_instructions, fadd->instructions, sizeof(mercury_opcode) * fadd->number_instructions);
-	memcpy(fbase->instruction_tokens + fbase->number_instructions, fadd->instruction_tokens, sizeof(mercury_int) * fadd->number_instructions);
-
+		memcpy(fbase->instructions + fbase->number_instructions, fadd->instructions, sizeof(mercury_opcode) * fadd->number_instructions);
+		memcpy(fbase->instruction_tokens + fbase->number_instructions, fadd->instruction_tokens, sizeof(mercury_int) * fadd->number_instructions);
 	fbase->number_instructions = nsiz;
+	}
+
 	if (fadd->errorcode && !fbase->errorcode) {
 		fbase->errorcode = fadd->errorcode;
 		fbase->token_error_num = fadd->token_error_num;
@@ -1223,7 +1227,7 @@ inline void add_string_onto_stack(compiler_function* f,char* s,mercury_int len,m
 
 //forward refrences for other complex functions
 mercury_int m_compile_read_var_statment(compiler_function* f, compiler_token* tokens, mercury_int num_tokens, mercury_int token_offset, compiler_info* i, compiler_function* postfix_function = nullptr);
-compiler_function* mercury_compile_tokens_to_bytecode(compiler_token* tokens, mercury_int num_tokens, mercury_int token_offset = 0, mercury_int* tokens_used = nullptr, compiler_info* ci = nullptr);
+compiler_function* mercury_compile_tokens_to_bytecode(compiler_token* tokens, mercury_int num_tokens, mercury_int token_offset = 0, mercury_int* tokens_used = nullptr, compiler_info* ci = nullptr, compiler_function* in=nullptr);
 
 
 mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset,compiler_info* i){
@@ -1567,21 +1571,19 @@ mercury_int m_compile_read_variable(compiler_function* f, compiler_token* tokens
 
 		add_instruction(&funcargreadf,M_OPCODE_CLS,0); //discards extra args in
 		mercury_int toks_consumed=0;
-		compiler_function* ff = mercury_compile_tokens_to_bytecode(tokens, num_tokens, token_offset,&toks_consumed);
-		if (!ff) {
-			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
-			f->token_error_num = token_offset;
-			return 0;
-		}
-		if(ff->errorcode){
-			f->errorcode=ff->errorcode;
-			f->token_error_num=ff->token_error_num;
+		compiler_function ff;
+		memset(&ff, 0, sizeof(ff));
+		mercury_compile_tokens_to_bytecode(tokens, num_tokens, token_offset, &toks_consumed, nullptr, &ff);
+		if(ff.errorcode){
+			f->errorcode=ff.errorcode;
+			f->token_error_num=ff.token_error_num;
 			return 0;
 		}
 		token_offset += toks_consumed;
 		merge_compiler_functions_nofree(f, &funcargreadf);
 		clear_compiler_function(&funcargreadf);
-		merge_compiler_functions(f,ff);
+		merge_compiler_functions_nofree(f,&ff);
+		clear_compiler_function(&ff);
 		add_instruction(f, M_OPCODE_EXIT, token_offset);
 		//*sizeoffunction = f->number_instructions-initial_bytecode_size;
 		*(binarydata*)(f->instructions + initial_bytecode_size - MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE) = f->number_instructions - initial_bytecode_size;
@@ -2578,13 +2580,18 @@ mercury_int m_compile_parse_while_loop(compiler_function* f, compiler_token* tok
 	while(true){
 		mercury_int consumed=0;
 		ci->additional_instructions=oci.additional_instructions+f->number_instructions;
-		compiler_function* bf=mercury_compile_tokens_to_bytecode(tokens,num_tokens,token_offset , &consumed,ci);
-		if(bf->errorcode){
-			f->errorcode=bf->errorcode;
-			f->token_error_num=bf->token_error_num;
+		compiler_function bf;
+		memset(&bf, 0, sizeof(bf));
+		mercury_compile_tokens_to_bytecode(tokens, num_tokens, token_offset, &consumed, ci, &bf);
+		if (bf.errorcode) {
+			f->errorcode=bf.errorcode;
+			f->token_error_num=bf.token_error_num;
 			return 0;
 		}
-		merge_compiler_functions(f,bf);
+		
+		merge_compiler_functions_nofree(f,&bf);
+		clear_compiler_function(&bf);
+		
 		token_offset+=consumed;
 		
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -2677,13 +2684,16 @@ mercury_int m_compile_parse_if_statement(compiler_function* f, compiler_token* t
 	while(true){
 		mercury_int consumed=0;
 		ci->additional_instructions=oci.additional_instructions+f->number_instructions;
-		compiler_function* bf=mercury_compile_tokens_to_bytecode(tokens,num_tokens,token_offset , &consumed,ci);
-		if(bf->errorcode){
-			f->errorcode=bf->errorcode;
-			f->token_error_num=bf->token_error_num;
+		compiler_function bf;
+		memset(&bf, 0, sizeof(bf));
+		mercury_compile_tokens_to_bytecode(tokens, num_tokens, token_offset, &consumed, ci,&bf);
+		if(bf.errorcode){
+			f->errorcode=bf.errorcode;
+			f->token_error_num=bf.token_error_num;
 			return 0;
 		}
-		merge_compiler_functions(f,bf);
+		merge_compiler_functions_nofree(f,&bf);
+		clear_compiler_function(&bf);
 		token_offset+=consumed;
 		
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -2810,8 +2820,14 @@ mercury_int m_compile_read_keyword_block(compiler_function* f, compiler_token* t
 
 
 
-compiler_function* mercury_compile_tokens_to_bytecode(compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* tokens_used, compiler_info* ci){
-	compiler_function* out = new_compiler_function();
+compiler_function* mercury_compile_tokens_to_bytecode(compiler_token* tokens,mercury_int num_tokens,mercury_int token_offset, mercury_int* tokens_used, compiler_info* ci, compiler_function* in){
+	compiler_function* out;
+	if (in) {
+		out = in;
+	}
+	else {
+		out = new_compiler_function();
+	}
 	if(!out)return nullptr;
 	mercury_int initial_offset=token_offset;
 	bool ci_was_defined=false;
