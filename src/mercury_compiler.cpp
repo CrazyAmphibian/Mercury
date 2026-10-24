@@ -2943,28 +2943,30 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 	
 	mercury_int num_tokens;
 	compiler_token* tokens = mercury_compile_tokenize_mstring(str,&num_tokens);
-	compiler_function* func = mercury_compile_tokens_to_bytecode(tokens,num_tokens,0);
+	compiler_function func;
+	memset(&func, 0, sizeof(func));
+	mercury_compile_tokens_to_bytecode(tokens, num_tokens, 0, nullptr, nullptr, &func);
 
-	if (func->errorcode) {
+	if (func.errorcode) {
 		int req_chars;
 		char* buffer=nullptr;
 
 		char pbuf[512];
 
-		if (func->token_error_num >= num_tokens) {
+		if (func.token_error_num >= num_tokens) {
 #ifdef MERCURY_DEBUG
-			printf("DEBUG/error|compiler: error registered at token %zi, but we only have %zi avalible.\n", func->token_error_num, num_tokens);
+			printf("DEBUG/error|compiler: error registered at token %zi, but we only have %zi avalible.\n", func.token_error_num, num_tokens);
 #endif
-			func->token_error_num = num_tokens - 1;
+			func.token_error_num = num_tokens - 1;
 		}
-		else if (func->token_error_num < 0) {
+		else if (func.token_error_num < 0) {
 #ifdef MERCURY_DEBUG
-			printf("DEBUG/error|compiler: error registered at token %zi when the minimum is 0\n", func->token_error_num);
+			printf("DEBUG/error|compiler: error registered at token %zi when the minimum is 0\n", func.token_error_num);
 #endif
-			func->token_error_num = 0;
+			func.token_error_num = 0;
 		}
 
-		compiler_token* etok = tokens+func->token_error_num;
+		compiler_token* etok = tokens+func.token_error_num;
 		char* ts=(char*)malloc(etok->num_chars+1);
 		if (!ts)return;
 		memcpy(ts, etok->chars, etok->num_chars);
@@ -2976,7 +2978,7 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 #endif
 		const char* reason;
 
-		switch (func->errorcode) {	
+		switch (func.errorcode) {	
 			case M_COMPERR_MEMORY_ALLOCATION:
 				reason = "failed to allocate memory";
 				break;
@@ -3043,22 +3045,22 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 		mercury_debug_token* dts=nullptr;
 
 		if (!remove_debug_info) {
-			nmf->instruction_dbg_lookup = (mercury_uint*)malloc(sizeof(mercury_uint) * func->number_instructions);
+			nmf->instruction_dbg_lookup = (mercury_uint*)malloc(sizeof(mercury_uint) * func.number_instructions);
 			if (!(nmf->instruction_dbg_lookup))return;
 			
 
-			for (mercury_int i = 0; i < func->number_instructions; i++) {
-				mercury_int toknum = func->instruction_tokens[i];
+			for (mercury_int i = 0; i < func.number_instructions; i++) {
+				mercury_int toknum = func.instruction_tokens[i];
 
 				if (toknum >= num_tokens) {
 #ifdef MERCURY_DEBUG
-					printf("DEBUG/error|compiler: instruction #%zi (%hi/%hx) was assigned by token %zi, but we only have %zi avalible.\n", i, func->instructions[i], func->instructions[i], toknum, num_tokens);
+					printf("DEBUG/error|compiler: instruction #%zi (%hi/%hx) was assigned by token %zi, but we only have %zi avalible.\n", i, func.instructions[i], func.instructions[i], toknum, num_tokens);
 #endif
 					toknum = num_tokens - 1;
 				}
 				nmf->instruction_dbg_lookup[i] = toknum;
 			}
-			free(func->instruction_tokens);
+			free(func.instruction_tokens);
 
 			nmf->dbg_tokens = (mercury_debug_token*)malloc(sizeof(mercury_debug_token) * num_tokens);
 			for (mercury_int i = 0; i < num_tokens; i++) {
@@ -3098,10 +3100,8 @@ void mercury_compile_mstring(mercury_string* str, mercury_variable* out, bool re
 
 		nmf->enviromental = false;
 		nmf->refrences = 0;
-		nmf->instructions = func->instructions;
-		nmf->numberofinstructions = func->number_instructions;
-		
-		free(func);
+		nmf->instructions = func.instructions;
+		nmf->numberofinstructions = func.number_instructions;
 
 		out->data.p = nmf;
 		out->type = M_TYPE_FUNCTION;
