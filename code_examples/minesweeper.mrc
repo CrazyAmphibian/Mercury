@@ -47,7 +47,7 @@ end
 
 global reveal_tile=function(x,y,flag)
 	if !!xy_is_valid(x,y) then return end
-	if flag==nil then flag=10 end
+	if flag==nil then flag=50 end
 	local idx=(x+(y*global size_x))
 	if visible[idx]!=VISIBLE_UNKNOWN then return end
 	if gameboard[idx] then 
