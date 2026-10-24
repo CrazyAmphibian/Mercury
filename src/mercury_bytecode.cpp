@@ -1329,20 +1329,66 @@ void M_BYTECODE_CNCT(mercury_state* const M_CPP_restrict M) { // CoNCaTenate
 		}
 	}
 
-	mercury_string* s3 = mercury_mstrings_concat(s1, s2);
+	if (s1->constant || s1->refrences) { //standard concatenation code.
+		if (s2->refrences) {//standard concatenation code.
+			mercury_string* s3 = mercury_mstrings_concat(s1, s2);
 
-	if (st->type != M_TYPE_STRING)mercury_mstring_delete(s2);
-	if (ss->type != M_TYPE_STRING)mercury_mstring_delete(s1);
+			if (st->type != M_TYPE_STRING)mercury_mstring_delete(s2);
+			if (ss->type != M_TYPE_STRING)mercury_mstring_delete(s1);
 
-	if (!s3) {
-		mercury_raise_error(M, M_ERROR_ALLOCATION);
-		return;
+			if (!s3) {
+				if (st->type != M_TYPE_STRING)mercury_mstring_delete(s2);
+				if (ss->type != M_TYPE_STRING)mercury_mstring_delete(s1);
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
+				return;
+			}
+
+			mercury_release_var(st);
+			mercury_release_var(ss);
+			ss->data.p = s3;
+			ss->type = M_TYPE_STRING;
+		}
+		else { //if the second string will be freed, we can re-use its struct to save on a single allocation call.
+
+			char* nptr= (char*)malloc(s1->size + s2->size);
+			if (!nptr) {
+				if (st->type != M_TYPE_STRING)mercury_mstring_delete(s2);
+				if (ss->type != M_TYPE_STRING)mercury_mstring_delete(s1);
+				mercury_raise_error(M, M_ERROR_ALLOCATION);
+				return;
+			}
+			memcpy(nptr,s1->ptr,s1->size);
+			memcpy(nptr+s1->size,s2->ptr,s2->size);
+			if (!s2->constant)free(s2->ptr); //free the pointer if needed.
+			s2->ptr = nptr;
+			s2->constant = false;
+			s2->refrences = 0;
+			s2->size += s1->size;
+			if (ss->type != M_TYPE_STRING)mercury_mstring_delete(s1);
+			mercury_release_var(ss);
+			//do not release st, as we are using that data.
+			ss->type = M_TYPE_STRING;
+			ss->data.p = s2;
+		}
 	}
+	else { //if the first string is destined to be freed, we can use it and append to save a couple allocations
+		if (!mercury_mstrings_append(s1, s2)) {
+			if (st->type != M_TYPE_STRING)mercury_mstring_delete(s2);
+			if (ss->type != M_TYPE_STRING)mercury_mstring_delete(s1);
+			mercury_raise_error(M, M_ERROR_ALLOCATION);
+			return;
+		}
+		
+		if (st->type != M_TYPE_STRING)mercury_mstring_delete(s2);
 
-	mercury_release_var(st);
-	mercury_release_var(ss);
-	ss->data.p = s3;
-	ss->type = M_TYPE_STRING;
+		mercury_release_var(st);
+		if (ss->type != M_TYPE_STRING) { //if not a string, replace it. otherwise the changes will naturally propigate because pointers.
+			mercury_release_var(ss);
+			ss->data.p = s1;
+			ss->type = M_TYPE_STRING;
+		}
+	}
+	
 	M->sizeofstack--;
 	return;
 }
