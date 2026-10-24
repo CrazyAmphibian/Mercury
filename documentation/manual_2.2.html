@@ -24,7 +24,7 @@
 
 <div>
 	<h3>the state</h3>
-	<p>the mercury runtime operates on 1 state at a time. this state stores everything, from variables to bytecode.</p>
+	<p>the mercury runtime operates on 1 state at a time per thread. this state stores everything, from variables to bytecode.</p>
 	<p class="codeblock">
 	struct mercury_state {<br>
 	mercury_state* parentstate = nullptr; <br>
