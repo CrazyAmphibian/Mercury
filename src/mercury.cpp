@@ -515,13 +515,7 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 	newstate->programcounter = 0;
 	newstate->errorcode = 0;
 
-	newstate->bytecode.enviromental = true;
-	newstate->bytecode.instructions = nullptr;
-	newstate->bytecode.numberofinstructions = 0;
-	newstate->bytecode.refrences = 0xFFFF;
-	newstate->bytecode.dbg_tokens = nullptr;
-	newstate->bytecode.num_dbg_tokens = 0;
-	newstate->bytecode.instruction_dbg_lookup = nullptr;
+	newstate->bytecode = nullptr;
 
 	//newstate->numberofinstructions = 0;
 	//newstate->instructions = nullptr;
@@ -532,9 +526,9 @@ mercury_state* mercury_newstate(const mercury_state* const parent) {
 
 
 bool mercury_stepstate(mercury_state* const M_CPP_restrict M) {
-	if (M->programcounter >= M->bytecode.numberofinstructions) return false;
+	if (M->programcounter >= M->bytecode->numberofinstructions) return false;
 
-	mercury_opcode opcode = M->bytecode.instructions[M->programcounter];
+	mercury_opcode opcode = M->bytecode->instructions[M->programcounter];
 
 	//printf("%i - %i %i\n", M->programcounter,iflags,opcode);
 	M->programcounter++;
@@ -606,8 +600,13 @@ void mercury_destroystate(mercury_state* const M_CPP_restrict M) {
 	free(M->stack);
 
 	//if (M->enviroment)mercury_destroytable(M->enviroment);
-	M->bytecode.refrences--;
-	if(!M->bytecode.refrences)mercury_clear_function(&M->bytecode);
+	if (M->bytecode) {
+		M->bytecode->refrences--;
+		if (!M->bytecode->refrences) {
+			mercury_clear_function(M->bytecode);
+			free(M->bytecode);
+		}
+	}
 
 	if (M->masterstate == M && M->registers) {
 		free(M->registers);

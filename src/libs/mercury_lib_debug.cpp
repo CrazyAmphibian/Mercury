@@ -61,7 +61,7 @@ void m_output_state(mercury_state* M, mercury_int* l,bool is_cur) {
 	for (mercury_int i = 0; i < *l; i++) {
 		putchar('\t');
 	}
-	printf("state 0x%p instruction pool: 0x%p [%zu/%zu] %s %s\n",M,M->bytecode.instructions,M->programcounter,M->bytecode.numberofinstructions,M==M->masterstate?"<MASTER> " :"", is_cur?"<CURRENT>" :"");
+	printf("state 0x%p instruction pool: 0x%p [%zu/%zu] %s %s\n",M,M->bytecode->instructions,M->programcounter,M->bytecode->numberofinstructions,M==M->masterstate?"<MASTER> " :"", is_cur?"<CURRENT>" :"");
 	(*l)++;
 }
 
@@ -185,8 +185,8 @@ void mercury_lib_debug_bytecode_dbg(mercury_state* const M_CPP_restrict M, const
 	}
 	else {
 
-		printf("state %p bytecode (%zi/%zu)\n", M, M->programcounter, M->bytecode.numberofinstructions);
-		mercury_string* l = mercury_get_bytecode_debug(&M->bytecode);
+		printf("state %p bytecode (%zi/%zu)\n", M, M->programcounter, M->bytecode->numberofinstructions);
+		mercury_string* l = mercury_get_bytecode_debug(M->bytecode);
 		for (mercury_int i = 0; i < l->size; i++) {
 			putchar(l->ptr[i]);
 		}
@@ -218,8 +218,8 @@ void mercury_lib_debug_bytecode_rawbinary_dbg(mercury_state* const M_CPP_restric
 	}
 	else {
 
-		printf("state %p bytecode (%zi/%zu)\n", M, M->programcounter, M->bytecode.numberofinstructions);
-		mercury_string* l = mercury_get_bytecode_rawbinary_debug(&M->bytecode);
+		printf("state %p bytecode (%zi/%zu)\n", M, M->programcounter, M->bytecode->numberofinstructions);
+		mercury_string* l = mercury_get_bytecode_rawbinary_debug(M->bytecode);
 		for (mercury_int i = 0; i < l->size; i++) {
 			putchar(l->ptr[i]);
 		}
@@ -296,10 +296,10 @@ void mercury_lib_debug_dump_debug_info_dbg(mercury_state* const M_CPP_restrict M
 	}
 	else {
 
-		mercury_debug_token* toks = M->bytecode.dbg_tokens;
+		mercury_debug_token* toks = M->bytecode->dbg_tokens;
 		printf("state %p debug info:\n", M);
 		if (toks) {
-			for (mercury_uint i = 0; i < M->bytecode.num_dbg_tokens; i++) {
+			for (mercury_uint i = 0; i < M->bytecode->num_dbg_tokens; i++) {
 				mercury_debug_token t = toks[i];
 				printf("%zu] ln:%zi col:%zi ", i, t.line, t.col);
 				for (mercury_int c = 0; c < t.num_chars; c++) {

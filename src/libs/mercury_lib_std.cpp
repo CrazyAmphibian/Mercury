@@ -74,13 +74,13 @@ void mercury_lib_std_iterate(mercury_state* const M_CPP_restrict M, const mercur
 		mercury_raise_error(M, M_ERROR_ALLOCATION);
 		return;
 	}
-	mercury_function previous = SubM->bytecode;
+	mercury_function* previous = SubM->bytecode;
 
 	mercury_increment_variable_refrence_count(&function);
 	mercury_increment_variable_refrence_count(&listlike);
 	
 	if (function.type == M_TYPE_FUNCTION) {
-		SubM->bytecode = *((mercury_function*)function.data.p);
+		SubM->bytecode = ((mercury_function*)function.data.p);
 	}
 
 	if (listlike.type == M_TYPE_ARRAY) {
@@ -291,12 +291,12 @@ void mercury_lib_std_restricted_call(mercury_state* const M_CPP_restrict M, cons
 	}
 	mercury_destroytable(iso_M->enviroment);
 	iso_M->enviroment = (mercury_table*)tab.data.p;
-	mercury_function oldfunc = iso_M->bytecode;
+	mercury_function* oldfunc = iso_M->bytecode;
 	for (mercury_int i = 0; i < args_in - 2; i++) {
 		mercury_pushstack(iso_M, argt+i);
 	}
 	if (func.type == M_TYPE_FUNCTION) {
-		iso_M->bytecode = *(mercury_function*)func.data.p;
+		iso_M->bytecode = (mercury_function*)func.data.p;
 	}
 
 	mercury_variable out;

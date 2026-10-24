@@ -194,8 +194,7 @@ int main(int argc, char** argv) {
 
 		M->programcounter = 0;
 		compiled->refrences = 1;
-		M->bytecode = *compiled;
-		free(compiled);
+		M->bytecode = compiled;
 		/*
 		M->bytecode.instructions = compiled->instructions;
 		M->bytecode.numberofinstructions = compiled->numberofinstructions;
@@ -214,10 +213,10 @@ int main(int argc, char** argv) {
 			M->programcounter = 0; //clear bytecode
 			free(code);
 			code = nullptr;
-			M->bytecode.numberofinstructions = 0;
 
-			mercury_clear_function(&M->bytecode);
-			
+			mercury_clear_function(M->bytecode);
+			free(M->bytecode);
+			M->bytecode = nullptr;
 
 			while (M->sizeofstack) { //clear stack
 				mercury_discard_top_of_stack(M);

@@ -46,16 +46,16 @@ mercury_string* mercury_get_state_traceback(mercury_state* M) {
 		}
 		memset(prepend, NULL, sizeof(mercury_string));
 
-		if (M->bytecode.instruction_dbg_lookup) {
-			mercury_uint dbg_tok_num = M->bytecode.instruction_dbg_lookup[M->programcounter - 1];
+		if (M->bytecode->instruction_dbg_lookup) {
+			mercury_uint dbg_tok_num = M->bytecode->instruction_dbg_lookup[M->programcounter - 1];
 			mercury_debug_token T, T_n, T_p;
 			bool next = false;
 			bool prev = false;
 			if (dbg_tok_num)prev = true;
-			if (dbg_tok_num + 1 < M->bytecode.num_dbg_tokens)next = true;
-			T = M->bytecode.dbg_tokens[dbg_tok_num];
-			if (prev)T_p = M->bytecode.dbg_tokens[dbg_tok_num - 1];
-			if (next)T_n = M->bytecode.dbg_tokens[dbg_tok_num + 1];
+			if (dbg_tok_num + 1 < M->bytecode->num_dbg_tokens)next = true;
+			T = M->bytecode->dbg_tokens[dbg_tok_num];
+			if (prev)T_p = M->bytecode->dbg_tokens[dbg_tok_num - 1];
+			if (next)T_n = M->bytecode->dbg_tokens[dbg_tok_num + 1];
 
 
 			char* tchars = (char*)malloc(T.num_chars + 1);
@@ -252,7 +252,7 @@ void mercury_raise_error(mercury_state* M, const uint32_t errorcode, const mercu
 
 	while (M) {
 		M->errorcode = errorcode;
-		M->programcounter = M->bytecode.numberofinstructions; //push to end to stop execution
+		M->programcounter = M->bytecode->numberofinstructions; //push to end to stop execution
 		M = M->parentstate;
 	}
 }

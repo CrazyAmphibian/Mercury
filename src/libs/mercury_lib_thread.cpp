@@ -141,13 +141,13 @@ void mercury_lib_thread_new(mercury_state* const M_CPP_restrict M, const mercury
 	if (t->state) {
 		//t->state->bytecode.numberofinstructions = ((mercury_function*)func_var.data.p)->numberofinstructions;
 		//t->state->bytecode.instructions = ((mercury_function*)func_var.data.p)->instructions;
-		mercury_clone_function((mercury_function*)func_var.data.p,&(t->state->bytecode));
-		if (((mercury_function*)func_var.data.p)->numberofinstructions != t->state->bytecode.numberofinstructions) {
+		mercury_clone_function((mercury_function*)func_var.data.p,t->state->bytecode);
+		if (((mercury_function*)func_var.data.p)->numberofinstructions != t->state->bytecode->numberofinstructions) {
 			mercury_raise_error(M, M_ERROR_ALLOCATION);
 			MERCURY_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 			return;
 		}
-		t->state->bytecode.refrences = 1;
+		t->state->bytecode->refrences = 1;
 		if (vart) {
 			for (mercury_int i = 0; i < args_in - 2; i++) {
 				mercury_pushstack(t->state, vart+i);
@@ -404,7 +404,7 @@ void mercury_lib_thread_break(mercury_state* const M_CPP_restrict M, const mercu
 	mercury_threadholder* t = (mercury_threadholder*)in.data.p;
 	if (!t->finished) {
 		t->state->errorcode = M_ERROR_EXECUTION_ABORT;
-		t->state->programcounter = t->state->bytecode.numberofinstructions;
+		t->state->programcounter = t->state->bytecode->numberofinstructions;
 	}
 
 	mercury_release_var(&in);

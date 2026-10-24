@@ -2173,8 +2173,8 @@ void mercury_lib_string_match_function(mercury_state* const M_CPP_restrict M, co
 	}
 	memset(out_str, 0, sizeof(mercury_string));
 
-	mercury_function previous = SubM->bytecode;
-	SubM->bytecode = *((mercury_function*)var_func.data.p);
+	mercury_function* previous = SubM->bytecode;
+	SubM->bytecode = ((mercury_function*)var_func.data.p);
 	mercury_variable out;
 
 	mercury_string* base_str = (mercury_string*)var_str.data.p;
@@ -2294,8 +2294,8 @@ void mercury_lib_string_p_match_function(mercury_state* const M_CPP_restrict M, 
 	}
 	memset(out_str, 0, sizeof(mercury_string));
 
-	mercury_function previous = SubM->bytecode;
-	SubM->bytecode = *((mercury_function*)var_func.data.p);
+	mercury_function* previous = SubM->bytecode;
+	SubM->bytecode = ((mercury_function*)var_func.data.p);
 	mercury_variable out;
 
 	mercury_string* base_str = (mercury_string*)var_str.data.p;

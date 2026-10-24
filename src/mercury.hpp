@@ -221,10 +221,10 @@ struct mercury_state {
 	mercury_uint num_constants = 0;
 
 	mercury_uint programcounter = 0;
-	mercury_function bytecode;
-	uint32_t errorcode;
+	mercury_function* bytecode = nullptr;
+	uint32_t errorcode = 0;
 
-	mercury_table* enviroment;
+	mercury_table* enviroment = nullptr;
 
 };
 
