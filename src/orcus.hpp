@@ -70,7 +70,7 @@ struct orcus_variable {
 
 struct orcus_string {
 	orcus_int size=0;
-	orcus_uint refrences = 0;
+	orcus_uint references = 0;
 	char* ptr = nullptr;
 	bool constant = false; //if true, ptr points to another char*, and so we should not free it. optimization to reduce malloc calls.
 };
@@ -83,7 +83,7 @@ struct orcus_subtable {
 
 struct orcus_table {
 	orcus_subtable* data;
-	orcus_uint refrences = 0;
+	orcus_uint references = 0;
 	bool enviromental = false;
 };
 
@@ -98,7 +98,7 @@ struct orcus_debug_token {
 };
 
 struct orcus_array { //gee bill, two storage types?
-	orcus_uint refrences = 0;
+	orcus_uint references = 0;
 #ifdef ORCUS_64BIT
 	orcus_variable****** values = nullptr; //array of arrays of arrays of arrays of arrays of arrays of pointers to structs.  array ->  array ->  array ->  array -> array -> array -> struct*. who needs efficency, anyways? hey look pal, you wanted 64 bit indexes, you're gonna get 64 bit indexes.
 #else
@@ -184,7 +184,7 @@ inline orcus_int orcus_reconstruct_array_index(int i1, int i2, int i3) {
 #endif
 
 struct orcus_function {
-	orcus_uint refrences = 0;
+	orcus_uint references = 0;
 	orcus_uint numberofinstructions = 0;
 	orcus_opcode* instructions = nullptr;
 	bool enviromental = false;
@@ -199,7 +199,7 @@ enum ORCUS_FILEFLAGS :uint8_t { //append and extended mode doesn't really impact
 };
 
 struct orcus_filewrapper {
-	orcus_uint refrences = 0;
+	orcus_uint references = 0;
 	FILE* file;
 	uint8_t modeflags;
 };
@@ -230,7 +230,7 @@ struct orcus_state {
 
 
 struct orcus_threadholder {
-	orcus_uint refrences = 0;
+	orcus_uint references = 0;
 	volatile bool finished = false; //it could change, you know.
 	bool customenv = false;
 #ifdef _WIN32
@@ -271,8 +271,8 @@ struct orcus_libdef {
 	const char* table = nullptr;
 };
 
-extern orcus_libdef* M_LIBS;
-extern orcus_int M_NUM_LIBS;
+extern orcus_libdef* ORCUS_LIBS;
+extern orcus_int ORCUS_NUM_LIBS;
 
 //functions defined in the .cpp
 
@@ -384,22 +384,22 @@ inline void orcus_increment_variable_refrence_count(const orcus_variable* const 
 	case ORCUS_TYPE_BOOL:
 		return;
 	case ORCUS_TYPE_STRING:
-		((orcus_string*)var->data.p)->refrences++;
+		((orcus_string*)var->data.p)->references++;
 		return;
 	case ORCUS_TYPE_TABLE:
-		((orcus_table*)var->data.p)->refrences++;
+		((orcus_table*)var->data.p)->references++;
 		return;
 	case ORCUS_TYPE_ARRAY:
-		((orcus_array*)var->data.p)->refrences++;
+		((orcus_array*)var->data.p)->references++;
 		return;
 	case ORCUS_TYPE_FUNCTION:
-		((orcus_function*)var->data.p)->refrences++;
+		((orcus_function*)var->data.p)->references++;
 		return;
 	case ORCUS_TYPE_FILE:
-		((orcus_filewrapper*)var->data.p)->refrences++;
+		((orcus_filewrapper*)var->data.p)->references++;
 		return;
 	case ORCUS_TYPE_THREAD:
-		((orcus_threadholder*)var->data.p)->refrences++;
+		((orcus_threadholder*)var->data.p)->references++;
 		return;
 	}
 }
@@ -411,22 +411,22 @@ inline void orcus_decrement_variable_refrence_count(const orcus_variable* const 
 	case ORCUS_TYPE_BOOL:
 		return;
 	case ORCUS_TYPE_STRING:
-		((orcus_string*)var->data.p)->refrences--;
+		((orcus_string*)var->data.p)->references--;
 		return;
 	case ORCUS_TYPE_TABLE:
-		((orcus_table*)var->data.p)->refrences--;
+		((orcus_table*)var->data.p)->references--;
 		return;
 	case ORCUS_TYPE_ARRAY:
-		((orcus_array*)var->data.p)->refrences--;
+		((orcus_array*)var->data.p)->references--;
 		return;
 	case ORCUS_TYPE_FUNCTION:
-		((orcus_function*)var->data.p)->refrences--;
+		((orcus_function*)var->data.p)->references--;
 		return;
 	case ORCUS_TYPE_FILE:
-		((orcus_filewrapper*)var->data.p)->refrences--;
+		((orcus_filewrapper*)var->data.p)->references--;
 		return;
 	case ORCUS_TYPE_THREAD:
-		((orcus_threadholder*)var->data.p)->refrences--;
+		((orcus_threadholder*)var->data.p)->references--;
 		return;
 	}
 }

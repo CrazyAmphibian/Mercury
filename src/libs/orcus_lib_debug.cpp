@@ -237,22 +237,22 @@ void orcus_lib_debug_refcount_dbg(orcus_state* const ORCUS_CPP_restrict M, const
 
 	switch (in.type) {
 		case ORCUS_TYPE_STRING:
-			printf("string has %zu refrences.\n", ((orcus_string*)in.data.p)->refrences);
+			printf("string has %zu references.\n", ((orcus_string*)in.data.p)->references);
 			break;
 		case ORCUS_TYPE_TABLE:
-			printf("table has %zu refrences.\n", ((orcus_table*)in.data.p)->refrences);
+			printf("table has %zu references.\n", ((orcus_table*)in.data.p)->references);
 			break;
 		case ORCUS_TYPE_ARRAY:
-			printf("array has %zu refrences.\n", ((orcus_array*)in.data.p)->refrences);
+			printf("array has %zu references.\n", ((orcus_array*)in.data.p)->references);
 			break;
 		case ORCUS_TYPE_FUNCTION:
-			printf("function has %zu refrences.\n", ((orcus_function*)in.data.p)->refrences);
+			printf("function has %zu references.\n", ((orcus_function*)in.data.p)->references);
 			break;
 		case ORCUS_TYPE_THREAD:
-			printf("thread has %zu refrences.\n", ((orcus_threadholder*)in.data.p)->refrences);
+			printf("thread has %zu references.\n", ((orcus_threadholder*)in.data.p)->references);
 			break;
 		case ORCUS_TYPE_FILE:
-			printf("file has %zu refrences.\n", ((orcus_filewrapper*)in.data.p)->refrences);
+			printf("file has %zu references.\n", ((orcus_filewrapper*)in.data.p)->references);
 			break;
 		default:
 			printf("type is not refcounted.\n");

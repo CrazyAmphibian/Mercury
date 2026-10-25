@@ -119,7 +119,7 @@ void orcus_lib_io_open(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 			fclose(F);
 			return;
 		}
-		fw->refrences = 0;
+		fw->references = 0;
 		fw->modeflags = flags;
 		fw->file = F;
 
@@ -222,7 +222,7 @@ void orcus_lib_io_read(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 			}
 			str->ptr = s;
 			str->size = num_r;
-			str->refrences = 0;
+			str->references = 0;
 			str->constant = false;
 			out.type = ORCUS_TYPE_STRING;
 			out.data.p = str;
@@ -1234,7 +1234,7 @@ void orcus_lib_io_serialize(orcus_state* const ORCUS_CPP_restrict M, const orcus
 		}
 		str->ptr = (char*)chars;
 		str->constant = false;
-		str->refrences = 1;
+		str->references = 1;
 		str->size = num_chars;
 		out.data.p = str;
 		out.type = ORCUS_TYPE_STRING;
@@ -1335,7 +1335,7 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->refrences = 1;
+			str->references = 1;
 			out->type = ORCUS_TYPE_STRING;
 			out->data.p = str;
 			}
@@ -1347,7 +1347,7 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->refrences = 1;
+			str->references = 1;
 			str->size = 1;
 			str->ptr = (char*)malloc(1);
 			if (!str->ptr) { free(str); return false; }
@@ -1369,7 +1369,7 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->refrences = 1;
+			str->references = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1391,7 +1391,7 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->refrences = 1;
+			str->references = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1413,7 +1413,7 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->refrences = 1;
+			str->references = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1435,7 +1435,7 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->refrences = 1;
+			str->references = 1;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1572,7 +1572,7 @@ void orcus_lib_io_cwd(orcus_state* const ORCUS_CPP_restrict M, const orcus_int a
 		}
 		str->constant = false;
 		str->ptr = buffer;
-		str->refrences = 0;
+		str->references = 0;
 		str->size = strlen(buffer);
 
 		orcus_variable nvar;
@@ -1628,7 +1628,7 @@ void orcus_lib_io_executabledirectory(orcus_state* const ORCUS_CPP_restrict M, c
 		}
 		str->constant = false;
 		str->ptr = buffer;
-		str->refrences = 0;
+		str->references = 0;
 		str->size = strlen(buffer);
 
 		orcus_variable nvar;
@@ -1704,7 +1704,7 @@ void orcus_lib_io_userdirectory(orcus_state* const ORCUS_CPP_restrict M, const o
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 			return;
 		}
-		str->refrences = 0;
+		str->references = 0;
 
 #ifdef _WIN32
 		str->constant = false;

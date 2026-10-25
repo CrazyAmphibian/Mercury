@@ -52,7 +52,7 @@ orcus_string* orcus_cstring_const_to_mstring(const char* const ORCUS_CPP_restric
 	nstr->size = size;
 	nstr->ptr = (char*)str;
 	nstr->constant = true;
-	nstr->refrences = 0;
+	nstr->references = 0;
 	return nstr;
 }
 
@@ -62,7 +62,7 @@ orcus_string* orcus_cstring_promote_to_mstring(char* const ORCUS_CPP_restrict st
 	if (!nstr) return nullptr;
 	nstr->size = size;
 	nstr->constant = false;
-	nstr->refrences = 0;
+	nstr->references = 0;
 	nstr->ptr = str;
 	return nstr;
 }
@@ -87,7 +87,7 @@ orcus_string* orcus_copystring(const orcus_string* const ORCUS_CPP_restrict str)
 		nstr->size = str->size;
 		nstr->constant = true;
 		nstr->ptr = str->ptr;
-		nstr->refrences = 1;
+		nstr->references = 1;
 		return nstr;
 	}
 	else {
@@ -97,7 +97,7 @@ orcus_string* orcus_copystring(const orcus_string* const ORCUS_CPP_restrict str)
 		if (nstr->ptr == nullptr) return nullptr;
 		nstr->size = str->size;
 		nstr->constant = false;
-		nstr->refrences = 0;
+		nstr->references = 0;
 		memcpy(nstr->ptr, str->ptr, str->size * sizeof(char));
 		return nstr;
 	}
@@ -117,7 +117,7 @@ orcus_string* orcus_mstrings_concat(const orcus_string* const str1, const orcus_
 	memcpy(nstr->ptr+str1->size, str2->ptr, str2->size * sizeof(char));
 	nstr->constant = false;
 	nstr->size = str1->size + str2->size;
-	nstr->refrences = 0;
+	nstr->references = 0;
 	return nstr;
 }
 
@@ -189,7 +189,7 @@ orcus_string* orcus_mstring_substring(orcus_string* str, orcus_int start, orcus_
 
 	nstr->size = 1l+end - start;
 	nstr->ptr=(char*)malloc(sizeof(char)*nstr->size);
-	nstr->refrences = 0;
+	nstr->references = 0;
 	nstr->constant = false;
 	if (!nstr->ptr) {
 		nstr->size = 0;
@@ -214,7 +214,7 @@ orcus_table* orcus_newtable() {
 	}
 	*/
 	newt->enviromental = false;
-	newt->refrences = 0;
+	newt->references = 0;
 
 	return newt;
 }
@@ -411,7 +411,7 @@ orcus_int orcus_table_set_cstring_keyvalue(orcus_table* const table, const char*
 	orcus_string* nstr= orcus_cstring_const_to_mstring(key,strlen(key));
 	if (!nstr)return -1;
 
-	nstr->refrences = 1;
+	nstr->references = 1;
 	orcus_increment_variable_refrence_count(value);
 	kv.data.p = nstr;
 	subt.keys[subt.size] = kv;
@@ -452,7 +452,7 @@ orcus_state* orcus_newstate(const orcus_state* const parent) {
 		free(newstate);
 		return nullptr;
 	}
-	newstate->enviroment->refrences = 1;
+	newstate->enviroment->references = 1;
 
 	/*
 	orcus_variable* envvarkey = (orcus_variable*)malloc(sizeof(orcus_variable));
@@ -484,8 +484,8 @@ orcus_state* orcus_newstate(const orcus_state* const parent) {
 		newstate->masterstate = parent->masterstate;
 		newstate->parentstate = (orcus_state*)parent;
 
-		parent->enviroment->refrences+=1;
-		parent->masterstate->enviroment->refrences += 1;
+		parent->enviroment->references+=1;
+		parent->masterstate->enviroment->references += 1;
 	}
 	newstate->childstate = nullptr;
 
@@ -569,8 +569,8 @@ void orcus_clearstate(orcus_state* const ORCUS_CPP_restrict M, bool for_deletion
 		else {
 			M->enviroment->enviromental = false;
 			orcus_cleartable(M->enviroment);
-			M->enviroment->refrences--;
-			if(!M->enviroment->refrences)orcus_destroytable(M->enviroment);
+			M->enviroment->references--;
+			if(!M->enviroment->references)orcus_destroytable(M->enviroment);
 			M->enviroment = nullptr;
 		}
 	}
@@ -592,8 +592,8 @@ void orcus_destroystate(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_clearstate(M,true);
 
 	if (M->parentstate) {
-		M->parentstate->enviroment->refrences -= 1;
-		M->parentstate->masterstate->enviroment->refrences -= 1;
+		M->parentstate->enviroment->references -= 1;
+		M->parentstate->masterstate->enviroment->references -= 1;
 	}
 
 
@@ -601,8 +601,8 @@ void orcus_destroystate(orcus_state* const ORCUS_CPP_restrict M) {
 
 	//if (M->enviroment)orcus_destroytable(M->enviroment);
 	if (M->bytecode) {
-		M->bytecode->refrences--;
-		if (!M->bytecode->refrences) {
+		M->bytecode->references--;
+		if (!M->bytecode->references) {
 			orcus_clear_function(M->bytecode);
 			free(M->bytecode);
 		}
@@ -625,24 +625,24 @@ void orcus_release_var(orcus_variable* const ORCUS_CPP_restrict var) {
 	case ORCUS_TYPE_CFUNC:
 		return;
 	case ORCUS_TYPE_TABLE:
-		if (!((orcus_table*)var->data.p)->refrences) {
+		if (!((orcus_table*)var->data.p)->references) {
 			orcus_destroytable((orcus_table*)var->data.p);
 		}
 		return;
 	case ORCUS_TYPE_STRING:
-		if (!((orcus_string*)var->data.p)->refrences) {
+		if (!((orcus_string*)var->data.p)->references) {
 			orcus_mstring_delete((orcus_string*)var->data.p);
 		}
 		return;
 	case ORCUS_TYPE_ARRAY:
-		if (!((orcus_array*)var->data.p)->refrences) {
+		if (!((orcus_array*)var->data.p)->references) {
 			orcus_destroyarray((orcus_array*)var->data.p);
 		}
 		return;
 	case ORCUS_TYPE_FUNCTION:
 		{
 			orcus_function* ffunction = (orcus_function*)var->data.p;
-			if (!ffunction->refrences) {
+			if (!ffunction->references) {
 				orcus_clear_function(ffunction);
 				free(ffunction);
 			}
@@ -651,7 +651,7 @@ void orcus_release_var(orcus_variable* const ORCUS_CPP_restrict var) {
 	case ORCUS_TYPE_FILE:
 		{
 			orcus_filewrapper* fw = (orcus_filewrapper*)var->data.p;
-			if (!fw->refrences) {
+			if (!fw->references) {
 				if (fw->modeflags)fclose(fw->file);
 				free(fw);
 			}
@@ -660,7 +660,7 @@ void orcus_release_var(orcus_variable* const ORCUS_CPP_restrict var) {
 	case ORCUS_TYPE_THREAD:
 		{
 			orcus_threadholder* t = (orcus_threadholder*)var->data.p;
-			if (!t->refrences) {
+			if (!t->references) {
 				if (!t->finished) { //you stupid son of a bitch why are you like this?
 	#if defined(_WIN32) || defined(_WIN64)
 					WaitForSingleObject(t->threadobject, INFINITE);
@@ -672,8 +672,8 @@ void orcus_release_var(orcus_variable* const ORCUS_CPP_restrict var) {
 	#endif
 				}
 				if (t->customenv) {
-					t->state->enviroment->refrences--;
-					if (!t->state->enviroment->refrences)orcus_destroytable(t->state->enviroment);
+					t->state->enviroment->references--;
+					if (!t->state->enviroment->references)orcus_destroytable(t->state->enviroment);
 					t->state->enviroment = nullptr;
 				}
 				//t->state->bytecode.instructions = nullptr;
@@ -736,7 +736,7 @@ orcus_array* orcus_newarray() {
 	orcus_array* nar = (orcus_array*)malloc(sizeof(orcus_array));
 	if (nar == nullptr)return nullptr;
 
-	nar->refrences = 0;
+	nar->references = 0;
 	nar->values = nullptr;
 
 	return nar;
@@ -1397,7 +1397,7 @@ void orcus_debugdumptable(orcus_table* tab,int level) {
 
 void orcus_clone_function(orcus_function* in, orcus_function* out) {
 	out->numberofinstructions = in->numberofinstructions - 1;// guard value. this will be overwritten later as long as the function executes correctly and these should be the same number.
-	out->refrences = 0;
+	out->references = 0;
 	if (in->instruction_dbg_lookup) {
 		out->instruction_dbg_lookup = (orcus_uint*)malloc(sizeof(orcus_uint) * in->numberofinstructions);
 		if (!out->instruction_dbg_lookup)return;
@@ -1424,7 +1424,7 @@ void orcus_clone_function(orcus_function* in, orcus_function* out) {
 	memcpy(out->instructions, in->instructions, sizeof(orcus_opcode) * in->numberofinstructions);
 	out->numberofinstructions = in->numberofinstructions;
 	out->enviromental = false;
-	out->refrences = 0;
+	out->references = 0;
 }
 
 //takes a orcus_function* and frees the data associated at the pointer, but does NOT free the pointer itself.
@@ -1689,30 +1689,30 @@ orcus_string* orcus_get_bytecode_rawbinary_debug(orcus_function* F) {
 
 
 bool orcus_register_library(void* data, const char* key, const char* table,uint8_t type) {
-	void* nreg=realloc(M_LIBS,sizeof(orcus_libdef)*(M_NUM_LIBS+1) );
+	void* nreg=realloc(ORCUS_LIBS,sizeof(orcus_libdef)*(ORCUS_NUM_LIBS+1) );
 	if (!nreg)return false;
-	M_LIBS = (orcus_libdef*)nreg;
+	ORCUS_LIBS = (orcus_libdef*)nreg;
 
-	orcus_libdef* ndef = M_LIBS + M_NUM_LIBS;
+	orcus_libdef* ndef = ORCUS_LIBS + ORCUS_NUM_LIBS;
 	ndef->dataptr = data;
 	ndef->key = key;
 	ndef->table = table;
 	ndef->type = type;
 
-	M_NUM_LIBS++;
+	ORCUS_NUM_LIBS++;
 	return true;
 }
 
-orcus_libdef* M_LIBS = nullptr;
-orcus_int M_NUM_LIBS = 0;
+orcus_libdef* ORCUS_LIBS = nullptr;
+orcus_int ORCUS_NUM_LIBS = 0;
 
 
 
 
 void orcus_populate_table_with_libs(orcus_table* T) {
 
-	for (orcus_int i = 0; i < M_NUM_LIBS; i++) {
-		orcus_libdef* lib = M_LIBS+i;
+	for (orcus_int i = 0; i < ORCUS_NUM_LIBS; i++) {
+		orcus_libdef* lib = ORCUS_LIBS+i;
 		
 		orcus_variable v;
 		v.type = lib->type;

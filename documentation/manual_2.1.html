@@ -103,7 +103,7 @@
 	<p class="codeblock">
 	struct orcus_string {<br>
 		&nbsp;&nbsp;orcus_int size=0;<br>
-		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
+		&nbsp;&nbsp;orcus_uint references = 0;<br>
 		&nbsp;&nbsp;char* ptr = nullptr;<br>
 		&nbsp;&nbsp;bool constant = false;<br>
 	};
@@ -129,7 +129,7 @@
 	};<br>
 	<br>
 	struct orcus_filewrapper {<br>
-		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
+		&nbsp;&nbsp;orcus_uint references = 0;<br>
 		&nbsp;&nbsp;FILE* file;<br>
 		&nbsp;&nbsp;uint8_t modeflags;<br>
 	};<br>
@@ -149,7 +149,7 @@
 	#endif<br>
 	<br>
 	struct orcus_threadholder {<br>
-		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
+		&nbsp;&nbsp;orcus_uint references = 0;<br>
 		&nbsp;&nbsp;volatile bool finished = false;<br>
 		&nbsp;&nbsp;bool customenv = false;<br>
 		&nbsp;&nbsp;#ifdef _WIN32<br>
@@ -221,7 +221,7 @@
 
 	struct orcus_table {<br>
 		&nbsp;&nbsp;orcus_subtable* data;<br>
-		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
+		&nbsp;&nbsp;orcus_uint references = 0;<br>
 		&nbsp;&nbsp;bool enviromental = false;<br>
 	};<br>
 	</p>
@@ -240,7 +240,7 @@
 	</p>
 	<p class="codeblock">
 	struct orcus_array { <br>
-	&nbsp;&nbsp;	orcus_uint refrences = 0;<br>
+	&nbsp;&nbsp;	orcus_uint references = 0;<br>
 	&nbsp;&nbsp;#ifdef ORCUS_64BIT<br>
 	&nbsp;&nbsp;&nbsp;&nbsp;	orcus_variable****** values = nullptr;<br>
 	&nbsp;&nbsp;#else<br>
@@ -295,7 +295,7 @@
 	};<br>
 <br>
 	struct orcus_function {<br>
-		orcus_uint refrences = 0;<br>
+		orcus_uint references = 0;<br>
 		orcus_uint numberofinstructions = 0;<br>
 		orcus_opcode* instructions = nullptr;<br>
 		bool enviromental = false;<br>

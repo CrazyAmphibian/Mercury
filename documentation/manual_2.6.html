@@ -53,7 +53,7 @@
 			&emsp;&emsp;//handle comipler error here<Br>
 		}else{<Br>
 			&emsp;&emsp;M->bytecode = ((orcus_function*)compile_output.data.p);//set the state's bytecode to the function we just compiled<Br>
-			&emsp;&emsp;M->bytecode->refrences++; //since the function is being stored by the state.<Br>
+			&emsp;&emsp;M->bytecode->references++; //since the function is being stored by the state.<Br>
 			&emsp;&emsp;while (orcus_stepstate(M)); //run the state's code<Br>
 			&emsp;&emsp;orcus_destroystate(M); //destroy the state once finished. do not do this if you want to keep the data.<Br>
 		}<Br>

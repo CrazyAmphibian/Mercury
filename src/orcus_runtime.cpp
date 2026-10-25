@@ -193,7 +193,7 @@ int main(int argc, char** argv) {
 #endif
 
 		M->programcounter = 0;
-		compiled->refrences = 1;
+		compiled->references = 1;
 		M->bytecode = compiled;
 		/*
 		M->bytecode.instructions = compiled->instructions;

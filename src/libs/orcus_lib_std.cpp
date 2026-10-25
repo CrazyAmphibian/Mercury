@@ -85,7 +85,7 @@ void orcus_lib_std_iterate(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 
 	if (listlike.type == ORCUS_TYPE_ARRAY) {
 		orcus_array* arr = (orcus_array*)listlike.data.p;
-		orcus_int srefs = arr->refrences;
+		orcus_int srefs = arr->references;
 
 
 		if (arr->values) {
@@ -179,13 +179,13 @@ void orcus_lib_std_iterate(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 #endif
 		}
 
-		//arr->refrences = srefs;
+		//arr->references = srefs;
 
 
 	}
 	else if (listlike.type == ORCUS_TYPE_TABLE) {
 		orcus_table* tab = (orcus_table*)listlike.data.p;
-		orcus_int srefs = tab->refrences;
+		orcus_int srefs = tab->references;
 
 		for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 			orcus_subtable subt = tab->data[t];
@@ -227,7 +227,7 @@ void orcus_lib_std_iterate(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 				orcus_clearstate(SubM);
 			}
 		}
-		//tab->refrences = srefs;
+		//tab->references = srefs;
 
 
 	}
@@ -933,7 +933,7 @@ int m_variable_deepcopy(orcus_variable* var_in, orcus_variable* var_out,orcus_ui
 			add_converted_pointer(intab, newtab, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
 
 			newtab->enviromental = false;
-			newtab->refrences = 0;
+			newtab->references = 0;
 			for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES;t++) {
 				orcus_subtable st = intab->data[t];
 				orcus_variable key;
@@ -977,14 +977,14 @@ int m_variable_deepcopy(orcus_variable* var_in, orcus_variable* var_out,orcus_ui
 			add_converted_pointer(instr, nptr, num_pointers_converted, pointer_conversions_in, pointer_conversions_out);
 			memcpy(nptr->ptr, instr->ptr, instr->size);
 			nptr->size = instr->size;
-			nptr->refrences = 0;
+			nptr->references = 0;
 			var_out->data.p = nptr;
 			}
 			return DEEPCOPY_SUCCES;
 		case ORCUS_TYPE_ARRAY:
 			{
 				orcus_array* newarr = orcus_newarray();
-				newarr->refrences = 0;
+				newarr->references = 0;
 				orcus_array* inarr = (orcus_array*)var_in->data.p;
 				if (!newarr) {
 					return DEEPCOPY_MEMORY_ALLOCATION_ERROR;
@@ -1059,7 +1059,7 @@ int m_variable_deepcopy(orcus_variable* var_in, orcus_variable* var_out,orcus_ui
 			}
 			memset(nptr, 0, sizeof(orcus_function));
 			orcus_clone_function(infun, nptr);
-			nptr->refrences = 0;
+			nptr->references = 0;
 			if (nptr->numberofinstructions != infun->numberofinstructions) {
 				free(nptr);
 				return DEEPCOPY_MEMORY_ALLOCATION_ERROR;

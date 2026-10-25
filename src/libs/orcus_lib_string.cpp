@@ -244,7 +244,7 @@ void orcus_lib_string_replace(orcus_state* const ORCUS_CPP_restrict M, const orc
 		return;
 	}
 	outstr->size = 0;
-	outstr->refrences = 0;
+	outstr->references = 0;
 	outstr->ptr = nullptr;
 	
 	orcus_string* str = (orcus_string*)str_var.data.p;
@@ -569,7 +569,7 @@ void orcus_lib_string_upper(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	}
 	os->size = str->size;
 	os->constant = false;
-	os->refrences = 0;
+	os->references = 0;
 
 	orcus_release_var(&var_string);
 	
@@ -622,7 +622,7 @@ void orcus_lib_string_lower(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	}
 	os->size = str->size;
 	os->constant = false;
-	os->refrences = 0;
+	os->references = 0;
 
 	orcus_release_var(&var_string);
 	
@@ -1044,7 +1044,7 @@ void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcu
 	outstr->constant = false;
 	outstr->ptr = nullptr;
 	outstr->size = 0;
-	outstr->refrences = 0;
+	outstr->references = 0;
 		
 	
 	/*
@@ -1834,7 +1834,7 @@ void orcus_lib_string_escape_orcus(orcus_state* const ORCUS_CPP_restrict M, cons
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
-	os->refrences = 0;
+	os->references = 0;
 
 	orcus_string* is = (orcus_string*)instr.data.p;
 	orcus_int pos = 0;
@@ -1887,7 +1887,7 @@ void orcus_lib_string_escape_url(orcus_state* const ORCUS_CPP_restrict M, const 
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
-	os->refrences = 0;
+	os->references = 0;
 
 	orcus_string* is = (orcus_string*)instr.data.p;
 	orcus_int pos = 0;
@@ -1957,7 +1957,7 @@ void orcus_lib_string_escape_c(orcus_state* const ORCUS_CPP_restrict M, const or
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
-	os->refrences = 0;
+	os->references = 0;
 
 	orcus_string* is = (orcus_string*)instr.data.p;
 	orcus_int pos = 0;
@@ -2042,7 +2042,7 @@ void orcus_lib_string_escape_html(orcus_state* const ORCUS_CPP_restrict M, const
 	os->size = 0;
 	os->ptr = nullptr;
 	os->constant = false;
-	os->refrences = 0;
+	os->references = 0;
 
 	orcus_string* is = (orcus_string*)instr.data.p;
 	orcus_int pos = 0;
@@ -2115,7 +2115,7 @@ void orcus_lib_string_copy_string(orcus_state* const ORCUS_CPP_restrict M, const
 		nstr->ptr = nullptr;
 	}
 	nstr->constant = false;
-	nstr->refrences = 0;
+	nstr->references = 0;
 	nstr->size = instr->size;
 
 	orcus_release_var(&in);
@@ -2207,12 +2207,12 @@ void orcus_lib_string_match_function(orcus_state* const ORCUS_CPP_restrict M, co
 		push.data.p = orcus_mstring_substring(base_str, i, i + find_str->size - 1);
 		orcus_pushstack(SubM, &push);
 		push.type = ORCUS_TYPE_STRING;
-		base_str->refrences++; //add a refrence to prevent freeing in use.
+		base_str->references++; //add a refrence to prevent freeing in use.
 		push.data.p = base_str;
 		orcus_pushstack(SubM, &push);
 		while (orcus_stepstate(SubM));
 		if (SubM->errorcode) {
-			base_str->refrences--;
+			base_str->references--;
 			orcus_mstring_delete(out_str);
 			orcus_release_var(&var_str);
 			orcus_release_var(&var_match);
@@ -2222,7 +2222,7 @@ void orcus_lib_string_match_function(orcus_state* const ORCUS_CPP_restrict M, co
 		SubM->programcounter = 0;
 		orcus_popstack(SubM, &push);
 		while (SubM->sizeofstack)orcus_discard_top_of_stack(SubM);
-		base_str->refrences--;
+		base_str->references--;
 		if (push.type == ORCUS_TYPE_STRING) {
 			orcus_mstrings_append(out_str, (orcus_string*)push.data.p);
 		}
@@ -2338,12 +2338,12 @@ void orcus_lib_string_p_match_function(orcus_state* const ORCUS_CPP_restrict M, 
 		push.data.p = orcus_mstring_substring(base_str, start, end);
 		orcus_pushstack(SubM, &push);
 		push.type = ORCUS_TYPE_STRING;
-		base_str->refrences++; //add a refrence to prevent freeing in use.
+		base_str->references++; //add a refrence to prevent freeing in use.
 		push.data.p = base_str;
 		orcus_pushstack(SubM, &push);
 		while (orcus_stepstate(SubM));
 		if (SubM->errorcode) {
-			base_str->refrences--;
+			base_str->references--;
 			orcus_mstring_delete(out_str);
 			orcus_release_var(&var_str);
 			orcus_release_var(&var_match);
@@ -2354,7 +2354,7 @@ void orcus_lib_string_p_match_function(orcus_state* const ORCUS_CPP_restrict M, 
 		SubM->programcounter = 0;
 		orcus_popstack(SubM, &push);
 		while (SubM->sizeofstack)orcus_discard_top_of_stack(SubM);
-		base_str->refrences--;
+		base_str->references--;
 		if (push.type == ORCUS_TYPE_STRING) {
 			orcus_mstrings_append(out_str, (orcus_string*)push.data.p);
 		}

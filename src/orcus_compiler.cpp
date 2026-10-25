@@ -1225,7 +1225,7 @@ inline void add_string_onto_stack(compiler_function* f,char* s,orcus_int len,orc
 
 
 
-//forward refrences for other complex functions
+//forward references for other complex functions
 orcus_int m_compile_read_var_statment(compiler_function* f, compiler_token* tokens, orcus_int num_tokens, orcus_int token_offset, compiler_info* i, compiler_function* postfix_function = nullptr);
 compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens, orcus_int num_tokens, orcus_int token_offset = 0, orcus_int* tokens_used = nullptr, compiler_info* ci = nullptr, compiler_function* in=nullptr);
 
@@ -3099,7 +3099,7 @@ void orcus_compile_mstring(orcus_string* str, orcus_variable* out, bool remove_d
 		free(tokens);
 
 		nmf->enviromental = false;
-		nmf->refrences = 0;
+		nmf->references = 0;
 		nmf->instructions = func.instructions;
 		nmf->numberofinstructions = func.number_instructions;
 

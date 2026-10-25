@@ -117,14 +117,14 @@ void orcus_lib_thread_new(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	}
 
 	t->finished = false;
-	t->refrences = 0;
+	t->references = 0;
 	if (table_var.type) {
 		t->state = orcus_newstate();
 		t->customenv = true;
 		if (t->state) {
 			orcus_destroytable(t->state->enviroment);
 			t->state->enviroment = (orcus_table*)table_var.data.p;
-			t->state->enviroment->refrences++;
+			t->state->enviroment->references++;
 			//printf("making with custom\n");
 		}
 	}
@@ -153,7 +153,7 @@ void orcus_lib_thread_new(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 			return;
 		}
-		t->state->bytecode->refrences = 1;
+		t->state->bytecode->references = 1;
 		if (vart) {
 			for (orcus_int i = 0; i < args_in - 2; i++) {
 				orcus_pushstack(t->state, vart+i);

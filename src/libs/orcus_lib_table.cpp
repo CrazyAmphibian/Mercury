@@ -53,7 +53,7 @@ void orcus_lib_table_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 
 		newtab->data[t] = st_n;
 	}
-	newtab->refrences = 1;
+	newtab->references = 1;
 
 	new_tab_var.type = ORCUS_TYPE_TABLE;
 	new_tab_var.data.p = newtab;

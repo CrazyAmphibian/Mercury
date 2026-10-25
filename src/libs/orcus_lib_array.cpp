@@ -142,7 +142,7 @@ void orcus_lib_array_flush(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 }
 
 
-void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //creates a copy of all values. not recursive. arrays are refrences so this will make a new one.
+void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //creates a copy of all values. not recursive. arrays are references so this will make a new one.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;

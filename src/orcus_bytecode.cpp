@@ -1016,7 +1016,7 @@ void M_BYTECODE_NFUN(orcus_state* const ORCUS_CPP_restrict M) { //New FUNction /
 		return;
 	}
 
-	fptr->refrences = 0;
+	fptr->references = 0;
 	fptr->numberofinstructions = function_size;
 	fptr->instructions = (orcus_opcode*)malloc(function_size * sizeof(orcus_opcode));
 	fptr->enviromental = false;
@@ -1339,7 +1339,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 
 	orcus_string* s3;
 	char* buffer;
-	if (!s1->refrences) {
+	if (!s1->references) {
 		s3 = s1;
 		if (!s1->constant) {
 			buffer = (char*)realloc(s1->ptr,s1->size+s2->size);
@@ -1366,7 +1366,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 		if (st->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
 		orcus_release_var(st);
 	}
-	else if (!s2->refrences) {
+	else if (!s2->references) {
 		s3 = s2;
 		buffer = (char*)malloc(s1->size + s2->size);
 		if (!buffer) {
@@ -1401,7 +1401,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 		
 		memcpy(buffer, s1->ptr, s1->size);
 		memcpy(buffer+ s1->size, s2->ptr, s2->size);
-		s3->refrences = 0;
+		s3->references = 0;
 		s3->size = s1->size + s2->size;
 		if (st->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
 		if (ss->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s1);
@@ -1810,7 +1810,7 @@ void M_BYTECODE_SETL_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Local,
 		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
-	keystr->refrences = 1;
+	keystr->references = 1;
 	key.data.p = keystr;
 
 	orcus_increment_variable_refrence_count(value);
@@ -1899,7 +1899,7 @@ void M_BYTECODE_SETG_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Global
 		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
-	keystr->refrences = 1;
+	keystr->references = 1;
 	key.data.p = keystr;
 
 	orcus_increment_variable_refrence_count(value);
@@ -1995,7 +1995,7 @@ void M_BYTECODE_SENV_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
-	keystr->refrences = 1;
+	keystr->references = 1;
 	key.data.p = keystr;
 
 	orcus_increment_variable_refrence_count(value);
@@ -2101,7 +2101,7 @@ void M_BYTECODE_SET_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
-	keystr->refrences = 1;
+	keystr->references = 1;
 	key.data.p = keystr;
 
 	orcus_increment_variable_refrence_count(value);
