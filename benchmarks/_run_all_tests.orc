@@ -2,8 +2,8 @@ local exitcode=0
 local total=0
 local passes=0
 iterate(io.getfiles(""),function(i,v,a)
-	if v=="_run_all_tests.mrc" then return end
-	if !!string.find(v,".mrc") then return end
+	if v=="_run_all_tests.orc" then return end
+	if !!string.find(v,".orc") then return end
 	//print(v)
 	total++
 	local f=io.open(v,"r")
