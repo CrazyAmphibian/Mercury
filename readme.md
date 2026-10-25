@@ -1,7 +1,7 @@
-# Mercury
+# Orcus
 **current version: 6.0**
 
-Mercury is an interpreted stack-based programming language focused on being simple, reasonably fast, and putting responsibility in the hands of programmers.
+Orcus is an interpreted stack-based programming language focused on being simple, reasonably fast, and putting responsibility in the hands of programmers.
 
 Some features include:
 * integers and floats as distinct types
@@ -22,8 +22,8 @@ print("hello, world!")
 ## how to build
 
 ### windows
-1. Use visual studio to open /Mercury/Mercury.sln
-2. run batch build. select the proper configuration for your platform, and ensure that 1 build of Mercury and 1 build of Mercury_Runtime is selected.
+1. Use visual studio to open /Orcus/Orcus.sln
+2. run batch build. select the proper configuration for your platform, and ensure that 1 build of Orcus and 1 build of Orcus_Runtime is selected.
 3. Build. The output will be in ./out/windows[configuration]
 
 ### unix-like systems
@@ -33,7 +33,7 @@ print("hello, world!")
 
 
 ### not compiling with libraries
-to not compile with a library, modify mercury.cpp so that it does not include the library's header. next, remove the library's files from the build. On windows, this is done by removing them from the solution. On unix-like systems, this is done by removing them from the file list in the compile script.
+to not compile with a library, modify orcus.cpp so that it does not include the library's header. next, remove the library's files from the build. On windows, this is done by removing them from the solution. On unix-like systems, this is done by removing them from the file list in the compile script.
 
 
 ## how to contribute

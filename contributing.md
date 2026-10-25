@@ -18,13 +18,13 @@ Your pull request must be tested before being merged.
 ## style guidelines
 code should be written in C++, and files given the extension of .cpp and .hpp
 
-Mercury code submitted is to be given the extension of .mrc
+Orcus code submitted is to be given the extension of .mrc
 
 Code should be easily readable, and should be clear what it does just by looking at it. This means descriptive variable and function names, and sensibly laid out code.
 
 inline assembly or other such micro-optimizations are not likely to be accepted unless they are proven to dramatically improve performance.
 
-Though written in C++, mercury takes a C coding style, and using C++ features like classes or std:: is heavily discouraged. You should do your best to find a different implementation, and such code is only to be accepted where absolutely necessary.
+Though written in C++, orcus takes a C coding style, and using C++ features like classes or std:: is heavily discouraged. You should do your best to find a different implementation, and such code is only to be accepted where absolutely necessary.
 nullptr should be used over NULL, and malloc() over new.
 
-names of functions, types, and constants that exist for mercury, and that are included in header files should be given names that denote they belong to mercury, such as prefixing with mercury_ or M_. This makes code more readable, and reduces the chance of name clashes.
+names of functions, types, and constants that exist for orcus, and that are included in header files should be given names that denote they belong to orcus, such as prefixing with orcus_ or M_. This makes code more readable, and reduces the chance of name clashes.

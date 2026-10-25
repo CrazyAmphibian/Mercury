@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Mercury user manual</title>
+	<title>Orcus user manual</title>
 	<link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -25,37 +25,37 @@
 <div>
 	<h3>overview</h3>
 	<p>
-		Mercury is easily embeded into another codebase to add an easy and dynamic language for extensions or faster development.<br>
-		this document will cover how to set up the basic mercury runtime environment.<br>
-		the details of setting up an API between mercury and your project will be up for you to decide, and the previous chapters go over some of the technicalities of the language.
+		Orcus is easily embeded into another codebase to add an easy and dynamic language for extensions or faster development.<br>
+		this document will cover how to set up the basic orcus runtime environment.<br>
+		the details of setting up an API between orcus and your project will be up for you to decide, and the previous chapters go over some of the technicalities of the language.
 	</p>	
 </div>
 
 <div>
 	<h3>the basics</h3>
 	<p>
-		mercury uses state objects to run code. you will need to make one. you can decide yourself if you want a shared global state or not, either way the code will be similar.<br>
-		the following is a basic setup to run mercury code stored in a char*, code_to_execute, then remove the mercury runtime state once finished.
+		orcus uses state objects to run code. you will need to make one. you can decide yourself if you want a shared global state or not, either way the code will be similar.<br>
+		the following is a basic setup to run orcus code stored in a char*, code_to_execute, then remove the orcus runtime state once finished.
 	</p>	
 	<p class="codeblock">
-		#include "mercury.hpp"<Br>
+		#include "orcus.hpp"<Br>
 		#include &lt;string.h><Br>
 		#include &lt;malloc.h><Br>
 		<Br>
-		mercury_state* M=mercury_newstate(); //creates the state<Br>
-		mercury_populate_table_with_libs(M->enviroment); //adds mercury libraries into the environment<Br>
+		orcus_state* M=orcus_newstate(); //creates the state<Br>
+		orcus_populate_table_with_libs(M->enviroment); //adds orcus libraries into the environment<Br>
 		<Br>
 		const char* code_to_execute = "print(\"hello, world!\")";<Br>
-		mercury_variable compile_output; //function outputs into a variable, since there's multiple return types.<Br>
-		mercury_compile_cstring(code_to_execute,strlen(code_to_execute),&compile_output);<Br>
+		orcus_variable compile_output; //function outputs into a variable, since there's multiple return types.<Br>
+		orcus_compile_cstring(code_to_execute,strlen(code_to_execute),&compile_output);<Br>
 		<Br>
 		if(compile_output.type!=M_TYPE_FUNCTION){<Br>
 			&emsp;&emsp;//handle comipler error here<Br>
 		}else{<Br>
-			&emsp;&emsp;M->bytecode = ((mercury_function*)compile_output.data.p);//set the state's bytecode to the function we just compiled<Br>
+			&emsp;&emsp;M->bytecode = ((orcus_function*)compile_output.data.p);//set the state's bytecode to the function we just compiled<Br>
 			&emsp;&emsp;M->bytecode->refrences++; //since the function is being stored by the state.<Br>
-			&emsp;&emsp;while (mercury_stepstate(M)); //run the state's code<Br>
-			&emsp;&emsp;mercury_destroystate(M); //destroy the state once finished. do not do this if you want to keep the data.<Br>
+			&emsp;&emsp;while (orcus_stepstate(M)); //run the state's code<Br>
+			&emsp;&emsp;orcus_destroystate(M); //destroy the state once finished. do not do this if you want to keep the data.<Br>
 		}<Br>
 	</p>
 </div>

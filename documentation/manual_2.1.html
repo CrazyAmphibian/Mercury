@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Mercury user manual</title>
+	<title>Orcus user manual</title>
 	<link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -24,26 +24,26 @@
 
 <div>
 	<h3>general typedefs</h3>
-	<p>to make programming easier, and cross-platform, mercury uses some typedefs for basic types</p>
+	<p>to make programming easier, and cross-platform, orcus uses some typedefs for basic types</p>
 	
 	<p class="codeblock">
 	#include &lt;stdint.h><br>
 	<br>
 	#if INT64_MAX==INTPTR_MAX<br>
-	&nbsp;&nbsp;typedef int64_t mercury_int;<br>
-	&nbsp;&nbsp;typedef uint64_t mercury_uint;<br>
-	&nbsp;&nbsp;typedef double mercury_float;<br>
-	&nbsp;&nbsp;#define MERCURY_64BIT<br>
+	&nbsp;&nbsp;typedef int64_t orcus_int;<br>
+	&nbsp;&nbsp;typedef uint64_t orcus_uint;<br>
+	&nbsp;&nbsp;typedef double orcus_float;<br>
+	&nbsp;&nbsp;#define ORCUS_64BIT<br>
 	#else<br>
-	&nbsp;&nbsp;typedef int32_t mercury_int;<br>
-	&nbsp;&nbsp;typedef uint32_t mercury_uint;<br>
-	&nbsp;&nbsp;typedef float mercury_float;<br>
-	&nbsp;&nbsp;#define MERCURY_32BIT<br>
+	&nbsp;&nbsp;typedef int32_t orcus_int;<br>
+	&nbsp;&nbsp;typedef uint32_t orcus_uint;<br>
+	&nbsp;&nbsp;typedef float orcus_float;<br>
+	&nbsp;&nbsp;#define ORCUS_32BIT<br>
 	#endif<br>
 	<br>
 	<br>
-	typedef uint16_t mercury_opcode;<br>
-	constexpr size_t MERCURY_INSTRUCTIONS_PER_VARIABLE_SIZE = sizeof(mercury_int) / sizeof(mercury_opcode);<br>
+	typedef uint16_t orcus_opcode;<br>
+	constexpr size_t ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE = sizeof(orcus_int) / sizeof(orcus_opcode);<br>
 	</p>
 	types are defined in an enum.
 	
@@ -69,22 +69,22 @@
 
 <div>
 	<h3>primative types</h3>
-	<p>primitive types are stored as raw binary data. since all mercury types are of the same size, and the same size of a pointer on the system, a union is a logical compiler structure to use to group it together.<br>
+	<p>primitive types are stored as raw binary data. since all orcus types are of the same size, and the same size of a pointer on the system, a union is a logical compiler structure to use to group it together.<br>
 	<br>
 	variables themselves (not their data) are almost always stored as a literal, and passed as a pointer.<br>
 	</p>
 	
 	<p class="codeblock">
-	union mercury_rawdata {<br>
-		&nbsp;&nbsp;mercury_int i;<br>
-		&nbsp;&nbsp;mercury_uint u;<br>
-		&nbsp;&nbsp;mercury_float f;<br>
+	union orcus_rawdata {<br>
+		&nbsp;&nbsp;orcus_int i;<br>
+		&nbsp;&nbsp;orcus_uint u;<br>
+		&nbsp;&nbsp;orcus_float f;<br>
 		&nbsp;&nbsp;void* p;<br>
 	};<br>
 
-	struct mercury_variable {<br>
+	struct orcus_variable {<br>
 		&nbsp;&nbsp;uint8_t type = 0;<br>
-		&nbsp;&nbsp;mercury_rawdata data;<br>
+		&nbsp;&nbsp;orcus_rawdata data;<br>
 	};<br>
 	
 	</p>
@@ -101,15 +101,15 @@
 		strings are the simplest proprietary type, since they seek to solve the problem of C strings being null terminated, which isn't a terribly bad thing when you consider the historic reasons for it. regardless, this is how strings are stored
 	</p>
 	<p class="codeblock">
-	struct mercury_string {<br>
-		&nbsp;&nbsp;mercury_int size=0;<br>
-		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+	struct orcus_string {<br>
+		&nbsp;&nbsp;orcus_int size=0;<br>
+		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
 		&nbsp;&nbsp;char* ptr = nullptr;<br>
 		&nbsp;&nbsp;bool constant = false;<br>
 	};
 	</p>
 	<p>
-	the variable constant is used for an optimization, where the char* is managed by something other than the mercury runtime, or represents a constant character string that is baked into read-only memory.<br>
+	the variable constant is used for an optimization, where the char* is managed by something other than the orcus runtime, or represents a constant character string that is baked into read-only memory.<br>
 	do not make the mistake of setting a constant string to point to a function's instruction space, as when the function's lifetime ceases, the pointer will be invalid.
 	</p>
 </div>
@@ -124,12 +124,12 @@
 	#include &lt;stdio.h><br>
 	<br>
 	enum M_FILEFLAGS :uint8_t {<br>
-		&nbsp;&nbsp;MERCURY_FILEFLAG_READ = 1 &lt;&lt; 0,<br>
-		&nbsp;&nbsp;MERCURY_FILEFLAG_WRITE = 1 &lt;&lt; 1,<br>
+		&nbsp;&nbsp;ORCUS_FILEFLAG_READ = 1 &lt;&lt; 0,<br>
+		&nbsp;&nbsp;ORCUS_FILEFLAG_WRITE = 1 &lt;&lt; 1,<br>
 	};<br>
 	<br>
-	struct mercury_filewrapper {<br>
-		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+	struct orcus_filewrapper {<br>
+		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
 		&nbsp;&nbsp;FILE* file;<br>
 		&nbsp;&nbsp;uint8_t modeflags;<br>
 	};<br>
@@ -148,8 +148,8 @@
 	&nbsp;&nbsp;#include &lt;pthread.h><br>
 	#endif<br>
 	<br>
-	struct mercury_threadholder {<br>
-		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+	struct orcus_threadholder {<br>
+		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
 		&nbsp;&nbsp;volatile bool finished = false;<br>
 		&nbsp;&nbsp;bool customenv = false;<br>
 		&nbsp;&nbsp;#ifdef _WIN32<br>
@@ -157,7 +157,7 @@
 		&nbsp;&nbsp;#else<br>
 			&nbsp;&nbsp;&nbsp;&nbsp;pthread_t threadobject = NULL;<br>
 		&nbsp;&nbsp;#endif<br>
-		&nbsp;&nbsp;mercury_state* state = nullptr;<br>
+		&nbsp;&nbsp;orcus_state* state = nullptr;<br>
 	};<br>
 	</p>
 </div>
@@ -169,13 +169,13 @@
 		C functions are merely a classification of function with a particular syntax.
 	</p>
 	<p class="codeblock">
-		typedef void (*mercury_cfunc) (mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+		typedef void (*orcus_cfunc) (orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 	</p>
 	<p>
 		C function typedefs are not terribly readable, so here's it in proper written form
 	</p>
 	<p class="codeblock">
-		void function_name(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {<br>
+		void function_name(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
 		<br>
 		}<br>
 	</p>
@@ -191,13 +191,13 @@
 		C functions are merely a classification of function with a particular syntax.
 	</p>
 	<p class="codeblock">
-		typedef void (*mercury_cfunc) (mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out);
+		typedef void (*orcus_cfunc) (orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 	</p>
 	<p>
 		C function typedefs are not terribly readable, so here's it in proper written form
 	</p>
 	<p class="codeblock">
-		void function_name(mercury_state* const M_CPP_restrict M, const mercury_int args_in, const mercury_int args_out) {<br>
+		void function_name(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
 		<br>
 		}<br>
 	</p>
@@ -210,18 +210,18 @@
 <div>
 	<h3>tables</h3>
 	<p>
-		tables are the first truly unique mercury type. implemented as an array of variables and keys, seperated by type.
+		tables are the first truly unique orcus type. implemented as an array of variables and keys, seperated by type.
 	</p>
 	<p class="codeblock">
-	struct mercury_subtable {<br>
-		&nbsp;&nbsp;mercury_int size = 0;<br>
-		&nbsp;&nbsp;mercury_variable* keys = nullptr;<br>
-		&nbsp;&nbsp;mercury_variable* values = nullptr;<br>
+	struct orcus_subtable {<br>
+		&nbsp;&nbsp;orcus_int size = 0;<br>
+		&nbsp;&nbsp;orcus_variable* keys = nullptr;<br>
+		&nbsp;&nbsp;orcus_variable* values = nullptr;<br>
 	};<br>
 
-	struct mercury_table {<br>
-		&nbsp;&nbsp;mercury_subtable* data;<br>
-		&nbsp;&nbsp;mercury_uint refrences = 0;<br>
+	struct orcus_table {<br>
+		&nbsp;&nbsp;orcus_subtable* data;<br>
+		&nbsp;&nbsp;orcus_uint refrences = 0;<br>
 		&nbsp;&nbsp;bool enviromental = false;<br>
 	};<br>
 	</p>
@@ -239,42 +239,42 @@
 		arrays are structured in a manner that is quite confounding, however it represents a real tradeoff being made. that being between spare data efficiency and access speed.
 	</p>
 	<p class="codeblock">
-	struct mercury_array { <br>
-	&nbsp;&nbsp;	mercury_uint refrences = 0;<br>
-	&nbsp;&nbsp;#ifdef MERCURY_64BIT<br>
-	&nbsp;&nbsp;&nbsp;&nbsp;	mercury_variable****** values = nullptr;<br>
+	struct orcus_array { <br>
+	&nbsp;&nbsp;	orcus_uint refrences = 0;<br>
+	&nbsp;&nbsp;#ifdef ORCUS_64BIT<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;	orcus_variable****** values = nullptr;<br>
 	&nbsp;&nbsp;#else<br>
-	&nbsp;&nbsp;&nbsp;&nbsp;	mercury_variable*** values = nullptr;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;	orcus_variable*** values = nullptr;<br>
 	&nbsp;&nbsp;#endif<br>
 	};<br>
 <br>
-	#ifdef MERCURY_64BIT<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111 + 1;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111 + 1;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b1111111111 + 1;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_4 = 0b1111111111 + 1;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_5 = 0b111111111111 + 1;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_6 = 0b111111111111 + 1;<br>
+	#ifdef ORCUS_64BIT<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_1 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_2 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_3 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_4 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_5 = 0b111111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_6 = 0b111111111111 + 1;<br>
 <br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_1 = 10;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_3 = 10;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_4 = 10;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_5 = 12;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_6 = 12;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_1 = 10;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_2 = 10;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_3 = 10;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_4 = 10;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_5 = 12;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_6 = 12;<br>
 
 	#else<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_1 = 0b1111111111 + 1;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_2 = 0b1111111111 + 1;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_SIZE_SUBARRAY_3 = 0b111111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_1 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_2 = 0b1111111111 + 1;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_SIZE_SUBARRAY_3 = 0b111111111111 + 1;<br>
 <br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_1 = 10;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_2 = 10;<br>
-	&nbsp;&nbsp;constexpr int MERCURY_WIDTH_SUBARRAY_3 = 12;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_1 = 10;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_2 = 10;<br>
+	&nbsp;&nbsp;constexpr int ORCUS_WIDTH_SUBARRAY_3 = 12;<br>
 	#endif
 	</p>
 	<p>
-		a mercury array is a pointer to a pointer several times, until you get a pointer to variable.<br>
+		a orcus array is a pointer to a pointer several times, until you get a pointer to variable.<br>
 		this is because arrays are split up into bit ranges, as to not make setting a negative variable allocate several hundred GB of memory. this wastes some efficiency in dereferencing, but this solves the issue of semi-spare data, and keeps the access time linear with array size, since each index is based on the number.<br>
 		the result is that in a worst case, one variable will allocate at most 100 kB on a 64 bit system.<br>
 	</p>
@@ -287,21 +287,21 @@
 		functions store raw bytecode, as well as some debug information (sometimes). since functions are a rather barebones dataset, they depend on a state to execute their instructions in.
 	</p>
 	<p class="codeblock">
-	struct mercury_debug_token {<br>
+	struct orcus_debug_token {<br>
 		char* chars=nullptr;<br>
-		mercury_int num_chars=0;<br>
-		mercury_int col=0;<br>
-		mercury_int line=0;<br>
+		orcus_int num_chars=0;<br>
+		orcus_int col=0;<br>
+		orcus_int line=0;<br>
 	};<br>
 <br>
-	struct mercury_function {<br>
-		mercury_uint refrences = 0;<br>
-		mercury_uint numberofinstructions = 0;<br>
-		mercury_opcode* instructions = nullptr;<br>
+	struct orcus_function {<br>
+		orcus_uint refrences = 0;<br>
+		orcus_uint numberofinstructions = 0;<br>
+		orcus_opcode* instructions = nullptr;<br>
 		bool enviromental = false;<br>
-		mercury_uint* instruction_dbg_lookup=nullptr;<br>
-		mercury_uint num_dbg_tokens = 0;<br>
-		mercury_debug_token* dbg_tokens = nullptr;<br>
+		orcus_uint* instruction_dbg_lookup=nullptr;<br>
+		orcus_uint num_dbg_tokens = 0;<br>
+		orcus_debug_token* dbg_tokens = nullptr;<br>
 	};
 	</p>
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Mercury user manual</title>
+	<title>Orcus user manual</title>
 	<link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -58,7 +58,7 @@
 <div>
 	<h3 class="function"><span class="type">void</span> iterate  (<span class="type">structure</span> data, <span class="type">callable</span> executor)</h3>
 	<p>
-		takes a structure and a callable. for each element, the index, associated data, and structure will be sent to the callable. The key will be the first argument, the value will be the second, and the structure will be the third. if the callable returns a value considered true by mercury boolean logic, it will stop traversing the structure similar to how the break keyword works in a loop. returning a non-true value will simply halt iteration of the current element, like the continue keyword in a loop.
+		takes a structure and a callable. for each element, the index, associated data, and structure will be sent to the callable. The key will be the first argument, the value will be the second, and the structure will be the third. if the callable returns a value considered true by orcus boolean logic, it will stop traversing the structure similar to how the break keyword works in a loop. returning a non-true value will simply halt iteration of the current element, like the continue keyword in a loop.
 	</p>
 	<p class="codeblock">
 		a=[1,2,"hello",4)<br>
@@ -110,7 +110,7 @@
 <div>
 	<h3 class="function"><span class="type">function</span>|<span class="type">string</span> compile  (<span class="type">string</span> code)</h3>
 	<p>
-		attempts to compile a string as if it were mercury code. if successful, it will return a function which does that code. otherwise, returns a string containing the error encountered when compiling. 
+		attempts to compile a string as if it were orcus code. if successful, it will return a function which does that code. otherwise, returns a string containing the error encountered when compiling. 
 	</p>
 	<p class="codeblock">
 		a=compile(&quot;print(\&quot;hello, world!\&quot;)&quot;)

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Mercury user manual</title>
+	<title>Orcus user manual</title>
 	<link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -20,68 +20,68 @@
 </table>
 
 <p>
-this is a complete list of every function or inline provided in mercury.hpp, as well as how they operate.
+this is a complete list of every function or inline provided in orcus.hpp, as well as how they operate.
 </p>
 
 
 <div>
 	<h3>string functions</h3>
 	<p class="codeblock">
-		mercury_string* mercury_cstring_to_mstring(const char* const restrict str, const mercury_int size);
+		orcus_string* orcus_cstring_to_mstring(const char* const restrict str, const orcus_int size);
 	</p>
 	<p>
-	creates a new mercury string based on the data from a character array.<br>
-	the resulting mercury_string* will use a unique pointer for its char*, seperate from the provided one.<br>
+	creates a new orcus string based on the data from a character array.<br>
+	the resulting orcus_string* will use a unique pointer for its char*, seperate from the provided one.<br>
 	returns nullptr on a memory allocation failure.<br>
 	</p>
 	
 	<p class="codeblock">
-		mercury_string* mercury_cstring_const_to_mstring(const char* const restrict str, const mercury_int size);
+		orcus_string* orcus_cstring_const_to_mstring(const char* const restrict str, const orcus_int size);
 	</p>
 	<p>
-	creates a new mercury string marked as constant using a supplied character array.<br>
-	the resulting mercury_string* will use the pointer provided, but will never modify or free the pointer or assocaited data.<br>
+	creates a new orcus string marked as constant using a supplied character array.<br>
+	the resulting orcus_string* will use the pointer provided, but will never modify or free the pointer or assocaited data.<br>
 	returns nullptr on a memory allocation failure.<br>
 	</p>
 	
 	<p class="codeblock">
-		mercury_string* mercury_cstring_promote_to_mstring(char* const restrict str, const mercury_int size);
+		orcus_string* orcus_cstring_promote_to_mstring(char* const restrict str, const orcus_int size);
 	</p>
 	<p>
-	creates a new mercury string using a supplied character array.<br>
-	the resulting mercury_string* will use the pointer provided, and the mercury runtime will manage and possibly modify the pointer data, as well as freeing or reallocating.<br>
+	creates a new orcus string using a supplied character array.<br>
+	the resulting orcus_string* will use the pointer provided, and the orcus runtime will manage and possibly modify the pointer data, as well as freeing or reallocating.<br>
 	returns nullptr on a memory allocation failure.<br>
 	</p>
 	
 	<p class="codeblock">
-		char* mercury_mstring_to_cstring(const mercury_string* const restrict str)
+		char* orcus_mstring_to_cstring(const orcus_string* const restrict str)
 	</p>
 	<p>
-	creates a new character array, based on the supplied mercury string.<br>
+	creates a new character array, based on the supplied orcus string.<br>
 	the resulting array will be null-terminated, but is not guaranteed to only have null occur at the end.<br>
 	returns nullptr on a memory allocation failure.<br>
 	</p>
 	
 	<p class="codeblock">
-		mercury_string* mercury_copystring(const mercury_string* const restrict str)
+		orcus_string* orcus_copystring(const orcus_string* const restrict str)
 	</p>
 	<p>
-	creates a new mercury_string which has the same data as the supplied.<br>
+	creates a new orcus_string which has the same data as the supplied.<br>
 	if the supplied string is marked as constant, the pointer will be copied.<br>
 	otherwise, this will create a new pointer and copy the data from the original<br>
 	returns nullptr on a memory allocation failure.<br>
 	</p>
 	
 	<p class="codeblock">
-		mercury_string* mercury_mstrings_concat(const mercury_string* const str1, const mercury_string* const str2)
+		orcus_string* orcus_mstrings_concat(const orcus_string* const str1, const orcus_string* const str2)
 	</p>
 	<p>
-	creates a new mercury_string whose data is the concatenation of both input strings, with the first arg being the first portion of the resulting string.
+	creates a new orcus_string whose data is the concatenation of both input strings, with the first arg being the first portion of the resulting string.
 	returns nullptr on a memory allocation failure.<br>
 	</p>
 
 	<p class="codeblock">
-		bool mercury_mstrings_append(mercury_string* const basestr, const mercury_string* const appstr)
+		bool orcus_mstrings_append(orcus_string* const basestr, const orcus_string* const appstr)
 	</p>
 	<p>
 	modifies the first arg string with the second arg's string affixed to the end.<br>
@@ -90,7 +90,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>	
 	
 	<p class="codeblock">
-		bool mercury_mstring_addchars(mercury_string* const M_CPP_restrict str, const char* const chars, mercury_int len=1)
+		bool orcus_mstring_addchars(orcus_string* const M_CPP_restrict str, const char* const chars, orcus_int len=1)
 	</p>
 	<p>
 	modifies the first arg string with the supplied character array appended to it<br>
@@ -100,7 +100,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	
 	
 	<p class="codeblock">
-		mercury_string* mercury_mstring_substring(mercury_string* str, mercury_int start, mercury_int end)
+		orcus_string* orcus_mstring_substring(orcus_string* str, orcus_int start, orcus_int end)
 	</p>
 	<p>
 	creates a new string composed from the supplied string.
@@ -110,25 +110,25 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		void mercury_mstring_delete(mercury_string* const restrict str)
+		void orcus_mstring_delete(orcus_string* const restrict str)
 	</p>
 	<p>
-	frees the supplied mercury_string, regardless of reference count.<br>
+	frees the supplied orcus_string, regardless of reference count.<br>
 	if the pointer is not marked as constant, it will be freed.<br>
 	</p>
 	
 	<p class="codeblock">
-		inline bool mercury_mstrings_equal(const mercury_string* const str1, const mercury_string* const str2)
+		inline bool orcus_mstrings_equal(const orcus_string* const str1, const orcus_string* const str2)
 	</p>
 	<p>
-		returns a bool if the supplied mercury strings have the same data.
+		returns a bool if the supplied orcus strings have the same data.
 	</p>
 	
 	<p class="codeblock">
-		inline bool mercury_mstring_equal_cstring(const mercury_string* const mstr, const char* const cstr)
+		inline bool orcus_mstring_equal_cstring(const orcus_string* const mstr, const char* const cstr)
 	</p>
 	<p>
-		returns a bool if the supplied mercury string has the same data as the supplied null-terminated character array.
+		returns a bool if the supplied orcus string has the same data as the supplied null-terminated character array.
 	</p>
 	
 </div>
@@ -137,7 +137,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	<h3>table functions</h3>
 	
 	<p class="codeblock">
-		mercury_table* mercury_newtable()
+		orcus_table* orcus_newtable()
 	</p>
 	<p>
 	creates a new, empty table object
@@ -145,7 +145,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		mercury_int mercury_tablehaskey(const mercury_table* const table, const mercury_variable* const key)
+		orcus_int orcus_tablehaskey(const orcus_table* const table, const orcus_variable* const key)
 	</p>
 	<p>
 	searches a table for the supplied key. if found, returns the index in the subtable where it was found.<br>
@@ -153,14 +153,14 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>	
 	
 	<p class="codeblock">
-		bool mercury_getkey(const mercury_table* const table, mercury_variable* const key, mercury_variable* out)
+		bool orcus_getkey(const orcus_table* const table, orcus_variable* const key, orcus_variable* out)
 	</p>
 	<p>
 	sets the data at the variable pointer out to the value stored by the supplied key. if not found, returns false, and sets out to nil.
 	</p>	
 	
 	<p class="codeblock">
-		mercury_int mercury_setkey(mercury_table* const table, mercury_variable* const key, const mercury_variable* const value)
+		orcus_int orcus_setkey(orcus_table* const table, orcus_variable* const key, const orcus_variable* const value)
 	</p>
 	<p>
 	sets a key in the table, and returns the index in the subtable. on allocation failiure, returns -1.<br>
@@ -170,7 +170,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	
 	
 	<p class="codeblock">
-		bool mercury_tables_equal(const mercury_table* const table1, const mercury_table* const table2)
+		bool orcus_tables_equal(const orcus_table* const table1, const orcus_table* const table2)
 	</p>
 	<p>
 	evaluates every key in a table against another table. if every value is equal, returns true. otherwise, false
@@ -178,14 +178,14 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	
 	
 	<p class="codeblock">
-		bool mercury_table_get_cstring_keyvalue(const mercury_table* const table, const char* const key, mercury_variable* out)
+		bool orcus_table_get_cstring_keyvalue(const orcus_table* const table, const char* const key, orcus_variable* out)
 	</p>
 	<p>
 	sets the data at the variable pointer out to the value stored by the supplied key. if not found, returns false, and sets out to nil. Takes a null-terminated character array aas a key instead of a variable.
 	</p>
 	
 	<p class="codeblock">
-		mercury_int mercury_table_set_cstring_keyvalue(mercury_table* const table, const char* const key, const mercury_variable* const value)
+		orcus_int orcus_table_set_cstring_keyvalue(orcus_table* const table, const char* const key, const orcus_variable* const value)
 	</p>
 	<p>
 		sets a key in the table, and returns the index in the subtable. on allocation failiure, returns -1.<br>
@@ -196,7 +196,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		mercury_int mercury_table_has_cstring_key(const mercury_table* const table, const char* const key)
+		orcus_int orcus_table_has_cstring_key(const orcus_table* const table, const char* const key)
 	</p>
 	<p>
 	searches a table for the supplied key. if found, returns the index in the subtable where it was found.<br>
@@ -206,7 +206,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 
 
 	<p class="codeblock">
-		void mercury_prepare_table_for_state(mercury_table* table,mercury_state* M)
+		void orcus_prepare_table_for_state(orcus_table* table,orcus_state* M)
 	</p>
 	<p>
 	sets the values _G and _ENV given a state and its environment table.<br>
@@ -214,14 +214,14 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		void mercury_cleartable(const mercury_table* const table)
+		void orcus_cleartable(const orcus_table* const table)
 	</p>
 	<p>
 	goes through all stored variables in the stored table, and unrefrences, and possibly frees them, then removes them from storage.
 	</p>
 	
 	<p class="codeblock">
-		void mercury_destroytable(mercury_table* const table)
+		void orcus_destroytable(orcus_table* const table)
 	</p>
 	<p>
 	frees the supplied table. goes through all stored variables, and unrefrences, and possibly frees them.
@@ -234,7 +234,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 <div>
 	<h3>array functions</h3>
 	<p class="codeblock">
-		mercury_array* mercury_newarray()
+		orcus_array* orcus_newarray()
 	</p>
 	<p>
 	creates a new array object.<br>
@@ -242,7 +242,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		bool mercury_setarray(mercury_array* const array, const mercury_variable* const var, const mercury_int pos)
+		bool orcus_setarray(orcus_array* const array, const orcus_variable* const var, const orcus_int pos)
 	</p>
 	<p>
 	sets the array's index to the provided value.<br>
@@ -252,7 +252,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 
 	<p class="codeblock">
-		void mercury_getarray(mercury_array* const array, const mercury_int pos, mercury_variable* out)
+		void orcus_getarray(orcus_array* const array, const orcus_int pos, orcus_variable* out)
 	</p>
 	<p>
 	sets the data at the provided pointer to the value stored in the array at the index.<br>
@@ -260,7 +260,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		mercury_int mercury_array_len(const mercury_array* const restrict arr)
+		orcus_int orcus_array_len(const orcus_array* const restrict arr)
 	</p>
 	<p>
 	returns the index of the array's value with the highest value.<br>
@@ -269,7 +269,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>	
 	
 	<p class="codeblock">
-		void mercury_destroyarray(mercury_array* const restrict arr)
+		void orcus_destroyarray(orcus_array* const restrict arr)
 	</p>
 	<p>
 	frees the provided array, and dereferences and potentially frees all stored values.
@@ -282,7 +282,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 <div>
 	<h3>state functions</h3>
 	<p class="codeblock">
-		mercury_state* mercury_newstate(const mercury_state* const parent = nullptr)
+		orcus_state* orcus_newstate(const orcus_state* const parent = nullptr)
 	</p>
 	<p>
 	creates a new state. if parent is provided, this will set the new state's parent to the provided.<br>
@@ -290,7 +290,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		bool mercury_stepstate(mercury_state* const restrict M) 
+		bool orcus_stepstate(orcus_state* const restrict M) 
 	</p>
 	<p>
 	executes a single instruction of a state's bytecode.<br>
@@ -298,7 +298,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		void mercury_clearstate(mercury_state* const restrict M, bool for_deletion=false)
+		void orcus_clearstate(orcus_state* const restrict M, bool for_deletion=false)
 	</p>
 	<p>
 	clears a state into its initial state.<br>
@@ -306,21 +306,21 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		void mercury_destroystate(mercury_state* const restrict M)
+		void orcus_destroystate(orcus_state* const restrict M)
 	</p>
 	<p>
 	frees a state and unreferences or frees all associated data.<br>
 	</p>
 	
 	<p class="codeblock">
-		void mercury_release_var(mercury_variable* const restrict var) 
+		void orcus_release_var(orcus_variable* const restrict var) 
 	</p>
 	<p>
 	checks a variable's reference count, and frees the data if it is 0<br>
 	</p>
 		
 	<p class="codeblock">
-		void mercury_popstack(mercury_state* const restrict M, mercury_variable* out)
+		void orcus_popstack(orcus_state* const restrict M, orcus_variable* out)
 	</p>
 	<p>
 	sets the data at the pointer out to the provided state's top stack element, and decreases the stack size.<br>
@@ -328,7 +328,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		void mercury_pullstack(mercury_state* const restrict M, mercury_variable* out)
+		void orcus_pullstack(orcus_state* const restrict M, orcus_variable* out)
 	</p>
 	<p>
 	sets the data at the pointer out to the provided state's bottom stack element, and decreases the stack size then shifts all elements back by 1.<br>
@@ -336,7 +336,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		void mercury_pushstack(mercury_state* const restrict M, mercury_variable* var)
+		void orcus_pushstack(orcus_state* const restrict M, orcus_variable* var)
 	</p>
 	<p>
 		adds the provided variable onto the top of the provided state's stack.<br>
@@ -344,14 +344,14 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		inline void mercury_discard_top_of_stack(mercury_state* const restrict M)
+		inline void orcus_discard_top_of_stack(orcus_state* const restrict M)
 	</p>
 	<p>
 		takes the top variable of the stack of the provided state, and removes it, potentially freeing it.
 	</p>
 	
 	<p class="codeblock">
-		inline void mercury_peek_stack(const mercury_state* restrict M, mercury_variable* out) 
+		inline void orcus_peek_stack(const orcus_state* restrict M, orcus_variable* out) 
 	</p>
 	<p>
 		sets the data at the pointer out to the variable on the top of the stack if it exists, nil if not.<br>
@@ -359,7 +359,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		inline mercury_state* mercury_get_child_state(mercury_state* const M_CPP_restrict M)
+		inline orcus_state* orcus_get_child_state(orcus_state* const M_CPP_restrict M)
 	</p>
 	<p>
 		returns a pointer to a state's child state, used for function calls.<br>
@@ -374,7 +374,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	<h3>variable functions</h3>
 
 	<p class="codeblock">
-		mercury_string* mercury_tostring(const mercury_variable* const restrict var)
+		orcus_string* orcus_tostring(const orcus_variable* const restrict var)
 	</p>
 	<p>
 		creates a new string that represents the supplied variable's value.<br>
@@ -383,28 +383,28 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		bool mercury_checkbool(const mercury_variable* const restrict var)
+		bool orcus_checkbool(const orcus_variable* const restrict var)
 	</p>
 	<p>
 		interprets the supplied variable as a boolean, and returns the corresponding value.
 	</p>
 	
 	<p class="codeblock">
-		mercury_int mercury_checkint(const mercury_variable* const restrict var)
+		orcus_int orcus_checkint(const orcus_variable* const restrict var)
 	</p>
 	<p>
 		interprets the supplied variable as an integer, and returns the corresponding value.
 	</p>	
 	
 	<p class="codeblock">
-		mercury_float mercury_checkfloat(const mercury_variable* const restrict var)
+		orcus_float orcus_checkfloat(const orcus_variable* const restrict var)
 	</p>
 	<p>
 		interprets the supplied variable as a floating-point number, and returns the corresponding value.
 	</p>		
 	
 	<p class="codeblock">
-		mercury_float mercury_checkpointer(const mercury_variable* const restrict var)
+		orcus_float orcus_checkpointer(const orcus_variable* const restrict var)
 	</p>
 	<p>
 		interprets the supplied variable as a pointer, and returns the corresponding value.<br>
@@ -412,35 +412,35 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>		
 	
 	<p class="codeblock">
-		bool mercury_vars_equal(const mercury_variable* const var1, const mercury_variable* const var2)
+		bool orcus_vars_equal(const orcus_variable* const var1, const orcus_variable* const var2)
 	</p>
 	<p>
-		evaluates if the two suppplied variables are equal, using mercury equality rules.
+		evaluates if the two suppplied variables are equal, using orcus equality rules.
 	</p>	
 
 	<p class="codeblock">
-		inline void mercury_clear_variable(mercury_variable* var)
+		inline void orcus_clear_variable(orcus_variable* var)
 	</p>
 	<p>
 		sets the data at the pointer to nil
 	</p>
 	
 	<p class="codeblock">
-		inline bool mercury_type_is_complex(const uint8_t type)
+		inline bool orcus_type_is_complex(const uint8_t type)
 	</p>
 	<p>
 		returns if the type is complex (referenced)
 	</p>
 	
 	<p class="codeblock">
-		inline void mercury_increment_variable_refrence_count(const mercury_variable* const restrict var)
+		inline void orcus_increment_variable_refrence_count(const orcus_variable* const restrict var)
 	</p>
 	<p>
 		increments a variable's reference count
 	</p>
 	
 	<p class="codeblock">
-		inline void mercury_decrement_variable_refrence_count(const mercury_variable* const restrict var)
+		inline void orcus_decrement_variable_refrence_count(const orcus_variable* const restrict var)
 	</p>
 	<p>
 		decrements a variable's reference count
@@ -455,10 +455,10 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	<h3>other functions</h3>
 	
 	<p class="codeblock">
-		bool mercury_register_library(void* data, const char* key, const char* table, uint8_t type=M_TYPE_CFUNC)
+		bool orcus_register_library(void* data, const char* key, const char* table, uint8_t type=M_TYPE_CFUNC)
 	</p>
 	<p>
-		adds data to mercury's global libraries list.<br>
+		adds data to orcus's global libraries list.<br>
 		data is a pointer to the data<br>
 		key is a null-terminated string<br>
 		table is an optional null terminated string. if supplied with nullptr, will add the library to the table, otherwise, adds it to a sub-table whose key is the supplied string<br>
@@ -468,14 +468,14 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>	
 	
 	<p class="codeblock">
-		void mercury_populate_table_with_libs(mercury_table* T)
+		void orcus_populate_table_with_libs(orcus_table* T)
 	</p>
 	<p>
 		adds all libraries into the supplied table.
 	</p>	
 	
 	<p class="codeblock">
-		mercury_string* mercury_get_bytecode_debug(mercury_function* F)
+		orcus_string* orcus_get_bytecode_debug(orcus_function* F)
 	</p>
 	<p>
 		generates a string representing a function's bytecode<br>
@@ -484,7 +484,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>	
 	
 	<p class="codeblock">
-		mercury_string* mercury_get_bytecode_rawbinary_debug(mercury_function* F)
+		orcus_string* orcus_get_bytecode_rawbinary_debug(orcus_function* F)
 	</p>
 	<p>
 		generates a string representing a function's bytecode<br>
@@ -493,7 +493,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 
 	<p class="codeblock">
-		void mercury_debugdumptable(mercury_table* tab, int level = 0)
+		void orcus_debugdumptable(orcus_table* tab, int level = 0)
 	</p>
 	<p>
 		generates a debug string of a supplied table, and sends it to stdout.<br>
@@ -501,7 +501,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 	
 	<p class="codeblock">
-		void mercury_clone_function(mercury_function* in, mercury_function* out)
+		void orcus_clone_function(orcus_function* in, orcus_function* out)
 	</p>
 	<p>
 		copies a function's data into a new function. the function object must already exist.
@@ -509,7 +509,7 @@ this is a complete list of every function or inline provided in mercury.hpp, as 
 	</p>
 
 	<p class="codeblock">
-		void mercury_clear_function(mercury_function* in)
+		void orcus_clear_function(orcus_function* in)
 	</p>
 	<p>
 		clears all data associated with a function pointer, but does not free the pointer.

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Mercury user manual</title>
+	<title>Orcus user manual</title>
 	<link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -53,20 +53,20 @@
 </div>
 
 <div>
-	<h3>mercury runtime</h3>
+	<h3>orcus runtime</h3>
 	<p>
-		when running mercury from it's executable, a new global is added, <span style="font-family:monospace;">_ARGS</span>. this is an array of the command line arguments which led to the executable being ran. args passed to the language start at 0, though negative index args exist and represent the executable's args, not the language's.
+		when running orcus from it's executable, a new global is added, <span style="font-family:monospace;">_ARGS</span>. this is an array of the command line arguments which led to the executable being ran. args passed to the language start at 0, though negative index args exist and represent the executable's args, not the language's.
 	</p>
 	
 	consider the following startup command
 	<p class="codeblock">
-		mercury -n test_value=22
+		orcus -n test_value=22
 	</p>
-	and in mercury:
+	and in orcus:
 	<p class="codeblock">
 		print(_ARGS[0]) // test_value=22<br>
 		print(_ARGS[-1]) // -n<br>
-		print(_ARGS[-2]) // mercury<br>
+		print(_ARGS[-2]) // orcus<br>
 	</p>
 	
 </div>
@@ -74,9 +74,9 @@
 <div>
 	<h3>command line arguments</h3>
 	<p>
-		when running the standalone executable, mercury (the executable) has some args that changes what it does.<br>
-		mercury uses the following syntax for starting the executable:
-		<span style="font-family:monospace;">mercury [options] &lt;file> [runtime args]</span>
+		when running the standalone executable, orcus (the executable) has some args that changes what it does.<br>
+		orcus uses the following syntax for starting the executable:
+		<span style="font-family:monospace;">orcus [options] &lt;file> [runtime args]</span>
 	</p>
 	
 	<table class="tablefirstcollummono">
