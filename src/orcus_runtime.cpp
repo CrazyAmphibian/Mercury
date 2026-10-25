@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (fpath) {
-		const char* fpath = argv[argc-1];
+		//const char* fpath = argv[argc-1];
 		FILE* f=fopen(fpath,"rb");
 		if (!f) {
 			printf("error opening file %s\n",fpath);
