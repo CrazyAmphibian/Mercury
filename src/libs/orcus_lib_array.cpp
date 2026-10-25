@@ -451,7 +451,7 @@ int orcus_sort_use_orcus_function(const void* a, const void* b) {
 }
 
 
-int orcus_sort_greater_to_lesser(const void* a, const void* b) {
+int orcus_sort_function_greater_to_lesser(const void* a, const void* b) {
 	orcus_variable var_a = *(orcus_variable*)a;
 	orcus_variable var_b = *(orcus_variable*)b;
 	if (var_a.type != ORCUS_TYPE_INT && var_a.type != ORCUS_TYPE_FLOAT) {
@@ -480,7 +480,7 @@ int orcus_sort_greater_to_lesser(const void* a, const void* b) {
 	return 0;
 }
 
-int orcus_sort_lesser_to_greater(const void* a, const void* b) {
+int orcus_sort_function_lesser_to_greater(const void* a, const void* b) {
 	orcus_variable var_a = *(orcus_variable*)a;
 	orcus_variable var_b = *(orcus_variable*)b;
 
@@ -510,7 +510,7 @@ int orcus_sort_lesser_to_greater(const void* a, const void* b) {
 	return 0;
 }
 
-int orcus_sort_greater_to_lesser_absolute(const void* a, const void* b) {
+int orcus_sort_function_greater_to_lesser_absolute(const void* a, const void* b) {
 	orcus_variable var_a = *(orcus_variable*)a;
 	orcus_variable var_b = *(orcus_variable*)b;
 
@@ -543,7 +543,7 @@ int orcus_sort_greater_to_lesser_absolute(const void* a, const void* b) {
 
 
 
-int orcus_sort_lesser_to_greater_absolute(const void* a, const void* b) {
+int orcus_sort_function_lesser_to_greater_absolute(const void* a, const void* b) {
 	orcus_variable var_a = *(orcus_variable*)a;
 	orcus_variable var_b = *(orcus_variable*)b;
 
@@ -574,7 +574,7 @@ int orcus_sort_lesser_to_greater_absolute(const void* a, const void* b) {
 }
 
 
-int orcus_sort_alphabet_az(const void* a, const void* b) {
+int orcus_sort_function_alphabet_az(const void* a, const void* b) {
 	orcus_variable var_a = *(orcus_variable*)a;
 	orcus_variable var_b = *(orcus_variable*)b;
 
@@ -610,7 +610,7 @@ int orcus_sort_alphabet_az(const void* a, const void* b) {
 	return 0;
 }
 
-int orcus_sort_alphabet_za(const void* a, const void* b) {
+int orcus_sort_function_alphabet_za(const void* a, const void* b) {
 	orcus_variable var_a = *(orcus_variable*)a;
 	orcus_variable var_b = *(orcus_variable*)b;
 
@@ -678,23 +678,23 @@ void orcus_lib_array_sort(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 
 	if (var_func.type == ORCUS_TYPE_INT) {
 		switch(var_func.data.i) {
-			case m_sort_greater_to_lesser:
-				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_greater_to_lesser);
+			case orcus_sort_greater_to_lesser:
+				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_function_greater_to_lesser);
 				break;
-			case m_sort_lesser_to_greater:
-				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_lesser_to_greater);
+			case orcus_sort_lesser_to_greater:
+				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_function_lesser_to_greater);
 				break;
-			case m_sort_greater_to_lesser_absolute:
-				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_greater_to_lesser_absolute);
+			case orcus_sort_greater_to_lesser_absolute:
+				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_function_greater_to_lesser_absolute);
 				break;
-			case m_sort_lesser_to_greater_absolute:
-				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_lesser_to_greater_absolute);
+			case orcus_sort_lesser_to_greater_absolute:
+				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_function_lesser_to_greater_absolute);
 				break;
-			case m_sort_alphabet_az:
-				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_alphabet_az);
+			case orcus_sort_alphabet_az:
+				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_function_alphabet_az);
 				break;
-			case m_sort_alphabet_za:
-				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_alphabet_za);
+			case orcus_sort_alphabet_za:
+				qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_function_alphabet_za);
 				break;
 		}
 	}

@@ -34,17 +34,17 @@ void orcus_lib_math_random(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 void orcus_lib_math_randomint(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 void orcus_lib_math_randomseed(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 
-const orcus_float m_math_pi = 3.141592653589793; //15 digits should be enough i hope. doubles cannot store a more precise approximation than this.
-const orcus_float m_math_root2 = 1.41421356237309504; //gee bill, 17 digits?
-const orcus_float m_math_e = 2.718281828459045; // ditto.
-const orcus_float m_math_root3 = 1.7320508075688772; //16 digits
-const orcus_float m_math_golden = 1.6180339887498948; //16 digits
+const orcus_float orcus_math_pi = 3.141592653589793; //15 digits should be enough i hope. doubles cannot store a more precise approximation than this.
+const orcus_float orcus_math_root2 = 1.41421356237309504; //gee bill, 17 digits?
+const orcus_float orcus_math_e = 2.718281828459045; // ditto.
+const orcus_float orcus_math_root3 = 1.7320508075688772; //16 digits
+const orcus_float orcus_math_golden = 1.6180339887498948; //16 digits
 #ifdef ORCUS_64BIT
-const orcus_int m_math_intmax = 0x7FFFFFFFFFFFFFFF;
-const orcus_int m_math_uintmax =0xFFFFFFFFFFFFFFFF;
+const orcus_int orcus_math_intmax = 0x7FFFFFFFFFFFFFFF;
+const orcus_int orcus_math_uintmax =0xFFFFFFFFFFFFFFFF;
 #else
-const orcus_int m_math_intmax = 0x7FFFFFFF;
-const orcus_int m_math_uintmax = 0xFFFFFFFF;
+const orcus_int orcus_math_intmax = 0x7FFFFFFF;
+const orcus_int orcus_math_uintmax = 0xFFFFFFFF;
 #endif
 
 

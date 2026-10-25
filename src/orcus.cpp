@@ -1798,17 +1798,17 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_std_sleep, "sleep", nullptr);
 
 
-	orcus_register_library((void*)&m_const_type_nil, "TYPE_NIL", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_int, "TYPE_INT", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_float, "TYPE_FLOAT", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_bool, "TYPE_BOOL", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_table, "TYPE_TABLE", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_string, "TYPE_STRING", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_cfunc, "TYPE_CFUNC", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_array, "TYPE_ARRAY", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_function, "TYPE_FUNCTION", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_file, "TYPE_FILE", nullptr, ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_thread, "TYPE_THREAD", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_nil, "TYPE_NIL", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_int, "TYPE_INT", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_float, "TYPE_FLOAT", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_bool, "TYPE_BOOL", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_table, "TYPE_TABLE", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_string, "TYPE_STRING", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_cfunc, "TYPE_CFUNC", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_array, "TYPE_ARRAY", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_function, "TYPE_FUNCTION", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_file, "TYPE_FILE", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_const_type_thread, "TYPE_THREAD", nullptr, ORCUS_TYPE_INT);
 #endif
 
 #ifdef ORCUS_LIB_MATH
@@ -1836,14 +1836,14 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_math_mean, "mean", "math");
 	orcus_register_library(orcus_lib_math_mean_array, "amean", "math");
 
-	orcus_register_library((void*)&m_math_pi, "pi", "math", ORCUS_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_root2, "root2", "math", ORCUS_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_e, "e", "math", ORCUS_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_root3, "root3", "math", ORCUS_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_golden, "golden", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&orcus_math_pi, "pi", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&orcus_math_root2, "root2", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&orcus_math_e, "e", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&orcus_math_root3, "root3", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&orcus_math_golden, "golden", "math", ORCUS_TYPE_FLOAT);
 
-	orcus_register_library((void*)&m_math_intmax, "int_max", "math", ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_math_uintmax, "uint_max", "math", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_math_intmax, "int_max", "math", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_math_uintmax, "uint_max", "math", ORCUS_TYPE_INT);
 #endif
 #ifdef ORCUS_LIB_ARRAY
 	orcus_register_library(orcus_lib_array_flush, "flush", "array");
@@ -1854,12 +1854,12 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_array_sort, "sort", "array");
 	orcus_register_library(orcus_lib_array_concat, "concat", "array");
 
-	orcus_register_library((void*)&m_sort_greater_to_lesser, "SORTING_GREATER_TO_LESSER", "array", ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_sort_lesser_to_greater, "SORTING_LESSER_TO_GREATER", "array", ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_sort_greater_to_lesser_absolute, "SORTING_GREATER_TO_LESSER_MAGNITUDE", "array", ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_sort_lesser_to_greater_absolute, "SORTING_LESSER_TO_GREATER_MAGNITUDE", "array", ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_sort_alphabet_az, "SORTING_ALPHABETICAL_A_TO_Z", "array", ORCUS_TYPE_INT);
-	orcus_register_library((void*)&m_sort_alphabet_za, "SORTING_ALPHABETICAL_Z_TO_A", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_sort_greater_to_lesser, "SORTING_GREATER_TO_LESSER", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_sort_lesser_to_greater, "SORTING_LESSER_TO_GREATER", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_sort_greater_to_lesser_absolute, "SORTING_GREATER_TO_LESSER_MAGNITUDE", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_sort_lesser_to_greater_absolute, "SORTING_LESSER_TO_GREATER_MAGNITUDE", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_sort_alphabet_az, "SORTING_ALPHABETICAL_A_TO_Z", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&orcus_sort_alphabet_za, "SORTING_ALPHABETICAL_Z_TO_A", "array", ORCUS_TYPE_INT);
 #endif
 #ifdef ORCUS_LIB_STRING
 	orcus_register_library(orcus_lib_string_sub, "sub", "string");
@@ -1895,9 +1895,9 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_os_clock, "clock", "os");
 	orcus_register_library(orcus_lib_os_getdate, "get_date", "os");
 	orcus_register_library(orcus_lib_os_gettime, "get_time", "os");
-	orcus_register_library((void*)&m_os_isposix, "IS_POSIX", "os", ORCUS_TYPE_BOOL);
-	orcus_register_library((void*)&m_os_isposix, "IS_UNIX", "os", ORCUS_TYPE_BOOL);
-	orcus_register_library((void*)&m_os_is64bit, "IS_64BIT", "os", ORCUS_TYPE_BOOL);
+	orcus_register_library((void*)&orcus_os_isposix, "IS_POSIX", "os", ORCUS_TYPE_BOOL);
+	orcus_register_library((void*)&orcus_os_isposix, "IS_UNIX", "os", ORCUS_TYPE_BOOL);
+	orcus_register_library((void*)&orcus_os_is64bit, "IS_64BIT", "os", ORCUS_TYPE_BOOL);
 	orcus_register_library(orcus_lib_os_exit, "exit", "os");
 #endif
 #ifdef ORCUS_LIB_IO

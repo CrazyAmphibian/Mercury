@@ -358,7 +358,7 @@ inline bool add_dump_pointer(void* ptr, orcus_uint* num_pointers_covered, void**
 }
 
 
-orcus_string* m_stringify(orcus_rawdata data, uint8_t type,orcus_uint* num_pointers_covered,void*** pointers_covered) {
+orcus_string* orcus_stringify(orcus_rawdata data, uint8_t type,orcus_uint* num_pointers_covered,void*** pointers_covered) {
 	orcus_string* str = nullptr;// orcus_cstring_to_mstring((char*)"", 0);
 
 
@@ -408,9 +408,9 @@ orcus_string* m_stringify(orcus_rawdata data, uint8_t type,orcus_uint* num_point
 				for (uint8_t i = 0; i < ORCUS_NUMBER_OF_TYPES; i++) {
 					orcus_subtable st = t->data[i];
 					for (orcus_int n = 0; n < st.size; n++) {
-						orcus_string* key = m_stringify(st.keys[n].data, i, num_pointers_covered, pointers_covered);
+						orcus_string* key = orcus_stringify(st.keys[n].data, i, num_pointers_covered, pointers_covered);
 						orcus_variable v = st.values[n];
-						orcus_string* value = m_stringify(v.data, v.type, num_pointers_covered, pointers_covered);
+						orcus_string* value = orcus_stringify(v.data, v.type, num_pointers_covered, pointers_covered);
 
 						if (!key || !value) {
 							if(key)orcus_mstring_delete(key);
@@ -529,10 +529,10 @@ orcus_string* m_stringify(orcus_rawdata data, uint8_t type,orcus_uint* num_point
 								const orcus_int index = orcus_reconstruct_array_index(i1, i2, i3);
 	#endif
 								if (var.type) {
-									temp = m_stringify(var.data, var.type, num_pointers_covered, pointers_covered);
+									temp = orcus_stringify(var.data, var.type, num_pointers_covered, pointers_covered);
 									if (!temp)continue;
 
-									orcus_string* temp2 = m_stringify({ index }, ORCUS_TYPE_INT, num_pointers_covered, pointers_covered);
+									orcus_string* temp2 = orcus_stringify({ index }, ORCUS_TYPE_INT, num_pointers_covered, pointers_covered);
 									orcus_mstrings_append(str, temp2);
 									orcus_mstring_delete(temp2);
 
@@ -588,7 +588,7 @@ void orcus_lib_std_dump(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 
 	orcus_uint nptrs=0;
 	void** ptrs = nullptr;
-	orcus_string* dmp_str = m_stringify(vartodump.data, vartodump.type,&nptrs,&ptrs);
+	orcus_string* dmp_str = orcus_stringify(vartodump.data, vartodump.type,&nptrs,&ptrs);
 	if (!dmp_str) {
 		dmp_str = (orcus_string*)malloc(sizeof(orcus_string));
 		if (!dmp_str) {
@@ -903,7 +903,7 @@ inline bool add_converted_pointer(void* originalp,void* newp, orcus_uint* num_po
 }
 
 //pointer to an array of void*s
-int m_variable_deepcopy(orcus_variable* var_in, orcus_variable* var_out,orcus_uint* num_pointers_converted,void*** pointer_conversions_in,void*** pointer_conversions_out) {
+int orcus_variable_deepcopy(orcus_variable* var_in, orcus_variable* var_out,orcus_uint* num_pointers_converted,void*** pointer_conversions_in,void*** pointer_conversions_out) {
 	var_out->type = var_in->type;
 	//printf("called!\n");
 	if (type_is_pointer(var_in)) {
@@ -944,10 +944,10 @@ int m_variable_deepcopy(orcus_variable* var_in, orcus_variable* var_out,orcus_ui
 					if (var_can_be_deepcopied(&key) && var_can_be_deepcopied(&value) ) {
 						orcus_variable newkey;
 						orcus_variable newvalue;
-						if (m_variable_deepcopy(&key, &newkey, num_pointers_converted, pointer_conversions_in, pointer_conversions_out) != DEEPCOPY_SUCCES) {
+						if (orcus_variable_deepcopy(&key, &newkey, num_pointers_converted, pointer_conversions_in, pointer_conversions_out) != DEEPCOPY_SUCCES) {
 							continue;
 						}
-						if(m_variable_deepcopy(&value,&newvalue,num_pointers_converted,pointer_conversions_in,pointer_conversions_out) != DEEPCOPY_SUCCES) {
+						if(orcus_variable_deepcopy(&value,&newvalue,num_pointers_converted,pointer_conversions_in,pointer_conversions_out) != DEEPCOPY_SUCCES) {
 							orcus_release_var(&newkey);
 							continue;
 						}
@@ -1025,7 +1025,7 @@ int m_variable_deepcopy(orcus_variable* var_in, orcus_variable* var_out,orcus_ui
 #endif
 								if (var.type && var_can_be_deepcopied(&var)) {
 									orcus_variable newvar;
-									if (m_variable_deepcopy((orcus_variable*)&var, &newvar, num_pointers_converted, pointer_conversions_in, pointer_conversions_out) != DEEPCOPY_SUCCES) {
+									if (orcus_variable_deepcopy((orcus_variable*)&var, &newvar, num_pointers_converted, pointer_conversions_in, pointer_conversions_out) != DEEPCOPY_SUCCES) {
 										continue;
 									}
 									orcus_increment_variable_refrence_count(&newvar);
@@ -1092,7 +1092,7 @@ void orcus_lib_std_deepcopy(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_uint nc = 0;
 	void** cpi = nullptr;
 	void** cpo = nullptr;
-	int code=m_variable_deepcopy(&in, &out, &nc, &cpi, &cpo);
+	int code=orcus_variable_deepcopy(&in, &out, &nc, &cpi, &cpo);
 	free(cpi);
 	free(cpo);
 	orcus_release_var(&in);

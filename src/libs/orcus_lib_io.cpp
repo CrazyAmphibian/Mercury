@@ -868,7 +868,7 @@ void orcus_lib_io_input(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 }
 
 const size_t char_array_blocksize = 16;
-enum m_serialize_types:unsigned char{
+enum orcus_serialize_types:unsigned char{
 	SERIALIZED_NIL = '\0',
 	SERIALIZED_INT64,
 	SERIALIZED_INT32,
@@ -951,7 +951,7 @@ inline bool can_serialize_var(const orcus_variable* var) {
 	}
 }
 
-bool m_serialize_variable(const orcus_variable* var, unsigned char** chars,orcus_int* num_chars,orcus_int* chars_allocated,void*** pointerscovered,orcus_uint* num_pointers_covered) {
+bool orcus_serialize_variable(const orcus_variable* var, unsigned char** chars,orcus_int* num_chars,orcus_int* chars_allocated,void*** pointerscovered,orcus_uint* num_pointers_covered) {
 	
 	switch (var->type) {
 		case ORCUS_TYPE_INT:
@@ -1130,8 +1130,8 @@ bool m_serialize_variable(const orcus_variable* var, unsigned char** chars,orcus
 									if (check_pointer_serial(var.data.p, num_pointers_covered, pointerscovered))continue;
 								}
 
-								if (!m_serialize_variable(&indexvar, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
-								if (!m_serialize_variable(&var, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+								if (!orcus_serialize_variable(&indexvar, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+								if (!orcus_serialize_variable(&var, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
 
 								cur_elems++;
 							}
@@ -1179,8 +1179,8 @@ bool m_serialize_variable(const orcus_variable* var, unsigned char** chars,orcus
 							if (st.values[i].type == ORCUS_TYPE_ARRAY || st.values[i].type == ORCUS_TYPE_TABLE) {
 								if (check_pointer_serial(st.values[i].data.p, num_pointers_covered, pointerscovered))continue;
 							}
-							if (!m_serialize_variable(st.keys+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
-							if (!m_serialize_variable(st.values+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+							if (!orcus_serialize_variable(st.keys+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
+							if (!orcus_serialize_variable(st.values+i, chars, num_chars, chars_allocated, pointerscovered, num_pointers_covered))return false;
 							cur_elems++;
 						}
 
@@ -1224,7 +1224,7 @@ void orcus_lib_io_serialize(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_uint num_pointers_covered = 0;
 
 
-	if (m_serialize_variable(&in, &chars, &num_chars, &chars_allocated, &pointerscovered, &num_pointers_covered)) {
+	if (orcus_serialize_variable(&in, &chars, &num_chars, &chars_allocated, &pointerscovered, &num_pointers_covered)) {
 		orcus_string* str=(orcus_string*)malloc(sizeof(orcus_string));
 		if (!str) {
 			free(chars);
@@ -1261,7 +1261,7 @@ inline bool deser_chars_avalible(orcus_int size,orcus_int position,orcus_int req
 	return position + requested <= size;
 }
 
-bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const orcus_int size,orcus_int* position) {
+bool orcus_deserialize_variable(orcus_variable* out,const unsigned char* chars,const orcus_int size,orcus_int* position) {
 	if (!deser_chars_avalible(size, *position, 1))return false;
 	unsigned char cur_char = chars[*position];
 	switch (cur_char) {
@@ -1456,12 +1456,12 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 				while (asize) {
 					orcus_variable key;
 					orcus_variable value;
-					if (!m_deserialize_variable(&key, chars, size, position))return false;
+					if (!orcus_deserialize_variable(&key, chars, size, position))return false;
 					if (key.type != ORCUS_TYPE_INT) {
 						orcus_release_var(&key);
 						return false;
 					}
-					if (!m_deserialize_variable(&value, chars, size, position))return false;
+					if (!orcus_deserialize_variable(&value, chars, size, position))return false;
 					if (!orcus_setarray(arr, &value, key.data.i)) {
 						orcus_release_var(&value);
 						return false;
@@ -1483,8 +1483,8 @@ bool m_deserialize_variable(orcus_variable* out,const unsigned char* chars,const
 			while (asize) {
 				orcus_variable key;
 				orcus_variable value;
-				if (!m_deserialize_variable(&key, chars, size, position))return false;
-				if (!m_deserialize_variable(&value, chars, size, position)) {
+				if (!orcus_deserialize_variable(&key, chars, size, position))return false;
+				if (!orcus_deserialize_variable(&value, chars, size, position)) {
 					orcus_release_var(&key);
 					return false;
 				};
@@ -1530,7 +1530,7 @@ void orcus_lib_io_deserialize(orcus_state* const ORCUS_CPP_restrict M, const orc
 	orcus_int pos = 0;
 	orcus_string* str = (orcus_string*)in.data.p;
 
-	if (!m_deserialize_variable(&out, (unsigned char*)str->ptr, str->size, &pos)) {
+	if (!orcus_deserialize_variable(&out, (unsigned char*)str->ptr, str->size, &pos)) {
 		orcus_release_var(&out);
 		out.data.i = 0;
 		out.type = ORCUS_TYPE_NIL;

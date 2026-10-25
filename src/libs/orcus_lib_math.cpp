@@ -216,7 +216,7 @@ void orcus_lib_math_to_radians(orcus_state* const ORCUS_CPP_restrict M, const or
 		return;
 	}
 
-	out.data.f = (m_math_pi*out.data.f)/180.0;
+	out.data.f = (orcus_math_pi*out.data.f)/180.0;
 
 	orcus_pushstack(M, &out);
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
@@ -251,7 +251,7 @@ void orcus_lib_math_to_degrees(orcus_state* const ORCUS_CPP_restrict M, const or
 		return;
 	}
 
-	out.data.f = (180.0 * out.data.f) / m_math_pi;
+	out.data.f = (180.0 * out.data.f) / orcus_math_pi;
 
 	orcus_pushstack(M, &out);
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);

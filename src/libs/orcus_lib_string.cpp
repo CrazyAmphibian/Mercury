@@ -751,7 +751,7 @@ void printf_wrapper_takes_int(char* buffer, size_t buffer_size, orcus_string* st
 	orcus_mstring_addchars(str_out, buffer, chars_added);
 }
 
-union m_rawdata_snowflake_printf { //because printf promotes floats to doubles for some fucking reason. why?
+union orcus_rawdata_snowflake_printf { //because printf promotes floats to doubles for some fucking reason. why?
 	double f;
 	orcus_int i;
 	orcus_uint u;
@@ -759,7 +759,7 @@ union m_rawdata_snowflake_printf { //because printf promotes floats to doubles f
 };
 
 
-orcus_int m_readformat(orcus_string* str, orcus_int offset, orcus_string* str_out, orcus_variable* v_arr, orcus_int* num_vars) {
+orcus_int orcus_readformat(orcus_string* str, orcus_int offset, orcus_string* str_out, orcus_variable* v_arr, orcus_int* num_vars) {
 	orcus_int add_off = 0;
 
 	unsigned char nargs = 0;
@@ -771,7 +771,7 @@ orcus_int m_readformat(orcus_string* str, orcus_int offset, orcus_string* str_ou
 	char printfbuffer[BUFFER_SIZE] = {'\0'};
 
 	const char* type=nullptr;
-	m_rawdata_snowflake_printf value;
+	orcus_rawdata_snowflake_printf value;
 	value.i = 0;
 
 	while (true) {
@@ -1061,7 +1061,7 @@ void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcu
 		if (c == '%') {
 			pc++;
 			if (pc < s->size) {
-				pc+=m_readformat(s,pc, outstr,var_t,&var_s);
+				pc+=orcus_readformat(s,pc, outstr,var_t,&var_s);
 			}
 		}
 		else {
@@ -1114,7 +1114,7 @@ void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcu
 */
 
 
-enum M_PAT_MATCH {
+enum ORCUS_PAT_MATCH {
 	//count flags
 	MATCH_SINGLE = (1<<0), //we only want a single char, and stop as soon as we find what we want.
 	MATCH_AT_LEAST_ONE = (1<<1), //we can match many chars, and keep going until the rule stops being true.
@@ -1124,7 +1124,7 @@ enum M_PAT_MATCH {
 	MATCH_INVERTED = (1<<4), //we do NOT want this char.
 };
 
-struct M_PATTERN{
+struct ORCUS_PATTERN{
 	bool allowed_chars[256] = { false };
 	int match_type = MATCH_SINGLE;
 	orcus_int first_good_char = 0; //succesive checks will start at this +1 if not MATCH_GREEDY
@@ -1132,14 +1132,14 @@ struct M_PATTERN{
 	bool passed = false;
 };
 
-void m_initialize_pattern(M_PATTERN* P) {
+void orcus_initialize_pattern(ORCUS_PATTERN* P) {
 	if (!P)return;
-	memset(P, 0, sizeof(M_PATTERN));
+	memset(P, 0, sizeof(ORCUS_PATTERN));
 	P->match_type = MATCH_SINGLE;
 }
 
 
-inline void m_init_pattern_filter_numbers(M_PATTERN* P){
+inline void orcus_init_pattern_filter_numbers(ORCUS_PATTERN* P){
 	if (!P)return;
 	int i = '0';
 	while (i <= '9') {
@@ -1147,7 +1147,7 @@ inline void m_init_pattern_filter_numbers(M_PATTERN* P){
 		i++;
 	}
 }
-inline void m_init_pattern_filter_letter_upper(M_PATTERN* P) {
+inline void orcus_init_pattern_filter_letter_upper(ORCUS_PATTERN* P) {
 	if (!P)return;
 	int i = 'A';
 	while (i <= 'Z') {
@@ -1156,7 +1156,7 @@ inline void m_init_pattern_filter_letter_upper(M_PATTERN* P) {
 	}
 }
 
-inline void m_init_pattern_filter_letter_lower(M_PATTERN* P) {
+inline void orcus_init_pattern_filter_letter_lower(ORCUS_PATTERN* P) {
 	if (!P)return;
 	int i = 'a';
 	while (i <= 'z') {
@@ -1165,7 +1165,7 @@ inline void m_init_pattern_filter_letter_lower(M_PATTERN* P) {
 	}
 }
 
-inline void m_init_pattern_filter_wildcard(M_PATTERN* P) {
+inline void orcus_init_pattern_filter_wildcard(ORCUS_PATTERN* P) {
 	if (!P)return;
 	int i = '\x00';
 	while (i <= (unsigned char)'\xFF') {
@@ -1174,7 +1174,7 @@ inline void m_init_pattern_filter_wildcard(M_PATTERN* P) {
 	}
 }
 
-inline void m_init_pattern_filter_symbols(M_PATTERN* P) {
+inline void orcus_init_pattern_filter_symbols(ORCUS_PATTERN* P) {
 	if (!P)return;
 	int i = '\x21';
 	while (i <= '\x2F') {
@@ -1198,7 +1198,7 @@ inline void m_init_pattern_filter_symbols(M_PATTERN* P) {
 	}
 }
 
-inline void m_init_pattern_filter_whitespace(M_PATTERN* P) {
+inline void orcus_init_pattern_filter_whitespace(ORCUS_PATTERN* P) {
 	if (!P)return;
 	P->allowed_chars[' '] = true;
 	P->allowed_chars['\t'] = true;
@@ -1206,7 +1206,7 @@ inline void m_init_pattern_filter_whitespace(M_PATTERN* P) {
 	P->allowed_chars['\r'] = true;
 }
 
-inline void m_init_pattern_filter_hexadecimal(M_PATTERN* P) {
+inline void orcus_init_pattern_filter_hexadecimal(ORCUS_PATTERN* P) {
 	if (!P)return;
 	P->allowed_chars['a'] = true;
 	P->allowed_chars['b'] = true;
@@ -1232,7 +1232,7 @@ inline void m_init_pattern_filter_hexadecimal(M_PATTERN* P) {
 	P->allowed_chars['9'] = true;
 }
 
-inline void m_init_mattern_invert_filter_chars(M_PATTERN* P) {
+inline void orcus_init_mattern_invert_filter_chars(ORCUS_PATTERN* P) {
 	if (!P)return;
 	int i = '\x00';
 	while (i <= (unsigned char)'\xFF') {
@@ -1241,20 +1241,20 @@ inline void m_init_mattern_invert_filter_chars(M_PATTERN* P) {
 	}
 }
 
-M_PATTERN* m_patternize_string(orcus_string* str,orcus_int* num_out) {
+ORCUS_PATTERN* orcus_patternize_string(orcus_string* str,orcus_int* num_out) {
 	orcus_int n = 0;
-	M_PATTERN* out = nullptr;
+	ORCUS_PATTERN* out = nullptr;
 
 
 	for (orcus_int c = 0; c < str->size; c++) {
 		char cc = str->ptr[c];
 		//printf("%i %c\n",c,cc);
-		M_PATTERN* nptr = (M_PATTERN*)realloc(out, sizeof(M_PATTERN) * (n + 1));
+		ORCUS_PATTERN* nptr = (ORCUS_PATTERN*)realloc(out, sizeof(ORCUS_PATTERN) * (n + 1));
 		if (!nptr)return nullptr;
 		out = nptr;
-		M_PATTERN* p = out+n;
+		ORCUS_PATTERN* p = out+n;
 		n++;
-		m_initialize_pattern(p);
+		orcus_initialize_pattern(p);
 		
 		//look for the first part of the pattern, the character set.
 		if (cc == '%' && (c + 1) < str->size) {
@@ -1262,34 +1262,34 @@ M_PATTERN* m_patternize_string(orcus_string* str,orcus_int* num_out) {
 			c++;
 			switch (nc) {
 			case 'n':
-				m_init_pattern_filter_numbers(p);
+				orcus_init_pattern_filter_numbers(p);
 				break;
 			case 'l':
-				m_init_pattern_filter_letter_upper(p);
-				m_init_pattern_filter_letter_lower(p);
+				orcus_init_pattern_filter_letter_upper(p);
+				orcus_init_pattern_filter_letter_lower(p);
 				break;
 			case 'u':
-				m_init_pattern_filter_letter_upper(p);
+				orcus_init_pattern_filter_letter_upper(p);
 				break;
 			case 'w':
-				m_init_pattern_filter_letter_lower(p);
+				orcus_init_pattern_filter_letter_lower(p);
 				break;
 			case 'a':
-				m_init_pattern_filter_numbers(p);
-				m_init_pattern_filter_letter_upper(p);
-				m_init_pattern_filter_letter_lower(p);
+				orcus_init_pattern_filter_numbers(p);
+				orcus_init_pattern_filter_letter_upper(p);
+				orcus_init_pattern_filter_letter_lower(p);
 				break;
 			case 's':
-				m_init_pattern_filter_symbols(p);
+				orcus_init_pattern_filter_symbols(p);
 				break;
 			case ' ':
-				m_init_pattern_filter_whitespace(p);
+				orcus_init_pattern_filter_whitespace(p);
 				break;
 			case '.':
-				m_init_pattern_filter_wildcard(p);
+				orcus_init_pattern_filter_wildcard(p);
 				break;
 			case 'x':
-				m_init_pattern_filter_hexadecimal(p);
+				orcus_init_pattern_filter_hexadecimal(p);
 				break;
 			case '%': //explicitly define this as intented behavior. if you're not escaping %, then you're just asking for trouble later down the line.
 			default:
@@ -1329,27 +1329,27 @@ M_PATTERN* m_patternize_string(orcus_string* str,orcus_int* num_out) {
 				p->match_type = MATCH_SINGLE;
 				break;
 			case '/':
-				m_init_mattern_invert_filter_chars(p);
+				orcus_init_mattern_invert_filter_chars(p);
 				p->match_type = MATCH_AT_LEAST_ONE | MATCH_OPTIONAL | MATCH_GREEDY;
 				break;
 			case '\\':
-				m_init_mattern_invert_filter_chars(p);
+				orcus_init_mattern_invert_filter_chars(p);
 				p->match_type = MATCH_AT_LEAST_ONE | MATCH_OPTIONAL;
 				break;
 			case '#':
-				m_init_mattern_invert_filter_chars(p);
+				orcus_init_mattern_invert_filter_chars(p);
 				p->match_type = MATCH_AT_LEAST_ONE | MATCH_GREEDY;
 				break;
 			case '@':
-				m_init_mattern_invert_filter_chars(p);
+				orcus_init_mattern_invert_filter_chars(p);
 				p->match_type = MATCH_AT_LEAST_ONE;
 				break;
 			case '|':
-				m_init_mattern_invert_filter_chars(p);
+				orcus_init_mattern_invert_filter_chars(p);
 				p->match_type = MATCH_SINGLE | MATCH_OPTIONAL;
 				break;
 			case '=':
-				m_init_mattern_invert_filter_chars(p);
+				orcus_init_mattern_invert_filter_chars(p);
 				p->match_type = MATCH_SINGLE;
 				break;
 			case '%': //see above.
@@ -1366,13 +1366,13 @@ M_PATTERN* m_patternize_string(orcus_string* str,orcus_int* num_out) {
 }
 
 
-bool m_evaluate_patterns(orcus_string* str, M_PATTERN* patterns, orcus_int num_patterns, orcus_int str_start, orcus_int* pattern_str_start, orcus_int* pattern_str_end) {
+bool orcus_evaluate_patterns(orcus_string* str, ORCUS_PATTERN* patterns, orcus_int num_patterns, orcus_int str_start, orcus_int* pattern_str_start, orcus_int* pattern_str_end) {
 
-#if defined(DEBUG) || defined(_DEBUG)
+#ifdef ORCUS_DEBUG
 
 	for (orcus_int i = 0; i < num_patterns; i++) {
 
-		M_PATTERN P = patterns[i];
+		ORCUS_PATTERN P = patterns[i];
 		printf("pattern %zi: ",i);
 
 		if (P.match_type & MATCH_SINGLE) {
@@ -1424,7 +1424,7 @@ bool m_evaluate_patterns(orcus_string* str, M_PATTERN* patterns, orcus_int num_p
 		unsigned char cc = str->ptr[c];
 		
 		
-		M_PATTERN* p = patterns+current_pattern;
+		ORCUS_PATTERN* p = patterns+current_pattern;
 		if (!current_pattern && !p->passed)*pattern_str_start = c;
 		if (p->allowed_chars[cc]) {
 			if (p->match_type & MATCH_SINGLE) {
@@ -1560,12 +1560,12 @@ void orcus_lib_string_p_find(orcus_state* const ORCUS_CPP_restrict M, const orcu
 	orcus_string* pat_str = (orcus_string*)searchforvar.data.p;
 
 	orcus_int num_pats = 0;
-	M_PATTERN* P = m_patternize_string(pat_str,&num_pats);
+	ORCUS_PATTERN* P = orcus_patternize_string(pat_str,&num_pats);
 
 
 	orcus_int start = 0;
 	orcus_int end = 0;
-	bool found=m_evaluate_patterns(str,P,num_pats, startat.type ? startat.data.i : 0,&start,&end);
+	bool found=orcus_evaluate_patterns(str,P,num_pats, startat.type ? startat.data.i : 0,&start,&end);
 
 	free(P);
 	
@@ -1624,7 +1624,7 @@ void orcus_lib_string_p_extract(orcus_state* const ORCUS_CPP_restrict M, const o
 	orcus_string* match = (orcus_string*)matchvar.data.p;
 
 	orcus_int num_pats = 0;
-	M_PATTERN* P = m_patternize_string(match, &num_pats);
+	ORCUS_PATTERN* P = orcus_patternize_string(match, &num_pats);
 
 	orcus_array* arr=orcus_newarray();
 
@@ -1632,7 +1632,7 @@ void orcus_lib_string_p_extract(orcus_state* const ORCUS_CPP_restrict M, const o
 	orcus_int count = 0;
 	orcus_int start = 0;
 	orcus_int end = 0;
-	while (m_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
+	while (orcus_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
 		orcus_string* ss=orcus_mstring_substring(str,start,end);
 		if (!ss) {
 			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
@@ -1712,7 +1712,7 @@ void orcus_lib_string_p_replace(orcus_state* const ORCUS_CPP_restrict M, const o
 	orcus_string* rep = (orcus_string*)repvar.data.p;
 
 	orcus_int num_pats = 0;
-	M_PATTERN* P = m_patternize_string(match, &num_pats);
+	ORCUS_PATTERN* P = orcus_patternize_string(match, &num_pats);
 	
 
 	orcus_string* outstr = orcus_cstring_to_mstring((char*)"", 0);
@@ -1723,7 +1723,7 @@ void orcus_lib_string_p_replace(orcus_state* const ORCUS_CPP_restrict M, const o
 	orcus_int start = 0;
 	orcus_int end = 0;
 	orcus_int lastendmatch = 0;
-	while (m_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
+	while (orcus_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
 		if (max_replacments.type && count >= max_replacments.data.i)break;
 
 		//printf("%i=%i\n", start, end);
@@ -1785,14 +1785,14 @@ void orcus_lib_string_p_count(orcus_state* const ORCUS_CPP_restrict M, const orc
 	orcus_string* match = (orcus_string*)matchvar.data.p;
 
 	orcus_int num_pats = 0;
-	M_PATTERN* P = m_patternize_string(match, &num_pats);
+	ORCUS_PATTERN* P = orcus_patternize_string(match, &num_pats);
 
 
 	orcus_int count = 0;
 
 	orcus_int start = 0;
 	orcus_int end = 0;
-	while (m_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
+	while (orcus_evaluate_patterns(str, P, num_pats, end, &start, &end)) {
 		//printf("%i=%i\n", start, end);
 
 		end++;
@@ -2304,7 +2304,7 @@ void orcus_lib_string_p_match_function(orcus_state* const ORCUS_CPP_restrict M, 
 	//orcus_int i = 0;
 
 	orcus_int num_pats = 0;
-	M_PATTERN* P = m_patternize_string(find_str, &num_pats);
+	ORCUS_PATTERN* P = orcus_patternize_string(find_str, &num_pats);
 	orcus_int start = 0;
 	orcus_int end = 0;
 	orcus_int i = 0;
@@ -2316,7 +2316,7 @@ void orcus_lib_string_p_match_function(orcus_state* const ORCUS_CPP_restrict M, 
 			break;
 		}
 		
-		if (!m_evaluate_patterns(base_str, P, num_pats, end, &start, &end)) {
+		if (!orcus_evaluate_patterns(base_str, P, num_pats, end, &start, &end)) {
 			orcus_mstring_addchars(out_str,base_str->ptr+i,1);
 			i++;
 			start = end = i;

@@ -12,9 +12,9 @@ void orcus_lib_array_swap(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 void orcus_lib_array_sort(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 void orcus_lib_array_concat(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 
-const orcus_int m_sort_greater_to_lesser = 1;
-const orcus_int m_sort_lesser_to_greater = 2;
-const orcus_int m_sort_greater_to_lesser_absolute = 3;
-const orcus_int m_sort_lesser_to_greater_absolute = 4;
-const orcus_int m_sort_alphabet_az = 5;
-const orcus_int m_sort_alphabet_za = 6;
+const orcus_int orcus_sort_greater_to_lesser = 1;
+const orcus_int orcus_sort_lesser_to_greater = 2;
+const orcus_int orcus_sort_greater_to_lesser_absolute = 3;
+const orcus_int orcus_sort_lesser_to_greater_absolute = 4;
+const orcus_int orcus_sort_alphabet_az = 5;
+const orcus_int orcus_sort_alphabet_za = 6;

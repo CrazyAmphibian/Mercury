@@ -12,15 +12,15 @@ void orcus_lib_os_gettime(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 void orcus_lib_os_exit(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 
 #ifdef _WIN32
-const orcus_int m_os_isposix=0;
+const orcus_int orcus_os_isposix=0;
 #else
-const orcus_int m_os_isposix = 1;
+const orcus_int orcus_os_isposix = 1;
 #endif
 
 #ifdef ORCUS_64BIT
-const orcus_int m_os_is64bit = 1;
+const orcus_int orcus_os_is64bit = 1;
 #else
-const orcus_int m_os_is64bit = 0;
+const orcus_int orcus_os_is64bit = 0;
 #endif
 
 
