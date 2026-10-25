@@ -424,19 +424,19 @@ void orcus_lib_array_swap(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 
 
 
-orcus_function* SORTING_M_FUNCTION = nullptr;
-orcus_state* SORTING_M_STATE = nullptr;
+orcus_function* SORTING_ORCUS_FUNCTION = nullptr;
+orcus_state* SORTING_ORCUS_STATE = nullptr;
 
 int orcus_sort_use_orcus_function(const void* a, const void* b) {
 	orcus_variable var_a = *(orcus_variable*)a;
 	orcus_variable var_b = *(orcus_variable*)b;
 
-	orcus_state* M= orcus_get_child_state(SORTING_M_STATE);
+	orcus_state* M= orcus_get_child_state(SORTING_ORCUS_STATE);
 	if (!M)return 0;
-	//M->bytecode.instructions = SORTING_M_FUNCTION->instructions;
-	//M->bytecode.numberofinstructions = SORTING_M_FUNCTION->numberofinstructions;
+	//M->bytecode.instructions = SORTING_ORCUS_FUNCTION->instructions;
+	//M->bytecode.numberofinstructions = SORTING_ORCUS_FUNCTION->numberofinstructions;
 	orcus_function* oldf = M->bytecode;
-	M->bytecode = SORTING_M_FUNCTION;
+	M->bytecode = SORTING_ORCUS_FUNCTION;
 	orcus_pushstack(M,&var_b);
 	orcus_pushstack(M,&var_a);
 	while (orcus_stepstate(M));
@@ -699,8 +699,8 @@ void orcus_lib_array_sort(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 		}
 	}
 	else {
-		SORTING_M_FUNCTION = (orcus_function*)var_func.data.p;
-		SORTING_M_STATE = M;
+		SORTING_ORCUS_FUNCTION = (orcus_function*)var_func.data.p;
+		SORTING_ORCUS_STATE = M;
 		qsort(tlist, arr_size, sizeof(orcus_variable), orcus_sort_use_orcus_function); //surely this will work.
 	}
 

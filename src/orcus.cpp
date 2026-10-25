@@ -1442,7 +1442,7 @@ void orcus_clear_function(orcus_function* in) {
 
 inline const char* m_get_opcode_str(orcus_opcode instruction) {
 
-	if (instruction > M_OPCODE_GET_KCS) {
+	if (instruction > ORCUS_OPCODE_GET_KCS) {
 		return "????";
 	}
 	static const char* lookup[0xFFFF] = {
@@ -1558,17 +1558,17 @@ orcus_string* orcus_get_bytecode_debug(orcus_function* F) {
 		orcus_mstring_addchars(out, buffer, strlen(buffer) );
 
 		switch (instruction) {
-			case M_OPCODE_NINT: //static var inputs
+			case ORCUS_OPCODE_NINT: //static var inputs
 				snprintf(buffer, 0x2FFF, " %zi", *(orcus_int*)(F->instructions + offset));
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
-			case M_OPCODE_NFLO:
+			case ORCUS_OPCODE_NFLO:
 				snprintf(buffer, 0x2FFF, " %f", *(orcus_float*)(F->instructions + offset));
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
-			case M_OPCODE_NSTR:
+			case ORCUS_OPCODE_NSTR:
 				{
 				orcus_int size = *(orcus_int*)(F->instructions + offset);
 				snprintf(buffer, 0x2FFF, " size:%zi ", size );
@@ -1585,12 +1585,12 @@ orcus_string* orcus_get_bytecode_debug(orcus_function* F) {
 				orcus_mstring_addchars(out, (char*)"\"", 1);
 				}
 				break;
-			case M_OPCODE_NFUN:
+			case ORCUS_OPCODE_NFUN:
 				snprintf(buffer, 0x2FFF, " instructions:%zi ", *(orcus_int*)(F->instructions + offset));
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
-			case M_OPCODE_CALL:
+			case ORCUS_OPCODE_CALL:
 				snprintf(buffer, 0x2FFF, " in:%zi ", *(orcus_int*)(F->instructions + offset));
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;	
@@ -1598,24 +1598,24 @@ orcus_string* orcus_get_bytecode_debug(orcus_function* F) {
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
-			case M_OPCODE_JMP: //gaurentee takes 1, int
-			case M_OPCODE_JMPR:
-			case M_OPCODE_JIF:
-			case M_OPCODE_JNIF:
-			case M_OPCODE_JRIF:
-			case M_OPCODE_JRNI:
+			case ORCUS_OPCODE_JMP: //gaurentee takes 1, int
+			case ORCUS_OPCODE_JMPR:
+			case ORCUS_OPCODE_JIF:
+			case ORCUS_OPCODE_JNIF:
+			case ORCUS_OPCODE_JRIF:
+			case ORCUS_OPCODE_JRNI:
 				snprintf(buffer, 0x2FFF, " offset:%zi ", *(orcus_int*)(F->instructions + offset));
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
-			case M_OPCODE_CPYX:
-			case M_OPCODE_SCON:
-			case M_OPCODE_GCON:
+			case ORCUS_OPCODE_CPYX:
+			case ORCUS_OPCODE_SCON:
+			case ORCUS_OPCODE_GCON:
 				snprintf(buffer, 0x2FFF, " %zi ", *(orcus_int*)(F->instructions + offset));
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
-			case M_OPCODE_SWXY:
+			case ORCUS_OPCODE_SWXY:
 				snprintf(buffer, 0x2FFF, " %zu ", *(orcus_int*)(F->instructions + offset));
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
@@ -1623,14 +1623,14 @@ orcus_string* orcus_get_bytecode_debug(orcus_function* F) {
 				orcus_mstring_addchars(out, buffer, strlen(buffer));
 				offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 				break;
-			case M_OPCODE_SETL_KCS:
-			case M_OPCODE_GETL_KCS:
-			case M_OPCODE_SETG_KCS:
-			case M_OPCODE_GETG_KCS:
-			case M_OPCODE_SENV_KCS:
-			case M_OPCODE_GENV_KCS:
-			case M_OPCODE_SET_KCS:
-			case M_OPCODE_GET_KCS:
+			case ORCUS_OPCODE_SETL_KCS:
+			case ORCUS_OPCODE_GETL_KCS:
+			case ORCUS_OPCODE_SETG_KCS:
+			case ORCUS_OPCODE_GETG_KCS:
+			case ORCUS_OPCODE_SENV_KCS:
+			case ORCUS_OPCODE_GENV_KCS:
+			case ORCUS_OPCODE_SET_KCS:
+			case ORCUS_OPCODE_GET_KCS:
 				{
 				orcus_int size = *(orcus_int*)(F->instructions + offset);
 				snprintf(buffer, 0x2FFF, " size:%zi ", size);

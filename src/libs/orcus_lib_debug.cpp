@@ -54,9 +54,9 @@ void orcus_lib_debug_stack_dbg(orcus_state* const ORCUS_CPP_restrict M, const or
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
-void m_output_state(orcus_state* M, orcus_int* l,bool is_cur) {
+void orcus_output_state(orcus_state* M, orcus_int* l,bool is_cur) {
 	if (M->parentstate) {
-		m_output_state(M->parentstate, l,false);
+		orcus_output_state(M->parentstate, l,false);
 	}
 	for (orcus_int i = 0; i < *l; i++) {
 		putchar('\t');
@@ -69,13 +69,13 @@ void orcus_lib_debug_state_dbg(orcus_state* const ORCUS_CPP_restrict M, const or
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 
 	orcus_int c = 0;
-	m_output_state(M, &c,true);
+	orcus_output_state(M, &c,true);
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 }
 
 
-char* m_var_to_string(uint8_t type,orcus_rawdata data) {
+char* orcus_var_to_string(uint8_t type,orcus_rawdata data) {
 	char* out = (char*)malloc(sizeof(char)*2048 );
 	if (!out)return nullptr;
 	switch (type) {
@@ -138,7 +138,7 @@ void orcus_lib_debug_enviroment_dbg(orcus_state* const ORCUS_CPP_restrict M, con
 		for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 			orcus_subtable st = e->data[t];
 			for (orcus_int i = 0; i < st.size; i++) {
-				printf("\t%s = %s\n", m_var_to_string(t, st.keys[i].data), m_var_to_string(st.values[i].type, st.values[i].data));
+				printf("\t%s = %s\n", orcus_var_to_string(t, st.keys[i].data), orcus_var_to_string(st.values[i].type, st.values[i].data));
 			}
 
 		}
@@ -156,7 +156,7 @@ void orcus_lib_debug_constants_dbg(orcus_state* const ORCUS_CPP_restrict M, cons
 
 	for (orcus_uint i = 0; i < M->num_constants; i++) {
 		orcus_variable c=M->constants[i];
-		printf("\t%zu : %s\n", i, m_var_to_string(c.type, c.data));
+		printf("\t%zu : %s\n", i, orcus_var_to_string(c.type, c.data));
 	}
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);

@@ -1069,104 +1069,104 @@ orcus_opcode m_compile_get_operator_opcode_from_token(compiler_token* t,int ttyp
 		char c=t->chars[0];
 		switch (c){
 			case '+':
-				return M_OPCODE_ADD;
+				return ORCUS_OPCODE_ADD;
 			case '-':
-				return ttype==1 ? M_OPCODE_UNM : M_OPCODE_SUB;
+				return ttype==1 ? ORCUS_OPCODE_UNM : ORCUS_OPCODE_SUB;
 			case '*':
-				return M_OPCODE_MUL;
+				return ORCUS_OPCODE_MUL;
 			case '^':
-				return M_OPCODE_POW;
+				return ORCUS_OPCODE_POW;
 			case '/':
-				return M_OPCODE_DIV;
+				return ORCUS_OPCODE_DIV;
 			case '\\':
-				return M_OPCODE_IDIV;
+				return ORCUS_OPCODE_IDIV;
 			case '%':
-				return M_OPCODE_MOD;
+				return ORCUS_OPCODE_MOD;
 			case '!':
-				return M_OPCODE_BNOT;
+				return ORCUS_OPCODE_BNOT;
 			case '&':
-				return M_OPCODE_BAND;
+				return ORCUS_OPCODE_BAND;
 			case '|':
-				return M_OPCODE_BOR;
+				return ORCUS_OPCODE_BOR;
 			case '~':
-				return M_OPCODE_BXOR;
+				return ORCUS_OPCODE_BXOR;
 			case '#':
-				return M_OPCODE_LEN;
+				return ORCUS_OPCODE_LEN;
 			case '<':
-				return M_OPCODE_LET;
+				return ORCUS_OPCODE_LET;
 			case '>':
-				return M_OPCODE_GRT;
+				return ORCUS_OPCODE_GRT;
 		}
 	}else if(nc==2){
 		if(t->chars[0]==t->chars[1]){
 			switch(t->chars[0]){
 				case '=':
-					return M_OPCODE_EQL;
+					return ORCUS_OPCODE_EQL;
 				case '.':
-					return M_OPCODE_CNCT;	
+					return ORCUS_OPCODE_CNCT;	
 				case '<':
-					return M_OPCODE_BSHL;
+					return ORCUS_OPCODE_BSHL;
 				case '>':
-					return M_OPCODE_BSHR;
+					return ORCUS_OPCODE_BSHR;
 				case '!':
-					return M_OPCODE_LNOT;
+					return ORCUS_OPCODE_LNOT;
 				case '&':
-					return M_OPCODE_LAND;
+					return ORCUS_OPCODE_LAND;
 				case '|':
-					return M_OPCODE_LOR;
+					return ORCUS_OPCODE_LOR;
 				case '~':
-					return M_OPCODE_LXOR;
+					return ORCUS_OPCODE_LXOR;
 				case '+':
-					return M_OPCODE_INC;
+					return ORCUS_OPCODE_INC;
 				case '-':
-					return M_OPCODE_DEC;
+					return ORCUS_OPCODE_DEC;
 			}
 		}else if(t->chars[1]=='='){
 			switch(t->chars[0]){
 				case '!':
-					return M_OPCODE_NEQ;
+					return ORCUS_OPCODE_NEQ;
 				case '<':
-					return M_OPCODE_LTE;
+					return ORCUS_OPCODE_LTE;
 				case '>':
-					return M_OPCODE_GTE;
+					return ORCUS_OPCODE_GTE;
 				case '&':
-					return M_OPCODE_BAND;
+					return ORCUS_OPCODE_BAND;
 				case '|':
-					return M_OPCODE_BOR;
+					return ORCUS_OPCODE_BOR;
 				case '~':
-					return M_OPCODE_BXOR;
+					return ORCUS_OPCODE_BXOR;
 				case '+':
-					return M_OPCODE_ADD;
+					return ORCUS_OPCODE_ADD;
 				case '-':
-					return M_OPCODE_SUB;
+					return ORCUS_OPCODE_SUB;
 				case '*':
-					return M_OPCODE_MUL;
+					return ORCUS_OPCODE_MUL;
 				case '^':
-					return M_OPCODE_POW;
+					return ORCUS_OPCODE_POW;
 				case '\\':
-					return M_OPCODE_IDIV;
+					return ORCUS_OPCODE_IDIV;
 				case '/':
-					return M_OPCODE_DIV;
+					return ORCUS_OPCODE_DIV;
 				case '%':
-					return M_OPCODE_MOD;
+					return ORCUS_OPCODE_MOD;
 			}
 		}
 	}else if(nc==3){
 		if(token_matches_chars(t,"..=")){
-			return M_OPCODE_CNCT;
+			return ORCUS_OPCODE_CNCT;
 		}else if(token_matches_chars(t,"<<=")){
-			return M_OPCODE_BSHL;
+			return ORCUS_OPCODE_BSHL;
 		}else if(token_matches_chars(t,">>=")){
-			return M_OPCODE_BSHR;
+			return ORCUS_OPCODE_BSHR;
 		}else if (token_matches_chars(t, "&&=")) {
-			return M_OPCODE_LAND;
+			return ORCUS_OPCODE_LAND;
 		}else if (token_matches_chars(t, "||=")) {
-			return M_OPCODE_LOR;
+			return ORCUS_OPCODE_LOR;
 		}else if (token_matches_chars(t, "~~=")) {
-			return M_OPCODE_LXOR;
+			return ORCUS_OPCODE_LXOR;
 		}
 	}
-	return M_OPCODE_NOP;
+	return ORCUS_OPCODE_NOP;
 }
 
 inline bool add_raw_string_onto_stack(compiler_function* f, char* s, orcus_int len, orcus_int dbg_toknum) { //no additional opcode, just raw length and chars.
@@ -1198,7 +1198,7 @@ inline bool add_raw_string_onto_stack(compiler_function* f, char* s, orcus_int l
 
 inline void add_string_onto_stack(compiler_function* f,char* s,orcus_int len,orcus_int dbg_toknum){
 	orcus_int required_space = (len + sizeof(orcus_opcode)-1) / sizeof(orcus_opcode);
-	add_instruction(f, M_OPCODE_NSTR,dbg_toknum);
+	add_instruction(f, ORCUS_OPCODE_NSTR,dbg_toknum);
 	add_rawdata_bitwidth_size(f, len,dbg_toknum);
 	void* nptr=realloc(f->instructions, sizeof(orcus_opcode)*(f->number_instructions+required_space) );
 	if(!nptr){
@@ -1238,13 +1238,13 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		return 0;
 	}
 	if(cur_tok->token_flags & TOKEN_STATIC_NIL){
-		add_instruction(f, M_OPCODE_NNIL,token_offset);
+		add_instruction(f, ORCUS_OPCODE_NNIL,token_offset);
 		token_offset++;
 	}else if(cur_tok->token_flags & TOKEN_STATIC_BOOLEAN){
 		if(cur_tok->chars[0]=='t'){
-			add_instruction(f, M_OPCODE_NTRU,token_offset);
+			add_instruction(f, ORCUS_OPCODE_NTRU,token_offset);
 		}else{
-			add_instruction(f, M_OPCODE_NFAL,token_offset);
+			add_instruction(f, ORCUS_OPCODE_NFAL,token_offset);
 		}
 		token_offset++;
 	}else if(cur_tok->token_flags & TOKEN_STATIC_STRING){
@@ -1254,7 +1254,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 			f->token_error_num=token_offset;
 			return 0;
 		}
-		add_instruction(f,M_OPCODE_GCON, token_offset);
+		add_instruction(f,ORCUS_OPCODE_GCON, token_offset);
 		add_rawdata_bitwidth_size(f,ci, token_offset);
 		//add_string_onto_stack(f,cur_tok->chars,cur_tok->num_chars,token_offset);
 		token_offset++;
@@ -1296,12 +1296,12 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		}
 		
 		if (*end=='\0') {
-			add_instruction(f, M_OPCODE_NINT,token_offset);
+			add_instruction(f, ORCUS_OPCODE_NINT,token_offset);
 			add_rawdata_bitwidth_size(f, *((binarydata*)&i),token_offset);
 		}else{
 			orcus_float fa = strtod(cstr, &end);
 			if (*end=='\0') {
-				add_instruction(f, M_OPCODE_NFLO,token_offset);
+				add_instruction(f, ORCUS_OPCODE_NFLO,token_offset);
 				add_rawdata_bitwidth_size(f, *((binarydata*)&fa),token_offset);
 			}else{
 				f->errorcode=ORCUS_COMPERR_MALFORMED_NUMBER;
@@ -1316,7 +1316,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		bool is_array = cur_tok->chars[0]=='[';
 		orcus_int implicit_position=0;
 			
-		add_instruction(f,is_array? M_OPCODE_NARR : M_OPCODE_NTAB,token_offset);
+		add_instruction(f,is_array? ORCUS_OPCODE_NARR : ORCUS_OPCODE_NTAB,token_offset);
 		token_offset++;
 
 		while(true){ //the ticky thing about tables and arrays is how many syntax options we have. [1,2,3], [1=1,2=2,3=3]
@@ -1357,7 +1357,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 				
 			if(cur_tok->token_flags & TOKEN_OPERATOR && cur_tok->num_chars==1){
 				if(cur_tok->chars[0]=='='){ //explicit index
-					add_instruction(f,M_OPCODE_CPYT,token_offset);
+					add_instruction(f,ORCUS_OPCODE_CPYT,token_offset);
 					
 					
 
@@ -1368,7 +1368,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 					orcus_int o= m_compile_read_var_statment(f,tokens,num_tokens,token_offset,i);
 					i->args_out = oao;
 					
-					add_instruction(f, M_OPCODE_SWPT, token_offset);
+					add_instruction(f, ORCUS_OPCODE_SWPT, token_offset);
 
 					merge_compiler_functions_nofree(f, &idxfunc);
 					clear_compiler_function(&idxfunc);
@@ -1381,7 +1381,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 						return 0;
 					}
 						
-					add_instruction(f,M_OPCODE_SET,token_offset);
+					add_instruction(f,ORCUS_OPCODE_SET,token_offset);
 					token_offset += o;
 					cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 						
@@ -1398,18 +1398,18 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 					}
 					if(cur_tok->chars[0] == ',')token_offset++;
 				}else if(cur_tok->chars[0]==',' || is_array ? ']' : '}'){ //implicit index
-					add_instruction(f,M_OPCODE_CPYT,token_offset);
+					add_instruction(f,ORCUS_OPCODE_CPYT,token_offset);
 					
 					merge_compiler_functions_nofree(f, &idxfunc);
 					clear_compiler_function(&idxfunc);
 
-					add_instruction(f, M_OPCODE_SWPT, token_offset);
+					add_instruction(f, ORCUS_OPCODE_SWPT, token_offset);
 
-					add_instruction(f,M_OPCODE_NINT,token_offset);
+					add_instruction(f,ORCUS_OPCODE_NINT,token_offset);
 					add_rawdata_bitwidth_size(f,*(binarydata*)&implicit_position,token_offset);
 					implicit_position++;
 
-					add_instruction(f,M_OPCODE_SET,token_offset);
+					add_instruction(f,ORCUS_OPCODE_SET,token_offset);
 					if(cur_tok->chars[0] == ',')token_offset++;
 				}else{
 					f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
@@ -1425,12 +1425,12 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		};
 		
 	}else if(cur_tok->token_flags & (TOKEN_ENV_VAR | TOKEN_SCOPESPECIFIER) ){
-		orcus_opcode g_op= M_OPCODE_GENV_KCS;
+		orcus_opcode g_op= ORCUS_OPCODE_GENV_KCS;
 		if(cur_tok->token_flags & TOKEN_SCOPESPECIFIER){
 			if(token_matches_chars(cur_tok,"local")){
-				g_op = M_OPCODE_GETL_KCS;
+				g_op = ORCUS_OPCODE_GETL_KCS;
 			}else if(token_matches_chars(cur_tok,"global")){
-				g_op = M_OPCODE_GETG_KCS;
+				g_op = ORCUS_OPCODE_GETG_KCS;
 			}
 			token_offset++;
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
@@ -1461,7 +1461,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 			f->token_error_num=token_offset;
 			return 0;
 		}
-		add_instruction(f,M_OPCODE_GCON, token_offset);
+		add_instruction(f,ORCUS_OPCODE_GCON, token_offset);
 		add_rawdata_bitwidth_size(f,ci, token_offset);
 		//add_string_onto_stack(f,cur_tok->chars,cur_tok->num_chars,token_offset);
 		add_instruction(f, g_op,token_offset);
@@ -1504,7 +1504,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 			return 0;
 		}
 		
-		add_instruction(f,M_OPCODE_NFUN,token_offset);
+		add_instruction(f,ORCUS_OPCODE_NFUN,token_offset);
 		
 		//binarydata* sizeoffunction=(binarydata*)(f->instructions+f->number_instructions);
 		
@@ -1529,13 +1529,13 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 			}
 			
 			if(cur_tok->token_flags & TOKEN_ENV_VAR){
-				add_instruction(&funcargreadf, M_OPCODE_NNSE, token_offset);
-				add_instruction(&funcargreadf, M_OPCODE_SETL_KCS, token_offset);
+				add_instruction(&funcargreadf, ORCUS_OPCODE_NNSE, token_offset);
+				add_instruction(&funcargreadf, ORCUS_OPCODE_SETL_KCS, token_offset);
 				add_raw_string_onto_stack(&funcargreadf, cur_tok->chars, cur_tok->num_chars, token_offset);
 				//add_string_onto_stack(&funcargreadf,cur_tok->chars,cur_tok->num_chars,token_offset);
 				//token_offset+=m_compile_read_variable(funcargreadf,tokens,num_tokens,token_offset, nullptr); //load the var name onto the stack
-				//add_instruction(funcargreadf,M_OPCODE_SWPT,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key
-				//add_instruction(&funcargreadf,M_OPCODE_SETL,token_offset);
+				//add_instruction(funcargreadf,ORCUS_OPCODE_SWPT,token_offset); // we need the stack to be key, value. currently it's value 1, value 2, ..., key
+				//add_instruction(&funcargreadf,ORCUS_OPCODE_SETL,token_offset);
 				token_offset++;
 			}else{
 				f->errorcode=ORCUS_COMPERR_NO_NAMED_VARIABLE;
@@ -1569,7 +1569,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		}
 		token_offset++;
 
-		add_instruction(&funcargreadf,M_OPCODE_CLS,0); //discards extra args in
+		add_instruction(&funcargreadf,ORCUS_OPCODE_CLS,0); //discards extra args in
 		orcus_int toks_consumed=0;
 		compiler_function ff;
 		memset(&ff, 0, sizeof(ff));
@@ -1584,7 +1584,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		clear_compiler_function(&funcargreadf);
 		merge_compiler_functions_nofree(f,&ff);
 		clear_compiler_function(&ff);
-		add_instruction(f, M_OPCODE_EXIT, token_offset);
+		add_instruction(f, ORCUS_OPCODE_EXIT, token_offset);
 		//*sizeoffunction = f->number_instructions-initial_bytecode_size;
 		*(binarydata*)(f->instructions + initial_bytecode_size - ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE) = f->number_instructions - initial_bytecode_size;
 		token_offset++; //advance 1 token to step over the ending end keyword
@@ -1622,7 +1622,7 @@ orcus_int m_compile_read_binary_op(compiler_function* f, compiler_token* tokens,
 		token_offset++;
 	}
 	else if (cur_tok->token_flags & TOKEN_STATIC_NUMBER && cur_tok->chars[0] == '-') {
-		add_instruction(f, M_OPCODE_ADD, token_offset); //do not increment the token count, as we need to read it again to know what number we are adding.
+		add_instruction(f, ORCUS_OPCODE_ADD, token_offset); //do not increment the token count, as we need to read it again to know what number we are adding.
 	}else{
 		return 0;
 	}
@@ -1654,8 +1654,8 @@ orcus_int m_compile_read_var_indexing(compiler_function* f, compiler_token* toke
 			}else{
 				//token_offset+=m_compile_read_variable(f,tokens,num_tokens,token_offset,i);
 				//f->number_instructions--; //truncate the GENV instruction that will be added.
-				//add_instruction(f, M_OPCODE_GET, token_offset);
-				add_instruction(f, M_OPCODE_GET_KCS, token_offset);
+				//add_instruction(f, ORCUS_OPCODE_GET, token_offset);
+				add_instruction(f, ORCUS_OPCODE_GET_KCS, token_offset);
 				add_raw_string_onto_stack(f, cur_tok->chars, cur_tok->num_chars, token_offset);
 				token_offset++;
 			}
@@ -1685,7 +1685,7 @@ orcus_int m_compile_read_var_indexing(compiler_function* f, compiler_token* toke
 				return 0;
 			}
 			
-			add_instruction(f, M_OPCODE_GET, token_offset);
+			add_instruction(f, ORCUS_OPCODE_GET, token_offset);
 			token_offset++;
 		}else{
 			break;
@@ -1852,7 +1852,7 @@ orcus_int m_compile_read_var_statment(compiler_function* f, compiler_token* toke
 			merge_compiler_functions_nofree(&func_complete, &func_var); clear_compiler_function(&func_var);
 			merge_compiler_functions_nofree(&func_complete, &func_index); clear_compiler_function(&func_index);
 
-			add_instruction(&func_complete, M_OPCODE_CALL, token_offset - 1);
+			add_instruction(&func_complete, ORCUS_OPCODE_CALL, token_offset - 1);
 			add_rawdata_bitwidth_size(&func_complete, f_args_in, token_offset - 1);
 			add_rawdata_bitwidth_size(&func_complete, i->args_out, token_offset - 1); //args out
 			i->args_out=0;
@@ -1950,7 +1950,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 			}
 			token_offset++;
 		}
-		add_instruction(f, M_OPCODE_EXIT, token_offset);
+		add_instruction(f, ORCUS_OPCODE_EXIT, token_offset);
 		return token_offset-initial_offset;
 	}else if(cur_tok->token_flags & (TOKEN_KEYWORD | TOKEN_LOOP_MODIFIER)){
 		return 0;
@@ -1970,8 +1970,8 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 
 	i->args_out = 0;
 	orcus_opcode* set_instructs = nullptr;
-	orcus_opcode get_instruction = M_OPCODE_GENV;
-	orcus_opcode set_instruction = M_OPCODE_SENV;
+	orcus_opcode get_instruction = ORCUS_OPCODE_GENV;
+	orcus_opcode set_instruction = ORCUS_OPCODE_SENV;
 	compiler_function* varfuncs = nullptr;
 	compiler_function* vargetresidualfuncs = nullptr;
 	compiler_function* varsetresidualfuncs = nullptr;
@@ -2027,19 +2027,19 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		varsetresidualfuncs = (compiler_function*)nptr;
 		memset(varsetresidualfuncs + i->args_out, 0, sizeof(compiler_function));
 
-		get_instruction = M_OPCODE_GENV_KCS;
-		set_instruction = M_OPCODE_SENV_KCS;
+		get_instruction = ORCUS_OPCODE_GENV_KCS;
+		set_instruction = ORCUS_OPCODE_SENV_KCS;
 
 		cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
 		if (cur_tok->token_flags & TOKEN_SCOPESPECIFIER) { //find local/global keyword first
 
 			if (token_matches_chars(cur_tok, "local")) {
-				get_instruction = M_OPCODE_GETL_KCS;
-				set_instruction = M_OPCODE_SETL_KCS;
+				get_instruction = ORCUS_OPCODE_GETL_KCS;
+				set_instruction = ORCUS_OPCODE_SETL_KCS;
 			}
 			else {
-				get_instruction = M_OPCODE_GETG_KCS;
-				set_instruction = M_OPCODE_SETG_KCS;
+				get_instruction = ORCUS_OPCODE_GETG_KCS;
+				set_instruction = ORCUS_OPCODE_SETG_KCS;
 			}
 
 			token_offset++;
@@ -2120,8 +2120,8 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 				clear_compiler_function(funcvarset);
 				
 
-				get_instruction = M_OPCODE_GET;
-				set_instruction = M_OPCODE_SET;
+				get_instruction = ORCUS_OPCODE_GET;
+				set_instruction = ORCUS_OPCODE_SET;
 				token_offset++;
 				if (cur_tok->chars[0] == '[') { //explicit index
 					orcus_int oao = i->args_out;
@@ -2179,9 +2179,9 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 					}
 					//token_offset += m_compile_read_variable(getvarfunc, tokens, num_tokens, token_offset, i);
 					//getvarfunc->number_instructions--; //remove the last instruction, which would be GENV. hacky, i know.
-					add_instruction(funcvarget, M_OPCODE_GET_KCS,token_offset);
+					add_instruction(funcvarget, ORCUS_OPCODE_GET_KCS,token_offset);
 					add_raw_string_onto_stack(funcvarget, cur_tok->chars, cur_tok->num_chars, token_offset);
-					add_instruction(funcvarset, M_OPCODE_SET_KCS, token_offset);
+					add_instruction(funcvarset, ORCUS_OPCODE_SET_KCS, token_offset);
 					add_raw_string_onto_stack(funcvarset, cur_tok->chars, cur_tok->num_chars, token_offset);
 					/*
 					orcus_int ci = compiler_info_add_constant_string_from_token(i, cur_tok);
@@ -2190,7 +2190,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 						f->token_error_num = token_offset;
 						return 0;
 					}
-					add_instruction(getvarfunc, M_OPCODE_GCON, token_offset);
+					add_instruction(getvarfunc, ORCUS_OPCODE_GCON, token_offset);
 					add_rawdata_bitwidth_size(getvarfunc, ci, token_offset);*/
 					token_offset++;
 				}
@@ -2231,7 +2231,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 					clear_compiler_function(&prepend);
 					return 0;
 				}
-				add_instruction(funcvarblock, M_OPCODE_CALL, ito);
+				add_instruction(funcvarblock, ORCUS_OPCODE_CALL, ito);
 				add_rawdata_bitwidth_size(funcvarblock, ain, ito);
 				add_rawdata_bitwidth_size(funcvarblock, 0, ito);
 
@@ -2240,8 +2240,8 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 				*funcvarblock = prepend;
 
 				function_output_args_point = (orcus_uint*)((funcvarblock->instructions) + (funcvarblock->number_instructions) - sizeof(orcus_uint) / sizeof(orcus_opcode)); //put this here because the instructions pointer will move around during the earlier code.
-				get_instruction = M_OPCODE_GET;
-				set_instruction = M_OPCODE_SET;
+				get_instruction = ORCUS_OPCODE_GET;
+				set_instruction = ORCUS_OPCODE_SET;
 				should_set = false;
 			}
 			else
@@ -2453,12 +2453,12 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 			clear_compiler_function(varfuncs);
 			// stack: table, key
 			// we of course need to do both get and set in one line, so we have to get a bit tricky about the stack variables, so...
-			if (get_instruction == M_OPCODE_GET) {
-				add_instruction(f, M_OPCODE_CPYX, ito);
+			if (get_instruction == ORCUS_OPCODE_GET) {
+				add_instruction(f, ORCUS_OPCODE_CPYX, ito);
 				add_rawdata_bitwidth_size(f, 2, ito);
 			}
-			else if(get_instruction == M_OPCODE_GET_KCS || get_instruction == M_OPCODE_GENV) { //for enviromental vars, we only have the key on the stack, since the table is implicit. for static key gets, we only have the table on the stack and will copy that.
-				add_instruction(f, M_OPCODE_CPYT, ito);
+			else if(get_instruction == ORCUS_OPCODE_GET_KCS || get_instruction == ORCUS_OPCODE_GENV) { //for enviromental vars, we only have the key on the stack, since the table is implicit. for static key gets, we only have the table on the stack and will copy that.
+				add_instruction(f, ORCUS_OPCODE_CPYT, ito);
 			}
 			else { //other cases have nothing initially on the stack.
 
@@ -2488,16 +2488,16 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 
 			add_instruction(f, insop, ito);
 
-			if (get_instruction == M_OPCODE_GET){ //this is a bit annoying, TBH. we need to go from 1,2,3 to 3,1,2 (table, key, value -> value,table,key)
-				add_instruction(f, M_OPCODE_SWXY, ito);
+			if (get_instruction == ORCUS_OPCODE_GET){ //this is a bit annoying, TBH. we need to go from 1,2,3 to 3,1,2 (table, key, value -> value,table,key)
+				add_instruction(f, ORCUS_OPCODE_SWXY, ito);
 				add_rawdata_bitwidth_size(f, 0, ito);
 				add_rawdata_bitwidth_size(f, 2, ito);
-				add_instruction(f, M_OPCODE_SWXY, ito);
+				add_instruction(f, ORCUS_OPCODE_SWXY, ito);
 				add_rawdata_bitwidth_size(f, 0, ito);
 				add_rawdata_bitwidth_size(f, 1, ito);
 			}
-			else if(get_instruction==M_OPCODE_GENV){ // key, value-> value, key
-				add_instruction(f, M_OPCODE_SWPT, ito);
+			else if(get_instruction==ORCUS_OPCODE_GENV){ // key, value-> value, key
+				add_instruction(f, ORCUS_OPCODE_SWPT, ito);
 			}else{ //no stack manipulation needed for this.
 
 			}
@@ -2561,7 +2561,7 @@ orcus_int m_compile_parse_while_loop(compiler_function* f, compiler_token* token
 	ci->args_out = oao;
 	if(f->errorcode)return 0;
 	
-	add_instruction(f, M_OPCODE_JRNI, token_offset);
+	add_instruction(f, ORCUS_OPCODE_JRNI, token_offset);
 	compiler_info_add_loop_endjump(ci,f->number_instructions);
 	add_rawdata_bitwidth_size(f,0,token_offset);
 	
@@ -2610,7 +2610,7 @@ orcus_int m_compile_parse_while_loop(compiler_function* f, compiler_token* token
 		
 	}
 	
-	add_instruction(f, M_OPCODE_JMPR, token_offset-1);
+	add_instruction(f, ORCUS_OPCODE_JMPR, token_offset-1);
 	add_rawdata_bitwidth_size(f, ci->loop_jumppoint_start-f->number_instructions,token_offset-1);
 
 	for(orcus_int i=0;i<ci->loop_endpoint_ref_count;i++){
@@ -2675,7 +2675,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 	}
 	
 	
-	add_instruction(f, M_OPCODE_JRNI, token_offset);
+	add_instruction(f, ORCUS_OPCODE_JRNI, token_offset);
 	ci->conditional_jumppoint_init=f->number_instructions;
 	add_rawdata_bitwidth_size(f,0,token_offset);
 	token_offset++;
@@ -2702,7 +2702,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 			f->token_error_num = token_offset;
 			return 0;
 		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"elseif") ){
-			add_instruction(f, M_OPCODE_JMPR, token_offset);
+			add_instruction(f, ORCUS_OPCODE_JMPR, token_offset);
 			compiler_info_add_conditional_endjump(ci,f->number_instructions);
 			add_rawdata_bitwidth_size(f,0,token_offset);
 			token_offset++;
@@ -2722,7 +2722,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 			}
 			token_offset+=o;
 			
-			add_instruction(f, M_OPCODE_JRNI, token_offset);
+			add_instruction(f, ORCUS_OPCODE_JRNI, token_offset);
 			ci->conditional_jumppoint_init=f->number_instructions;
 			add_rawdata_bitwidth_size(f,0,token_offset);
 			
@@ -2735,7 +2735,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 			token_offset++;
 			
 		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"else") ){
-			add_instruction(f, M_OPCODE_JMPR, token_offset);
+			add_instruction(f, ORCUS_OPCODE_JMPR, token_offset);
 			compiler_info_add_conditional_endjump(ci, f->number_instructions);
 			add_rawdata_bitwidth_size(f, 0, token_offset);
 
@@ -2801,7 +2801,7 @@ orcus_int m_compile_read_keyword_block(compiler_function* f, compiler_token* tok
 			f->token_error_num=token_offset;
 			return 0;
 		}
-		add_instruction(f,M_OPCODE_JMPR, token_offset);
+		add_instruction(f,ORCUS_OPCODE_JMPR, token_offset);
 		if(!compiler_info_add_goto_jump(ci,cur_tok,f->number_instructions+ci->additional_instructions)){
 			f->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num=token_offset;
@@ -2853,10 +2853,10 @@ compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens,orcus
 		if(cur_tok && cur_tok->token_flags & TOKEN_LOOP_MODIFIER){
 			if(ci->in_loop){
 				if(token_matches_chars(cur_tok,"continue")){
-					add_instruction(out, M_OPCODE_JMPR, token_offset);
+					add_instruction(out, ORCUS_OPCODE_JMPR, token_offset);
 					add_rawdata_bitwidth_size(out, ci->loop_jumppoint_start-(ci->additional_instructions+out->number_instructions)  ,token_offset);
 				}else{ //break
-					add_instruction(out, M_OPCODE_JMPR, token_offset);
+					add_instruction(out, ORCUS_OPCODE_JMPR, token_offset);
 					if(!compiler_info_add_loop_endjump(ci,out->number_instructions+ci->additional_instructions)){
 						out->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 						out->token_error_num=token_offset;
@@ -2918,13 +2918,13 @@ compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens,orcus
 		orcus_int offset = 0;
 		for (orcus_int i = 0; i < ci->num_constants; i++) {
 			orcus_string s = ci->constants[i];
-			out->instructions[offset] = M_OPCODE_NSTR;
+			out->instructions[offset] = ORCUS_OPCODE_NSTR;
 			offset++;
 			*((orcus_int*)(out->instructions + offset)) = s.size;
 			offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 			memcpy(out->instructions + offset, s.ptr, s.size);
 			offset += (s.size + sizeof(orcus_opcode) - 1) / sizeof(orcus_opcode);
-			out->instructions[offset] = M_OPCODE_SCON;
+			out->instructions[offset] = ORCUS_OPCODE_SCON;
 			offset++;
 			*((orcus_int*)(out->instructions + offset)) = i;
 			offset += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
