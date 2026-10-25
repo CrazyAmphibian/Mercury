@@ -18,7 +18,7 @@ Your pull request must be tested before being merged.
 ## style guidelines
 code should be written in C++, and files given the extension of .cpp and .hpp
 
-Orcus code submitted is to be given the extension of .mrc
+Orcus code submitted is to be given the extension of .orc
 
 Code should be easily readable, and should be clear what it does just by looking at it. This means descriptive variable and function names, and sensibly laid out code.
 
