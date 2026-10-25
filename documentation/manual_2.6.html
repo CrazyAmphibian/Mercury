@@ -49,7 +49,7 @@
 		orcus_variable compile_output; //function outputs into a variable, since there's multiple return types.<Br>
 		orcus_compile_cstring(code_to_execute,strlen(code_to_execute),&compile_output);<Br>
 		<Br>
-		if(compile_output.type!=M_TYPE_FUNCTION){<Br>
+		if(compile_output.type!=ORCUS_TYPE_FUNCTION){<Br>
 			&emsp;&emsp;//handle comipler error here<Br>
 		}else{<Br>
 			&emsp;&emsp;M->bytecode = ((orcus_function*)compile_output.data.p);//set the state's bytecode to the function we just compiled<Br>

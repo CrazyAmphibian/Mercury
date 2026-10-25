@@ -32,10 +32,10 @@
 		unlike a low-level CPU bytecode, though, the opcodes do have a fair bit of flexability, and are actually just fancy functions.
 	</p>
 	<p class="codeblock">
-		typedef void (*orcus_instruction) (orcus_state* const M_CPP_restrict M);<br>
+		typedef void (*orcus_instruction) (orcus_state* const ORCUS_CPP_restrict M);<br>
 		<br>
 		//or, written in a more readable form:<br>
-		void orcus_instruction(orcus_state* const M_CPP_restrict M) {<br>
+		void orcus_instruction(orcus_state* const ORCUS_CPP_restrict M) {<br>
 		<br>
 		}<br>
 		<br>

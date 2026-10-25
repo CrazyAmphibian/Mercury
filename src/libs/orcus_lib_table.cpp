@@ -5,7 +5,7 @@
 #include <malloc.h>
 #include <cstring>
 
-void orcus_lib_table_copy(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //basically the same as array.copy
+void orcus_lib_table_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //basically the same as array.copy
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -14,8 +14,8 @@ void orcus_lib_table_copy(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 	orcus_variable tab_var;
 	orcus_popstack(M,&tab_var);
-	if (tab_var.type != M_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, M_TYPE_TABLE, 1);
+	if (tab_var.type != ORCUS_TYPE_TABLE) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
@@ -25,7 +25,7 @@ void orcus_lib_table_copy(orcus_state* const M_CPP_restrict M, const orcus_int a
 	orcus_table* newtab = orcus_newtable();
 	orcus_table* oldtab = (orcus_table*)tab_var.data.p;
 
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++){
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++){
 		orcus_subtable st_n = newtab->data[t];
 		orcus_subtable st_o = oldtab->data[t];
 
@@ -55,7 +55,7 @@ void orcus_lib_table_copy(orcus_state* const M_CPP_restrict M, const orcus_int a
 	}
 	newtab->refrences = 1;
 
-	new_tab_var.type = M_TYPE_TABLE;
+	new_tab_var.type = ORCUS_TYPE_TABLE;
 	new_tab_var.data.p = newtab;
 	orcus_pushstack(M, &new_tab_var);
 
@@ -64,18 +64,18 @@ void orcus_lib_table_copy(orcus_state* const M_CPP_restrict M, const orcus_int a
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_table_flush(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //basically the same as array.flush
+void orcus_lib_table_flush(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //basically the same as array.flush
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
 	orcus_variable tab_var;
 	orcus_popstack(M, &tab_var);
-	if (tab_var.type != M_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, M_TYPE_TABLE, 1);
+	if (tab_var.type != ORCUS_TYPE_TABLE) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
 	orcus_table* tab = (orcus_table*)tab_var.data.p;
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 		orcus_subtable st = tab->data[t];
 		if (!st.size)continue;
 		orcus_int subtracted_size = 0;
@@ -117,7 +117,7 @@ void orcus_lib_table_flush(orcus_state* const M_CPP_restrict M, const orcus_int 
 }
 
 
-void orcus_lib_table_getkeys(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //array of all keys
+void orcus_lib_table_getkeys(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //array of all keys
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -133,14 +133,14 @@ void orcus_lib_table_getkeys(orcus_state* const M_CPP_restrict M, const orcus_in
 
 	orcus_variable tab_var;
 	orcus_popstack(M, &tab_var);
-	if (tab_var.type != M_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, M_TYPE_TABLE, 1);
+	if (tab_var.type != ORCUS_TYPE_TABLE) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
 	orcus_int counter = 0;
 	orcus_table* tab = (orcus_table*)tab_var.data.p;
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 		orcus_subtable st = tab->data[t];
 		if (!st.size)continue;
 		for (orcus_int i = 0; i < st.size; i++) { //for each value
@@ -157,11 +157,11 @@ void orcus_lib_table_getkeys(orcus_state* const M_CPP_restrict M, const orcus_in
 	orcus_release_var(&tab_var);
 
 	orcus_variable out;
-	out.type = M_TYPE_ARRAY;
+	out.type = ORCUS_TYPE_ARRAY;
 	out.data.p = arr;
 	orcus_pushstack(M, &out);
 	if (args_out > 1) {
-		out.type = M_TYPE_INT;
+		out.type = ORCUS_TYPE_INT;
 		out.data.i = counter;
 		orcus_pushstack(M, &out);
 	}
@@ -170,7 +170,7 @@ void orcus_lib_table_getkeys(orcus_state* const M_CPP_restrict M, const orcus_in
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out,2);
 }
 
-void orcus_lib_table_getvalues(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //array of all values
+void orcus_lib_table_getvalues(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //array of all values
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -186,14 +186,14 @@ void orcus_lib_table_getvalues(orcus_state* const M_CPP_restrict M, const orcus_
 
 	orcus_variable tab_var;
 	orcus_popstack(M, &tab_var);
-	if (tab_var.type != M_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, M_TYPE_TABLE, 1);
+	if (tab_var.type != ORCUS_TYPE_TABLE) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
 	orcus_int counter = 0;
 	orcus_table* tab = (orcus_table*)tab_var.data.p;
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 		orcus_subtable st = tab->data[t];
 		if (!st.size)continue;
 		for (orcus_int i = 0; i < st.size; i++) { //for each value
@@ -210,11 +210,11 @@ void orcus_lib_table_getvalues(orcus_state* const M_CPP_restrict M, const orcus_
 	orcus_release_var(&tab_var);
 
 	orcus_variable out;
-	out.type = M_TYPE_ARRAY;
+	out.type = ORCUS_TYPE_ARRAY;
 	out.data.p = arr;
 	orcus_pushstack(M, &out);
 	if (args_out > 1) {
-		out.type = M_TYPE_INT;
+		out.type = ORCUS_TYPE_INT;
 		out.data.i = counter;
 		orcus_pushstack(M, &out);
 	}
@@ -224,7 +224,7 @@ void orcus_lib_table_getvalues(orcus_state* const M_CPP_restrict M, const orcus_
 }
 
 
-void orcus_lib_table_haskey(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //if has a key
+void orcus_lib_table_haskey(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //if has a key
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -241,12 +241,12 @@ void orcus_lib_table_haskey(orcus_state* const M_CPP_restrict M, const orcus_int
 	orcus_variable out;
 
 	orcus_table* tab = (orcus_table*)tab_var.data.p;
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 		orcus_subtable st = tab->data[t];
 		if (!st.size)continue;
 		for (orcus_int i = 0; i < st.size; i++) {
 			if (orcus_vars_equal(st.keys + i, &key_var)) {
-				out.type = M_TYPE_BOOL;
+				out.type = ORCUS_TYPE_BOOL;
 				out.data.i = 1;
 				orcus_pushstack(M, &out);
 				if (args_out > 1) {
@@ -257,11 +257,11 @@ void orcus_lib_table_haskey(orcus_state* const M_CPP_restrict M, const orcus_int
 		}
 	}
 
-	out.type = M_TYPE_BOOL;
+	out.type = ORCUS_TYPE_BOOL;
 	out.data.i = 0;
 	orcus_pushstack(M, &out);
 	if (args_out > 1) {
-		out.type = M_TYPE_NIL;
+		out.type = ORCUS_TYPE_NIL;
 		orcus_pushstack(M, &out);
 	}
 
@@ -269,7 +269,7 @@ void orcus_lib_table_haskey(orcus_state* const M_CPP_restrict M, const orcus_int
 }
 
 
-void orcus_lib_table_hasvalue(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //if has a value
+void orcus_lib_table_hasvalue(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //if has a value
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -286,12 +286,12 @@ void orcus_lib_table_hasvalue(orcus_state* const M_CPP_restrict M, const orcus_i
 	orcus_variable out;
 
 	orcus_table* tab = (orcus_table*)tab_var.data.p;
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 		orcus_subtable st = tab->data[t];
 		if (!st.size)continue;
 		for (orcus_int i = 0; i < st.size; i++) {
 			if (orcus_vars_equal(st.values + i, &key_var)) {
-				out.type = M_TYPE_BOOL;
+				out.type = ORCUS_TYPE_BOOL;
 				out.data.i = 1;
 				orcus_pushstack(M, &out);
 				if (args_out > 1) {
@@ -302,18 +302,18 @@ void orcus_lib_table_hasvalue(orcus_state* const M_CPP_restrict M, const orcus_i
 		}
 	}
 
-	out.type = M_TYPE_BOOL;
+	out.type = ORCUS_TYPE_BOOL;
 	out.data.i = 0;
 	orcus_pushstack(M, &out);
 	if (args_out > 1) {
-		out.type = M_TYPE_NIL;
+		out.type = ORCUS_TYPE_NIL;
 		orcus_pushstack(M, &out);
 	}
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 2);
 }
 
-void orcus_lib_table_keyswithvalue(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //all keys with a value
+void orcus_lib_table_keyswithvalue(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //all keys with a value
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -337,7 +337,7 @@ void orcus_lib_table_keyswithvalue(orcus_state* const M_CPP_restrict M, const or
 	orcus_variable out;
 	orcus_int elements = 0;
 	orcus_table* tab = (orcus_table*)tab_var.data.p;
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 		orcus_subtable st = tab->data[t];
 		if (!st.size)continue;
 		for (orcus_int i = 0; i < st.size; i++) {
@@ -348,11 +348,11 @@ void orcus_lib_table_keyswithvalue(orcus_state* const M_CPP_restrict M, const or
 		}
 	}
 
-	out.type = M_TYPE_ARRAY;
+	out.type = ORCUS_TYPE_ARRAY;
 	out.data.p = arr;
 	orcus_pushstack(M, &out);
 	if (args_out > 1) {
-		out.type = M_TYPE_INT;
+		out.type = ORCUS_TYPE_INT;
 		out.data.i = elements;
 		orcus_pushstack(M, &out);
 	}

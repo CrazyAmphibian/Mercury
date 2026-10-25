@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
 	for (int i = 0; i < argc; i++) {
 		orcus_variable av;
-		av.type = M_TYPE_STRING;
+		av.type = ORCUS_TYPE_STRING;
 		av.data.p = orcus_cstring_to_mstring(argv[i], strlen(argv[i]));
 		orcus_setarray(arg_arr, &av, (i- arg_offset) );
 	}
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
 	orcus_state* M=orcus_newstate();
 
 	orcus_variable at_v;
-	at_v.type = M_TYPE_ARRAY;
+	at_v.type = ORCUS_TYPE_ARRAY;
 	at_v.data.p = arg_arr;
 	orcus_table_set_cstring_keyvalue(M->enviroment,"_ARGS",&at_v);
 
@@ -164,8 +164,8 @@ int main(int argc, char** argv) {
 	orcus_compile_cstring(code,code_size,&funcy);
 	free(code);
 	code = nullptr;
-	if (funcy.type != M_TYPE_FUNCTION) {
-		if (funcy.type == M_TYPE_STRING) {
+	if (funcy.type != ORCUS_TYPE_FUNCTION) {
+		if (funcy.type == ORCUS_TYPE_STRING) {
 			orcus_string* s = (orcus_string*)funcy.data.p;
 			for (orcus_int n = 0; n < s->size; n++) {
 				putchar(s->ptr[n]);
@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (interactivemode) {
-		if (funcy.type == M_TYPE_FUNCTION) { //cleanup the state partially
+		if (funcy.type == ORCUS_TYPE_FUNCTION) { //cleanup the state partially
 			M->programcounter = 0; //clear bytecode
 			free(code);
 			code = nullptr;

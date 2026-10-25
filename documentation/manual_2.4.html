@@ -34,7 +34,7 @@
 	<p class="codeblock">
 		#include "orcus.hpp"<br>
 		<br>
-		void add_10_to(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
+		void add_10_to(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
 		&emsp;&emsp;orcus_variable in;<br>
 		&emsp;&emsp;orcus_popstack(M,&in);<br>
 		&emsp;&emsp;in.data.i+=10;<br>
@@ -52,7 +52,7 @@
 		#include "orcus.hpp"<br>
 		#include "orcus_error.hpp"<br>
 		<br>
-		void add_10_to(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
+		void add_10_to(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
 		&emsp;&emsp;if(ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in,1)){ <br>
 		&emsp;&emsp;&emsp;&emsp;return; //we want 1 arg minimum, and 1 arg maximum<br>
 		&emsp;&emsp;}<br>
@@ -73,15 +73,15 @@
 		#include "orcus.hpp"<br>
 		#include "orcus_error.hpp"<br>
 		<br>
-		void add_10_to(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
+		void add_10_to(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
 		&emsp;&emsp;if(ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in,1)){ <br>
 		&emsp;&emsp;&emsp;&emsp;return; //we want 1 arg minimum, and 1 arg maximum<br>
 		&emsp;&emsp;}<br>
 		<br>
 		&emsp;&emsp;orcus_variable in;<br>
 		&emsp;&emsp;orcus_popstack(M,&in);<br>
-		&emsp;&emsp;if(in.type!=M_TYPE_INT){<br>
-			&emsp;&emsp;&emsp;&emsp;orcus_raise_error_nonpointer(M,M_ERROR_WRONG_TYPE,in.type,M_TYPE_INT,1);<br>
+		&emsp;&emsp;if(in.type!=ORCUS_TYPE_INT){<br>
+			&emsp;&emsp;&emsp;&emsp;orcus_raise_error_nonpointer(M,M_ERROR_WRONG_TYPE,in.type,ORCUS_TYPE_INT,1);<br>
 			&emsp;&emsp;&emsp;&emsp;orcus_release_var(&in); //since it may be a complex refrenced type<Br>
 			&emsp;&emsp;&emsp;&emsp;return;<br>
 		&emsp;&emsp;}<br>

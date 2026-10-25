@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-void orcus_lib_string_sub(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_sub(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -17,23 +17,23 @@ void orcus_lib_string_sub(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 	orcus_variable var_end;
 	orcus_popstack(M, &var_end);
-	if (var_end.type != M_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_end, M_TYPE_INT, 3);
+	if (var_end.type != ORCUS_TYPE_INT) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_end, ORCUS_TYPE_INT, 3);
 		orcus_release_var(&var_end);
 		return;
 	}
 	orcus_variable var_start;
 	orcus_popstack(M, &var_start);
-	if (var_start.type != M_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_start, M_TYPE_INT, 2);
+	if (var_start.type != ORCUS_TYPE_INT) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_start, ORCUS_TYPE_INT, 2);
 		orcus_release_var(&var_start);
 		return;
 	}
 
 	orcus_variable var_string;
 	orcus_popstack(M,&var_string);
-	if (var_string.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, M_TYPE_STRING, 1);
+	if (var_string.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_string);
 		return;
 	}
@@ -41,7 +41,7 @@ void orcus_lib_string_sub(orcus_state* const M_CPP_restrict M, const orcus_int a
 	orcus_string* os=orcus_mstring_substring((orcus_string*)var_string.data.p, var_start.data.i, var_end.data.i);
 	orcus_variable out;
 	
-	out.type = M_TYPE_STRING;
+	out.type = ORCUS_TYPE_STRING;
 	out.data.p = os;
 	orcus_release_var(&var_string);
 	orcus_pushstack(M, &out);
@@ -52,7 +52,7 @@ void orcus_lib_string_sub(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 
 
-void orcus_lib_string_reverse(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_reverse(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -61,8 +61,8 @@ void orcus_lib_string_reverse(orcus_state* const M_CPP_restrict M, const orcus_i
 
 	orcus_variable var_string;
 	orcus_popstack(M,&var_string);
-	if (var_string.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, M_TYPE_STRING, 1);
+	if (var_string.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_string);
 		return;
 	}
@@ -87,7 +87,7 @@ void orcus_lib_string_reverse(orcus_state* const M_CPP_restrict M, const orcus_i
 
 	orcus_variable out;
 	
-	out.type = M_TYPE_STRING;
+	out.type = ORCUS_TYPE_STRING;
 	out.data.p = os;
 	orcus_release_var(&var_string);
 	orcus_pushstack(M, &out);
@@ -97,7 +97,7 @@ void orcus_lib_string_reverse(orcus_state* const M_CPP_restrict M, const orcus_i
 
 
 
-void orcus_lib_string_find(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_find(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2,3))return;
 	if (!args_out) {
 		if(args_in>2)orcus_discard_top_of_stack(M);
@@ -109,28 +109,28 @@ void orcus_lib_string_find(orcus_state* const M_CPP_restrict M, const orcus_int 
 	orcus_variable startat;
 	if (args_in > 2) {
 		orcus_popstack(M,&startat);
-		if (startat.type != M_TYPE_INT) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &startat, M_TYPE_INT, 3);
+		if (startat.type != ORCUS_TYPE_INT) {
+			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &startat, ORCUS_TYPE_INT, 3);
 			orcus_release_var(&startat);
 			return;
 		}
 	}
 	else {
-		startat.type = M_TYPE_NIL;
+		startat.type = ORCUS_TYPE_NIL;
 	}
 
 	orcus_variable searchforvar;
 	orcus_popstack(M,&searchforvar);
-	if (searchforvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &searchforvar, M_TYPE_STRING, 2);
+	if (searchforvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &searchforvar, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&searchforvar);
 		return;
 	}
 
 	orcus_variable strvar;
 	orcus_popstack(M,&strvar);
-	if (strvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, M_TYPE_STRING, 1);
+	if (strvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&strvar);
 		return;
 	}
@@ -156,11 +156,11 @@ void orcus_lib_string_find(orcus_state* const M_CPP_restrict M, const orcus_int 
 	
 
 	if (located_at != -1) {
-		out.type = M_TYPE_INT;
+		out.type = ORCUS_TYPE_INT;
 		out.data.i = located_at;
 	}
 	else {
-		out.type = M_TYPE_NIL;
+		out.type = ORCUS_TYPE_NIL;
 		out.data.i = 0;
 	}
 
@@ -172,11 +172,11 @@ void orcus_lib_string_find(orcus_state* const M_CPP_restrict M, const orcus_int 
 		
 
 		if (located_at != -1) {
-			out2.type = M_TYPE_INT;
+			out2.type = ORCUS_TYPE_INT;
 			out2.data.i = located_at+search->size-1;
 		}
 		else {
-			out2.type = M_TYPE_NIL;
+			out2.type = ORCUS_TYPE_NIL;
 			out2.data.i = 0;
 		}
 		orcus_pushstack(M, &out2);
@@ -190,7 +190,7 @@ void orcus_lib_string_find(orcus_state* const M_CPP_restrict M, const orcus_int 
 
 
 
-void orcus_lib_string_replace(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_replace(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3, 4))return;
 	if (!args_out) {
 		if(args_in>3)orcus_discard_top_of_stack(M);
@@ -204,36 +204,36 @@ void orcus_lib_string_replace(orcus_state* const M_CPP_restrict M, const orcus_i
 	orcus_variable max_replacments;
 	if (args_in > 3) {
 		orcus_popstack(M,&max_replacments);
-		if (max_replacments.type != M_TYPE_INT) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &max_replacments, M_TYPE_INT, 4);
+		if (max_replacments.type != ORCUS_TYPE_INT) {
+			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &max_replacments, ORCUS_TYPE_INT, 4);
 			orcus_release_var(&max_replacments);
 			return;
 		}
 	}
 	else {
-		max_replacments.type = M_TYPE_NIL;
+		max_replacments.type = ORCUS_TYPE_NIL;
 	}
 
 	orcus_variable replace_var;
 	orcus_popstack(M,& replace_var);
-	if (replace_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &replace_var, M_TYPE_STRING, 3);
+	if (replace_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &replace_var, ORCUS_TYPE_STRING, 3);
 		orcus_release_var(&replace_var);
 		return;
 	}
 
 	orcus_variable search_var;
 	orcus_popstack(M, &search_var);
-	if (search_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &search_var, M_TYPE_STRING, 2);
+	if (search_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &search_var, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&search_var);
 		return;
 	}
 
 	orcus_variable str_var;
 	orcus_popstack(M, &str_var);
-	if (str_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, M_TYPE_STRING, 1);
+	if (str_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&str_var);
 		return;
 	}
@@ -278,7 +278,7 @@ void orcus_lib_string_replace(orcus_state* const M_CPP_restrict M, const orcus_i
 
 	orcus_variable out;
 	
-	out.type = M_TYPE_STRING;
+	out.type = ORCUS_TYPE_STRING;
 	out.data.p = outstr;
 
 	orcus_pushstack(M,&out);
@@ -286,7 +286,7 @@ void orcus_lib_string_replace(orcus_state* const M_CPP_restrict M, const orcus_i
 	if (args_out > 1) {
 		orcus_variable out2;
 		
-		out2.type = M_TYPE_INT;
+		out2.type = ORCUS_TYPE_INT;
 		out2.data.i = replacments;
 		orcus_pushstack(M, &out2);
 	}
@@ -294,7 +294,7 @@ void orcus_lib_string_replace(orcus_state* const M_CPP_restrict M, const orcus_i
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 2);
 }
 
-void orcus_lib_string_count(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_count(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -304,16 +304,16 @@ void orcus_lib_string_count(orcus_state* const M_CPP_restrict M, const orcus_int
 
 	orcus_variable search_var;
 	orcus_popstack(M, &search_var);
-	if (search_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &search_var, M_TYPE_STRING, 2);
+	if (search_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &search_var, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&search_var);
 		return;
 	}
 
 	orcus_variable str_var;
 	orcus_popstack(M, &str_var);
-	if (str_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, M_TYPE_STRING, 1);
+	if (str_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&str_var);
 		return;
 	}
@@ -341,7 +341,7 @@ void orcus_lib_string_count(orcus_state* const M_CPP_restrict M, const orcus_int
 	orcus_release_var(&search_var);
 
 	
-	search_var.type = M_TYPE_INT;
+	search_var.type = ORCUS_TYPE_INT;
 	search_var.data.i = replacments;
 
 	orcus_pushstack(M, &search_var);
@@ -349,7 +349,7 @@ void orcus_lib_string_count(orcus_state* const M_CPP_restrict M, const orcus_int
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_string_toarray(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //converts the bytes to an array of ints.
+void orcus_lib_string_toarray(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //converts the bytes to an array of ints.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -358,8 +358,8 @@ void orcus_lib_string_toarray(orcus_state* const M_CPP_restrict M, const orcus_i
 
 	orcus_variable str_var;
 	orcus_popstack(M, &str_var);
-	if (str_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, M_TYPE_STRING, 1);
+	if (str_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&str_var);
 		return;
 	}
@@ -374,21 +374,21 @@ void orcus_lib_string_toarray(orcus_state* const M_CPP_restrict M, const orcus_i
 	for (orcus_int i = 0; i < str->size; i++) {
 		orcus_variable* v=(orcus_variable*)malloc(sizeof(orcus_variable));
 		if (!v)continue;
-		v->type = M_TYPE_INT;
+		v->type = ORCUS_TYPE_INT;
 		v->data.i = (unsigned char)str->ptr[i];
 		orcus_setarray(arr, v, i);
 	}
 
 	orcus_release_var(&str_var); //re use
 	
-	str_var.type = M_TYPE_ARRAY;
+	str_var.type = ORCUS_TYPE_ARRAY;
 	str_var.data.p = arr;
 	orcus_pushstack(M, &str_var);
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_string_fromarray(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //converts an array of ints into a string
+void orcus_lib_string_fromarray(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //converts an array of ints into a string
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -397,8 +397,8 @@ void orcus_lib_string_fromarray(orcus_state* const M_CPP_restrict M, const orcus
 
 	orcus_variable str_var;
 	orcus_popstack(M,&str_var);
-	if (str_var.type != M_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, M_TYPE_ARRAY, 1);
+	if (str_var.type != ORCUS_TYPE_ARRAY) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&str_var);
 		return;
 	}
@@ -423,7 +423,7 @@ void orcus_lib_string_fromarray(orcus_state* const M_CPP_restrict M, const orcus
 	for (orcus_int i = 0; i < len; i++) {
 		orcus_variable v;
 		orcus_getarray(arr, i,&v);
-		if (v.type == M_TYPE_INT) {
+		if (v.type == ORCUS_TYPE_INT) {
 			st->ptr[i] = (unsigned char)(v.data.i & 0xFF);
 		}
 		else {
@@ -433,7 +433,7 @@ void orcus_lib_string_fromarray(orcus_state* const M_CPP_restrict M, const orcus
 
 	orcus_release_var(&str_var);
 	
-	str_var.type = M_TYPE_STRING;
+	str_var.type = ORCUS_TYPE_STRING;
 	str_var.data.p = st;
 	orcus_pushstack(M, &str_var);
 
@@ -441,7 +441,7 @@ void orcus_lib_string_fromarray(orcus_state* const M_CPP_restrict M, const orcus
 }
 
 
-void orcus_lib_string_separate(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //seperates a string into an array of smaller strings.
+void orcus_lib_string_separate(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //seperates a string into an array of smaller strings.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -452,16 +452,16 @@ void orcus_lib_string_separate(orcus_state* const M_CPP_restrict M, const orcus_
 
 	orcus_variable sep_var;
 	orcus_popstack(M, &sep_var);
-	if (sep_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &sep_var, M_TYPE_STRING, 2);
+	if (sep_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &sep_var, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&sep_var);
 		return;
 	}
 
 	orcus_variable str_var;
 	orcus_popstack(M, &str_var);
-	if (str_var.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, M_TYPE_STRING, 1);
+	if (str_var.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &str_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&str_var);
 		return;
 	}
@@ -492,7 +492,7 @@ void orcus_lib_string_separate(orcus_state* const M_CPP_restrict M, const orcus_
 			if (!ns)continue;
 			orcus_variable* v=(orcus_variable*)malloc(sizeof(orcus_variable));
 			if (!v)continue;
-			v->type = M_TYPE_STRING;
+			v->type = ORCUS_TYPE_STRING;
 			v->data.p = ns;
 			orcus_setarray(arr, v, arr_elems);
 			arr_elems++;
@@ -510,7 +510,7 @@ void orcus_lib_string_separate(orcus_state* const M_CPP_restrict M, const orcus_
 		if (!ns)return;
 		orcus_variable* v = (orcus_variable*)malloc(sizeof(orcus_variable));
 		if (!v)return;
-		v->type = M_TYPE_STRING;
+		v->type = ORCUS_TYPE_STRING;
 		v->data.p = ns;
 		orcus_setarray(arr, v, arr_elems);
 		arr_elems++;
@@ -520,7 +520,7 @@ void orcus_lib_string_separate(orcus_state* const M_CPP_restrict M, const orcus_
 	orcus_release_var(&str_var);
 	
 	
-	sep_var.type = M_TYPE_ARRAY;
+	sep_var.type = ORCUS_TYPE_ARRAY;
 	sep_var.data.p = arr;
 	orcus_pushstack(M, &sep_var);
 
@@ -529,7 +529,7 @@ void orcus_lib_string_separate(orcus_state* const M_CPP_restrict M, const orcus_
 }
 
 
-void orcus_lib_string_upper(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_upper(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -538,8 +538,8 @@ void orcus_lib_string_upper(orcus_state* const M_CPP_restrict M, const orcus_int
 
 	orcus_variable var_string;
 	orcus_popstack(M,&var_string);
-	if (var_string.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, M_TYPE_STRING, 1);
+	if (var_string.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_string);
 		return;
 	}
@@ -573,7 +573,7 @@ void orcus_lib_string_upper(orcus_state* const M_CPP_restrict M, const orcus_int
 
 	orcus_release_var(&var_string);
 	
-	var_string.type = M_TYPE_STRING;
+	var_string.type = ORCUS_TYPE_STRING;
 	var_string.data.p = os;
 
 	orcus_pushstack(M, &var_string);
@@ -582,7 +582,7 @@ void orcus_lib_string_upper(orcus_state* const M_CPP_restrict M, const orcus_int
 }
 
 
-void orcus_lib_string_lower(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_lower(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -591,8 +591,8 @@ void orcus_lib_string_lower(orcus_state* const M_CPP_restrict M, const orcus_int
 
 	orcus_variable var_string;
 	orcus_popstack(M, &var_string);
-	if (var_string.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, M_TYPE_STRING, 1);
+	if (var_string.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_string, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_string);
 		return;
 	}
@@ -626,7 +626,7 @@ void orcus_lib_string_lower(orcus_state* const M_CPP_restrict M, const orcus_int
 
 	orcus_release_var(&var_string);
 	
-	var_string.type = M_TYPE_STRING;
+	var_string.type = ORCUS_TYPE_STRING;
 	var_string.data.p = os;
 
 	orcus_pushstack(M, &var_string);
@@ -1001,7 +1001,7 @@ return add_off;
 
 
 
-void orcus_lib_string_format(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //c-style printf formatting.
+void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //c-style printf formatting.
 	if (args_in < 1) {
 		orcus_raise_error_nonpointer(M, M_ERROR_NOT_ENOUGH_ARGS, args_in, 1);
 		return;
@@ -1024,8 +1024,8 @@ void orcus_lib_string_format(orcus_state* const M_CPP_restrict M, const orcus_in
 
 	orcus_variable strvar;
 	orcus_popstack(M,&strvar);
-	if (strvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, M_TYPE_STRING, 1);
+	if (strvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&strvar);
 		return;
 	}
@@ -1078,7 +1078,7 @@ void orcus_lib_string_format(orcus_state* const M_CPP_restrict M, const orcus_in
 
 	orcus_release_var(&strvar);
 	
-	strvar.type = M_TYPE_STRING;
+	strvar.type = ORCUS_TYPE_STRING;
 	strvar.data.p = outstr; //orcus_cstring_to_mstring(buffer, cc);
 	orcus_pushstack(M, &strvar);
 
@@ -1517,7 +1517,7 @@ bool m_evaluate_patterns(orcus_string* str, M_PATTERN* patterns, orcus_int num_p
 
 
 
-void orcus_lib_string_p_find(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_p_find(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if(ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2, 3))return;
 	if (!args_out) {
 		if(args_in>2)orcus_discard_top_of_stack(M);
@@ -1529,28 +1529,28 @@ void orcus_lib_string_p_find(orcus_state* const M_CPP_restrict M, const orcus_in
 	orcus_variable startat;
 	if (args_in > 2) {
 		orcus_popstack(M, &startat);
-		if (startat.type != M_TYPE_INT) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &startat, M_TYPE_INT, 3);
+		if (startat.type != ORCUS_TYPE_INT) {
+			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &startat, ORCUS_TYPE_INT, 3);
 			orcus_release_var(&startat);
 			return;
 		}
 	}
 	else {
-		startat.type = M_TYPE_NIL;
+		startat.type = ORCUS_TYPE_NIL;
 	}
 
 	orcus_variable searchforvar;
 	orcus_popstack(M, &searchforvar);
-	if (searchforvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &searchforvar, M_TYPE_STRING, 2);
+	if (searchforvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &searchforvar, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&searchforvar);
 		return;
 	}
 
 	orcus_variable strvar;
 	orcus_popstack(M, &strvar);
-	if (strvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, M_TYPE_STRING, 1);
+	if (strvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&strvar);
 		return;
 	}
@@ -1576,15 +1576,15 @@ void orcus_lib_string_p_find(orcus_state* const M_CPP_restrict M, const orcus_in
 
 
 	if (found) {
-		searchforvar.type = M_TYPE_INT;
+		searchforvar.type = ORCUS_TYPE_INT;
 		searchforvar.data.i = start;
-		strvar.type = M_TYPE_INT;
+		strvar.type = ORCUS_TYPE_INT;
 		strvar.data.i = end;
 	}
 	else {
-		searchforvar.type = M_TYPE_NIL;
+		searchforvar.type = ORCUS_TYPE_NIL;
 		searchforvar.data.i = 0;
-		strvar.type = M_TYPE_NIL;
+		strvar.type = ORCUS_TYPE_NIL;
 		strvar.data.i = 0;
 	}
 
@@ -1596,7 +1596,7 @@ void orcus_lib_string_p_find(orcus_state* const M_CPP_restrict M, const orcus_in
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 2);
 }
 
-void orcus_lib_string_p_extract(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //returns all instances of a match in an array.
+void orcus_lib_string_p_extract(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //returns all instances of a match in an array.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -1606,16 +1606,16 @@ void orcus_lib_string_p_extract(orcus_state* const M_CPP_restrict M, const orcus
 
 	orcus_variable matchvar;
 	orcus_popstack(M, &matchvar);
-	if (matchvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &matchvar, M_TYPE_STRING, 2);
+	if (matchvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &matchvar, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&matchvar);
 		return;
 	}
 
 	orcus_variable strvar;
 	orcus_popstack(M, &strvar);
-	if (strvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, M_TYPE_STRING, 1);
+	if (strvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&strvar);
 		return;
 	}
@@ -1642,7 +1642,7 @@ void orcus_lib_string_p_extract(orcus_state* const M_CPP_restrict M, const orcus
 			return;
 		}
 		orcus_variable inter;
-		inter.type = M_TYPE_STRING;
+		inter.type = ORCUS_TYPE_STRING;
 		inter.data.p = ss;
 		orcus_setarray(arr, &inter, count);
 		count++;
@@ -1653,14 +1653,14 @@ void orcus_lib_string_p_extract(orcus_state* const M_CPP_restrict M, const orcus
 	orcus_release_var(&matchvar);
 	free(P);
 	
-	matchvar.type = M_TYPE_ARRAY;
+	matchvar.type = ORCUS_TYPE_ARRAY;
 	matchvar.data.p = arr;
 	orcus_pushstack(M,&matchvar);
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_string_p_replace(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_p_replace(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3,4))return;
 	if (!args_out) {
 		if(args_in>3)orcus_discard_top_of_stack(M);
@@ -1673,36 +1673,36 @@ void orcus_lib_string_p_replace(orcus_state* const M_CPP_restrict M, const orcus
 	orcus_variable max_replacments;
 	if (args_in > 3) {
 		orcus_popstack(M, &max_replacments);
-		if (max_replacments.type != M_TYPE_INT) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &max_replacments, M_TYPE_INT, 4);
+		if (max_replacments.type != ORCUS_TYPE_INT) {
+			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &max_replacments, ORCUS_TYPE_INT, 4);
 			orcus_release_var(&max_replacments);
 			return;
 		}
 	}
 	else {
-		max_replacments.type = M_TYPE_NIL;
+		max_replacments.type = ORCUS_TYPE_NIL;
 	}
 
 	orcus_variable repvar;
 	orcus_popstack(M, &repvar);
-	if (repvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &repvar, M_TYPE_STRING, 3);
+	if (repvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &repvar, ORCUS_TYPE_STRING, 3);
 		orcus_release_var(&repvar);
 		return;
 	}
 
 	orcus_variable matchvar;
 	orcus_popstack(M, &matchvar);
-	if (matchvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &matchvar, M_TYPE_STRING, 2);
+	if (matchvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &matchvar, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&matchvar);
 		return;
 	}
 
 	orcus_variable strvar;
 	orcus_popstack(M, &strvar);
-	if (strvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, M_TYPE_STRING, 1);
+	if (strvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&strvar);
 		return;
 	}
@@ -1749,7 +1749,7 @@ void orcus_lib_string_p_replace(orcus_state* const M_CPP_restrict M, const orcus
 	orcus_release_var(&strvar);
 	free(P);
 	
-	matchvar.type = M_TYPE_STRING;
+	matchvar.type = ORCUS_TYPE_STRING;
 	matchvar.data.p = outstr;
 	orcus_pushstack(M, &matchvar);
 
@@ -1757,7 +1757,7 @@ void orcus_lib_string_p_replace(orcus_state* const M_CPP_restrict M, const orcus
 }
 
 
-void orcus_lib_string_p_count(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_p_count(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -1767,16 +1767,16 @@ void orcus_lib_string_p_count(orcus_state* const M_CPP_restrict M, const orcus_i
 
 	orcus_variable matchvar;
 	orcus_popstack(M, &matchvar);
-	if (matchvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &matchvar, M_TYPE_STRING, 2);
+	if (matchvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &matchvar, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&matchvar);
 		return;
 	}
 
 	orcus_variable strvar;
 	orcus_popstack(M, &strvar);
-	if (strvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, M_TYPE_STRING, 1);
+	if (strvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &strvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&strvar);
 		return;
 	}
@@ -1803,7 +1803,7 @@ void orcus_lib_string_p_count(orcus_state* const M_CPP_restrict M, const orcus_i
 	orcus_release_var(&matchvar);
 	free(P);
 
-	matchvar.type = M_TYPE_INT;
+	matchvar.type = ORCUS_TYPE_INT;
 	matchvar.data.i = count;
 	orcus_pushstack(M, &matchvar);
 
@@ -1811,7 +1811,7 @@ void orcus_lib_string_p_count(orcus_state* const M_CPP_restrict M, const orcus_i
 }
 
 
-void orcus_lib_string_escape_orcus(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_escape_orcus(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -1820,8 +1820,8 @@ void orcus_lib_string_escape_orcus(orcus_state* const M_CPP_restrict M, const or
 
 	orcus_variable instr;
 	orcus_popstack(M,&instr);
-	if (instr.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, M_TYPE_STRING, 1);
+	if (instr.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&instr);
 		return;
 	}
@@ -1856,7 +1856,7 @@ void orcus_lib_string_escape_orcus(orcus_state* const M_CPP_restrict M, const or
 
 	orcus_release_var(&instr);
 	
-	instr.type = M_TYPE_STRING;
+	instr.type = ORCUS_TYPE_STRING;
 	instr.data.p = os;
 	orcus_pushstack(M, &instr);
 
@@ -1864,7 +1864,7 @@ void orcus_lib_string_escape_orcus(orcus_state* const M_CPP_restrict M, const or
 }
 
 
-void orcus_lib_string_escape_url(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_escape_url(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -1873,8 +1873,8 @@ void orcus_lib_string_escape_url(orcus_state* const M_CPP_restrict M, const orcu
 
 	orcus_variable instr;
 	orcus_popstack(M, &instr);
-	if (instr.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, M_TYPE_STRING, 1);
+	if (instr.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&instr);
 		return;
 	}
@@ -1926,7 +1926,7 @@ void orcus_lib_string_escape_url(orcus_state* const M_CPP_restrict M, const orcu
 
 	orcus_release_var(&instr);
 	
-	instr.type = M_TYPE_STRING;
+	instr.type = ORCUS_TYPE_STRING;
 	instr.data.p = os;
 	orcus_pushstack(M, &instr);
 
@@ -1934,7 +1934,7 @@ void orcus_lib_string_escape_url(orcus_state* const M_CPP_restrict M, const orcu
 }
 
 
-void orcus_lib_string_escape_c(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_escape_c(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -1943,8 +1943,8 @@ void orcus_lib_string_escape_c(orcus_state* const M_CPP_restrict M, const orcus_
 
 	orcus_variable instr;
 	orcus_popstack(M, &instr);
-	if (instr.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, M_TYPE_STRING, 1);
+	if (instr.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&instr);
 		return;
 	}
@@ -2012,14 +2012,14 @@ void orcus_lib_string_escape_c(orcus_state* const M_CPP_restrict M, const orcus_
 
 	orcus_release_var(&instr);
 	
-	instr.type = M_TYPE_STRING;
+	instr.type = ORCUS_TYPE_STRING;
 	instr.data.p = os;
 	orcus_pushstack(M, &instr);
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_string_escape_html(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_escape_html(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -2028,8 +2028,8 @@ void orcus_lib_string_escape_html(orcus_state* const M_CPP_restrict M, const orc
 
 	orcus_variable instr;
 	orcus_popstack(M, &instr);
-	if (instr.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, M_TYPE_STRING, 1);
+	if (instr.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &instr, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&instr);
 		return;
 	}
@@ -2073,7 +2073,7 @@ void orcus_lib_string_escape_html(orcus_state* const M_CPP_restrict M, const orc
 
 	orcus_release_var(&instr);
 	
-	instr.type = M_TYPE_STRING;
+	instr.type = ORCUS_TYPE_STRING;
 	instr.data.p = os;
 	orcus_pushstack(M, &instr);
 
@@ -2082,7 +2082,7 @@ void orcus_lib_string_escape_html(orcus_state* const M_CPP_restrict M, const orc
 
 
 
-void orcus_lib_string_copy_string(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_copy_string(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -2090,8 +2090,8 @@ void orcus_lib_string_copy_string(orcus_state* const M_CPP_restrict M, const orc
 	}
 	orcus_variable in;
 	orcus_popstack(M, &in);
-	if (in.type != M_TYPE_STRING){
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_STRING, 1);
+	if (in.type != ORCUS_TYPE_STRING){
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&in);
 		return;
 	}
@@ -2126,30 +2126,30 @@ void orcus_lib_string_copy_string(orcus_state* const M_CPP_restrict M, const orc
 }
 
 //iterates all matches in a function and lets you do things to them
-void orcus_lib_string_match_function(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_match_function(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
 	orcus_variable var_str;
 	orcus_variable var_match;
 	orcus_variable var_func;
 
 	orcus_popstack(M, &var_func);
-	if (var_func.type != M_TYPE_FUNCTION) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, M_TYPE_FUNCTION, 3);
+	if (var_func.type != ORCUS_TYPE_FUNCTION) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, ORCUS_TYPE_FUNCTION, 3);
 		orcus_release_var(&var_func);
 		return;
 	}
 
 	orcus_popstack(M, &var_match);
-	if (var_match.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_match, M_TYPE_STRING, 2);
+	if (var_match.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_match, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&var_match);
 		orcus_release_var(&var_func);
 		return;
 	}
 
 	orcus_popstack(M, &var_str);
-	if (var_str.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+	if (var_str.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_str);
 		orcus_release_var(&var_match);
 		orcus_release_var(&var_func);
@@ -2197,16 +2197,16 @@ void orcus_lib_string_match_function(orcus_state* const M_CPP_restrict M, const 
 		SubM->programcounter = 0;
 
 		orcus_variable push;
-		push.type = M_TYPE_INT;
+		push.type = ORCUS_TYPE_INT;
 		push.data.i = i + find_str->size - 1;
 		orcus_pushstack(SubM, &push);
-		push.type = M_TYPE_INT;
+		push.type = ORCUS_TYPE_INT;
 		push.data.i = i;
 		orcus_pushstack(SubM, &push);
-		push.type = M_TYPE_STRING;
+		push.type = ORCUS_TYPE_STRING;
 		push.data.p = orcus_mstring_substring(base_str, i, i + find_str->size - 1);
 		orcus_pushstack(SubM, &push);
-		push.type = M_TYPE_STRING;
+		push.type = ORCUS_TYPE_STRING;
 		base_str->refrences++; //add a refrence to prevent freeing in use.
 		push.data.p = base_str;
 		orcus_pushstack(SubM, &push);
@@ -2223,7 +2223,7 @@ void orcus_lib_string_match_function(orcus_state* const M_CPP_restrict M, const 
 		orcus_popstack(SubM, &push);
 		while (SubM->sizeofstack)orcus_discard_top_of_stack(SubM);
 		base_str->refrences--;
-		if (push.type == M_TYPE_STRING) {
+		if (push.type == ORCUS_TYPE_STRING) {
 			orcus_mstrings_append(out_str, (orcus_string*)push.data.p);
 		}
 		orcus_release_var(&push);
@@ -2238,7 +2238,7 @@ void orcus_lib_string_match_function(orcus_state* const M_CPP_restrict M, const 
 	orcus_release_var(&var_match);
 	orcus_release_var(&var_func);
 
-	out.type = M_TYPE_STRING;
+	out.type = ORCUS_TYPE_STRING;
 	out.data.p = out_str;
 	orcus_pushstack(M, &out);
 
@@ -2247,30 +2247,30 @@ void orcus_lib_string_match_function(orcus_state* const M_CPP_restrict M, const 
 
 
 //iterates all matches in a function and lets you do things to them
-void orcus_lib_string_p_match_function(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_p_match_function(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
 	orcus_variable var_str;
 	orcus_variable var_match;
 	orcus_variable var_func;
 
 	orcus_popstack(M, &var_func);
-	if (var_func.type != M_TYPE_FUNCTION) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, M_TYPE_FUNCTION, 3);
+	if (var_func.type != ORCUS_TYPE_FUNCTION) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, ORCUS_TYPE_FUNCTION, 3);
 		orcus_release_var(&var_func);
 		return;
 	}
 
 	orcus_popstack(M, &var_match);
-	if (var_match.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_match, M_TYPE_STRING, 2);
+	if (var_match.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_match, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&var_match);
 		orcus_release_var(&var_func);
 		return;
 	}
 
 	orcus_popstack(M, &var_str);
-	if (var_str.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+	if (var_str.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_str);
 		orcus_release_var(&var_match);
 		orcus_release_var(&var_func);
@@ -2328,16 +2328,16 @@ void orcus_lib_string_p_match_function(orcus_state* const M_CPP_restrict M, cons
 		SubM->programcounter = 0;
 
 		orcus_variable push;
-		push.type = M_TYPE_INT;
+		push.type = ORCUS_TYPE_INT;
 		push.data.i = end;
 		orcus_pushstack(SubM, &push);
-		push.type = M_TYPE_INT;
+		push.type = ORCUS_TYPE_INT;
 		push.data.i = start;
 		orcus_pushstack(SubM, &push);
-		push.type = M_TYPE_STRING;
+		push.type = ORCUS_TYPE_STRING;
 		push.data.p = orcus_mstring_substring(base_str, start, end);
 		orcus_pushstack(SubM, &push);
-		push.type = M_TYPE_STRING;
+		push.type = ORCUS_TYPE_STRING;
 		base_str->refrences++; //add a refrence to prevent freeing in use.
 		push.data.p = base_str;
 		orcus_pushstack(SubM, &push);
@@ -2355,7 +2355,7 @@ void orcus_lib_string_p_match_function(orcus_state* const M_CPP_restrict M, cons
 		orcus_popstack(SubM, &push);
 		while (SubM->sizeofstack)orcus_discard_top_of_stack(SubM);
 		base_str->refrences--;
-		if (push.type == M_TYPE_STRING) {
+		if (push.type == ORCUS_TYPE_STRING) {
 			orcus_mstrings_append(out_str, (orcus_string*)push.data.p);
 		}
 		orcus_release_var(&push);
@@ -2372,7 +2372,7 @@ void orcus_lib_string_p_match_function(orcus_state* const M_CPP_restrict M, cons
 	orcus_release_var(&var_match);
 	orcus_release_var(&var_func);
 
-	out.type = M_TYPE_STRING;
+	out.type = ORCUS_TYPE_STRING;
 	out.data.p = out_str;
 	orcus_pushstack(M, &out);
 
@@ -2380,22 +2380,22 @@ void orcus_lib_string_p_match_function(orcus_state* const M_CPP_restrict M, cons
 }
 
 //makes a string of input string string times
-void orcus_lib_string_repeat_chars(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_repeat_chars(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2))return;
 
 	orcus_variable var_count;
 	orcus_variable var_str;
 
 	orcus_popstack(M, &var_count);
-	if (var_count.type != M_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_count, M_TYPE_INT, 2);
+	if (var_count.type != ORCUS_TYPE_INT) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_count, ORCUS_TYPE_INT, 2);
 		orcus_release_var(&var_count);
 		return;
 	}
 
 	orcus_popstack(M, &var_str);
-	if (var_str.type != M_TYPE_STRING && var_str.type != M_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+	if (var_str.type != ORCUS_TYPE_STRING && var_str.type != ORCUS_TYPE_INT) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_str);
 		return;
 	}
@@ -2406,7 +2406,7 @@ void orcus_lib_string_repeat_chars(orcus_state* const M_CPP_restrict M, const or
 	}
 
 	orcus_int sizeneed = 1;
-	if (var_str.type == M_TYPE_STRING) sizeneed = ((orcus_string*)var_str.data.p)->size;
+	if (var_str.type == ORCUS_TYPE_STRING) sizeneed = ((orcus_string*)var_str.data.p)->size;
 	if (var_count.data.i < 0)var_count.data.i = 0;
 
 
@@ -2419,7 +2419,7 @@ void orcus_lib_string_repeat_chars(orcus_state* const M_CPP_restrict M, const or
 			return;
 		}
 		out.data.p = outstr;
-		out.type = M_TYPE_STRING;
+		out.type = ORCUS_TYPE_STRING;
 	}
 	else {
 
@@ -2438,7 +2438,7 @@ void orcus_lib_string_repeat_chars(orcus_state* const M_CPP_restrict M, const or
 		}
 
 
-		if (var_str.type == M_TYPE_STRING) {
+		if (var_str.type == ORCUS_TYPE_STRING) {
 			while (var_count.data.i) {
 				var_count.data.i--;
 				memcpy(buffer+ (sizeneed* var_count.data.i), ((orcus_string*)var_str.data.p)->ptr, sizeneed);
@@ -2449,7 +2449,7 @@ void orcus_lib_string_repeat_chars(orcus_state* const M_CPP_restrict M, const or
 		}
 		orcus_release_var(&var_str);
 		
-		out.type = M_TYPE_STRING;
+		out.type = ORCUS_TYPE_STRING;
 		out.data.p = outstr;
 
 	}
@@ -2461,7 +2461,7 @@ void orcus_lib_string_repeat_chars(orcus_state* const M_CPP_restrict M, const or
 }
 
 
-void orcus_lib_string_set_chars(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_string_set_chars(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 3))return;
 
 	orcus_variable var_position;
@@ -2469,22 +2469,22 @@ void orcus_lib_string_set_chars(orcus_state* const M_CPP_restrict M, const orcus
 	orcus_variable var_str;
 
 	orcus_popstack(M, &var_position);
-	if (var_position.type != M_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_position, M_TYPE_INT, 3);
+	if (var_position.type != ORCUS_TYPE_INT) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_position, ORCUS_TYPE_INT, 3);
 		orcus_release_var(&var_position);
 		return;
 	}
 
 	orcus_popstack(M, &var_replace);
-	if (var_replace.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_replace, M_TYPE_STRING, 2);
+	if (var_replace.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_replace, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&var_replace);
 		return;
 	}
 
 	orcus_popstack(M, &var_str);
-	if (var_str.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, M_TYPE_STRING, 1);
+	if (var_str.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&var_replace);
 		orcus_release_var(&var_str);
 		return;
@@ -2518,7 +2518,7 @@ void orcus_lib_string_set_chars(orcus_state* const M_CPP_restrict M, const orcus
 		}
 		orcus_variable out;
 		out.data.p = outstr;
-		out.type = M_TYPE_STRING;
+		out.type = ORCUS_TYPE_STRING;
 		orcus_pushstack(M, &out);
 		return;
 	}
@@ -2548,7 +2548,7 @@ void orcus_lib_string_set_chars(orcus_state* const M_CPP_restrict M, const orcus
 	orcus_release_var(&var_str);
 
 	orcus_variable out;
-	out.type = M_TYPE_STRING;
+	out.type = ORCUS_TYPE_STRING;
 	out.data.p = outstr;
 	orcus_pushstack(M, &out);
 

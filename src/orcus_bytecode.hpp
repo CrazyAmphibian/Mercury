@@ -4,98 +4,98 @@
 #include <stdint.h>
 
 
-typedef void (*orcus_instruction) (orcus_state* const M_CPP_restrict M); //takes a state
+typedef void (*orcus_instruction) (orcus_state* const ORCUS_CPP_restrict M); //takes a state
 
 
-void M_BYTECODE_NOP(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_NOP(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_ADD(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SUB(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_MUL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_DIV(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_POW(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_IDIV(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_MOD(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_ADD(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SUB(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_MUL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_DIV(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_POW(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_IDIV(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_MOD(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_BAND(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_BOR(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_BXOR(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_BNOT(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_BSHL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_BSHR(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_BAND(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_BOR(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_BXOR(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_BNOT(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_BSHL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_BSHR(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_LAND(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_LOR(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_LXOR(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_LNOT(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_LAND(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_LOR(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_LXOR(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_LNOT(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_EQL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NEQ(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GRT(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_LET(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GTE(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_LTE(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_EQL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NEQ(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GRT(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_LET(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GTE(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_LTE(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_SENV(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GENV(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SET(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GET(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SREG(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GREG(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_SENV(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GENV(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SET(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GET(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SREG(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GREG(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_NINT(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NFLO(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NTRU(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NFAL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NNIL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NSTR(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NFUN(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NTAB(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_NARR(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_NINT(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NFLO(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NTRU(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NFAL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NNIL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NSTR(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NFUN(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NTAB(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_NARR(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_JMP(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_JMPR(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_JIF(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_JNIF(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_JRIF(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_JRNI(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_JMP(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_JMPR(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_JIF(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_JNIF(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_JRIF(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_JRNI(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_CALL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_END(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_CALL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_END(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_LEN(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_CNCT(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_LEN(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_CLS(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_CLS(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_GETL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SETL(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GETG(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SETG(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_GETL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SETL(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GETG(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SETG(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_CPYT(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SWPT(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_CPYX(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_CPYT(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SWPT(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_CPYX(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_UNM(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_INC(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_DEC(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_UNM(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_INC(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_DEC(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_SCON(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GCON(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_SCON(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GCON(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_SWXY(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_SWXY(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_NNSE(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_NNSE(orcus_state* const ORCUS_CPP_restrict M);
 
-void M_BYTECODE_SETL_KCS(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GETL_KCS(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SETG_KCS(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GETG_KCS(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SENV_KCS(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GENV_KCS(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_SET_KCS(orcus_state* const M_CPP_restrict M);
-void M_BYTECODE_GET_KCS(orcus_state* const M_CPP_restrict M);
+void M_BYTECODE_SETL_KCS(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GETL_KCS(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SETG_KCS(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GETG_KCS(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SENV_KCS(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GENV_KCS(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_SET_KCS(orcus_state* const ORCUS_CPP_restrict M);
+void M_BYTECODE_GET_KCS(orcus_state* const ORCUS_CPP_restrict M);
 
 extern orcus_instruction orcus_bytecode_list[];
 

@@ -48,20 +48,20 @@
 	types are defined in an enum.
 	
 	<p class="codeblock">
-	extern uint8_t M_NUMBER_OF_TYPES;<br>
+	extern uint8_t ORCUS_NUMBER_OF_TYPES;<br>
 <br>
-	enum M_TYPE_ENUMS:uint8_t {<br>
-		&nbsp;&nbsp;M_TYPE_NIL = 0,<br>
-		&nbsp;&nbsp;M_TYPE_INT = 1,<br>
-		&nbsp;&nbsp;M_TYPE_FLOAT = 2,<br>
-		&nbsp;&nbsp;M_TYPE_BOOL = 3,<br>
-		&nbsp;&nbsp;M_TYPE_TABLE = 4,<br>
-		&nbsp;&nbsp;M_TYPE_STRING = 5,<br>
-		&nbsp;&nbsp;M_TYPE_CFUNC = 6,<br>
-		&nbsp;&nbsp;M_TYPE_ARRAY = 7,<br>
-		&nbsp;&nbsp;M_TYPE_FUNCTION = 8,<br>
-		&nbsp;&nbsp;M_TYPE_FILE = 9,<br>
-		&nbsp;&nbsp;M_TYPE_THREAD=10,<br>
+	enum ORCUS_TYPE_ENUMS:uint8_t {<br>
+		&nbsp;&nbsp;ORCUS_TYPE_NIL = 0,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_INT = 1,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_FLOAT = 2,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_BOOL = 3,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_TABLE = 4,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_STRING = 5,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_CFUNC = 6,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_ARRAY = 7,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_FUNCTION = 8,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_FILE = 9,<br>
+		&nbsp;&nbsp;ORCUS_TYPE_THREAD=10,<br>
 	};<br>
 	</p>
 </div>
@@ -123,7 +123,7 @@
 	<p class="codeblock">
 	#include &lt;stdio.h><br>
 	<br>
-	enum M_FILEFLAGS :uint8_t {<br>
+	enum ORCUS_FILEFLAGS :uint8_t {<br>
 		&nbsp;&nbsp;ORCUS_FILEFLAG_READ = 1 &lt;&lt; 0,<br>
 		&nbsp;&nbsp;ORCUS_FILEFLAG_WRITE = 1 &lt;&lt; 1,<br>
 	};<br>
@@ -169,13 +169,13 @@
 		C functions are merely a classification of function with a particular syntax.
 	</p>
 	<p class="codeblock">
-		typedef void (*orcus_cfunc) (orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
+		typedef void (*orcus_cfunc) (orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 	</p>
 	<p>
 		C function typedefs are not terribly readable, so here's it in proper written form
 	</p>
 	<p class="codeblock">
-		void function_name(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
+		void function_name(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
 		<br>
 		}<br>
 	</p>
@@ -191,13 +191,13 @@
 		C functions are merely a classification of function with a particular syntax.
 	</p>
 	<p class="codeblock">
-		typedef void (*orcus_cfunc) (orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
+		typedef void (*orcus_cfunc) (orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 	</p>
 	<p>
 		C function typedefs are not terribly readable, so here's it in proper written form
 	</p>
 	<p class="codeblock">
-		void function_name(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
+		void function_name(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {<br>
 		<br>
 		}<br>
 	</p>
@@ -226,7 +226,7 @@
 	};<br>
 	</p>
 	<p>
-		when a table is created, data is allocated with a size to fit M_NUMBER_OF_TYPES elements, meaning that each type gets its own dedicated subtable.<Br>
+		when a table is created, data is allocated with a size to fit ORCUS_NUMBER_OF_TYPES elements, meaning that each type gets its own dedicated subtable.<Br>
 		<Br>
 		from there, keys and values are stored in an array, which is resized according to the runtime's needs. because of this, tables are not very time efficient with large amounts of data. though, tables are made for sparse and mixed type data.<Br>
 	</p>

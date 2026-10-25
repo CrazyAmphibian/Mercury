@@ -90,7 +90,7 @@ this is a complete list of every function or inline provided in orcus.hpp, as we
 	</p>	
 	
 	<p class="codeblock">
-		bool orcus_mstring_addchars(orcus_string* const M_CPP_restrict str, const char* const chars, orcus_int len=1)
+		bool orcus_mstring_addchars(orcus_string* const ORCUS_CPP_restrict str, const char* const chars, orcus_int len=1)
 	</p>
 	<p>
 	modifies the first arg string with the supplied character array appended to it<br>
@@ -359,7 +359,7 @@ this is a complete list of every function or inline provided in orcus.hpp, as we
 	</p>
 	
 	<p class="codeblock">
-		inline orcus_state* orcus_get_child_state(orcus_state* const M_CPP_restrict M)
+		inline orcus_state* orcus_get_child_state(orcus_state* const ORCUS_CPP_restrict M)
 	</p>
 	<p>
 		returns a pointer to a state's child state, used for function calls.<br>
@@ -455,7 +455,7 @@ this is a complete list of every function or inline provided in orcus.hpp, as we
 	<h3>other functions</h3>
 	
 	<p class="codeblock">
-		bool orcus_register_library(void* data, const char* key, const char* table, uint8_t type=M_TYPE_CFUNC)
+		bool orcus_register_library(void* data, const char* key, const char* table, uint8_t type=ORCUS_TYPE_CFUNC)
 	</p>
 	<p>
 		adds data to orcus's global libraries list.<br>

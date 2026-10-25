@@ -56,7 +56,7 @@ void* threadfunction(void* param) {
 
 
 //creates a thread, given a function and input variable. optional table to act as the enviroment. defaults current env.
-void orcus_lib_thread_new(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_new(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (!args_in) {
 		orcus_raise_error_nonpointer(M, M_ERROR_NOT_ENOUGH_ARGS, args_in, 1);
 		return;
@@ -91,19 +91,19 @@ void orcus_lib_thread_new(orcus_state* const M_CPP_restrict M, const orcus_int a
 	}
 	else {
 		orcus_popstack(M, &func_var);
-		table_var.type = M_TYPE_NIL;
+		table_var.type = ORCUS_TYPE_NIL;
 	}
 
 
-	if ( func_var.type != M_TYPE_FUNCTION) {
+	if ( func_var.type != ORCUS_TYPE_FUNCTION) {
 		free(vart);
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &func_var, M_TYPE_FUNCTION, 1);
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &func_var, ORCUS_TYPE_FUNCTION, 1);
 		orcus_release_var(&func_var);
 		return;
 	}
-	if ((table_var.type && table_var.type != M_TYPE_TABLE)) {
+	if ((table_var.type && table_var.type != ORCUS_TYPE_TABLE)) {
 		free(vart);
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table_var, M_TYPE_TABLE, 2);
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &table_var, ORCUS_TYPE_TABLE, 2);
 		orcus_release_var(&table_var);
 		return;
 	}
@@ -136,7 +136,7 @@ void orcus_lib_thread_new(orcus_state* const M_CPP_restrict M, const orcus_int a
 	
 	orcus_variable out;
 	out.data.i = 0;
-	out.type = M_TYPE_NIL;
+	out.type = ORCUS_TYPE_NIL;
 	
 	if (t->state) {
 		//t->state->bytecode.numberofinstructions = ((orcus_function*)func_var.data.p)->numberofinstructions;
@@ -167,7 +167,7 @@ void orcus_lib_thread_new(orcus_state* const M_CPP_restrict M, const orcus_int a
 		HANDLE h = CreateThread(NULL, 0, threadfunction, (LPVOID)t, 0, NULL);
 		if (h) {
 			t->threadobject = h;
-			out.type = M_TYPE_THREAD;
+			out.type = ORCUS_TYPE_THREAD;
 			out.data.p = t;
 		}
 		else {
@@ -182,7 +182,7 @@ void orcus_lib_thread_new(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 		int c=pthread_create(&(t->threadobject), NULL, threadfunction, t);
 		if (!c) {
-			out.type = M_TYPE_THREAD;
+			out.type = ORCUS_TYPE_THREAD;
 			out.data.p = t;
 		}
 		else {
@@ -206,7 +206,7 @@ void orcus_lib_thread_new(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 
 //bool if thread is finished. simple.
-void orcus_lib_thread_checkfinish(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_checkfinish(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -216,14 +216,14 @@ void orcus_lib_thread_checkfinish(orcus_state* const M_CPP_restrict M, const orc
 
 	orcus_variable in;
 	orcus_popstack(M,&in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
 
 	orcus_variable out;
-	out.type = M_TYPE_BOOL;
+	out.type = ORCUS_TYPE_BOOL;
 	out.data.i = ((orcus_threadholder*)in.data.p)->finished ? 1 : 0;
 
 	orcus_release_var(&in);
@@ -235,7 +235,7 @@ void orcus_lib_thread_checkfinish(orcus_state* const M_CPP_restrict M, const orc
 
 
 //gets a value
-void orcus_lib_thread_getvalue(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_getvalue(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -244,8 +244,8 @@ void orcus_lib_thread_getvalue(orcus_state* const M_CPP_restrict M, const orcus_
 
 	orcus_variable in;
 	orcus_popstack(M, &in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
@@ -272,13 +272,13 @@ void orcus_lib_thread_getvalue(orcus_state* const M_CPP_restrict M, const orcus_
 
 
 //dire circumstances. use with caution
-void orcus_lib_thread_abort(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_abort(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
 	orcus_variable in;
 	orcus_popstack(M,&in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
@@ -304,7 +304,7 @@ void orcus_lib_thread_abort(orcus_state* const M_CPP_restrict M, const orcus_int
 
 
 //returns number of values. 0 if not finished.
-void orcus_lib_thread_getnumvalues(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_getnumvalues(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -313,8 +313,8 @@ void orcus_lib_thread_getnumvalues(orcus_state* const M_CPP_restrict M, const or
 
 	orcus_variable in;
 	orcus_popstack(M,&in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
@@ -322,7 +322,7 @@ void orcus_lib_thread_getnumvalues(orcus_state* const M_CPP_restrict M, const or
 	orcus_threadholder* t = (orcus_threadholder*)in.data.p;
 
 	orcus_variable out;
-	out.type = M_TYPE_INT;
+	out.type = ORCUS_TYPE_INT;
 	out.data.i = 0;
 
 	if (t->finished) {
@@ -339,13 +339,13 @@ void orcus_lib_thread_getnumvalues(orcus_state* const M_CPP_restrict M, const or
 
 
 //waits for a closure
-void orcus_lib_thread_waitfor(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_waitfor(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
 	orcus_variable in;
 	orcus_popstack(M,&in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
@@ -369,7 +369,7 @@ void orcus_lib_thread_waitfor(orcus_state* const M_CPP_restrict M, const orcus_i
 
 
 //inverse of is finished.
-void orcus_lib_thread_checkrunning(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_checkrunning(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -378,14 +378,14 @@ void orcus_lib_thread_checkrunning(orcus_state* const M_CPP_restrict M, const or
 
 	orcus_variable in;
 	orcus_popstack(M,&in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
 
 	orcus_variable out;
-	out.type = M_TYPE_BOOL;
+	out.type = ORCUS_TYPE_BOOL;
 	out.data.i = ((orcus_threadholder*)in.data.p)->finished ? 0 : 1;
 
 	orcus_release_var(&in);
@@ -396,13 +396,13 @@ void orcus_lib_thread_checkrunning(orcus_state* const M_CPP_restrict M, const or
 
 
 //tries to abort execution on a thread without leaking as much.
-void orcus_lib_thread_break(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_break(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
 	orcus_variable in;
 	orcus_popstack(M, &in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
@@ -419,7 +419,7 @@ void orcus_lib_thread_break(orcus_state* const M_CPP_restrict M, const orcus_int
 }
 
 
-void orcus_lib_thread_check_error(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_thread_check_error(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -428,8 +428,8 @@ void orcus_lib_thread_check_error(orcus_state* const M_CPP_restrict M, const orc
 
 	orcus_variable in;
 	orcus_popstack(M, &in);
-	if (in.type != M_TYPE_THREAD) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_THREAD, 1);
+	if (in.type != ORCUS_TYPE_THREAD) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_THREAD, 1);
 		orcus_release_var(&in);
 		return;
 	}
@@ -438,7 +438,7 @@ void orcus_lib_thread_check_error(orcus_state* const M_CPP_restrict M, const orc
 	orcus_release_var(&in);
 	if (!args_out)return;
 
-	in.type = M_TYPE_BOOL;
+	in.type = ORCUS_TYPE_BOOL;
 	in.data.i = ec != 0;
 	orcus_pushstack(M,&in);
 

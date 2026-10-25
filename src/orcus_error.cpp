@@ -24,7 +24,7 @@ const char* typetostring[256] = {
 };
 
 inline const char* get_type_string(uint8_t type) {
-	if (type >= M_NUMBER_OF_TYPES) {
+	if (type >= ORCUS_NUMBER_OF_TYPES) {
 		return "unknown";
 	}
 	return typetostring[type];

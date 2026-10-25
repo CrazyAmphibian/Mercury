@@ -45,7 +45,7 @@ orcus_string* orcus_get_state_traceback(orcus_state* M);
 //helper functions for making c functions. returns true if there's a problem, false if nothing went wrong. if()return;
 
 //variadic functions need not apply. also if you want to take optional args, you should specify max_args as the largest number you want to take. this function ensures that additional args will be discarded, and if args are missing, an error will be thrown.
-inline bool ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int min_args, orcus_int max_args=0) {
+inline bool ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int min_args, orcus_int max_args=0) {
 	if (!max_args) {
 		max_args = min_args; //by default, args are specific
 	}
@@ -60,7 +60,7 @@ inline bool ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(orcus_state* const 
 }
 
 //pretty simple will output any args that haven't been outputted. is nil.
-inline bool ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(orcus_state* const M_CPP_restrict M, const orcus_int args_out, const orcus_int sent_args=0) {
+inline bool ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_out, const orcus_int sent_args=0) {
 	orcus_int diff = args_out - sent_args;
 	if (diff > 0) {
 		if (M->allocatedstacksize < M->sizeofstack + diff) {

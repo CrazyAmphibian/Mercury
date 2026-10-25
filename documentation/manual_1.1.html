@@ -27,17 +27,17 @@
 	
 	<table>
 		<tr> <th>Variable</th> <th>Type</th> <th>Value</th> <th>Desc</th> </tr>
-		<tr> <td>M_TYPE_NIL</td> <td>Int</td>  <td>0</td>  <td>Numeric type of nil</td>  </tr>
-		<tr> <td>M_TYPE_INT</td> <td>Int</td>  <td>1</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_FLOAT</td> <td>Int</td>  <td>2</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_BOOL</td> <td>Int</td>  <td>3</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_TABLE</td> <td>Int</td>  <td>4</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_STRING</td> <td>Int</td>  <td>5</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_CFUNC</td> <td>Int</td>  <td>6</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_ARRAY</td> <td>Int</td>  <td>7</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_FUNCTION</td> <td>Int</td>  <td>8</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_FILE</td> <td>Int</td>  <td>9</td>  <td>ditto.</td>  </tr>
-		<tr> <td>M_TYPE_THREAD</td> <td>Int</td>  <td>10</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_NIL</td> <td>Int</td>  <td>0</td>  <td>Numeric type of nil</td>  </tr>
+		<tr> <td>ORCUS_TYPE_INT</td> <td>Int</td>  <td>1</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_FLOAT</td> <td>Int</td>  <td>2</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_BOOL</td> <td>Int</td>  <td>3</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_TABLE</td> <td>Int</td>  <td>4</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_STRING</td> <td>Int</td>  <td>5</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_CFUNC</td> <td>Int</td>  <td>6</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_ARRAY</td> <td>Int</td>  <td>7</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_FUNCTION</td> <td>Int</td>  <td>8</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_FILE</td> <td>Int</td>  <td>9</td>  <td>ditto.</td>  </tr>
+		<tr> <td>ORCUS_TYPE_THREAD</td> <td>Int</td>  <td>10</td>  <td>ditto.</td>  </tr>
 	</table>
 	
 	<h2>FUNCTIONS</h2>	
@@ -126,7 +126,7 @@
 		returns the type of a variable as an integer 
 	</p>
 	<p class="codeblock">
-		if type(a)!=M_TYPE_INT then <br/>
+		if type(a)!=ORCUS_TYPE_INT then <br/>
 		a=0<br/>
 		print(&quot;something went wrong!&quot;) <br/>
 		end 

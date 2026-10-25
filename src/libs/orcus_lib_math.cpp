@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 //returns the smallest value. takes vararg. if no values are provided, returns infinity
-void orcus_lib_math_min(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_min(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (!args_out) { 
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 		return; 
@@ -19,7 +19,7 @@ void orcus_lib_math_min(orcus_state* const M_CPP_restrict M, const orcus_int arg
 #else
 	out.data.i = 0x7f800000;
 #endif
-	out.type = M_TYPE_FLOAT;	
+	out.type = ORCUS_TYPE_FLOAT;	
 
 	//we can do a backwards stack loop with no issue because the order doesn't matter here
 	for (orcus_int a = 0; a < args_in;a++) {
@@ -27,23 +27,23 @@ void orcus_lib_math_min(orcus_state* const M_CPP_restrict M, const orcus_int arg
 		orcus_popstack(M,&var);
 
 		//we just ignore non-number variables.
-		if (var.type == M_TYPE_FLOAT) {
-			if (out.type == M_TYPE_FLOAT) {
+		if (var.type == ORCUS_TYPE_FLOAT) {
+			if (out.type == ORCUS_TYPE_FLOAT) {
 				if (var.data.f< out.data.f) {
 					out.data.f = var.data.f;
 				}
 			}
 			else {
 				if (var.data.f< (orcus_float)out.data.i) {
-					out.type = M_TYPE_FLOAT;
+					out.type = ORCUS_TYPE_FLOAT;
 					out.data.f = var.data.f;
 				}
 			}
 		}
-		else if (var.type == M_TYPE_INT) {
-			if (out.type == M_TYPE_FLOAT) {
+		else if (var.type == ORCUS_TYPE_INT) {
+			if (out.type == ORCUS_TYPE_FLOAT) {
 				if ((orcus_float)var.data.i < out.data.f) {
-					out.type = M_TYPE_INT;
+					out.type = ORCUS_TYPE_INT;
 					out.data.i = var.data.i;
 				}
 			}
@@ -64,7 +64,7 @@ void orcus_lib_math_min(orcus_state* const M_CPP_restrict M, const orcus_int arg
 
 
 //returns the biggestvalue. takes vararg. if no values are provided, returns negative infinity
-void orcus_lib_math_max(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_max(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (!args_out) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0);
 		return;
@@ -76,7 +76,7 @@ void orcus_lib_math_max(orcus_state* const M_CPP_restrict M, const orcus_int arg
 #else
 	out.data.i = 0xff800000;
 #endif
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	//we can do a backwards stack loop with no issue because the order doesn't matter here
 	for (orcus_int a = 0; a < args_in; a++) {
@@ -84,23 +84,23 @@ void orcus_lib_math_max(orcus_state* const M_CPP_restrict M, const orcus_int arg
 		orcus_popstack(M, &var);
 
 		//we just ignore non-number variables.
-		if (var.type == M_TYPE_FLOAT) {
-			if (out.type == M_TYPE_FLOAT) {
+		if (var.type == ORCUS_TYPE_FLOAT) {
+			if (out.type == ORCUS_TYPE_FLOAT) {
 				if (var.data.f > out.data.f) {
 					out.data.f = var.data.f;
 				}
 			}
 			else {
 				if (var.data.f > (orcus_float)out.data.i) {
-					out.type = M_TYPE_FLOAT;
+					out.type = ORCUS_TYPE_FLOAT;
 					out.data.f = var.data.f;
 				}
 			}
 		}
-		else if (var.type == M_TYPE_INT) {
-			if (out.type == M_TYPE_FLOAT) {
+		else if (var.type == ORCUS_TYPE_INT) {
+			if (out.type == ORCUS_TYPE_FLOAT) {
 				if ((orcus_float)var.data.i > out.data.f) {
-					out.type = M_TYPE_INT;
+					out.type = ORCUS_TYPE_INT;
 					out.data.i = var.data.i;
 				}
 			}
@@ -119,7 +119,7 @@ void orcus_lib_math_max(orcus_state* const M_CPP_restrict M, const orcus_int arg
 }
 
 //will return an int.
-void orcus_lib_math_floor(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_floor(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -131,14 +131,14 @@ void orcus_lib_math_floor(orcus_state* const M_CPP_restrict M, const orcus_int a
 	orcus_variable out;
 	
 	out.data.i = 0;
-	out.type = M_TYPE_INT;
+	out.type = ORCUS_TYPE_INT;
 
 	orcus_variable val;
 	orcus_popstack(M,&val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.i = val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.i=(orcus_int)floor(val.data.f);
 	}
 	else {
@@ -153,7 +153,7 @@ void orcus_lib_math_floor(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 
 //will return an int.
-void orcus_lib_math_ceil(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_ceil(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -165,14 +165,14 @@ void orcus_lib_math_ceil(orcus_state* const M_CPP_restrict M, const orcus_int ar
 	orcus_variable out;
 	
 	out.data.f = 0;
-	out.type = M_TYPE_INT;
+	out.type = ORCUS_TYPE_INT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.i = val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.i = (orcus_int)ceil(val.data.f);
 	}
 	else {
@@ -188,7 +188,7 @@ void orcus_lib_math_ceil(orcus_state* const M_CPP_restrict M, const orcus_int ar
 
 
 
-void orcus_lib_math_to_radians(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //degrees to radians
+void orcus_lib_math_to_radians(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //degrees to radians
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -200,14 +200,14 @@ void orcus_lib_math_to_radians(orcus_state* const M_CPP_restrict M, const orcus_
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -223,7 +223,7 @@ void orcus_lib_math_to_radians(orcus_state* const M_CPP_restrict M, const orcus_
 }
 
 
-void orcus_lib_math_to_degrees(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //radians to degrees
+void orcus_lib_math_to_degrees(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //radians to degrees
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -235,14 +235,14 @@ void orcus_lib_math_to_degrees(orcus_state* const M_CPP_restrict M, const orcus_
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -258,7 +258,7 @@ void orcus_lib_math_to_degrees(orcus_state* const M_CPP_restrict M, const orcus_
 }
 
 
-void orcus_lib_math_log(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_log(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1,2)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -272,7 +272,7 @@ void orcus_lib_math_log(orcus_state* const M_CPP_restrict M, const orcus_int arg
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable base;
 	
@@ -280,15 +280,15 @@ void orcus_lib_math_log(orcus_state* const M_CPP_restrict M, const orcus_int arg
 
 	if (args_in == 1) {
 		orcus_popstack(M,&num);
-		base.type = M_TYPE_NIL;
+		base.type = ORCUS_TYPE_NIL;
 	}
 	else {
 		orcus_popstack(M,&base);
-		if (base.type == M_TYPE_INT) {
+		if (base.type == ORCUS_TYPE_INT) {
 			base.data.f = (orcus_float)base.data.i;
-			base.type = M_TYPE_FLOAT;
+			base.type = ORCUS_TYPE_FLOAT;
 		}
-		else if (base.type != M_TYPE_FLOAT) {
+		else if (base.type != ORCUS_TYPE_FLOAT) {
 			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &base, 2);
 			orcus_release_var(&base);
 			return;
@@ -296,11 +296,11 @@ void orcus_lib_math_log(orcus_state* const M_CPP_restrict M, const orcus_int arg
 		orcus_popstack(M, &num);
 	}
 
-	if (num.type == M_TYPE_INT) {
+	if (num.type == ORCUS_TYPE_INT) {
 		num.data.f = (orcus_float)num.data.i;
-		num.type = M_TYPE_FLOAT;
+		num.type = ORCUS_TYPE_FLOAT;
 	}
-	else if (num.type != M_TYPE_FLOAT) {
+	else if (num.type != ORCUS_TYPE_FLOAT) {
 		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &num, 1);
 		orcus_release_var(&num);
 		return;
@@ -320,7 +320,7 @@ void orcus_lib_math_log(orcus_state* const M_CPP_restrict M, const orcus_int arg
 
 
 
-void orcus_lib_math_to_absolute(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //absolute value
+void orcus_lib_math_to_absolute(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //absolute value
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -332,15 +332,15 @@ void orcus_lib_math_to_absolute(orcus_state* const M_CPP_restrict M, const orcus
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
-		out.type = M_TYPE_INT;
+	if (val.type == ORCUS_TYPE_INT) {
+		out.type = ORCUS_TYPE_INT;
 		out.data.i =abs(val.data.i);
 	}
-	else if (val.type == M_TYPE_FLOAT) { //since floats use a sign bit, we can use a simple bitwise to do stuff fast.
+	else if (val.type == ORCUS_TYPE_FLOAT) { //since floats use a sign bit, we can use a simple bitwise to do stuff fast.
 #ifdef ORCUS_64BIT
 		out.data.i = 0x7FFFFFFFFFFFFFFF & val.data.i;
 #else
@@ -360,7 +360,7 @@ void orcus_lib_math_to_absolute(orcus_state* const M_CPP_restrict M, const orcus
 
 
 
-void orcus_lib_math_to_sin(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //sine
+void orcus_lib_math_to_sin(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //sine
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -372,14 +372,14 @@ void orcus_lib_math_to_sin(orcus_state* const M_CPP_restrict M, const orcus_int 
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -394,7 +394,7 @@ void orcus_lib_math_to_sin(orcus_state* const M_CPP_restrict M, const orcus_int 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_math_to_cos(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //cosine
+void orcus_lib_math_to_cos(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //cosine
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -406,14 +406,14 @@ void orcus_lib_math_to_cos(orcus_state* const M_CPP_restrict M, const orcus_int 
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -429,7 +429,7 @@ void orcus_lib_math_to_cos(orcus_state* const M_CPP_restrict M, const orcus_int 
 }
 
 
-void orcus_lib_math_to_tan(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //tangent
+void orcus_lib_math_to_tan(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //tangent
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -441,14 +441,14 @@ void orcus_lib_math_to_tan(orcus_state* const M_CPP_restrict M, const orcus_int 
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -463,7 +463,7 @@ void orcus_lib_math_to_tan(orcus_state* const M_CPP_restrict M, const orcus_int 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_math_to_asin(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //arcsine
+void orcus_lib_math_to_asin(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //arcsine
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -475,14 +475,14 @@ void orcus_lib_math_to_asin(orcus_state* const M_CPP_restrict M, const orcus_int
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -497,7 +497,7 @@ void orcus_lib_math_to_asin(orcus_state* const M_CPP_restrict M, const orcus_int
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_math_to_acos(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //arccosine
+void orcus_lib_math_to_acos(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //arccosine
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -509,14 +509,14 @@ void orcus_lib_math_to_acos(orcus_state* const M_CPP_restrict M, const orcus_int
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -532,7 +532,7 @@ void orcus_lib_math_to_acos(orcus_state* const M_CPP_restrict M, const orcus_int
 }
 
 
-void orcus_lib_math_to_atan(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //arctangent
+void orcus_lib_math_to_atan(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //arctangent
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -544,14 +544,14 @@ void orcus_lib_math_to_atan(orcus_state* const M_CPP_restrict M, const orcus_int
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -566,7 +566,7 @@ void orcus_lib_math_to_atan(orcus_state* const M_CPP_restrict M, const orcus_int
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_math_to_atan2(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_to_atan2(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -579,14 +579,14 @@ void orcus_lib_math_to_atan2(orcus_state* const M_CPP_restrict M, const orcus_in
 	orcus_variable out;
 	
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
-	if (val.type == M_TYPE_INT) {
+	if (val.type == ORCUS_TYPE_INT) {
 		out.data.f = (orcus_float)val.data.i;
 	}
-	else if (val.type == M_TYPE_FLOAT) {
+	else if (val.type == ORCUS_TYPE_FLOAT) {
 		out.data.f = val.data.f;
 	}
 	else {
@@ -597,10 +597,10 @@ void orcus_lib_math_to_atan2(orcus_state* const M_CPP_restrict M, const orcus_in
 
 	orcus_variable y;
 	orcus_popstack(M,&y);
-	if (y.type == M_TYPE_INT) {
+	if (y.type == ORCUS_TYPE_INT) {
 		y.data.f = (orcus_float)y.data.i;
 	}
-	else if (y.type == M_TYPE_FLOAT) {
+	else if (y.type == ORCUS_TYPE_FLOAT) {
 		y.data.f = y.data.f;
 	}
 	else {
@@ -640,7 +640,7 @@ inline uint32_t m_random() {
 
 
 
-void orcus_lib_math_random(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_random(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,2)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -655,13 +655,13 @@ void orcus_lib_math_random(orcus_state* const M_CPP_restrict M, const orcus_int 
 	if (args_in>0)orcus_popstack(M, &v2);
 	if (args_in>1)orcus_popstack(M, &v1);
 
-	if (args_in && (v1.type != M_TYPE_INT) && (v1.type != M_TYPE_FLOAT) ) {
+	if (args_in && (v1.type != ORCUS_TYPE_INT) && (v1.type != ORCUS_TYPE_FLOAT) ) {
 		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v1,1);
 		orcus_release_var(&v1);
 		return;
 	}
 
-	if (args_in &&  (v2.type != M_TYPE_INT) && (v2.type != M_TYPE_FLOAT)) {
+	if (args_in &&  (v2.type != ORCUS_TYPE_INT) && (v2.type != ORCUS_TYPE_FLOAT)) {
 		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, &v2, 2);
 		orcus_release_var(&v2);
 		return;
@@ -675,20 +675,20 @@ void orcus_lib_math_random(orcus_state* const M_CPP_restrict M, const orcus_int 
 
 	orcus_variable out;
 	
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 	if (!args_in) {
 		out.data.f = f;
 	}else{
 		orcus_float min=0.0;
 		orcus_float max=0.0;
-		if (v2.type == M_TYPE_INT) {
+		if (v2.type == ORCUS_TYPE_INT) {
 			max = (orcus_float)v2.data.i;
 		}
 		else {
 			max = v2.data.f;
 		}
 
-		if (v1.type == M_TYPE_INT) {
+		if (v1.type == ORCUS_TYPE_INT) {
 			min = (orcus_float)v1.data.i;
 		}
 		else {
@@ -704,7 +704,7 @@ void orcus_lib_math_random(orcus_state* const M_CPP_restrict M, const orcus_int 
 }
 
 
-void orcus_lib_math_randomint(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_randomint(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 2)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -715,14 +715,14 @@ void orcus_lib_math_randomint(orcus_state* const M_CPP_restrict M, const orcus_i
 	orcus_variable v1;
 	orcus_popstack(M,&v1);
 
-	if ( (v1.type != M_TYPE_INT)) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v1, M_TYPE_INT, 1);
+	if ( (v1.type != ORCUS_TYPE_INT)) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v1, ORCUS_TYPE_INT, 1);
 		orcus_release_var(&v1);
 		return;
 	}
 
-	if ( (v2.type != M_TYPE_INT)) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v2, M_TYPE_INT, 2);
+	if ( (v2.type != ORCUS_TYPE_INT)) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v2, ORCUS_TYPE_INT, 2);
 		orcus_release_var(&v2);
 		return;
 	}
@@ -734,7 +734,7 @@ void orcus_lib_math_randomint(orcus_state* const M_CPP_restrict M, const orcus_i
 
 	orcus_variable out;
 	
-	out.type = M_TYPE_INT;
+	out.type = ORCUS_TYPE_INT;
 
 	orcus_int min = v1.data.i;
 	orcus_int max = v2.data.i;
@@ -748,7 +748,7 @@ void orcus_lib_math_randomint(orcus_state* const M_CPP_restrict M, const orcus_i
 
 
 
-void orcus_lib_math_randomseed(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_randomseed(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -758,8 +758,8 @@ void orcus_lib_math_randomseed(orcus_state* const M_CPP_restrict M, const orcus_
 		orcus_variable v1;
 		orcus_popstack(M,&v1);
 
-		if ((v1.type != M_TYPE_INT)) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v1, M_TYPE_INT, 1);
+		if ((v1.type != ORCUS_TYPE_INT)) {
+			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &v1, ORCUS_TYPE_INT, 1);
 			orcus_release_var(&v1);
 			return;
 		}
@@ -770,7 +770,7 @@ void orcus_lib_math_randomseed(orcus_state* const M_CPP_restrict M, const orcus_
 
 	if (args_out) {
 		orcus_variable o;
-		o.type = M_TYPE_INT;
+		o.type = ORCUS_TYPE_INT;
 		o.data.u = (M_RANDOM_STATE & 0x0000FFFFFFFF0000) >> 16;
 		orcus_pushstack(M, &o);
 	}
@@ -779,7 +779,7 @@ void orcus_lib_math_randomseed(orcus_state* const M_CPP_restrict M, const orcus_
 }
 
 
-void orcus_lib_math_isnan(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_isnan(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 		return;
@@ -793,12 +793,12 @@ void orcus_lib_math_isnan(orcus_state* const M_CPP_restrict M, const orcus_int a
 	
 	out.data.i = 0;
 	
-	out.type = M_TYPE_BOOL;
+	out.type = ORCUS_TYPE_BOOL;
 
 	orcus_variable val;
 	orcus_popstack(M, &val);
 
-	if (val.type == M_TYPE_FLOAT) {
+	if (val.type == ORCUS_TYPE_FLOAT) {
 #ifdef ORCUS_64BIT
 		out.data.i = (val.data.i & 0x7ff0000000000000)== 0x7ff0000000000000; //NaN will always have all exponent bits checked. this also will catch infinity, which i suppose technically isn't a number.
 #else
@@ -813,7 +813,7 @@ void orcus_lib_math_isnan(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 
 
-void orcus_lib_math_min_array(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_min_array(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -821,8 +821,8 @@ void orcus_lib_math_min_array(orcus_state* const M_CPP_restrict M, const orcus_i
 	}
 	orcus_variable in;
 	orcus_popstack(M, &in);
-	if (in.type != M_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_ARRAY, 1);
+	if (in.type != ORCUS_TYPE_ARRAY) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&in);
 	}
 
@@ -832,7 +832,7 @@ void orcus_lib_math_min_array(orcus_state* const M_CPP_restrict M, const orcus_i
 #else
 	out.data.i = 0x7f800000;
 #endif
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_array* arr = (orcus_array*)in.data.p;
 
@@ -867,16 +867,16 @@ void orcus_lib_math_min_array(orcus_state* const M_CPP_restrict M, const orcus_i
 					orcus_variable const var = st2[i3];
 					const orcus_int index = orcus_reconstruct_array_index(i1, i2, i3);
 #endif
-					if (var.type==M_TYPE_INT) {
-						if (out.type == M_TYPE_INT) {
+					if (var.type==ORCUS_TYPE_INT) {
+						if (out.type == ORCUS_TYPE_INT) {
 							if (var.data.i < out.data.i)out = var;
 						}
 						else {
 							if (var.data.i < out.data.f)out = var;
 						}
 					}
-					else if (var.type == M_TYPE_FLOAT) {
-						if (out.type == M_TYPE_INT) {
+					else if (var.type == ORCUS_TYPE_FLOAT) {
+						if (out.type == ORCUS_TYPE_INT) {
 							if (var.data.f < out.data.i)out = var;
 						}
 						else {
@@ -908,7 +908,7 @@ void orcus_lib_math_min_array(orcus_state* const M_CPP_restrict M, const orcus_i
 
 
 
-void orcus_lib_math_max_array(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_max_array(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -916,8 +916,8 @@ void orcus_lib_math_max_array(orcus_state* const M_CPP_restrict M, const orcus_i
 	}
 	orcus_variable in;
 	orcus_popstack(M, &in);
-	if (in.type != M_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_ARRAY, 1);
+	if (in.type != ORCUS_TYPE_ARRAY) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&in);
 	}
 
@@ -927,7 +927,7 @@ void orcus_lib_math_max_array(orcus_state* const M_CPP_restrict M, const orcus_i
 #else
 	out.data.i = 0xff800000;
 #endif
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_array* arr = (orcus_array*)in.data.p;
 
@@ -962,16 +962,16 @@ void orcus_lib_math_max_array(orcus_state* const M_CPP_restrict M, const orcus_i
 					orcus_variable const var = st2[i3];
 					const orcus_int index = orcus_reconstruct_array_index(i1, i2, i3);
 #endif
-					if (var.type == M_TYPE_INT) {
-						if (out.type == M_TYPE_INT) {
+					if (var.type == ORCUS_TYPE_INT) {
+						if (out.type == ORCUS_TYPE_INT) {
 							if (var.data.i > out.data.i)out = var;
 						}
 						else {
 							if (var.data.i > out.data.f)out = var;
 						}
 					}
-					else if (var.type == M_TYPE_FLOAT) {
-						if (out.type == M_TYPE_INT) {
+					else if (var.type == ORCUS_TYPE_FLOAT) {
+						if (out.type == ORCUS_TYPE_INT) {
 							if (var.data.f > out.data.i)out = var;
 						}
 						else {
@@ -1003,7 +1003,7 @@ void orcus_lib_math_max_array(orcus_state* const M_CPP_restrict M, const orcus_i
 
 
 
-void orcus_lib_math_mean(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_mean(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (!args_out) {
 		ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M,args_in, 0);
 		return;
@@ -1011,7 +1011,7 @@ void orcus_lib_math_mean(orcus_state* const M_CPP_restrict M, const orcus_int ar
 	orcus_variable out;
 
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	//we can do a backwards stack loop with no issue because the order doesn't matter here
 	for (orcus_int a = 0; a < args_in; a++) {
@@ -1019,10 +1019,10 @@ void orcus_lib_math_mean(orcus_state* const M_CPP_restrict M, const orcus_int ar
 		orcus_popstack(M, &var);
 
 		//we just ignore non-number variables.
-		if (var.type == M_TYPE_FLOAT) {
+		if (var.type == ORCUS_TYPE_FLOAT) {
 			out.data.f += var.data.f;
 		}
-		else if (var.type == M_TYPE_INT) {
+		else if (var.type == ORCUS_TYPE_INT) {
 			out.data.f += (orcus_float)var.data.i;
 		}
 
@@ -1037,7 +1037,7 @@ void orcus_lib_math_mean(orcus_state* const M_CPP_restrict M, const orcus_int ar
 
 
 
-void orcus_lib_math_mean_array(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_math_mean_array(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1);
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -1045,14 +1045,14 @@ void orcus_lib_math_mean_array(orcus_state* const M_CPP_restrict M, const orcus_
 	}
 	orcus_variable in;
 	orcus_popstack(M, &in);
-	if (in.type != M_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, M_TYPE_ARRAY, 1);
+	if (in.type != ORCUS_TYPE_ARRAY) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&in);
 	}
 
 	orcus_variable out;
 	out.data.f = 0.0;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 
 	orcus_uint elements_traversed = 0;
 
@@ -1089,11 +1089,11 @@ void orcus_lib_math_mean_array(orcus_state* const M_CPP_restrict M, const orcus_
 					orcus_variable const var = st2[i3];
 					const orcus_int index = orcus_reconstruct_array_index(i1, i2, i3);
 #endif
-					if (var.type == M_TYPE_INT) {
+					if (var.type == ORCUS_TYPE_INT) {
 						elements_traversed++;
 						out.data.f += (orcus_float)var.data.i;
 					}
-					else if (var.type == M_TYPE_FLOAT) {
+					else if (var.type == ORCUS_TYPE_FLOAT) {
 						elements_traversed++;
 						out.data.f += var.data.f;
 					}

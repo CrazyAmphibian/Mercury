@@ -2938,7 +2938,7 @@ compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens,orcus
 
 
 void orcus_compile_mstring(orcus_string* str, orcus_variable* out, bool remove_debug_info){
-	out->type = M_TYPE_NIL;
+	out->type = ORCUS_TYPE_NIL;
 	out->data.i = 0;
 	
 	orcus_int num_tokens;
@@ -3034,7 +3034,7 @@ void orcus_compile_mstring(orcus_string* str, orcus_variable* out, bool remove_d
 
 		if (!buffer)return;
 
-		out->type = M_TYPE_STRING;
+		out->type = ORCUS_TYPE_STRING;
 		out->data.p = orcus_cstring_to_mstring(buffer,strlen(buffer));
 	}
 	else {
@@ -3104,6 +3104,6 @@ void orcus_compile_mstring(orcus_string* str, orcus_variable* out, bool remove_d
 		nmf->numberofinstructions = func.number_instructions;
 
 		out->data.p = nmf;
-		out->type = M_TYPE_FUNCTION;
+		out->type = ORCUS_TYPE_FUNCTION;
 	}
 }

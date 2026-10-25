@@ -23,12 +23,12 @@
 
 //gee i sure wish C++ had this as a standard keyword
 #ifdef __GNUC__
-#define M_CPP_restrict __restrict__
+#define ORCUS_CPP_restrict __restrict__
 #else
 #ifdef _MSC_VER
-#define M_CPP_restrict __restrict
+#define ORCUS_CPP_restrict __restrict
 #else
-#define M_CPP_restrict
+#define ORCUS_CPP_restrict
 #endif
 #endif
 
@@ -193,7 +193,7 @@ struct orcus_function {
 	orcus_debug_token* dbg_tokens = nullptr;
 };
 
-enum M_FILEFLAGS :uint8_t { //append and extended mode doesn't really impact the orcus runtime at all, so
+enum ORCUS_FILEFLAGS :uint8_t { //append and extended mode doesn't really impact the orcus runtime at all, so
 	ORCUS_FILEFLAG_READ = 1 << 0,
 	ORCUS_FILEFLAG_WRITE = 1 << 1,
 };
@@ -242,30 +242,30 @@ struct orcus_threadholder {
 };
 
 
-typedef void (*orcus_cfunc) (orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
+typedef void (*orcus_cfunc) (orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out);
 
 //type defenitions
-extern uint8_t M_NUMBER_OF_TYPES;
+extern uint8_t ORCUS_NUMBER_OF_TYPES;
 
-enum M_TYPE_ENUMS:uint8_t {
-	M_TYPE_NIL = 0,
-	M_TYPE_INT = 1,
-	M_TYPE_FLOAT = 2,
-	M_TYPE_BOOL = 3,
-	M_TYPE_TABLE = 4,
-	M_TYPE_STRING = 5,
-	M_TYPE_CFUNC = 6,
-	M_TYPE_ARRAY = 7,
-	M_TYPE_FUNCTION = 8,
-	M_TYPE_FILE = 9,
-	M_TYPE_THREAD=10,
+enum ORCUS_TYPE_ENUMS:uint8_t {
+	ORCUS_TYPE_NIL = 0,
+	ORCUS_TYPE_INT = 1,
+	ORCUS_TYPE_FLOAT = 2,
+	ORCUS_TYPE_BOOL = 3,
+	ORCUS_TYPE_TABLE = 4,
+	ORCUS_TYPE_STRING = 5,
+	ORCUS_TYPE_CFUNC = 6,
+	ORCUS_TYPE_ARRAY = 7,
+	ORCUS_TYPE_FUNCTION = 8,
+	ORCUS_TYPE_FILE = 9,
+	ORCUS_TYPE_THREAD=10,
 };
 
 extern uint16_t register_max;// = 0xf; //registers rage from 0 to this number
 
 
 struct orcus_libdef {
-	uint8_t type = M_TYPE_CFUNC;
+	uint8_t type = ORCUS_TYPE_CFUNC;
 	void* dataptr = nullptr;
 	const char* key = nullptr;
 	const char* table = nullptr;
@@ -277,21 +277,21 @@ extern orcus_int M_NUM_LIBS;
 //functions defined in the .cpp
 
 //string
-ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_cstring_to_mstring(const char* const M_CPP_restrict str, const orcus_int size);
-ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_cstring_const_to_mstring(const char* const M_CPP_restrict str, const orcus_int size);
-ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_cstring_promote_to_mstring(char* const M_CPP_restrict str, const orcus_int size);
-ORCUS_DYNAMIC_LIBRARY char* orcus_mstring_to_cstring(const orcus_string* const M_CPP_restrict str);
+ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_cstring_to_mstring(const char* const ORCUS_CPP_restrict str, const orcus_int size);
+ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_cstring_const_to_mstring(const char* const ORCUS_CPP_restrict str, const orcus_int size);
+ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_cstring_promote_to_mstring(char* const ORCUS_CPP_restrict str, const orcus_int size);
+ORCUS_DYNAMIC_LIBRARY char* orcus_mstring_to_cstring(const orcus_string* const ORCUS_CPP_restrict str);
 ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_mstrings_concat(const orcus_string* const str1, const orcus_string* const str2);
-ORCUS_DYNAMIC_LIBRARY void orcus_mstring_delete(orcus_string* const M_CPP_restrict str);
+ORCUS_DYNAMIC_LIBRARY void orcus_mstring_delete(orcus_string* const ORCUS_CPP_restrict str);
 ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_mstring_substring(orcus_string* str, orcus_int start, orcus_int end);
-ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_tostring(const orcus_variable* const M_CPP_restrict var);
+ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_tostring(const orcus_variable* const ORCUS_CPP_restrict var);
 ORCUS_DYNAMIC_LIBRARY bool orcus_mstrings_append(orcus_string* const basestr, const orcus_string* const appstr);
-ORCUS_DYNAMIC_LIBRARY bool orcus_mstring_addchars(orcus_string* const M_CPP_restrict str, const char* const chars, const orcus_int len=1);
-ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_copystring(const orcus_string* const M_CPP_restrict str);
+ORCUS_DYNAMIC_LIBRARY bool orcus_mstring_addchars(orcus_string* const ORCUS_CPP_restrict str, const char* const chars, const orcus_int len=1);
+ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_copystring(const orcus_string* const ORCUS_CPP_restrict str);
 
 //table
 ORCUS_DYNAMIC_LIBRARY orcus_table* orcus_newtable();
-ORCUS_DYNAMIC_LIBRARY void orcus_destroyarray(orcus_array* const M_CPP_restrict arr);
+ORCUS_DYNAMIC_LIBRARY void orcus_destroyarray(orcus_array* const ORCUS_CPP_restrict arr);
 ORCUS_DYNAMIC_LIBRARY bool orcus_getkey(const orcus_table* const table, orcus_variable* const key, orcus_variable* out);
 ORCUS_DYNAMIC_LIBRARY orcus_int orcus_setkey(orcus_table* const table, orcus_variable* const key, const orcus_variable* const value);
 ORCUS_DYNAMIC_LIBRARY bool orcus_tables_equal(const orcus_table* const table1, const orcus_table* const table2);
@@ -307,33 +307,33 @@ ORCUS_DYNAMIC_LIBRARY void orcus_prepare_table_for_state(orcus_table* table, orc
 ORCUS_DYNAMIC_LIBRARY orcus_array* orcus_newarray();
 ORCUS_DYNAMIC_LIBRARY bool orcus_setarray(orcus_array* const array, const orcus_variable* const var, const orcus_int pos);
 ORCUS_DYNAMIC_LIBRARY void orcus_getarray(orcus_array* const array, const orcus_int pos, orcus_variable* out);
-ORCUS_DYNAMIC_LIBRARY orcus_int orcus_array_len(const orcus_array* const M_CPP_restrict arr);
+ORCUS_DYNAMIC_LIBRARY orcus_int orcus_array_len(const orcus_array* const ORCUS_CPP_restrict arr);
 ORCUS_DYNAMIC_LIBRARY bool orcus_cleararrayindex(orcus_array* const array, const orcus_int pos);
 
 
 //state
 ORCUS_DYNAMIC_LIBRARY orcus_state* orcus_newstate(const orcus_state* const parent=nullptr);
-ORCUS_DYNAMIC_LIBRARY bool orcus_stepstate(orcus_state* const M_CPP_restrict M);
-ORCUS_DYNAMIC_LIBRARY void orcus_clearstate(orcus_state* const M_CPP_restrict M, bool for_deletion=false);
-ORCUS_DYNAMIC_LIBRARY void orcus_destroystate(orcus_state* const M_CPP_restrict M);
+ORCUS_DYNAMIC_LIBRARY bool orcus_stepstate(orcus_state* const ORCUS_CPP_restrict M);
+ORCUS_DYNAMIC_LIBRARY void orcus_clearstate(orcus_state* const ORCUS_CPP_restrict M, bool for_deletion=false);
+ORCUS_DYNAMIC_LIBRARY void orcus_destroystate(orcus_state* const ORCUS_CPP_restrict M);
 
 //stack
-ORCUS_DYNAMIC_LIBRARY void orcus_popstack(orcus_state* const M_CPP_restrict M, orcus_variable* out);
-ORCUS_DYNAMIC_LIBRARY void orcus_pullstack(orcus_state* const M_CPP_restrict M, orcus_variable* out);
-ORCUS_DYNAMIC_LIBRARY bool orcus_pushstack(orcus_state* const M_CPP_restrict M, orcus_variable* const var);
+ORCUS_DYNAMIC_LIBRARY void orcus_popstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* out);
+ORCUS_DYNAMIC_LIBRARY void orcus_pullstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* out);
+ORCUS_DYNAMIC_LIBRARY bool orcus_pushstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* const var);
 
-ORCUS_DYNAMIC_LIBRARY void orcus_release_var(orcus_variable* const M_CPP_restrict var);
+ORCUS_DYNAMIC_LIBRARY void orcus_release_var(orcus_variable* const ORCUS_CPP_restrict var);
 
 
 //misc
-ORCUS_DYNAMIC_LIBRARY bool orcus_checkbool(const orcus_variable* const M_CPP_restrict var);
-ORCUS_DYNAMIC_LIBRARY orcus_int orcus_checkint(const orcus_variable* const M_CPP_restrict var);
-ORCUS_DYNAMIC_LIBRARY orcus_float orcus_checkfloat(const orcus_variable* const M_CPP_restrict var);
-ORCUS_DYNAMIC_LIBRARY void* orcus_checkpointer(const orcus_variable* const M_CPP_restrict var);
+ORCUS_DYNAMIC_LIBRARY bool orcus_checkbool(const orcus_variable* const ORCUS_CPP_restrict var);
+ORCUS_DYNAMIC_LIBRARY orcus_int orcus_checkint(const orcus_variable* const ORCUS_CPP_restrict var);
+ORCUS_DYNAMIC_LIBRARY orcus_float orcus_checkfloat(const orcus_variable* const ORCUS_CPP_restrict var);
+ORCUS_DYNAMIC_LIBRARY void* orcus_checkpointer(const orcus_variable* const ORCUS_CPP_restrict var);
 ORCUS_DYNAMIC_LIBRARY bool orcus_vars_equal(const orcus_variable* const var1, const orcus_variable* const var2);
 
 
-ORCUS_DYNAMIC_LIBRARY bool orcus_register_library(void* data,const char* key, const char* table, uint8_t type=M_TYPE_CFUNC);
+ORCUS_DYNAMIC_LIBRARY bool orcus_register_library(void* data,const char* key, const char* table, uint8_t type=ORCUS_TYPE_CFUNC);
 ORCUS_DYNAMIC_LIBRARY void orcus_populate_table_with_libs(orcus_table* T);
 
 ORCUS_DYNAMIC_LIBRARY orcus_string* orcus_get_bytecode_debug(orcus_function* F);
@@ -346,11 +346,11 @@ ORCUS_DYNAMIC_LIBRARY void orcus_clear_function(orcus_function* in);
 //inlines, for SPEED
 inline void orcus_clear_variable(orcus_variable* var) {
 	var->data.i = 0;
-	var->type = M_TYPE_NIL;
+	var->type = ORCUS_TYPE_NIL;
 }
 
 //frees the top stack and decrements the stack size. analagous to popstack releasevar, albeit a bit faster.
-inline void orcus_discard_top_of_stack(orcus_state* const M_CPP_restrict M) {
+inline void orcus_discard_top_of_stack(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack) {
 		M->sizeofstack--;
 		orcus_release_var(M->stack + M->sizeofstack);
@@ -359,87 +359,87 @@ inline void orcus_discard_top_of_stack(orcus_state* const M_CPP_restrict M) {
 
 inline bool orcus_type_is_complex(const uint8_t type) {
 	switch (type) {
-		case M_TYPE_NIL:
-		case M_TYPE_INT:
-		case M_TYPE_FLOAT:
-		case M_TYPE_BOOL:
-		case M_TYPE_CFUNC:
+		case ORCUS_TYPE_NIL:
+		case ORCUS_TYPE_INT:
+		case ORCUS_TYPE_FLOAT:
+		case ORCUS_TYPE_BOOL:
+		case ORCUS_TYPE_CFUNC:
 			return false;
-		case M_TYPE_STRING:
-		case M_TYPE_ARRAY:
-		case M_TYPE_TABLE:
-		case M_TYPE_FUNCTION:
-		case M_TYPE_THREAD:
-		case M_TYPE_FILE:
+		case ORCUS_TYPE_STRING:
+		case ORCUS_TYPE_ARRAY:
+		case ORCUS_TYPE_TABLE:
+		case ORCUS_TYPE_FUNCTION:
+		case ORCUS_TYPE_THREAD:
+		case ORCUS_TYPE_FILE:
 		default:
 			return true;
 	}
 }
 
-inline void orcus_increment_variable_refrence_count(const orcus_variable* const M_CPP_restrict var) {
+inline void orcus_increment_variable_refrence_count(const orcus_variable* const ORCUS_CPP_restrict var) {
 	switch (var->type) {
-	case M_TYPE_NIL:
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-	case M_TYPE_BOOL:
+	case ORCUS_TYPE_NIL:
+	case ORCUS_TYPE_INT:
+	case ORCUS_TYPE_FLOAT:
+	case ORCUS_TYPE_BOOL:
 		return;
-	case M_TYPE_STRING:
+	case ORCUS_TYPE_STRING:
 		((orcus_string*)var->data.p)->refrences++;
 		return;
-	case M_TYPE_TABLE:
+	case ORCUS_TYPE_TABLE:
 		((orcus_table*)var->data.p)->refrences++;
 		return;
-	case M_TYPE_ARRAY:
+	case ORCUS_TYPE_ARRAY:
 		((orcus_array*)var->data.p)->refrences++;
 		return;
-	case M_TYPE_FUNCTION:
+	case ORCUS_TYPE_FUNCTION:
 		((orcus_function*)var->data.p)->refrences++;
 		return;
-	case M_TYPE_FILE:
+	case ORCUS_TYPE_FILE:
 		((orcus_filewrapper*)var->data.p)->refrences++;
 		return;
-	case M_TYPE_THREAD:
+	case ORCUS_TYPE_THREAD:
 		((orcus_threadholder*)var->data.p)->refrences++;
 		return;
 	}
 }
-inline void orcus_decrement_variable_refrence_count(const orcus_variable* const M_CPP_restrict var) {
+inline void orcus_decrement_variable_refrence_count(const orcus_variable* const ORCUS_CPP_restrict var) {
 	switch (var->type) {
-	case M_TYPE_NIL:
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-	case M_TYPE_BOOL:
+	case ORCUS_TYPE_NIL:
+	case ORCUS_TYPE_INT:
+	case ORCUS_TYPE_FLOAT:
+	case ORCUS_TYPE_BOOL:
 		return;
-	case M_TYPE_STRING:
+	case ORCUS_TYPE_STRING:
 		((orcus_string*)var->data.p)->refrences--;
 		return;
-	case M_TYPE_TABLE:
+	case ORCUS_TYPE_TABLE:
 		((orcus_table*)var->data.p)->refrences--;
 		return;
-	case M_TYPE_ARRAY:
+	case ORCUS_TYPE_ARRAY:
 		((orcus_array*)var->data.p)->refrences--;
 		return;
-	case M_TYPE_FUNCTION:
+	case ORCUS_TYPE_FUNCTION:
 		((orcus_function*)var->data.p)->refrences--;
 		return;
-	case M_TYPE_FILE:
+	case ORCUS_TYPE_FILE:
 		((orcus_filewrapper*)var->data.p)->refrences--;
 		return;
-	case M_TYPE_THREAD:
+	case ORCUS_TYPE_THREAD:
 		((orcus_threadholder*)var->data.p)->refrences--;
 		return;
 	}
 }
 
 //returns the top stack without removing it. do not free the returned pointer. will return nullptr if stack is 0.
-inline void orcus_peek_stack(const orcus_state* M_CPP_restrict M, orcus_variable* out) {
+inline void orcus_peek_stack(const orcus_state* ORCUS_CPP_restrict M, orcus_variable* out) {
 	if (!M->sizeofstack) {
 		orcus_clear_variable(out);
 	};
 	*out= M->stack[M->sizeofstack - 1];
 }
 
-inline orcus_state* orcus_get_child_state(orcus_state* const M_CPP_restrict M) {
+inline orcus_state* orcus_get_child_state(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->childstate)return M->childstate;
 	M->childstate=orcus_newstate(M);
 	return M->childstate;

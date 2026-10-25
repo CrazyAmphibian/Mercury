@@ -69,9 +69,9 @@
 	</p>
 	
 	<p class="codeblock">
-		void orcus_popstack(orcus_state* const M_CPP_restrict M, orcus_variable* out) {<br>
+		void orcus_popstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* out) {<br>
 			&nbsp;if (M->sizeofstack==0) {<br>
-				&nbsp;&nbsp;out->type = M_TYPE_NIL;<br>
+				&nbsp;&nbsp;out->type = ORCUS_TYPE_NIL;<br>
 				&nbsp;&nbsp;out->data.i = 0;<br>
 				&nbsp;&nbsp;return;<br>
 			&nbsp;}<br>
@@ -80,7 +80,7 @@
 		}<br>
 		<br>
 		<br>
-		bool orcus_pushstack(orcus_state* const M_CPP_restrict M, orcus_variable* const var) {<br>
+		bool orcus_pushstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* const var) {<br>
 		&nbsp;if (!(M->allocatedstacksize > M->sizeofstack)) {<br>
 			&nbsp;&nbsp;void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(orcus_variable));<br>
 			&nbsp;&nbsp;if (nstackptr == nullptr) return false;<br>

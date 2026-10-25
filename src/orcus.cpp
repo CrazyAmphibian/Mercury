@@ -23,7 +23,7 @@
 #include "libs/orcus_lib_table.hpp"
 #include "libs/orcus_lib_debug.hpp"
 
-uint8_t M_NUMBER_OF_TYPES = 11; //VERY IMPORTANT that this is kept at the proper number.
+uint8_t ORCUS_NUMBER_OF_TYPES = 11; //VERY IMPORTANT that this is kept at the proper number.
 uint16_t register_max = 0xf;
 
 
@@ -31,7 +31,7 @@ uint16_t register_max = 0xf;
 
 
 
-orcus_string* orcus_cstring_to_mstring(const char* const M_CPP_restrict str , const orcus_int size) {
+orcus_string* orcus_cstring_to_mstring(const char* const ORCUS_CPP_restrict str , const orcus_int size) {
 	orcus_string* nstr=(orcus_string*)malloc(sizeof(orcus_string));
 	if (!nstr) return nullptr;
 	char* nad = (char*)malloc(sizeof(char) * size);
@@ -45,7 +45,7 @@ orcus_string* orcus_cstring_to_mstring(const char* const M_CPP_restrict str , co
 	return nstr;
 }
 
-orcus_string* orcus_cstring_const_to_mstring(const char* const M_CPP_restrict str, const orcus_int size) {
+orcus_string* orcus_cstring_const_to_mstring(const char* const ORCUS_CPP_restrict str, const orcus_int size) {
 	orcus_string* nstr = (orcus_string*)malloc(sizeof(orcus_string));
 	if (!nstr) return nullptr;
 
@@ -57,7 +57,7 @@ orcus_string* orcus_cstring_const_to_mstring(const char* const M_CPP_restrict st
 }
 
 //similar to orcus_cstring_to_mstring, but reuses the char* provided instead of copying the data
-orcus_string* orcus_cstring_promote_to_mstring(char* const M_CPP_restrict str, const orcus_int size) {
+orcus_string* orcus_cstring_promote_to_mstring(char* const ORCUS_CPP_restrict str, const orcus_int size) {
 	orcus_string* nstr = (orcus_string*)malloc(sizeof(orcus_string));
 	if (!nstr) return nullptr;
 	nstr->size = size;
@@ -67,7 +67,7 @@ orcus_string* orcus_cstring_promote_to_mstring(char* const M_CPP_restrict str, c
 	return nstr;
 }
 
-char* orcus_mstring_to_cstring(const orcus_string* const M_CPP_restrict str) {
+char* orcus_mstring_to_cstring(const orcus_string* const ORCUS_CPP_restrict str) {
 	//orcus_int sz = strlen(str->ptr); //use this mecause null terminator
 	//printf("%i/%i %s",str->size,sz,str->ptr);
 	//if(sz > str->size)sz = str->size;
@@ -80,7 +80,7 @@ char* orcus_mstring_to_cstring(const orcus_string* const M_CPP_restrict str) {
 }
 
 
-orcus_string* orcus_copystring(const orcus_string* const M_CPP_restrict str) {
+orcus_string* orcus_copystring(const orcus_string* const ORCUS_CPP_restrict str) {
 	if (str->constant) {
 		orcus_string* nstr = (orcus_string*)malloc(sizeof(orcus_string));
 		if (nstr == nullptr) return nullptr;
@@ -142,7 +142,7 @@ bool orcus_mstrings_append(orcus_string* const basestr, const orcus_string* cons
 	return true;
 }
 
-bool orcus_mstring_addchars(orcus_string* const M_CPP_restrict str, const char* const chars, orcus_int len) {
+bool orcus_mstring_addchars(orcus_string* const ORCUS_CPP_restrict str, const char* const chars, orcus_int len) {
 	if (str->constant) {
 		char* nptr = (char*)malloc(sizeof(char) * (str->size + len));
 		if (!nptr)return false;
@@ -165,7 +165,7 @@ bool orcus_mstring_addchars(orcus_string* const M_CPP_restrict str, const char* 
 	return true;
 }
 
-void orcus_mstring_delete(orcus_string* const M_CPP_restrict str) {
+void orcus_mstring_delete(orcus_string* const ORCUS_CPP_restrict str) {
 	if (!str->constant) {
 		free(str->ptr);
 	}
@@ -205,11 +205,11 @@ orcus_table* orcus_newtable() {
 
 	orcus_table* newt = (orcus_table*)malloc(sizeof(orcus_table));
 	if (newt == nullptr) return nullptr;
-	newt->data=(orcus_subtable*)malloc(sizeof(orcus_subtable) * M_NUMBER_OF_TYPES);
+	newt->data=(orcus_subtable*)malloc(sizeof(orcus_subtable) * ORCUS_NUMBER_OF_TYPES);
 	if (!newt->data)return nullptr;
-	memset(newt->data, 0, sizeof(orcus_subtable)*M_NUMBER_OF_TYPES);
+	memset(newt->data, 0, sizeof(orcus_subtable)*ORCUS_NUMBER_OF_TYPES);
 	/* use this for later if non-zerod values are needed.
-	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
+	for (uint8_t i = 0; i < ORCUS_NUMBER_OF_TYPES; i++) {
 		memset(newt->data+i, 0, sizeof(orcus_subtable));
 	}
 	*/
@@ -220,7 +220,7 @@ orcus_table* orcus_newtable() {
 }
 
 void orcus_destroytable(orcus_table* const table) { //not ideal, but it works. kind of.
-	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
+	for (uint8_t i = 0; i < ORCUS_NUMBER_OF_TYPES; i++) {
 		orcus_subtable st = table->data[i];
 		for (orcus_int i2 = 0; i2 < st.size; i2++) {
 			orcus_decrement_variable_refrence_count(st.keys + i2);
@@ -236,7 +236,7 @@ void orcus_destroytable(orcus_table* const table) { //not ideal, but it works. k
 }
 
 void orcus_cleartable(const orcus_table* const table) {
-	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
+	for (uint8_t i = 0; i < ORCUS_NUMBER_OF_TYPES; i++) {
 		orcus_subtable st = table->data[i];
 		for (orcus_int i2 = 0; i2 < st.size; i2++) {
 			orcus_decrement_variable_refrence_count(st.keys + i2);
@@ -290,7 +290,7 @@ bool orcus_getkey(const orcus_table* const table, orcus_variable* const key, orc
 	}
 	
 	//orcus_release_var(key);
-	out->type = M_TYPE_NIL;
+	out->type = ORCUS_TYPE_NIL;
 	out->data.i = 0;
 	return false;
 }
@@ -349,7 +349,7 @@ orcus_int orcus_setkey(orcus_table* const table, orcus_variable* const key, cons
 }
 
 bool orcus_tables_equal(const orcus_table* const table1, const orcus_table* const table2) { //returns true if every single value of the tables match. no, it's not recursive, because fuck that (also because refs).
-	for (uint8_t i = 0; i < M_NUMBER_OF_TYPES; i++) {
+	for (uint8_t i = 0; i < ORCUS_NUMBER_OF_TYPES; i++) {
 		orcus_subtable subt1=table1->data[i];
 		orcus_subtable subt2=table2->data[i];
 
@@ -373,21 +373,21 @@ bool orcus_tables_equal(const orcus_table* const table1, const orcus_table* cons
 
 
 bool orcus_table_get_cstring_keyvalue(const orcus_table* const table, const char* const key, orcus_variable* out) {
-	const orcus_subtable* const subt = table->data+M_TYPE_STRING;
+	const orcus_subtable* const subt = table->data+ORCUS_TYPE_STRING;
 	for (orcus_int i = 0; i < subt->size; i++) {
 		if(orcus_mstring_equal_cstring((orcus_string*)subt->keys[i].data.p,key)){
 			*out = subt->values[i];
 			return true;
 		}
 	}
-	out->type = M_TYPE_NIL;
+	out->type = ORCUS_TYPE_NIL;
 	out->data.i = 0;
 	return false;
 }
 
 
 orcus_int orcus_table_set_cstring_keyvalue(orcus_table* const table, const char* const key, const orcus_variable* const value) {
-	orcus_subtable subt = table->data[M_TYPE_STRING];
+	orcus_subtable subt = table->data[ORCUS_TYPE_STRING];
 	for (orcus_int i = 0; i < subt.size; i++) {
 		if (orcus_mstring_equal_cstring((orcus_string*)subt.keys[i].data.p,key)) {		
 			orcus_increment_variable_refrence_count(value);
@@ -406,7 +406,7 @@ orcus_int orcus_table_set_cstring_keyvalue(orcus_table* const table, const char*
 	subt.values = (orcus_variable*)nptr;
 
 	orcus_variable kv;
-	kv.type = M_TYPE_STRING;
+	kv.type = ORCUS_TYPE_STRING;
 
 	orcus_string* nstr= orcus_cstring_const_to_mstring(key,strlen(key));
 	if (!nstr)return -1;
@@ -418,12 +418,12 @@ orcus_int orcus_table_set_cstring_keyvalue(orcus_table* const table, const char*
 	subt.values[subt.size] = *value;
 
 	subt.size++;
-	table->data[M_TYPE_STRING] = subt;
+	table->data[ORCUS_TYPE_STRING] = subt;
 	return subt.size - 1;
 }
 
 orcus_int orcus_table_has_cstring_key(const orcus_table* const table, const char* const key) {
-	const orcus_subtable subt = table->data[M_TYPE_STRING];
+	const orcus_subtable subt = table->data[ORCUS_TYPE_STRING];
 	for (orcus_int i = 0; i < subt.size; i++) {
 		if (orcus_mstring_equal_cstring((orcus_string*)subt.keys[i].data.p, key))return i;
 	}
@@ -434,7 +434,7 @@ orcus_int orcus_table_has_cstring_key(const orcus_table* const table, const char
 void orcus_prepare_table_for_state(orcus_table* table,orcus_state* M) {
 	orcus_variable v;
 
-	v.type = M_TYPE_TABLE;
+	v.type = ORCUS_TYPE_TABLE;
 	v.data.p = table;
 	orcus_table_set_cstring_keyvalue(table, "_ENV", &v);
 
@@ -457,11 +457,11 @@ orcus_state* orcus_newstate(const orcus_state* const parent) {
 	/*
 	orcus_variable* envvarkey = (orcus_variable*)malloc(sizeof(orcus_variable));
 	if (!envvarkey)return nullptr;
-	envvarkey->type = M_TYPE_STRING;
+	envvarkey->type = ORCUS_TYPE_STRING;
 	envvarkey->data.p = orcus_cstring_const_to_mstring((char*)"_ENV",4);
 	orcus_variable* envvarval = (orcus_variable*)malloc(sizeof(orcus_variable));
 	if (!envvarval)return nullptr;
-	envvarval->type = M_TYPE_TABLE;
+	envvarval->type = ORCUS_TYPE_TABLE;
 	envvarval->data.p = newstate->enviroment;
 	orcus_setkey(newstate->enviroment, envvarkey, envvarval);
 	*/
@@ -497,11 +497,11 @@ orcus_state* orcus_newstate(const orcus_state* const parent) {
 	/*
 	orcus_variable* globvarkey = (orcus_variable*)malloc(sizeof(orcus_variable));
 	if (!globvarkey)return nullptr;
-	globvarkey->type = M_TYPE_STRING;
+	globvarkey->type = ORCUS_TYPE_STRING;
 	globvarkey->data.p = orcus_cstring_const_to_mstring((char*)"_G", 2);
 	orcus_variable* globvarval = (orcus_variable*)malloc(sizeof(orcus_variable));
 	if (!globvarval)return nullptr;
-	globvarval->type = M_TYPE_TABLE;
+	globvarval->type = ORCUS_TYPE_TABLE;
 	globvarval->data.p = newstate->masterstate->enviroment;
 	orcus_setkey(newstate->enviroment, globvarkey, globvarval);
 	*/
@@ -525,7 +525,7 @@ orcus_state* orcus_newstate(const orcus_state* const parent) {
 }
 
 
-bool orcus_stepstate(orcus_state* const M_CPP_restrict M) {
+bool orcus_stepstate(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->programcounter >= M->bytecode->numberofinstructions) return false;
 
 	orcus_opcode opcode = M->bytecode->instructions[M->programcounter];
@@ -545,7 +545,7 @@ bool orcus_stepstate(orcus_state* const M_CPP_restrict M) {
 	return true;
 }
 
-void orcus_clearstate(orcus_state* const M_CPP_restrict M, bool for_deletion) {
+void orcus_clearstate(orcus_state* const ORCUS_CPP_restrict M, bool for_deletion) {
 	for (orcus_uint i = 0; i < M->sizeofstack; i++) {
 		orcus_release_var(M->stack+i);
 	}
@@ -556,7 +556,7 @@ void orcus_clearstate(orcus_state* const M_CPP_restrict M, bool for_deletion) {
 		for (orcus_uint i = 0; i < register_max; i++) {
 			if (M->registers[i].type) {
 				orcus_release_var(M->registers+i);
-				M->registers[i].type = M_TYPE_NIL;
+				M->registers[i].type = ORCUS_TYPE_NIL;
 			}
 		}
 	}
@@ -585,7 +585,7 @@ void orcus_clearstate(orcus_state* const M_CPP_restrict M, bool for_deletion) {
 	M->programcounter = 0;
 }
 
-void orcus_destroystate(orcus_state* const M_CPP_restrict M) {
+void orcus_destroystate(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->childstate) {
 		orcus_destroystate(M->childstate);
 	}
@@ -615,31 +615,31 @@ void orcus_destroystate(orcus_state* const M_CPP_restrict M) {
 	free(M);
 }
 
-void orcus_release_var(orcus_variable* const M_CPP_restrict var) {
+void orcus_release_var(orcus_variable* const ORCUS_CPP_restrict var) {
 	switch (var->type)
 	{
-	case M_TYPE_NIL:
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
-	case M_TYPE_BOOL:
-	case M_TYPE_CFUNC:
+	case ORCUS_TYPE_NIL:
+	case ORCUS_TYPE_INT:
+	case ORCUS_TYPE_FLOAT:
+	case ORCUS_TYPE_BOOL:
+	case ORCUS_TYPE_CFUNC:
 		return;
-	case M_TYPE_TABLE:
+	case ORCUS_TYPE_TABLE:
 		if (!((orcus_table*)var->data.p)->refrences) {
 			orcus_destroytable((orcus_table*)var->data.p);
 		}
 		return;
-	case M_TYPE_STRING:
+	case ORCUS_TYPE_STRING:
 		if (!((orcus_string*)var->data.p)->refrences) {
 			orcus_mstring_delete((orcus_string*)var->data.p);
 		}
 		return;
-	case M_TYPE_ARRAY:
+	case ORCUS_TYPE_ARRAY:
 		if (!((orcus_array*)var->data.p)->refrences) {
 			orcus_destroyarray((orcus_array*)var->data.p);
 		}
 		return;
-	case M_TYPE_FUNCTION:
+	case ORCUS_TYPE_FUNCTION:
 		{
 			orcus_function* ffunction = (orcus_function*)var->data.p;
 			if (!ffunction->refrences) {
@@ -648,7 +648,7 @@ void orcus_release_var(orcus_variable* const M_CPP_restrict var) {
 			}
 		}
 		return;
-	case M_TYPE_FILE:
+	case ORCUS_TYPE_FILE:
 		{
 			orcus_filewrapper* fw = (orcus_filewrapper*)var->data.p;
 			if (!fw->refrences) {
@@ -657,7 +657,7 @@ void orcus_release_var(orcus_variable* const M_CPP_restrict var) {
 			}
 		}
 		return;
-	case M_TYPE_THREAD:
+	case ORCUS_TYPE_THREAD:
 		{
 			orcus_threadholder* t = (orcus_threadholder*)var->data.p;
 			if (!t->refrences) {
@@ -688,12 +688,12 @@ void orcus_release_var(orcus_variable* const M_CPP_restrict var) {
 	}
 }
 
-void orcus_popstack(orcus_state* const M_CPP_restrict M, orcus_variable* out) {
+void orcus_popstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* out) {
 	if (M->sizeofstack==0) {
 #ifdef ORCUS_DEBUG
 		printf("popstack called when stack was empty.\n");
 #endif
-		out->type = M_TYPE_NIL;
+		out->type = ORCUS_TYPE_NIL;
 		out->data.i = 0;
 		return;
 	}
@@ -702,12 +702,12 @@ void orcus_popstack(orcus_state* const M_CPP_restrict M, orcus_variable* out) {
 }
 
 //takes from the bottom instead of the top of stack
-void orcus_pullstack(orcus_state* const M_CPP_restrict M, orcus_variable* out) {
+void orcus_pullstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* out) {
 	if (M->sizeofstack == 0) {
 #ifdef ORCUS_DEBUG
 		printf("pullstack called when stack was empty.\n");
 #endif
-		out->type = M_TYPE_NIL;
+		out->type = ORCUS_TYPE_NIL;
 		out->data.i = 0;
 		return;
 	}
@@ -718,7 +718,7 @@ void orcus_pullstack(orcus_state* const M_CPP_restrict M, orcus_variable* out) {
 }
 
 
-bool orcus_pushstack(orcus_state* const M_CPP_restrict M, orcus_variable* const var) {
+bool orcus_pushstack(orcus_state* const ORCUS_CPP_restrict M, orcus_variable* const var) {
 	if (!(M->allocatedstacksize > M->sizeofstack)) {
 		void* nstackptr = realloc(M->stack, (M->sizeofstack + 1) * sizeof(orcus_variable));
 		if (nstackptr == nullptr) return false;
@@ -742,7 +742,7 @@ orcus_array* orcus_newarray() {
 	return nar;
 }
 
-void orcus_destroyarray(orcus_array* const M_CPP_restrict arr) {
+void orcus_destroyarray(orcus_array* const ORCUS_CPP_restrict arr) {
 	if (arr->values) {
 #ifdef ORCUS_64BIT
 		//this can't be the best way to do it. i mean... just look at this piece of shit.
@@ -908,7 +908,7 @@ bool orcus_setarray(orcus_array* const array, const orcus_variable* const var, c
 bool orcus_cleararrayindex(orcus_array* const array, const orcus_int pos) {
 	orcus_variable cleared_var;
 	cleared_var.data.i = 0;
-	cleared_var.type = M_TYPE_NIL;
+	cleared_var.type = ORCUS_TYPE_NIL;
 #ifdef ORCUS_64BIT
 	if (!array->values) {
 		array->values = (orcus_variable******)calloc(ORCUS_SIZE_SUBARRAY_1, sizeof(void*));
@@ -1057,10 +1057,10 @@ void orcus_getarray(orcus_array* const array, const orcus_int pos, orcus_variabl
 #endif
 	no_index:
 	out->data.i = 0;
-	out->type = M_TYPE_NIL;
+	out->type = ORCUS_TYPE_NIL;
 }
 
-orcus_int orcus_array_len(const orcus_array* const M_CPP_restrict arr) {
+orcus_int orcus_array_len(const orcus_array* const ORCUS_CPP_restrict arr) {
 	if (!arr->values)return -1;
 	orcus_int out = 0;
 #ifdef ORCUS_64BIT
@@ -1110,7 +1110,7 @@ orcus_int orcus_array_len(const orcus_array* const M_CPP_restrict arr) {
 
 
 
-orcus_string* orcus_tostring(const orcus_variable* const M_CPP_restrict var) {
+orcus_string* orcus_tostring(const orcus_variable* const ORCUS_CPP_restrict var) {
 	orcus_string* tstr=nullptr;
 
 	char tout[256];
@@ -1120,24 +1120,24 @@ orcus_string* orcus_tostring(const orcus_variable* const M_CPP_restrict var) {
 	int tint;
 
 	switch (var->type) {
-	case M_TYPE_NIL:
+	case ORCUS_TYPE_NIL:
 		tstr = orcus_cstring_const_to_mstring((char*)"nil", 3);
 		break;
-	case M_TYPE_INT:
+	case ORCUS_TYPE_INT:
 		tint=snprintf( tout,sizeof(tout),"%zi",var->data.i);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = orcus_cstring_to_mstring(tout, strlen(tout) );
 		break;
-	case M_TYPE_FLOAT:
+	case ORCUS_TYPE_FLOAT:
 		tint = snprintf(tout, sizeof(tout), "%#.10g", var->data.f);	
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = orcus_cstring_to_mstring(tout, strlen(tout));
 		break;
-	case M_TYPE_BOOL:
+	case ORCUS_TYPE_BOOL:
 		if (var->data.i) {
 			tstr = orcus_cstring_const_to_mstring((char*)"true", 4);
 		}
@@ -1145,38 +1145,38 @@ orcus_string* orcus_tostring(const orcus_variable* const M_CPP_restrict var) {
 			tstr = orcus_cstring_const_to_mstring((char*)"false", 5);
 		}
 		break;
-	case M_TYPE_TABLE:
+	case ORCUS_TYPE_TABLE:
 		tint = snprintf(tout, sizeof(tout), "table %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = orcus_cstring_to_mstring(tout, strlen(tout));
 		break;
-	case M_TYPE_STRING:
+	case ORCUS_TYPE_STRING:
 		tstr = orcus_copystring((orcus_string*)var->data.p);
 		break;
-	case M_TYPE_CFUNC:
+	case ORCUS_TYPE_CFUNC:
 		tint = snprintf(tout, sizeof(tout), "c function %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = orcus_cstring_to_mstring(tout, strlen(tout));
 		break;
-	case M_TYPE_FUNCTION:
+	case ORCUS_TYPE_FUNCTION:
 		tint = snprintf(tout, sizeof(tout), "function %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = orcus_cstring_to_mstring(tout, strlen(tout));
 		break;
-	case M_TYPE_ARRAY:
+	case ORCUS_TYPE_ARRAY:
 		tint = snprintf(tout, sizeof(tout), "array %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
 		}
 		tstr = orcus_cstring_to_mstring(tout, strlen(tout));
 		break;
-	case M_TYPE_FILE:
+	case ORCUS_TYPE_FILE:
 		tint = snprintf(tout, sizeof(tout), "file %p", var->data.p);
 		if (tint==-1) {
 			return nullptr;
@@ -1190,18 +1190,18 @@ orcus_string* orcus_tostring(const orcus_variable* const M_CPP_restrict var) {
 	return tstr;
 }
 
-bool orcus_checkbool(const orcus_variable* const M_CPP_restrict var) {
+bool orcus_checkbool(const orcus_variable* const ORCUS_CPP_restrict var) {
 	switch (var->type) {
-	case M_TYPE_NIL:
+	case ORCUS_TYPE_NIL:
 		return false;
-	case M_TYPE_BOOL:
+	case ORCUS_TYPE_BOOL:
 		if (var->data.i) {
 			return true;
 		}
 		else {
 			return false;
 		}
-	case M_TYPE_INT:
+	case ORCUS_TYPE_INT:
 		return var->data.i != 0;
 	default:
 		return true;
@@ -1209,52 +1209,52 @@ bool orcus_checkbool(const orcus_variable* const M_CPP_restrict var) {
 }
 
 //type coersion when you really need it
-orcus_int orcus_checkint(const orcus_variable* const M_CPP_restrict var) {
+orcus_int orcus_checkint(const orcus_variable* const ORCUS_CPP_restrict var) {
 	switch (var->type) {
-	case M_TYPE_NIL:
+	case ORCUS_TYPE_NIL:
 		return 0;
-	case M_TYPE_BOOL:
+	case ORCUS_TYPE_BOOL:
 		if (var->data.i) {
 			return 1;
 		}
 		else {
 			return 0;
 		}
-	case M_TYPE_INT:
+	case ORCUS_TYPE_INT:
 		return var->data.i;
-	case M_TYPE_FLOAT:
+	case ORCUS_TYPE_FLOAT:
 		return (orcus_int)var->data.f;
 	default:
 		return 0;
 	}
 }
 //see above
-orcus_float orcus_checkfloat(const orcus_variable* const M_CPP_restrict var) {
+orcus_float orcus_checkfloat(const orcus_variable* const ORCUS_CPP_restrict var) {
 	switch (var->type) {
-	case M_TYPE_NIL:
+	case ORCUS_TYPE_NIL:
 		return 0.0;
-	case M_TYPE_BOOL:
+	case ORCUS_TYPE_BOOL:
 		if (var->data.i) {
 			return 1.0;
 		}
 		else {
 			return 0.0;
 		}
-	case M_TYPE_INT:
+	case ORCUS_TYPE_INT:
 		return (orcus_float)var->data.i;
-	case M_TYPE_FLOAT:
+	case ORCUS_TYPE_FLOAT:
 		return var->data.f;
 	default:
 		return 0.0;
 	}
 }
 //ditto
-void* orcus_checkpointer(const orcus_variable* const M_CPP_restrict var) {
+void* orcus_checkpointer(const orcus_variable* const ORCUS_CPP_restrict var) {
 	switch (var->type) {
-	case M_TYPE_NIL:
-	case M_TYPE_BOOL:
-	case M_TYPE_INT:
-	case M_TYPE_FLOAT:
+	case ORCUS_TYPE_NIL:
+	case ORCUS_TYPE_BOOL:
+	case ORCUS_TYPE_INT:
+	case ORCUS_TYPE_FLOAT:
 		return nullptr;
 	default:
 		return var->data.p;
@@ -1267,7 +1267,7 @@ bool orcus_vars_equal(const orcus_variable* const var1, const orcus_variable* co
 		return false;
 	}
 
-	if (var1->type == M_TYPE_STRING) {
+	if (var1->type == ORCUS_TYPE_STRING) {
 		return var1->data.i==var2->data.i || orcus_mstrings_equal( (orcus_string*)var1->data.p, (orcus_string*)var2->data.p);
 	}
 	else {
@@ -1277,7 +1277,7 @@ bool orcus_vars_equal(const orcus_variable* const var1, const orcus_variable* co
 
 
 void orcus_debugdumptable(orcus_table* tab,int level) {
-	for (uint8_t t = 0; t < M_NUMBER_OF_TYPES; t++) {
+	for (uint8_t t = 0; t < ORCUS_NUMBER_OF_TYPES; t++) {
 		orcus_subtable subt = tab->data[t];
 		for (orcus_int i = 0; i < subt.size; i++) {
 			for (int n = 0; n < level; n++) {
@@ -1285,16 +1285,16 @@ void orcus_debugdumptable(orcus_table* tab,int level) {
 			}
 			orcus_rawdata keydat = subt.keys[i].data;
 			switch (t) {
-				case M_TYPE_NIL:
+				case ORCUS_TYPE_NIL:
 					printf("nil_%zi", keydat.i);
 					break;
-				case M_TYPE_INT:
+				case ORCUS_TYPE_INT:
 					printf("%zi", keydat.i);
 					break;
-				case M_TYPE_FLOAT:
+				case ORCUS_TYPE_FLOAT:
 					printf("%f", keydat.f);
 					break;
-				case M_TYPE_STRING:
+				case ORCUS_TYPE_STRING:
 					{
 					orcus_string* str = (orcus_string*)keydat.p;
 					putchar('\"');
@@ -1313,13 +1313,13 @@ void orcus_debugdumptable(orcus_table* tab,int level) {
 			orcus_variable* var = subt.values+i;
 
 			switch (var->type) {
-				case M_TYPE_INT:
+				case ORCUS_TYPE_INT:
 					printf("%zi", var->data.i);
 					break;
-				case M_TYPE_FLOAT:
+				case ORCUS_TYPE_FLOAT:
 					printf("%f", var->data.f);
 					break;
-				case M_TYPE_TABLE:
+				case ORCUS_TYPE_TABLE:
 					if (var->data.p != tab) {
 						printf("TABLE 0x%p:\n", var->data.p);
 						orcus_debugdumptable((orcus_table*)var->data.p, level + 1);
@@ -1328,7 +1328,7 @@ void orcus_debugdumptable(orcus_table* tab,int level) {
 						printf("TABLE <self> 0x%p", var->data.p);
 					}
 					break;
-				case M_TYPE_ARRAY:
+				case ORCUS_TYPE_ARRAY:
 					printf("ARRAY 0x%p", var->data.p);
 					{
 						orcus_array* arr = (orcus_array*)var->data.p;
@@ -1342,16 +1342,16 @@ void orcus_debugdumptable(orcus_table* tab,int level) {
 							}
 							switch (v.type)
 							{
-							case M_TYPE_NIL:
+							case ORCUS_TYPE_NIL:
 								printf("%zi - nil", q);
 								break;
-							case M_TYPE_INT:
+							case ORCUS_TYPE_INT:
 								printf("%zi - %zi", q, v.data.i);
 								break;
-							case M_TYPE_FLOAT:
+							case ORCUS_TYPE_FLOAT:
 								printf("%zi - %f", q, v.data.f);
 								break;
-							case M_TYPE_STRING:
+							case ORCUS_TYPE_STRING:
 							{
 								orcus_string* sp = (orcus_string*)v.data.p;
 							
@@ -1371,7 +1371,7 @@ void orcus_debugdumptable(orcus_table* tab,int level) {
 						}
 					}
 					break;
-				case M_TYPE_STRING:
+				case ORCUS_TYPE_STRING:
 					{
 						orcus_string* str = (orcus_string*)var->data.p;
 						putchar('\"');
@@ -1718,17 +1718,17 @@ void orcus_populate_table_with_libs(orcus_table* T) {
 		v.type = lib->type;
 		switch (lib->type)
 		{
-		case M_TYPE_FLOAT:
+		case ORCUS_TYPE_FLOAT:
 			v.data.f = *(orcus_float*)lib->dataptr;
 			break;
-		case M_TYPE_INT:
-		case M_TYPE_BOOL:
+		case ORCUS_TYPE_INT:
+		case ORCUS_TYPE_BOOL:
 			v.data.i = *(orcus_int*)lib->dataptr;
 			break;
-		case M_TYPE_CFUNC:
+		case ORCUS_TYPE_CFUNC:
 			v.data.p = (orcus_cfunc)lib->dataptr;
 			break;
-		case M_TYPE_NIL:
+		case ORCUS_TYPE_NIL:
 			v.data.p = lib->dataptr;
 			break;
 		default:
@@ -1739,7 +1739,7 @@ void orcus_populate_table_with_libs(orcus_table* T) {
 			orcus_variable t;
 			orcus_table_get_cstring_keyvalue(T, lib->table, &t);
 
-			if (t.type == M_TYPE_TABLE) {
+			if (t.type == ORCUS_TYPE_TABLE) {
 				orcus_table_set_cstring_keyvalue((orcus_table*)t.data.p, lib->key, &v);
 			}
 			else {
@@ -1747,7 +1747,7 @@ void orcus_populate_table_with_libs(orcus_table* T) {
 				orcus_table_set_cstring_keyvalue(nt, lib->key, &v);
 
 				orcus_variable vv;
-				vv.type = M_TYPE_TABLE;
+				vv.type = ORCUS_TYPE_TABLE;
 				vv.data.p = nt;
 
 				orcus_table_set_cstring_keyvalue(T, lib->table, &vv);
@@ -1776,9 +1776,9 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 #endif
 
 	static const orcus_int v = ORCUS_VERSION;
-	orcus_register_library((void*)&v, "_VERSION", nullptr,M_TYPE_INT);
+	orcus_register_library((void*)&v, "_VERSION", nullptr,ORCUS_TYPE_INT);
 	static const orcus_int v_p = ORCUS_VERSION_PATCH;
-	orcus_register_library((void*)&v_p, "_VERSION_PATCH", nullptr, M_TYPE_INT);
+	orcus_register_library((void*)&v_p, "_VERSION_PATCH", nullptr, ORCUS_TYPE_INT);
 
 #ifdef ORCUS_LIB_STD
 	orcus_register_library(orcus_lib_std_print, "print", nullptr);
@@ -1798,17 +1798,17 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_std_sleep, "sleep", nullptr);
 
 
-	orcus_register_library((void*)&m_const_type_nil, "TYPE_NIL", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_int, "TYPE_INT", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_float, "TYPE_FLOAT", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_bool, "TYPE_BOOL", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_table, "TYPE_TABLE", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_string, "TYPE_STRING", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_cfunc, "TYPE_CFUNC", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_array, "TYPE_ARRAY", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_function, "TYPE_FUNCTION", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_file, "TYPE_FILE", nullptr, M_TYPE_INT);
-	orcus_register_library((void*)&m_const_type_thread, "TYPE_THREAD", nullptr, M_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_nil, "TYPE_NIL", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_int, "TYPE_INT", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_float, "TYPE_FLOAT", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_bool, "TYPE_BOOL", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_table, "TYPE_TABLE", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_string, "TYPE_STRING", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_cfunc, "TYPE_CFUNC", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_array, "TYPE_ARRAY", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_function, "TYPE_FUNCTION", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_file, "TYPE_FILE", nullptr, ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_const_type_thread, "TYPE_THREAD", nullptr, ORCUS_TYPE_INT);
 #endif
 
 #ifdef ORCUS_LIB_MATH
@@ -1836,14 +1836,14 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_math_mean, "mean", "math");
 	orcus_register_library(orcus_lib_math_mean_array, "amean", "math");
 
-	orcus_register_library((void*)&m_math_pi, "pi", "math", M_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_root2, "root2", "math", M_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_e, "e", "math", M_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_root3, "root3", "math", M_TYPE_FLOAT);
-	orcus_register_library((void*)&m_math_golden, "golden", "math", M_TYPE_FLOAT);
+	orcus_register_library((void*)&m_math_pi, "pi", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&m_math_root2, "root2", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&m_math_e, "e", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&m_math_root3, "root3", "math", ORCUS_TYPE_FLOAT);
+	orcus_register_library((void*)&m_math_golden, "golden", "math", ORCUS_TYPE_FLOAT);
 
-	orcus_register_library((void*)&m_math_intmax, "int_max", "math", M_TYPE_INT);
-	orcus_register_library((void*)&m_math_uintmax, "uint_max", "math", M_TYPE_INT);
+	orcus_register_library((void*)&m_math_intmax, "int_max", "math", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_math_uintmax, "uint_max", "math", ORCUS_TYPE_INT);
 #endif
 #ifdef ORCUS_LIB_ARRAY
 	orcus_register_library(orcus_lib_array_flush, "flush", "array");
@@ -1854,12 +1854,12 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_array_sort, "sort", "array");
 	orcus_register_library(orcus_lib_array_concat, "concat", "array");
 
-	orcus_register_library((void*)&m_sort_greater_to_lesser, "SORTING_GREATER_TO_LESSER", "array", M_TYPE_INT);
-	orcus_register_library((void*)&m_sort_lesser_to_greater, "SORTING_LESSER_TO_GREATER", "array", M_TYPE_INT);
-	orcus_register_library((void*)&m_sort_greater_to_lesser_absolute, "SORTING_GREATER_TO_LESSER_MAGNITUDE", "array", M_TYPE_INT);
-	orcus_register_library((void*)&m_sort_lesser_to_greater_absolute, "SORTING_LESSER_TO_GREATER_MAGNITUDE", "array", M_TYPE_INT);
-	orcus_register_library((void*)&m_sort_alphabet_az, "SORTING_ALPHABETICAL_A_TO_Z", "array", M_TYPE_INT);
-	orcus_register_library((void*)&m_sort_alphabet_za, "SORTING_ALPHABETICAL_Z_TO_A", "array", M_TYPE_INT);
+	orcus_register_library((void*)&m_sort_greater_to_lesser, "SORTING_GREATER_TO_LESSER", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_sort_lesser_to_greater, "SORTING_LESSER_TO_GREATER", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_sort_greater_to_lesser_absolute, "SORTING_GREATER_TO_LESSER_MAGNITUDE", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_sort_lesser_to_greater_absolute, "SORTING_LESSER_TO_GREATER_MAGNITUDE", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_sort_alphabet_az, "SORTING_ALPHABETICAL_A_TO_Z", "array", ORCUS_TYPE_INT);
+	orcus_register_library((void*)&m_sort_alphabet_za, "SORTING_ALPHABETICAL_Z_TO_A", "array", ORCUS_TYPE_INT);
 #endif
 #ifdef ORCUS_LIB_STRING
 	orcus_register_library(orcus_lib_string_sub, "sub", "string");
@@ -1895,9 +1895,9 @@ static void __attribute__((constructor)) dynamic_lib_load() {
 	orcus_register_library(orcus_lib_os_clock, "clock", "os");
 	orcus_register_library(orcus_lib_os_getdate, "get_date", "os");
 	orcus_register_library(orcus_lib_os_gettime, "get_time", "os");
-	orcus_register_library((void*)&m_os_isposix, "IS_POSIX", "os", M_TYPE_BOOL);
-	orcus_register_library((void*)&m_os_isposix, "IS_UNIX", "os", M_TYPE_BOOL);
-	orcus_register_library((void*)&m_os_is64bit, "IS_64BIT", "os", M_TYPE_BOOL);
+	orcus_register_library((void*)&m_os_isposix, "IS_POSIX", "os", ORCUS_TYPE_BOOL);
+	orcus_register_library((void*)&m_os_isposix, "IS_UNIX", "os", ORCUS_TYPE_BOOL);
+	orcus_register_library((void*)&m_os_is64bit, "IS_64BIT", "os", ORCUS_TYPE_BOOL);
 	orcus_register_library(orcus_lib_os_exit, "exit", "os");
 #endif
 #ifdef ORCUS_LIB_IO

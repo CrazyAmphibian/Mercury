@@ -9,7 +9,7 @@
 
 
 
-void orcus_lib_os_time(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //gets the current unix/epoch time.
+void orcus_lib_os_time(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //gets the current unix/epoch time.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0))return;
 	if (!args_out) {
 		return;
@@ -18,7 +18,7 @@ void orcus_lib_os_time(orcus_state* const M_CPP_restrict M, const orcus_int args
 	orcus_variable out;
 
 	orcus_int t=time(NULL);
-	out.type = M_TYPE_INT;
+	out.type = ORCUS_TYPE_INT;
 	out.data.i = t;
 	
 
@@ -27,13 +27,13 @@ void orcus_lib_os_time(orcus_state* const M_CPP_restrict M, const orcus_int args
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_os_execute(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //dangerous!
+void orcus_lib_os_execute(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //dangerous!
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
 	orcus_variable cvar;
 	orcus_popstack(M,&cvar);
-	if (cvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, M_TYPE_STRING, 1);
+	if (cvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&cvar);
 		return;
 	}
@@ -95,7 +95,7 @@ void orcus_lib_os_execute(orcus_state* const M_CPP_restrict M, const orcus_int a
 	}
 
 	orcus_release_var(&cvar);
-	cvar.type = M_TYPE_STRING;
+	cvar.type = ORCUS_TYPE_STRING;
 	cvar.data.p= orcus_cstring_const_to_mstring(out_c, size_c);
 	orcus_pushstack(M, &cvar);
 
@@ -103,13 +103,13 @@ void orcus_lib_os_execute(orcus_state* const M_CPP_restrict M, const orcus_int a
 }
 
 
-void orcus_lib_os_call(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //dangerous!
+void orcus_lib_os_call(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //dangerous!
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 
 	orcus_variable cvar;
 	orcus_popstack(M, &cvar);
-	if (cvar.type != M_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, M_TYPE_STRING, 1);
+	if (cvar.type != ORCUS_TYPE_STRING) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&cvar);
 		return;
 	}
@@ -135,7 +135,7 @@ void orcus_lib_os_call(orcus_state* const M_CPP_restrict M, const orcus_int args
 
 
 	orcus_release_var(&cvar);
-	cvar.type = M_TYPE_INT;
+	cvar.type = ORCUS_TYPE_INT;
 	cvar.data.i = r;
 	orcus_pushstack(M, &cvar);
 
@@ -143,7 +143,7 @@ void orcus_lib_os_call(orcus_state* const M_CPP_restrict M, const orcus_int args
 }
 
 
-void orcus_lib_os_clock(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //gets the time since program startup.
+void orcus_lib_os_clock(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //gets the time since program startup.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0))return;
 	if (!args_out) {
 		return;
@@ -152,7 +152,7 @@ void orcus_lib_os_clock(orcus_state* const M_CPP_restrict M, const orcus_int arg
 	orcus_variable out;
 
 	orcus_float t = ((orcus_float)clock()) / CLOCKS_PER_SEC;
-	out.type = M_TYPE_FLOAT;
+	out.type = ORCUS_TYPE_FLOAT;
 	out.data.f = t;
 	
 
@@ -162,7 +162,7 @@ void orcus_lib_os_clock(orcus_state* const M_CPP_restrict M, const orcus_int arg
 }
 
 
-void orcus_lib_os_getdate(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //returns a date in table form, from epoch time.
+void orcus_lib_os_getdate(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //returns a date in table form, from epoch time.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1))return;
 	if (!args_out) {
 		orcus_discard_top_of_stack(M);
@@ -173,14 +173,14 @@ void orcus_lib_os_getdate(orcus_state* const M_CPP_restrict M, const orcus_int a
 	orcus_popstack(M,&tvar);
 	time_t t;
 	switch (tvar.type) {
-	case M_TYPE_INT:
+	case ORCUS_TYPE_INT:
 		t = (time_t)tvar.data.i;
 		break;
-	case M_TYPE_FLOAT:
+	case ORCUS_TYPE_FLOAT:
 		t = (time_t)tvar.data.f;
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, M_TYPE_INT, 1);
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, ORCUS_TYPE_INT, 1);
 		orcus_release_var(&tvar);
 		return;
 	}
@@ -201,64 +201,64 @@ void orcus_lib_os_getdate(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 
 	orcus_variable kvar;
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = timedata.tm_sec;
 	orcus_table_set_cstring_keyvalue(outt, "seconds", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = timedata.tm_min;
 	orcus_table_set_cstring_keyvalue(outt, "minutes", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = timedata.tm_hour;
 	orcus_table_set_cstring_keyvalue(outt, "hours", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = ((timedata.tm_hour%12)+1);
 	orcus_table_set_cstring_keyvalue(outt, "hours12", &kvar);
 
 	
-	kvar.type = M_TYPE_BOOL;
+	kvar.type = ORCUS_TYPE_BOOL;
 	kvar.data.i = timedata.tm_hour >= 11;
 	orcus_table_set_cstring_keyvalue(outt, "ispm", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = (timedata.tm_year+1900);
 	orcus_table_set_cstring_keyvalue(outt, "year", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = (timedata.tm_mon + 1);
 	orcus_table_set_cstring_keyvalue(outt, "month", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = timedata.tm_wday;
 	orcus_table_set_cstring_keyvalue(outt, "dayofweek", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = timedata.tm_mday;
 	orcus_table_set_cstring_keyvalue(outt, "dayofmonth", &kvar);
 
 	
-	kvar.type = M_TYPE_INT;
+	kvar.type = ORCUS_TYPE_INT;
 	kvar.data.i = (timedata.tm_yday+1);
 	orcus_table_set_cstring_keyvalue(outt, "dayofyear", &kvar);
 
 	orcus_variable outv;
-	outv.type = M_TYPE_TABLE;
+	outv.type = ORCUS_TYPE_TABLE;
 	outv.data.p = outt;
 	orcus_pushstack(M, &outv);
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
 }
 
-void orcus_lib_os_gettime(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //like above, but returns epoch time from date information.
+void orcus_lib_os_gettime(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) { //like above, but returns epoch time from date information.
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 1)) {
 		return;
 	}
@@ -270,8 +270,8 @@ void orcus_lib_os_gettime(orcus_state* const M_CPP_restrict M, const orcus_int a
 	orcus_variable tvar;
 	orcus_popstack(M,&tvar);
 
-	if(tvar.type!=M_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, M_TYPE_TABLE, 1);
+	if(tvar.type!=ORCUS_TYPE_TABLE) {
+		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, ORCUS_TYPE_TABLE, 1);
 		return;
 	}
 	tm timedata;
@@ -288,7 +288,7 @@ void orcus_lib_os_gettime(orcus_state* const M_CPP_restrict M, const orcus_int a
 	timedata.tm_min= (int)orcus_checkint(&var);
 	
 	orcus_table_get_cstring_keyvalue(tab, "hours", &var);
-	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
+	if (var.type == ORCUS_TYPE_INT || var.type == ORCUS_TYPE_FLOAT) {
 		timedata.tm_hour = (int)orcus_checkint(&var);
 	}
 	else {
@@ -296,7 +296,7 @@ void orcus_lib_os_gettime(orcus_state* const M_CPP_restrict M, const orcus_int a
 	}
 
 	orcus_table_get_cstring_keyvalue(tab, "year", &var);
-	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
+	if (var.type == ORCUS_TYPE_INT || var.type == ORCUS_TYPE_FLOAT) {
 		timedata.tm_year = (int)orcus_checkint(&var)- 1900;
 	}
 	else {
@@ -304,7 +304,7 @@ void orcus_lib_os_gettime(orcus_state* const M_CPP_restrict M, const orcus_int a
 	}
 
 	orcus_table_get_cstring_keyvalue(tab, "month", &var);
-	if (var.type == M_TYPE_INT || var.type == M_TYPE_FLOAT) {
+	if (var.type == ORCUS_TYPE_INT || var.type == ORCUS_TYPE_FLOAT) {
 		timedata.tm_mon = (int)orcus_checkint(&var) - 1;
 	}
 	else {
@@ -319,7 +319,7 @@ void orcus_lib_os_gettime(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 	orcus_variable out;
 	
-	out.type = M_TYPE_INT;
+	out.type = ORCUS_TYPE_INT;
 #ifdef WIN32
 	out.data.i= _mkgmtime(&timedata); //why in the world does mktime use your local timezone? bad. stupid. uuuuuugh.
 #else
@@ -332,7 +332,7 @@ void orcus_lib_os_gettime(orcus_state* const M_CPP_restrict M, const orcus_int a
 
 
 
-void orcus_lib_os_exit(orcus_state* const M_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
+void orcus_lib_os_exit(orcus_state* const ORCUS_CPP_restrict M, const orcus_int args_in, const orcus_int args_out) {
 	if (ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_INPUT_ARGS(M, args_in, 0,1)) {
 		return;
 	}
@@ -341,7 +341,7 @@ void orcus_lib_os_exit(orcus_state* const M_CPP_restrict M, const orcus_int args
 	if (args_in) {
 		orcus_variable v;
 		orcus_popstack(M,&v);
-		if (v.type == M_TYPE_INT) {
+		if (v.type == ORCUS_TYPE_INT) {
 			exitcode = (int)v.data.i;
 		}
 
