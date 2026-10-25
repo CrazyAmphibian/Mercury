@@ -15,7 +15,7 @@ void M_BYTECODE_NOP(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_ADD(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -34,7 +34,7 @@ void M_BYTECODE_ADD(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
@@ -45,7 +45,7 @@ void M_BYTECODE_ADD(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.i += st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -55,7 +55,7 @@ void M_BYTECODE_ADD(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_SUB(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -75,7 +75,7 @@ void M_BYTECODE_SUB(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
@@ -86,7 +86,7 @@ void M_BYTECODE_SUB(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.i -= st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -96,7 +96,7 @@ void M_BYTECODE_SUB(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_MUL(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -116,7 +116,7 @@ void M_BYTECODE_MUL(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
@@ -127,7 +127,7 @@ void M_BYTECODE_MUL(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.i *= st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -137,7 +137,7 @@ void M_BYTECODE_MUL(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_DIV(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -151,7 +151,7 @@ void M_BYTECODE_DIV(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->type = ORCUS_TYPE_FLOAT;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
@@ -162,7 +162,7 @@ void M_BYTECODE_DIV(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.f /= (orcus_float)st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -172,7 +172,7 @@ void M_BYTECODE_DIV(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_POW(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -186,7 +186,7 @@ void M_BYTECODE_POW(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->type = ORCUS_TYPE_FLOAT;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
@@ -197,7 +197,7 @@ void M_BYTECODE_POW(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.f = pow(ss->data.f, (orcus_float)st->data.i);
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -208,7 +208,7 @@ void M_BYTECODE_POW(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_IDIV(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -222,27 +222,27 @@ void M_BYTECODE_IDIV(orcus_state* const ORCUS_CPP_restrict M) {
 	else if (ss->type == ORCUS_TYPE_INT) {
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
 	if (st->type == ORCUS_TYPE_FLOAT) {
 		st->data.i = (orcus_int)st->data.f;
 		if (!st->data.i) {
-			orcus_raise_error(M, M_ERROR_DIV_ZERO);
+			orcus_raise_error(M, ORCUS_ERROR_DIV_ZERO);
 			return;
 		}
 		ss->data.i /= st->data.i;
 	}
 	else if (st->type == ORCUS_TYPE_INT) {
 		if (!st->data.i) {
-			orcus_raise_error(M, M_ERROR_DIV_ZERO);
+			orcus_raise_error(M, ORCUS_ERROR_DIV_ZERO);
 			return;
 		}
 		ss->data.i /= st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -252,7 +252,7 @@ void M_BYTECODE_IDIV(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_MOD(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -272,7 +272,7 @@ void M_BYTECODE_MOD(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 
@@ -281,13 +281,13 @@ void M_BYTECODE_MOD(orcus_state* const ORCUS_CPP_restrict M) {
 	}
 	else if (st->type == ORCUS_TYPE_INT) {
 		if (!st->data.i) {
-			orcus_raise_error(M, M_ERROR_DIV_ZERO);
+			orcus_raise_error(M, ORCUS_ERROR_DIV_ZERO);
 			return;
 		}
 		ss->data.i %= st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -297,7 +297,7 @@ void M_BYTECODE_MOD(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_BAND(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -305,12 +305,12 @@ void M_BYTECODE_BAND(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_variable* ss = M->stack + M->sizeofstack - 2;
 
 	if(ss->type != ORCUS_TYPE_INT && ss->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
 	if (st->type != ORCUS_TYPE_INT && st->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
 		return;
 	}
 	ss->data.i &= st->data.i;
@@ -321,7 +321,7 @@ void M_BYTECODE_BAND(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_BOR(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -329,12 +329,12 @@ void M_BYTECODE_BOR(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_variable* ss = M->stack + M->sizeofstack - 2;
 
 	if (ss->type != ORCUS_TYPE_INT && ss->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
 	if (st->type != ORCUS_TYPE_INT && st->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
 		return;
 	}
 	ss->data.i |= st->data.i;
@@ -345,7 +345,7 @@ void M_BYTECODE_BOR(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_BXOR(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -353,12 +353,12 @@ void M_BYTECODE_BXOR(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_variable* ss = M->stack + M->sizeofstack - 2;
 
 	if (ss->type != ORCUS_TYPE_INT && ss->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
 	if (st->type != ORCUS_TYPE_INT && st->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
 		return;
 	}
 	ss->data.i ^= st->data.i;
@@ -369,12 +369,12 @@ void M_BYTECODE_BXOR(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_BNOT(orcus_state* const ORCUS_CPP_restrict M) {
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* st = M->stack + M->sizeofstack - 1;
 	if (st->type != ORCUS_TYPE_INT && st->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
 		return;
 	}
 #ifdef ORCUS_64BIT
@@ -387,7 +387,7 @@ void M_BYTECODE_BNOT(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_BSHL(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -395,12 +395,12 @@ void M_BYTECODE_BSHL(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_variable* ss = M->stack + M->sizeofstack - 2;
 
 	if (ss->type != ORCUS_TYPE_INT && ss->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
 	if (st->type != ORCUS_TYPE_INT && st->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
 		return;
 	}
 
@@ -416,7 +416,7 @@ void M_BYTECODE_BSHL(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_BSHR(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -424,12 +424,12 @@ void M_BYTECODE_BSHR(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_variable* ss = M->stack + M->sizeofstack - 2;
 
 	if (ss->type != ORCUS_TYPE_INT && ss->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 2);
 		return;
 	}
 
 	if (st->type != ORCUS_TYPE_INT && st->type != ORCUS_TYPE_FLOAT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 1);
 		return;
 	}
 
@@ -447,7 +447,7 @@ void M_BYTECODE_BSHR(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_LAND(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* st = M->stack + M->sizeofstack - 1;
@@ -473,7 +473,7 @@ void M_BYTECODE_LAND(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_LOR(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* st = M->stack + M->sizeofstack - 1;
@@ -504,7 +504,7 @@ void M_BYTECODE_LOR(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_LXOR(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -534,7 +534,7 @@ void M_BYTECODE_LXOR(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_LNOT(orcus_state* const ORCUS_CPP_restrict M) {
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -550,7 +550,7 @@ void M_BYTECODE_LNOT(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_EQL(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* st = M->stack + M->sizeofstack - 1;
@@ -568,7 +568,7 @@ void M_BYTECODE_EQL(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_NEQ(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* st = M->stack + M->sizeofstack - 1;
@@ -587,7 +587,7 @@ void M_BYTECODE_NEQ(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_GRT(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -606,7 +606,7 @@ void M_BYTECODE_GRT(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 	ss->type = ORCUS_TYPE_BOOL;
@@ -618,7 +618,7 @@ void M_BYTECODE_GRT(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.i = ss->data.i > st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -628,7 +628,7 @@ void M_BYTECODE_GRT(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_LET(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -647,7 +647,7 @@ void M_BYTECODE_LET(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 	ss->type = ORCUS_TYPE_BOOL;
@@ -659,7 +659,7 @@ void M_BYTECODE_LET(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.i = ss->data.i < st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -669,7 +669,7 @@ void M_BYTECODE_LET(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_GTE(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -688,7 +688,7 @@ void M_BYTECODE_GTE(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 	ss->type = ORCUS_TYPE_BOOL;
@@ -700,7 +700,7 @@ void M_BYTECODE_GTE(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.i = ss->data.i >= st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -710,7 +710,7 @@ void M_BYTECODE_GTE(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_LTE(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -729,7 +729,7 @@ void M_BYTECODE_LTE(orcus_state* const ORCUS_CPP_restrict M) {
 		}
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, ss, 1);
 		return;
 	}
 	ss->type = ORCUS_TYPE_BOOL;
@@ -741,7 +741,7 @@ void M_BYTECODE_LTE(orcus_state* const ORCUS_CPP_restrict M) {
 		ss->data.i = ss->data.i <= st->data.i;
 	}
 	else {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, st, 2);
 		return;
 	}
 
@@ -751,7 +751,7 @@ void M_BYTECODE_LTE(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_SENV(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* key = M->stack + M->sizeofstack -1;
@@ -781,13 +781,13 @@ void M_BYTECODE_SENV(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_subtable st = M->enviroment->data[key->type];
 	void* nptr = realloc(st.keys, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.keys = (orcus_variable*)nptr;
 	nptr = realloc(st.values, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.values = (orcus_variable*)nptr;
@@ -805,7 +805,7 @@ void M_BYTECODE_SENV(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_GENV(orcus_state* const ORCUS_CPP_restrict M) {
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* key = M->stack + M->sizeofstack - 1;
@@ -833,7 +833,7 @@ void M_BYTECODE_GENV(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_SET(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack<3) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* key = M->stack + M->sizeofstack - 1;
@@ -846,13 +846,13 @@ void M_BYTECODE_SET(orcus_state* const ORCUS_CPP_restrict M) {
 		break;
 	case ORCUS_TYPE_ARRAY:
 		if (key->type != ORCUS_TYPE_INT) {
-			orcus_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key->type);
+			orcus_raise_error_nonpointer(M, ORCUS_ERROR_INVALID_INDEX, key->type);
 			return;
 		}
 		orcus_setarray((orcus_array*)table->data.p, value, key->data.i);
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, &table, 1);
 		return;
 	}
 	M->sizeofstack -= 3;
@@ -861,7 +861,7 @@ void M_BYTECODE_SET(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_GET(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* key = M->stack + M->sizeofstack - 1;
@@ -873,14 +873,14 @@ void M_BYTECODE_GET(orcus_state* const ORCUS_CPP_restrict M) {
 		break;
 	case ORCUS_TYPE_ARRAY:
 		if (key->type != ORCUS_TYPE_INT) {
-			orcus_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key->type);
+			orcus_raise_error_nonpointer(M, ORCUS_ERROR_INVALID_INDEX, key->type);
 			return;
 		}
 		orcus_getarray((orcus_array*)table->data.p, key->data.i, &value);
 		break;
 	case ORCUS_TYPE_STRING:
 		if (key->type != ORCUS_TYPE_INT) {
-			orcus_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, key->type);
+			orcus_raise_error_nonpointer(M, ORCUS_ERROR_INVALID_INDEX, key->type);
 			return;
 		}
 		
@@ -888,7 +888,7 @@ void M_BYTECODE_GET(orcus_state* const ORCUS_CPP_restrict M) {
 		value.data.p = orcus_mstring_substring((orcus_string*)table->data.p, key->data.i, key->data.i);
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, table, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED, table, 1);
 		return;
 	}
 	orcus_increment_variable_refrence_count(&value); //so the value cannot be freed before it is sent out
@@ -991,7 +991,7 @@ void M_BYTECODE_NSTR(orcus_state* const ORCUS_CPP_restrict M) { //New STRing
 	
 	orcus_string* so=orcus_cstring_to_mstring( (char*)(M->bytecode->instructions + M->programcounter), string_size);
 	if (!so) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	out.data.p = so;
@@ -1007,12 +1007,12 @@ void M_BYTECODE_NFUN(orcus_state* const ORCUS_CPP_restrict M) { //New FUNction /
 
 	orcus_function* const fptr= (orcus_function*)malloc(sizeof(orcus_function));
 	if (fptr == nullptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 
 	if (M->bytecode->numberofinstructions < M->programcounter + function_size) {
-		orcus_raise_error(M, M_ERROR_INSTRUCTION_FAILIURE);
+		orcus_raise_error(M, ORCUS_ERROR_INSTRUCTION_FAILIURE);
 		return;
 	}
 
@@ -1023,7 +1023,7 @@ void M_BYTECODE_NFUN(orcus_state* const ORCUS_CPP_restrict M) { //New FUNction /
 	
 	if (fptr->instructions == nullptr) {
 		free(fptr);
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -1035,7 +1035,7 @@ void M_BYTECODE_NFUN(orcus_state* const ORCUS_CPP_restrict M) { //New FUNction /
 		if (fptr->instruction_dbg_lookup == nullptr) {
 			free(fptr->instructions);
 			free(fptr);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		memcpy(fptr->instruction_dbg_lookup, M->bytecode->instruction_dbg_lookup + M->programcounter, function_size * sizeof(orcus_uint));
@@ -1044,7 +1044,7 @@ void M_BYTECODE_NFUN(orcus_state* const ORCUS_CPP_restrict M) { //New FUNction /
 			free(fptr->instructions);
 			free(fptr->instruction_dbg_lookup);
 			free(fptr);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		for (orcus_uint i = 0; i < M->bytecode->num_dbg_tokens; i++) {
@@ -1055,7 +1055,7 @@ void M_BYTECODE_NFUN(orcus_state* const ORCUS_CPP_restrict M) { //New FUNction /
 				free(fptr->dbg_tokens);
 				free(fptr->instruction_dbg_lookup);
 				free(fptr);
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			fptr->num_dbg_tokens = M->bytecode->num_dbg_tokens;
@@ -1082,7 +1082,7 @@ void M_BYTECODE_NTAB(orcus_state* const ORCUS_CPP_restrict M) { //New TABle
 	
 	const orcus_table* const ntab = orcus_newtable();
 	if (ntab == nullptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	
@@ -1096,7 +1096,7 @@ void M_BYTECODE_NARR(orcus_state* const ORCUS_CPP_restrict M) { //New ARRay
 
 	const orcus_array* const narr = orcus_newarray();
 	if (narr == nullptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	
@@ -1166,7 +1166,7 @@ void M_BYTECODE_CALL(orcus_state* const ORCUS_CPP_restrict M) { //CALL function
 	M->programcounter += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 	orcus_int initial_stack_size = M->sizeofstack;
 	if (M->sizeofstack < (args_in+1) ) { //we need 1 extra arg for the function on the stack.
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	const orcus_int args_out = *(orcus_int*)(M->bytecode->instructions + M->programcounter);
@@ -1180,7 +1180,7 @@ void M_BYTECODE_CALL(orcus_state* const ORCUS_CPP_restrict M) { //CALL function
 		{
 		orcus_state* const FM= orcus_get_child_state(M);
 		if (!FM) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		orcus_function* previous = FM->bytecode;
@@ -1195,7 +1195,7 @@ void M_BYTECODE_CALL(orcus_state* const ORCUS_CPP_restrict M) { //CALL function
 			void* nptr=realloc(FM->stack, sizeof(orcus_variable) * (FM->sizeofstack + args_in));
 			if (!nptr) {
 				orcus_release_var(&ck);
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			FM->stack = (orcus_variable*)nptr;
@@ -1214,7 +1214,7 @@ void M_BYTECODE_CALL(orcus_state* const ORCUS_CPP_restrict M) { //CALL function
 			void* nptr = realloc(M->stack, sizeof(orcus_variable) * (M->sizeofstack + args_out));
 			if (!nptr) {
 				orcus_release_var(&ck);
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			M->stack = (orcus_variable*)nptr;
@@ -1244,14 +1244,14 @@ void M_BYTECODE_CALL(orcus_state* const ORCUS_CPP_restrict M) { //CALL function
 		((orcus_cfunc)(ck.data.p))(M,args_in,args_out);
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, &ck, 0);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION, &ck, 0);
 		orcus_release_var(&ck);
 		return;
 	}
 	orcus_release_var(&ck);
 
 	if (initial_stack_size + args_out - args_in - 1 !=M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -1263,7 +1263,7 @@ void M_BYTECODE_END(orcus_state* const ORCUS_CPP_restrict M) { //end state execu
 
 void M_BYTECODE_LEN(orcus_state* const ORCUS_CPP_restrict M) { //LENgth
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* var = M->stack + M->sizeofstack -1;
@@ -1291,7 +1291,7 @@ void M_BYTECODE_LEN(orcus_state* const ORCUS_CPP_restrict M) { //LENgth
 		}
 		break;
 	default:
-		orcus_raise_error_nonpointer(M, M_ERROR_INDEX_INVALID_TYPE, var->type);
+		orcus_raise_error_nonpointer(M, ORCUS_ERROR_INDEX_INVALID_TYPE, var->type);
 		return;
 	}
 	return;
@@ -1299,7 +1299,7 @@ void M_BYTECODE_LEN(orcus_state* const ORCUS_CPP_restrict M) { //LENgth
 
 void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 	if (M->sizeofstack<2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* st = M->stack + M->sizeofstack - 1;
@@ -1312,7 +1312,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 	else {
 		s2 = orcus_tostring(st);
 		if (!s2) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 	}
@@ -1324,7 +1324,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 		s1 = orcus_tostring(ss);
 		if (!s1) {
 			if(st->type!=ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 	}
@@ -1346,7 +1346,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 			if (!buffer) {
 				if (st->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
 				if (ss->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s1);
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			memcpy(buffer + s1->size, s2->ptr, s2->size);
@@ -1356,7 +1356,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 			if (!buffer) {
 				if (st->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
 				if (ss->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s1);
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			memcpy(buffer, s1->ptr, s1->size);
@@ -1372,7 +1372,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 		if (!buffer) {
 			if (st->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
 			if (ss->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s1);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		memcpy(buffer, s1->ptr, s1->size);
@@ -1387,7 +1387,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 		if (!s3) {
 			if (st->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
 			if (ss->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s1);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		buffer = (char*)malloc(s1->size + s2->size);
@@ -1395,7 +1395,7 @@ void M_BYTECODE_CNCT(orcus_state* const ORCUS_CPP_restrict M) { // CoNCaTenate
 			if (st->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s2);
 			if (ss->type != ORCUS_TYPE_STRING)orcus_mstring_delete(s1);
 			free(s3);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		
@@ -1433,7 +1433,7 @@ void M_BYTECODE_CLS(orcus_state* const ORCUS_CPP_restrict M) { // CLear Stack
 void M_BYTECODE_GETL(orcus_state* const ORCUS_CPP_restrict M) { //GET Local
 	//yeah, this is pretty simple.
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* k = M->stack + M->sizeofstack - 1;
@@ -1457,7 +1457,7 @@ void M_BYTECODE_SETL(orcus_state* const ORCUS_CPP_restrict M) { //SET Local
 	//ditto.
 	
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* key = M->stack + M->sizeofstack - 1;
@@ -1480,13 +1480,13 @@ void M_BYTECODE_SETL(orcus_state* const ORCUS_CPP_restrict M) { //SET Local
 
 	void* nptr=realloc(st.keys, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.keys = (orcus_variable*)nptr;
 	nptr=realloc(st.values, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.values = (orcus_variable*)nptr;
@@ -1504,7 +1504,7 @@ void M_BYTECODE_SETL(orcus_state* const ORCUS_CPP_restrict M) { //SET Local
 void M_BYTECODE_GETG(orcus_state* const ORCUS_CPP_restrict M) { //GET Global
 	//ditto.
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* k = M->stack + M->sizeofstack - 1;
@@ -1527,7 +1527,7 @@ void M_BYTECODE_GETG(orcus_state* const ORCUS_CPP_restrict M) { //GET Global
 void M_BYTECODE_SETG(orcus_state* const ORCUS_CPP_restrict M) { //SET Global
 		//ditto.
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* key = M->stack + M->sizeofstack - 1;
@@ -1550,13 +1550,13 @@ void M_BYTECODE_SETG(orcus_state* const ORCUS_CPP_restrict M) { //SET Global
 
 	void* nptr = realloc(st.keys, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.keys = (orcus_variable*)nptr;
 	nptr = realloc(st.values, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.values = (orcus_variable*)nptr;
@@ -1622,7 +1622,7 @@ void M_BYTECODE_CPYX(orcus_state* const ORCUS_CPP_restrict M) { // CoPY X elemen
 
 void M_BYTECODE_UNM(orcus_state* const ORCUS_CPP_restrict M) { //UNary Minus
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -1637,7 +1637,7 @@ void M_BYTECODE_UNM(orcus_state* const ORCUS_CPP_restrict M) { //UNary Minus
 		var->data.f *= -1.0;
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, var, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, var, 1);
 		return;
 	}
 	return;
@@ -1645,7 +1645,7 @@ void M_BYTECODE_UNM(orcus_state* const ORCUS_CPP_restrict M) { //UNary Minus
 
 void M_BYTECODE_INC(orcus_state* const ORCUS_CPP_restrict M) { //INCrement
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -1660,7 +1660,7 @@ void M_BYTECODE_INC(orcus_state* const ORCUS_CPP_restrict M) { //INCrement
 		var->data.f += 1.0;
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, var, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, var, 1);
 		return;
 	}
 	return;
@@ -1668,7 +1668,7 @@ void M_BYTECODE_INC(orcus_state* const ORCUS_CPP_restrict M) { //INCrement
 
 void M_BYTECODE_DEC(orcus_state* const ORCUS_CPP_restrict M) { //DECrement
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 
@@ -1683,7 +1683,7 @@ void M_BYTECODE_DEC(orcus_state* const ORCUS_CPP_restrict M) { //DECrement
 		var->data.f -= 1.0;
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, var, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, var, 1);
 		return;
 	}
 	return;
@@ -1691,7 +1691,7 @@ void M_BYTECODE_DEC(orcus_state* const ORCUS_CPP_restrict M) { //DECrement
 
 void M_BYTECODE_SCON(orcus_state* const ORCUS_CPP_restrict M) { //Set CONstant
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	const orcus_uint con_num = *(orcus_int*)(M->bytecode->instructions + M->programcounter);
@@ -1700,7 +1700,7 @@ void M_BYTECODE_SCON(orcus_state* const ORCUS_CPP_restrict M) { //Set CONstant
 	if (con_num >= M->num_constants) {
 		void* const nptr=realloc(M->constants, sizeof(orcus_variable) * (con_num+1) );
 		if (!nptr) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		M->num_constants = con_num+1;
@@ -1730,7 +1730,7 @@ void M_BYTECODE_SWXY(orcus_state* const ORCUS_CPP_restrict M) { //SWap stack X a
 	M->programcounter += ORCUS_INSTRUCTIONS_PER_VARIABLE_SIZE;
 
 	if (X >= M->sizeofstack || Y >= M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_INSTRUCTION_FAILIURE);
+		orcus_raise_error(M, ORCUS_ERROR_INSTRUCTION_FAILIURE);
 		return;
 	}
 
@@ -1747,7 +1747,7 @@ void M_BYTECODE_NNSE(orcus_state* const ORCUS_CPP_restrict M) { //New Nil if Sta
 		if (!M->allocatedstacksize) {
 			void* nptr=realloc(M->stack, sizeof(orcus_variable));
 			if (!nptr) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			M->stack = (orcus_variable*)nptr;
@@ -1761,7 +1761,7 @@ void M_BYTECODE_NNSE(orcus_state* const ORCUS_CPP_restrict M) { //New Nil if Sta
 
 void M_BYTECODE_SETL_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Local, Key is Constant String
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* value = M->stack + M->sizeofstack - 1;
@@ -1792,13 +1792,13 @@ void M_BYTECODE_SETL_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Local,
 
 	void* nptr = realloc(st.keys, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.keys = (orcus_variable*)nptr;
 	nptr = realloc(st.values, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.values = (orcus_variable*)nptr;
@@ -1807,7 +1807,7 @@ void M_BYTECODE_SETL_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Local,
 	key.type = ORCUS_TYPE_STRING;
 	orcus_string* keystr = orcus_cstring_to_mstring(chars, length);
 	if (!keystr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	keystr->refrences = 1;
@@ -1850,7 +1850,7 @@ void M_BYTECODE_GETL_KCS(orcus_state* const ORCUS_CPP_restrict M) { //GET Local,
 
 void M_BYTECODE_SETG_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Global, Key is Constant String
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* value = M->stack + M->sizeofstack - 1;
@@ -1881,13 +1881,13 @@ void M_BYTECODE_SETG_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Global
 
 	void* nptr = realloc(st.keys, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.keys = (orcus_variable*)nptr;
 	nptr = realloc(st.values, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.values = (orcus_variable*)nptr;
@@ -1896,7 +1896,7 @@ void M_BYTECODE_SETG_KCS(orcus_state* const ORCUS_CPP_restrict M) { //SET Global
 	key.type = ORCUS_TYPE_STRING;
 	orcus_string* keystr = orcus_cstring_to_mstring(chars, length);
 	if (!keystr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	keystr->refrences = 1;
@@ -1939,7 +1939,7 @@ void M_BYTECODE_GETG_KCS(orcus_state* const ORCUS_CPP_restrict M) { //GET Global
 
 void M_BYTECODE_SENV_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* value = M->stack + M->sizeofstack - 1;
@@ -1977,13 +1977,13 @@ void M_BYTECODE_SENV_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 	orcus_subtable st = M->enviroment->data[ORCUS_TYPE_STRING];
 	void* nptr = realloc(st.keys, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.keys = (orcus_variable*)nptr;
 	nptr = realloc(st.values, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.values = (orcus_variable*)nptr;
@@ -1992,7 +1992,7 @@ void M_BYTECODE_SENV_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 	key.type = ORCUS_TYPE_STRING;
 	orcus_string* keystr = orcus_cstring_to_mstring(chars, length);
 	if (!keystr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	keystr->refrences = 1;
@@ -2042,7 +2042,7 @@ void M_BYTECODE_GENV_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 
 void M_BYTECODE_SET_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 	if (M->sizeofstack < 2) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	const orcus_int length = *(orcus_int*)(M->bytecode->instructions + M->programcounter);
@@ -2055,10 +2055,10 @@ void M_BYTECODE_SET_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 
 	if (table->type != ORCUS_TYPE_TABLE) {
 		if (table->type != ORCUS_TYPE_STRING && table->type != ORCUS_TYPE_ARRAY) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table, 1);
+			orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table, 1);
 			return;
 		}
-		orcus_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, ORCUS_TYPE_STRING);
+		orcus_raise_error_nonpointer(M, ORCUS_ERROR_INVALID_INDEX, ORCUS_TYPE_STRING);
 		return;
 	}
 
@@ -2083,13 +2083,13 @@ void M_BYTECODE_SET_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 
 	void* nptr = realloc(st.keys, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.keys = (orcus_variable*)nptr;
 	nptr = realloc(st.values, sizeof(orcus_variable) * (st.size + 1));
 	if (!nptr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	st.values = (orcus_variable*)nptr;
@@ -2098,7 +2098,7 @@ void M_BYTECODE_SET_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 	key.type = ORCUS_TYPE_STRING;
 	orcus_string* keystr = orcus_cstring_to_mstring(chars, length);
 	if (!keystr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	keystr->refrences = 1;
@@ -2121,16 +2121,16 @@ void M_BYTECODE_GET_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 	M->programcounter += (length + sizeof(orcus_opcode) - 1) / sizeof(orcus_opcode);
 
 	if (!M->sizeofstack) {
-		orcus_raise_error(M, M_ERROR_STACK_CORRUPT);
+		orcus_raise_error(M, ORCUS_ERROR_STACK_CORRUPT);
 		return;
 	}
 	orcus_variable* table = M->stack + M->sizeofstack - 1;
 	if (table->type != ORCUS_TYPE_TABLE) {
 		if (table->type != ORCUS_TYPE_STRING && table->type != ORCUS_TYPE_ARRAY) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table, 1);
+			orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE, table, 1);
 			return;
 		}
-		orcus_raise_error_nonpointer(M, M_ERROR_INVALID_INDEX, ORCUS_TYPE_STRING);
+		orcus_raise_error_nonpointer(M, ORCUS_ERROR_INVALID_INDEX, ORCUS_TYPE_STRING);
 		return;
 	}
 

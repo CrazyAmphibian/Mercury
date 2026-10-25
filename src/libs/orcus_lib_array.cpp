@@ -16,7 +16,7 @@ void orcus_lib_array_flush(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 	orcus_variable arr_var;
 	orcus_popstack(M,&arr_var);
 	if (arr_var.type != ORCUS_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&arr_var);
 		return;
 	}
@@ -27,7 +27,7 @@ void orcus_lib_array_flush(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 
 	orcus_array* newarr=orcus_newarray();
 	if (!newarr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -155,7 +155,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_variable arr_var;
 	orcus_popstack(M,&arr_var);
 	if (arr_var.type != ORCUS_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&arr_var);
 		return;
 	}
@@ -163,7 +163,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_array* arr1 = (orcus_array*)arr_var.data.p;
 	orcus_array* arr2 = orcus_newarray();
 	if (!arr2) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		orcus_release_var(&arr_var);
 		return;
 	}
@@ -174,7 +174,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 #ifdef ORCUS_64BIT
 		arr2->values = (orcus_variable******)calloc(ORCUS_SIZE_SUBARRAY_1, sizeof(void*));
 		if (!arr2->values) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		for (int i1 = 0; i1 < ORCUS_SIZE_SUBARRAY_1; i1++) {
@@ -182,7 +182,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 			if (!st1_1)continue;
 			orcus_variable***** st1_2 = (orcus_variable*****)calloc(ORCUS_SIZE_SUBARRAY_2,sizeof(orcus_variable****));
 			if (!st1_2) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			arr2->values[i1] = st1_2;
@@ -191,7 +191,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 				if (!st2_1)continue;
 				orcus_variable**** st2_2 = (orcus_variable****)calloc(ORCUS_SIZE_SUBARRAY_3, sizeof(orcus_variable***));
 				if (!st2_2) {
-					orcus_raise_error(M, M_ERROR_ALLOCATION);
+					orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 					return;
 				}
 				st1_2[i2] = st2_2;
@@ -200,7 +200,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 					if (!st3_1)continue;
 					orcus_variable*** st3_2 = (orcus_variable***)calloc(ORCUS_SIZE_SUBARRAY_4, sizeof(orcus_variable**));
 					if (!st3_2) {
-						orcus_raise_error(M, M_ERROR_ALLOCATION);
+						orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 						return;
 					}
 					st2_2[i3] = st3_2;
@@ -209,7 +209,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 						if (!st4_1)continue;
 						orcus_variable** st4_2 = (orcus_variable**)calloc(ORCUS_SIZE_SUBARRAY_5, sizeof(orcus_variable*));
 						if (!st4_2) {
-							orcus_raise_error(M, M_ERROR_ALLOCATION);
+							orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 							return;
 						}
 						st3_2[i4] = st4_2;
@@ -218,7 +218,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 							if (!st5_1)continue;
 							orcus_variable* st5_2 = (orcus_variable*)calloc(ORCUS_SIZE_SUBARRAY_6, sizeof(orcus_variable));
 							if (!st5_2) {
-								orcus_raise_error(M, M_ERROR_ALLOCATION);
+								orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 								return;
 							}
 							st4_2[i5] = st5_2;
@@ -233,7 +233,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 #else
 		arr2->values = (orcus_variable***)calloc(ORCUS_SIZE_SUBARRAY_1, sizeof(void*));
 		if (!arr2->values) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		for (int i1 = 0; i1 < ORCUS_SIZE_SUBARRAY_1; i1++) {
@@ -241,7 +241,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 			if (!st1_1)continue;
 			orcus_variable** st1_2 = (orcus_variable**)calloc(ORCUS_SIZE_SUBARRAY_2, sizeof(orcus_variable*));
 			if (!st1_2) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			arr2->values[i1] = st1_2;
@@ -250,7 +250,7 @@ void orcus_lib_array_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 				if (!st2_1)continue;
 				orcus_variable* st2_2 = (orcus_variable*)calloc(ORCUS_SIZE_SUBARRAY_3, sizeof(orcus_variable));
 				if (!st2_2) {
-					orcus_raise_error(M, M_ERROR_ALLOCATION);
+					orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 					return;
 				}
 				st1_2[i2] = st2_2;
@@ -284,7 +284,7 @@ void orcus_lib_array_insert(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	if (args_in > 2) {
 		orcus_popstack(M,&len_var);
 		if (len_var.type != ORCUS_TYPE_INT) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE, &len_var, ORCUS_TYPE_INT, 3);
+			orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE, &len_var, ORCUS_TYPE_INT, 3);
 			orcus_release_var(&len_var);
 			return;
 		}
@@ -298,7 +298,7 @@ void orcus_lib_array_insert(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_variable arr_var;
 	orcus_popstack(M, &arr_var);
 	if (arr_var.type != ORCUS_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&arr_var);
 		return;
 	}
@@ -341,7 +341,7 @@ void orcus_lib_array_remove(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_variable len_var;
 	orcus_popstack(M, &len_var);
 	if (len_var.type != ORCUS_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE, &len_var, ORCUS_TYPE_INT, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE, &len_var, ORCUS_TYPE_INT, 2);
 		orcus_release_var(&len_var);
 		return;
 	}
@@ -349,7 +349,7 @@ void orcus_lib_array_remove(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_variable arr_var;
 	orcus_popstack(M, &arr_var);
 	if (arr_var.type != ORCUS_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&arr_var);
 		return;
 	}
@@ -389,21 +389,21 @@ void orcus_lib_array_swap(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_variable pos_var1;
 	orcus_popstack(M, &pos_var1);
 	if (pos_var1.type != ORCUS_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE, &pos_var1, ORCUS_TYPE_INT, 3);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE, &pos_var1, ORCUS_TYPE_INT, 3);
 		return;
 	}
 
 	orcus_variable pos_var2;
 	orcus_popstack(M, &pos_var2);
 	if (pos_var2.type != ORCUS_TYPE_INT) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE, &pos_var2, ORCUS_TYPE_INT, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE, &pos_var2, ORCUS_TYPE_INT, 2);
 		return;
 	}
 
 	orcus_variable arr_var;
 	orcus_popstack(M, &arr_var);
 	if (arr_var.type != ORCUS_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &arr_var, ORCUS_TYPE_ARRAY, 1);
 		return;
 	}
 
@@ -652,7 +652,7 @@ void orcus_lib_array_sort(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_variable var_func;
 	orcus_popstack(M,&var_func);
 	if (var_func.type != ORCUS_TYPE_INT && var_func.type != ORCUS_TYPE_CFUNC) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, ORCUS_TYPE_FUNCTION, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_func, ORCUS_TYPE_FUNCTION, 2);
 		orcus_release_var(&var_func);
 		return;
 	}
@@ -660,7 +660,7 @@ void orcus_lib_array_sort(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_variable var_array;
 	orcus_popstack(M,&var_array);
 	if (var_array.type != ORCUS_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_array, ORCUS_TYPE_ARRAY, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_array, ORCUS_TYPE_ARRAY, 1);
 		orcus_release_var(&var_array);
 		return;
 	}
@@ -669,7 +669,7 @@ void orcus_lib_array_sort(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_int arr_size=orcus_array_len(arr)+1;
 	orcus_variable* tlist=(orcus_variable*)malloc(sizeof(orcus_variable)*arr_size);
 	if (!tlist) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	for (orcus_int i = 0; i < arr_size; i++) { //this could probably be optimized with a memcpy. oh well.
@@ -723,14 +723,14 @@ void orcus_lib_array_concat(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_variable var_str;
 	orcus_popstack(M,&var_str);
 	if (var_str.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, ORCUS_TYPE_STRING, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_str, ORCUS_TYPE_STRING, 2);
 		return;
 	}
 
 	orcus_variable var_array;
 	orcus_popstack(M,&var_array);
 	if (var_array.type != ORCUS_TYPE_ARRAY) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_array, ORCUS_TYPE_ARRAY, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &var_array, ORCUS_TYPE_ARRAY, 1);
 		return;
 	}
 	if (!args_out) { 

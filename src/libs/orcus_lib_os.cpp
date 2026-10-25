@@ -33,7 +33,7 @@ void orcus_lib_os_execute(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_variable cvar;
 	orcus_popstack(M,&cvar);
 	if (cvar.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&cvar);
 		return;
 	}
@@ -41,7 +41,7 @@ void orcus_lib_os_execute(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 
 	char* c_code = (char*)malloc(sizeof(char) * (code->size + 1));
 	if (!c_code) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	for (orcus_int i = 0; i < code->size; i++) {
@@ -70,7 +70,7 @@ void orcus_lib_os_execute(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 			if (size_c == allocated_c) {
 				void* o = realloc(out_c, allocated_c + 128);
 				if (!o) {
-					orcus_raise_error(M, M_ERROR_ALLOCATION);
+					orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 					return;
 				}
 				out_c = (char*)o;
@@ -109,7 +109,7 @@ void orcus_lib_os_call(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 	orcus_variable cvar;
 	orcus_popstack(M, &cvar);
 	if (cvar.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &cvar, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&cvar);
 		return;
 	}
@@ -117,7 +117,7 @@ void orcus_lib_os_call(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 
 	char* c_code = (char*)malloc(sizeof(char) * (code->size + 1));
 	if (!c_code) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	for (orcus_int i = 0; i < code->size; i++) {
@@ -180,7 +180,7 @@ void orcus_lib_os_getdate(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 		t = (time_t)tvar.data.f;
 		break;
 	default:
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, ORCUS_TYPE_INT, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, ORCUS_TYPE_INT, 1);
 		orcus_release_var(&tvar);
 		return;
 	}
@@ -194,7 +194,7 @@ void orcus_lib_os_getdate(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 #endif
 	orcus_table* outt=orcus_newtable();
 	if (!outt) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	
@@ -271,7 +271,7 @@ void orcus_lib_os_gettime(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_popstack(M,&tvar);
 
 	if(tvar.type!=ORCUS_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, ORCUS_TYPE_TABLE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tvar, ORCUS_TYPE_TABLE, 1);
 		return;
 	}
 	tm timedata;

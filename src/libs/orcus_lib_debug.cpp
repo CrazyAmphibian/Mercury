@@ -324,7 +324,7 @@ void orcus_lib_debug_get_traceback(orcus_state* const ORCUS_CPP_restrict M, cons
 	out.type = ORCUS_TYPE_STRING;
 	out.data.p=orcus_get_state_traceback(M);
 	if (!out.data.p) {
-		orcus_raise_error_nonpointer(M, M_ERROR_ALLOCATION);
+		orcus_raise_error_nonpointer(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 	orcus_pushstack(M, &out);

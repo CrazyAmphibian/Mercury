@@ -66,25 +66,25 @@
 	
 	<table class="tablefirstcollummono">
 		<tr> <th>error enum</th> <th>message</th> <th>arg 1</th> <th>arg 2</th> <th>arg 3</th> </tr>
-		<tr> <td>M_ERROR_NONE</td> <td> <i>none. placeholder value of 0 to denote there is no error.</i></td> <td></td> <td></td> <td></td> </tr>
-		<tr> <td>M_ERROR_ALLOCATION</td> <td> memory allocation failiure.</td> <td></td> <td></td> <td></td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE</td> <td> arg [number] wrong type. expected [type], got [type].</td> <td>pointer to orcus int of the provided type</td> <td>pointer to orcus int of the expected type</td> <td>pointer to orcus int of which arg number the error occured at.</td> </tr>
-		<tr> <td>M_ERROR_DIV_ZERO</td> <td> integer division by 0.</td> <td> </td> <td> </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_INVALID_INDEX</td> <td> <i>unused.</i></td> <td> </td> <td> </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_INSTRUCTION_FAILIURE</td> <td> failiure to execute instruction.</td> <td> </td> <td> </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_CALL_NOT_FUNCTION</td> <td> attempt to call non-function value [type].</td> <td> pointer to orcus int of the provided type</td> <td> </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_INDEX_INVALID_TYPE</td> <td> attempt to index invalid variable type [type].</td> <td>pointer to orcus int of the provided type </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_NOT_ENOUGH_ARGS</td> <td>incorrect number of args. expected [num], got [num].</td> <td>pointer to orcus int of how many args were provided </td> <td> pointer to orcus int of how many args were expected</td> <td> </td> </tr>
-		<tr> <td>M_ERROR_CUSTOM_STRING</td> <td> [user defined]</td> <td>pointer to a null-terminated character array. should end with a newline. </td> <td> </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER</td> <td>arg [number] wrong type. expected a number, got [type].</td> <td> pointer to orcus int of the provided type </td> <td> pointer to orcus int of which arg the error occured at </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION</td> <td>arg [number] wrong type. expected any function type, got [type].</td> <td> pointer to orcus int of the provided type </td> <td> pointer to orcus int of which arg the error occured at </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE</td> <td>arg [number] wrong type. expected an array or table, got [type].</td> <td> pointer to orcus int of the provided type </td> <td> pointer to orcus int of which arg the error occured at </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_EXECUTION_ABORT</td> <td> <i>error is used internally to denote stopped code, should not be manually thrown.</i> </td> <td> </td> <td> </td> <td> </td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected [type], got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of the expected type</td> <td>pointer to orcus int of which arg the error occurred at</td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected a number, got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of which arg the error occurred at</td> <td></td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected any function type, got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of which arg the error occurred at</td> <td></td> </tr>
-		<tr> <td>M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected an array or table, got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of which arg the error occurred at</td> <td></td> </tr>
-		<tr> <td>M_ERROR_STACK_CORRUPT</td> <td>stack has been corrupted.</td> <td></td> <td></td> <td></td> </tr>
+		<tr> <td>ORCUS_ERROR_NONE</td> <td> <i>none. placeholder value of 0 to denote there is no error.</i></td> <td></td> <td></td> <td></td> </tr>
+		<tr> <td>ORCUS_ERROR_ALLOCATION</td> <td> memory allocation failiure.</td> <td></td> <td></td> <td></td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE</td> <td> arg [number] wrong type. expected [type], got [type].</td> <td>pointer to orcus int of the provided type</td> <td>pointer to orcus int of the expected type</td> <td>pointer to orcus int of which arg number the error occured at.</td> </tr>
+		<tr> <td>ORCUS_ERROR_DIV_ZERO</td> <td> integer division by 0.</td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_INVALID_INDEX</td> <td> <i>unused.</i></td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_INSTRUCTION_FAILIURE</td> <td> failiure to execute instruction.</td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_CALL_NOT_FUNCTION</td> <td> attempt to call non-function value [type].</td> <td> pointer to orcus int of the provided type</td> <td> </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_INDEX_INVALID_TYPE</td> <td> attempt to index invalid variable type [type].</td> <td>pointer to orcus int of the provided type </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_NOT_ENOUGH_ARGS</td> <td>incorrect number of args. expected [num], got [num].</td> <td>pointer to orcus int of how many args were provided </td> <td> pointer to orcus int of how many args were expected</td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_CUSTOM_STRING</td> <td> [user defined]</td> <td>pointer to a null-terminated character array. should end with a newline. </td> <td> </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER</td> <td>arg [number] wrong type. expected a number, got [type].</td> <td> pointer to orcus int of the provided type </td> <td> pointer to orcus int of which arg the error occured at </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION</td> <td>arg [number] wrong type. expected any function type, got [type].</td> <td> pointer to orcus int of the provided type </td> <td> pointer to orcus int of which arg the error occured at </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE</td> <td>arg [number] wrong type. expected an array or table, got [type].</td> <td> pointer to orcus int of the provided type </td> <td> pointer to orcus int of which arg the error occured at </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_EXECUTION_ABORT</td> <td> <i>error is used internally to denote stopped code, should not be manually thrown.</i> </td> <td> </td> <td> </td> <td> </td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected [type], got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of the expected type</td> <td>pointer to orcus int of which arg the error occurred at</td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected a number, got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of which arg the error occurred at</td> <td></td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected any function type, got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of which arg the error occurred at</td> <td></td> </tr>
+		<tr> <td>ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED</td> <td>arg [num] wrong type. expected an array or table, got [type] value [data]</td> <td>pointer to orcus_variable of the variable that was received</td> <td>pointer to orcus int of which arg the error occurred at</td> <td></td> </tr>
+		<tr> <td>ORCUS_ERROR_STACK_CORRUPT</td> <td>stack has been corrupted.</td> <td></td> <td></td> <td></td> </tr>
 	</table>
 </div>
 

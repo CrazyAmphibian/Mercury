@@ -136,52 +136,52 @@ orcus_string* orcus_generate_error_string(orcus_state* M, const uint32_t errorco
 	char buffer[buffer_size];
 	
 	switch (errorcode) {
-		case M_ERROR_ALLOCATION:
+		case ORCUS_ERROR_ALLOCATION:
 			orcus_mstring_addchars(out, ": memory allocation failiure.\n", 29);
 			break;
-		case M_ERROR_WRONG_TYPE:
+		case ORCUS_ERROR_WRONG_TYPE:
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected %s, got %s.\n", *data3, get_type_string((uint8_t)*data2), get_type_string((uint8_t)*data1));
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_DIV_ZERO:
+		case ORCUS_ERROR_DIV_ZERO:
 			orcus_mstring_addchars(out, ": integer division by 0.\n", 23);
 			break;
-		case M_ERROR_INSTRUCTION_FAILIURE:
+		case ORCUS_ERROR_INSTRUCTION_FAILIURE:
 			orcus_mstring_addchars(out, ": failiure to execute instruction.\n", 23);
 			break;
-		case M_ERROR_CALL_NOT_FUNCTION:
+		case ORCUS_ERROR_CALL_NOT_FUNCTION:
 			snprintf(buffer, buffer_size, ": attempt to call non-function value %s.\n", get_type_string((uint8_t)*data1));
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_INVALID_INDEX:
+		case ORCUS_ERROR_INVALID_INDEX:
 			snprintf(buffer, buffer_size, ": invalid index type %s.\n", get_type_string((uint8_t)*data1));
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_INDEX_INVALID_TYPE:
+		case ORCUS_ERROR_INDEX_INVALID_TYPE:
 			snprintf(buffer, buffer_size, ": attempt to index invalid variable type %s.\n", get_type_string((uint8_t)*data1));
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_NOT_ENOUGH_ARGS:
+		case ORCUS_ERROR_NOT_ENOUGH_ARGS:
 			snprintf(buffer, buffer_size, ": incorrect number of args. expected %zi, got %zi.\n", *data2, *data1);
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_CUSTOM_STRING:
+		case ORCUS_ERROR_CUSTOM_STRING:
 			orcus_mstring_addchars(out,": ", 2);
 			orcus_mstring_addchars(out, (char*)data1, strlen((char*)data1));
 			break;
-		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER:
+		case ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER:
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected a number, got %s.\n", *data2, get_type_string((uint8_t)*data1));
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION:
+		case ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION:
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected any function type, got %s.\n", *data2, get_type_string((uint8_t)*data1));
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE:
+		case ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE:
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected an array or table, got %s\n", *data2, get_type_string((uint8_t)*data1));
 			orcus_mstring_addchars(out, buffer, strlen(buffer));
 			break;
-		case M_ERROR_WRONG_TYPE_VARIABLEPROVIDED:
+		case ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED:
 			{
 			orcus_string* str=orcus_tostring((orcus_variable*)data1);
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected %s, got %s value ", *data3, get_type_string((uint8_t)*data2), get_type_string( ((orcus_variable*)data1)->type));
@@ -191,7 +191,7 @@ orcus_string* orcus_generate_error_string(orcus_state* M, const uint32_t errorco
 			orcus_mstring_addchars(out, ".\n", 2);
 			}
 			break;
-		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED:
+		case ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED:
 			{
 			orcus_string* str = orcus_tostring((orcus_variable*)data1);
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected a number, got %s value ", *data2, get_type_string(((orcus_variable*)data1)->type));
@@ -201,7 +201,7 @@ orcus_string* orcus_generate_error_string(orcus_state* M, const uint32_t errorco
 			orcus_mstring_addchars(out, ".\n", 2);
 			}
 			break;
-		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED:
+		case ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED:
 			{
 			orcus_string* str = orcus_tostring((orcus_variable*)data1);
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected any function type, got %s value ", *data2, get_type_string(((orcus_variable*)data1)->type));
@@ -211,7 +211,7 @@ orcus_string* orcus_generate_error_string(orcus_state* M, const uint32_t errorco
 			orcus_mstring_addchars(out, ".\n", 2);
 			}
 			break;
-		case M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED:
+		case ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED:
 			{
 			orcus_string* str = orcus_tostring((orcus_variable*)data1);
 			snprintf(buffer, buffer_size, ": arg %zi wrong type. expected an array or table, got %s value ", *data2, get_type_string(((orcus_variable*)data1)->type));
@@ -221,7 +221,7 @@ orcus_string* orcus_generate_error_string(orcus_state* M, const uint32_t errorco
 			orcus_mstring_addchars(out, ".\n", 2);
 			}
 			break;
-		case M_ERROR_STACK_CORRUPT:
+		case ORCUS_ERROR_STACK_CORRUPT:
 			orcus_mstring_addchars(out, ": stack has been corrupted.\n", 28);
 			break;
 		default:
@@ -229,10 +229,10 @@ orcus_string* orcus_generate_error_string(orcus_state* M, const uint32_t errorco
 			break;
 	}
 
-	/*M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, //args: variable pointer, expected type, arg number
-	M_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take ints or floats
-	M_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take C and M functions
-	M_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED*/
+	/*ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, //args: variable pointer, expected type, arg number
+	ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_NUMBER_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take ints or floats
+	ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_FUNCTION_VARIABLEPROVIDED, //args: variable pointer, arg number. for functions that can take C and M functions
+	ORCUS_ERROR_WRONG_TYPE_EXPECTS_ANY_STORAGETYPE_VARIABLEPROVIDED*/
 	return out;
 }
 

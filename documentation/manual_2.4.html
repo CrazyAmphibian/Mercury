@@ -81,7 +81,7 @@
 		&emsp;&emsp;orcus_variable in;<br>
 		&emsp;&emsp;orcus_popstack(M,&in);<br>
 		&emsp;&emsp;if(in.type!=ORCUS_TYPE_INT){<br>
-			&emsp;&emsp;&emsp;&emsp;orcus_raise_error_nonpointer(M,M_ERROR_WRONG_TYPE,in.type,ORCUS_TYPE_INT,1);<br>
+			&emsp;&emsp;&emsp;&emsp;orcus_raise_error_nonpointer(M,ORCUS_ERROR_WRONG_TYPE,in.type,ORCUS_TYPE_INT,1);<br>
 			&emsp;&emsp;&emsp;&emsp;orcus_release_var(&in); //since it may be a complex refrenced type<Br>
 			&emsp;&emsp;&emsp;&emsp;return;<br>
 		&emsp;&emsp;}<br>

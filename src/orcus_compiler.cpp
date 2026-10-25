@@ -33,23 +33,23 @@ enum token_flags {
 
 
 enum compiler_error_codes {
-	M_COMPERR_MEMORY_ALLOCATION,
-	M_COMPERR_NO_MORE_TOKENS,
+	ORCUS_COMPERR_MEMORY_ALLOCATION,
+	ORCUS_COMPERR_NO_MORE_TOKENS,
 
-	M_COMPERR_MALFORMED_NUMBER,
-	M_COMPERR_WRONG_SYMBOL,
-	M_COMPERR_NO_OPERATION_FOUND, //if we don't do anything with a var, so instead of a=5, we just do a
+	ORCUS_COMPERR_MALFORMED_NUMBER,
+	ORCUS_COMPERR_WRONG_SYMBOL,
+	ORCUS_COMPERR_NO_OPERATION_FOUND, //if we don't do anything with a var, so instead of a=5, we just do a
 
-	M_COMPERR_WHILE_NEEDS_DO,
-	M_COMPERR_IF_NEEDS_THEN,
-	M_COMPERR_LOOPKEYWORD_WRONG_SPOT,
-	M_COMPERR_ARRAY_NOT_CLOSED,
-	M_COMPERR_TABLE_NOT_CLOSED,
-	M_COMPERR_CALL_NOT_CLOSED,
-	M_COMPERR_NESTEDSTATMENT_NOT_CLOSED, // ()
-	M_COMPERR_NO_VARIABLE, //for any variable of any type with any syntax, including variable statments such as a>5
-	M_COMPERR_NO_NAMED_VARIABLE, //this is for implicit variable names, under TOKEN_ENV_VAR.
-	M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT, // for multi-set statments, eg a,b=
+	ORCUS_COMPERR_WHILE_NEEDS_DO,
+	ORCUS_COMPERR_IF_NEEDS_THEN,
+	ORCUS_COMPERR_LOOPKEYWORD_WRONG_SPOT,
+	ORCUS_COMPERR_ARRAY_NOT_CLOSED,
+	ORCUS_COMPERR_TABLE_NOT_CLOSED,
+	ORCUS_COMPERR_CALL_NOT_CLOSED,
+	ORCUS_COMPERR_NESTEDSTATMENT_NOT_CLOSED, // ()
+	ORCUS_COMPERR_NO_VARIABLE, //for any variable of any type with any syntax, including variable statments such as a>5
+	ORCUS_COMPERR_NO_NAMED_VARIABLE, //this is for implicit variable names, under TOKEN_ENV_VAR.
+	ORCUS_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT, // for multi-set statments, eg a,b=
 };
 
 
@@ -1174,14 +1174,14 @@ inline bool add_raw_string_onto_stack(compiler_function* f, char* s, orcus_int l
 	add_rawdata_bitwidth_size(f, len, dbg_toknum);
 	void* nptr = realloc(f->instructions, sizeof(orcus_opcode) * (f->number_instructions + required_space));
 	if (!nptr) {
-		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+		f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 		f->token_error_num = dbg_toknum;
 		return false;
 	}
 	f->instructions = (orcus_opcode*)nptr;
 	nptr = realloc(f->instruction_tokens, sizeof(orcus_int) * (f->number_instructions + required_space));
 	if (!nptr) {
-		f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+		f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 		f->token_error_num = dbg_toknum;
 		return false;
 	}
@@ -1202,14 +1202,14 @@ inline void add_string_onto_stack(compiler_function* f,char* s,orcus_int len,orc
 	add_rawdata_bitwidth_size(f, len,dbg_toknum);
 	void* nptr=realloc(f->instructions, sizeof(orcus_opcode)*(f->number_instructions+required_space) );
 	if(!nptr){
-		f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+		f->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 		f->token_error_num=dbg_toknum;
 		return;
 	}
 	f->instructions=(orcus_opcode*)nptr;
 	nptr=realloc(f->instruction_tokens, sizeof(orcus_int)*(f->number_instructions+required_space) );
 	if(!nptr){
-		f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+		f->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 		f->token_error_num=dbg_toknum;
 		return;
 	}
@@ -1250,7 +1250,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 	}else if(cur_tok->token_flags & TOKEN_STATIC_STRING){
 		orcus_int ci=compiler_info_add_constant_string_from_token(i,cur_tok);
 		if (ci==-1){
-			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -1261,7 +1261,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 	}else if(cur_tok->token_flags & TOKEN_STATIC_NUMBER){
 		char* cstr=(char*)malloc(cur_tok->num_chars+1);
 		if (!cstr) {
-			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
 			return 0;
 		}
@@ -1304,7 +1304,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 				add_instruction(f, M_OPCODE_NFLO,token_offset);
 				add_rawdata_bitwidth_size(f, *((binarydata*)&fa),token_offset);
 			}else{
-				f->errorcode=M_COMPERR_MALFORMED_NUMBER;
+				f->errorcode=ORCUS_COMPERR_MALFORMED_NUMBER;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -1350,7 +1350,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 			//read the next token to find out.
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 			if(!cur_tok){
-				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -1376,7 +1376,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 					if(f->errorcode){
 						return 0;
 					}else if(!o){
-						f->errorcode=M_COMPERR_NO_VARIABLE;
+						f->errorcode=ORCUS_COMPERR_NO_VARIABLE;
 						f->token_error_num=token_offset;
 						return 0;
 					}
@@ -1386,13 +1386,13 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 					cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 						
 					if(!cur_tok){
-						f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+						f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 						f->token_error_num=token_offset;
 						return 0;
 					}
 						
 					if(!(cur_tok->token_flags & TOKEN_OPERATOR) && cur_tok->num_chars!=1 && !(cur_tok->chars[0]==',' || is_array ? ']' : '}')){
-						f->errorcode=M_COMPERR_WRONG_SYMBOL;
+						f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 						f->token_error_num=token_offset;
 						return 0;
 					}
@@ -1412,12 +1412,12 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 					add_instruction(f,M_OPCODE_SET,token_offset);
 					if(cur_tok->chars[0] == ',')token_offset++;
 				}else{
-					f->errorcode=M_COMPERR_WRONG_SYMBOL;
+					f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 					f->token_error_num=token_offset;
 					return 0;
 				}
 			}else{
-				f->errorcode=M_COMPERR_WRONG_SYMBOL;
+				f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -1436,11 +1436,11 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 			
 			if(!cur_tok){
-				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 				f->token_error_num=token_offset;
 				return 0;
 			}else if(!(cur_tok->token_flags & TOKEN_ENV_VAR)){
-				f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+				f->errorcode = ORCUS_COMPERR_NO_NAMED_VARIABLE;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -1450,14 +1450,14 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		
 		add_instruction(f, g_op, token_offset);
 		if (!add_raw_string_onto_stack(f, cur_tok->chars, cur_tok->num_chars, token_offset)) {
-			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
 			return 0;
 		}
 		/*
 		orcus_int ci=compiler_info_add_constant_string_from_token(i,cur_tok);
 		if (ci==-1){
-			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -1481,11 +1481,11 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num=token_offset;
 			return 0;
 		}else if(!(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')') ){
-			f->errorcode = M_COMPERR_NESTEDSTATMENT_NOT_CLOSED;
+			f->errorcode = ORCUS_COMPERR_NESTEDSTATMENT_NOT_CLOSED;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -1495,11 +1495,11 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		token_offset++;
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num=token_offset;
 			return 0;
 		}else if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]=='(') ){
-			f->errorcode=M_COMPERR_WRONG_SYMBOL;
+			f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -1521,7 +1521,7 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 			
 			if(!cur_tok){
-				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 				f->token_error_num=token_offset;
 				return 0;
 			}else if(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')'){
@@ -1538,18 +1538,18 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 				//add_instruction(&funcargreadf,M_OPCODE_SETL,token_offset);
 				token_offset++;
 			}else{
-				f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
+				f->errorcode=ORCUS_COMPERR_NO_NAMED_VARIABLE;
 				f->token_error_num=token_offset;
 				return 0;
 			}
 			
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 			if(!cur_tok){
-				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 				f->token_error_num=token_offset;
 				return 0;
 			}else if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && (cur_tok->chars[0]==')' || cur_tok->chars[0]==',')  ) ){
-				f->errorcode=M_COMPERR_WRONG_SYMBOL;
+				f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -1559,11 +1559,11 @@ orcus_int m_compile_read_variable(compiler_function* f, compiler_token* tokens,o
 		
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num=token_offset;
 			return 0;
 		}else if( !(cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')') ){
-			f->errorcode=M_COMPERR_WRONG_SYMBOL;
+			f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -1644,11 +1644,11 @@ orcus_int m_compile_read_var_indexing(compiler_function* f, compiler_token* toke
 			token_offset++;
 			compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 			if(!cur_tok){
-				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 				f->token_error_num=token_offset;
 				return 0;
 			}else if(!(cur_tok->token_flags & TOKEN_ENV_VAR)){
-				f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
+				f->errorcode=ORCUS_COMPERR_NO_NAMED_VARIABLE;
 				f->token_error_num=token_offset;
 				return 0;
 			}else{
@@ -1668,7 +1668,7 @@ orcus_int m_compile_read_var_indexing(compiler_function* f, compiler_token* toke
 			if(f->errorcode){
 				return 0;
 			}else if(!o){
-				f->errorcode = M_COMPERR_NO_VARIABLE;
+				f->errorcode = ORCUS_COMPERR_NO_VARIABLE;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -1676,11 +1676,11 @@ orcus_int m_compile_read_var_indexing(compiler_function* f, compiler_token* toke
 			
 			compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 			if(!cur_tok){
-				f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 				f->token_error_num=token_offset;
 				return 0;
 			}else if(!(cur_tok->token_flags&TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==']')){
-				f->errorcode=M_COMPERR_WRONG_SYMBOL;
+				f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -1714,7 +1714,7 @@ orcus_int m_compile_read_call_func(compiler_function* f, compiler_token* tokens,
 		i->args_out = 1;
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num=token_offset;
 			return 0;
 		}else if( (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && cur_tok->chars[0]==')') ){
@@ -1726,7 +1726,7 @@ orcus_int m_compile_read_call_func(compiler_function* f, compiler_token* tokens,
 		if(f->errorcode){
 			return 0;
 		}else if(!o){
-			f->errorcode=M_COMPERR_NO_VARIABLE;
+			f->errorcode=ORCUS_COMPERR_NO_VARIABLE;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -1735,13 +1735,13 @@ orcus_int m_compile_read_call_func(compiler_function* f, compiler_token* tokens,
 		
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num=token_offset;
 			return 0;
 		}else if( (cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars==1 && (cur_tok->chars[0]==')' || cur_tok->chars[0]==',') ) ){
 			if(cur_tok->chars[0]==',')token_offset++;
 		}else{
-			f->errorcode=M_COMPERR_WRONG_SYMBOL;
+			f->errorcode=ORCUS_COMPERR_WRONG_SYMBOL;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -1773,7 +1773,7 @@ orcus_int m_compile_read_var_statment(compiler_function* f, compiler_token* toke
 	compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	//token_offset++;
 	if(!cur_tok){
-		//f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+		//f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 		//f->token_error_num=token_offset;
 		return 0;
 	}
@@ -1804,7 +1804,7 @@ orcus_int m_compile_read_var_statment(compiler_function* f, compiler_token* toke
 	}else if(!func_var.number_instructions){
 		clear_compiler_function(&func_unary);
 		clear_compiler_function(&func_var);
-		f->errorcode=M_COMPERR_NO_VARIABLE;
+		f->errorcode=ORCUS_COMPERR_NO_VARIABLE;
 		f->token_error_num=token_offset;
 		return 0;
 	}
@@ -1958,7 +1958,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		compiler_token* nt = tokens+token_offset + 1;
 		if (nt->token_flags & TOKEN_MISC_OP && nt->num_chars == 1 && nt->chars[0] == ':') {
 			if (!compiler_info_add_goto_label(i, cur_tok, f->number_instructions + i->additional_instructions)) {
-				f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+				f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 				f->token_error_num = token_offset;
 				return 0;
 			}
@@ -1978,7 +1978,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 	while (true) {
 		void* nptr=realloc(set_instructs, sizeof(orcus_opcode) * (i->args_out + 1));
 		if (!nptr) {
-			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
 			free(varfuncs);
 			free(set_instructs);
@@ -1990,7 +1990,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 
 		nptr = realloc(varfuncs, sizeof(compiler_function) * (i->args_out + 1));
 		if (!nptr) {
-			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
 			free(varfuncs);
 			free(set_instructs);
@@ -2003,7 +2003,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 
 		nptr = realloc(vargetresidualfuncs, sizeof(compiler_function) * (i->args_out + 1));
 		if (!nptr) {
-			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
 			free(varfuncs);
 			free(set_instructs);
@@ -2016,7 +2016,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 
 		nptr = realloc(varsetresidualfuncs, sizeof(compiler_function) * (i->args_out + 1));
 		if (!nptr) {
-			f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num = token_offset;
 			free(varfuncs);
 			free(set_instructs);
@@ -2046,7 +2046,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 			cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
 			if (!cur_tok) {
 				f->token_error_num = token_offset;
-				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 				for (orcus_int n = 0; n < i->args_out; n++) {
 					clear_compiler_function(varfuncs + n);
 					clear_compiler_function(vargetresidualfuncs + n);
@@ -2063,7 +2063,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		//then find the variable we'll be interfacing with
 		if (!(cur_tok->token_flags & TOKEN_ENV_VAR)) {
 			f->token_error_num = token_offset;
-			f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+			f->errorcode = ORCUS_COMPERR_NO_NAMED_VARIABLE;
 			for (orcus_int n = 0; n < i->args_out; n++) {
 				clear_compiler_function(varfuncs + n);
 				clear_compiler_function(vargetresidualfuncs + n);
@@ -2096,7 +2096,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 			if (!cur_tok) {
 				if (!should_set)break;
 				f->token_error_num = token_offset;
-				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 				for (orcus_int n = 0; n <= i->args_out; n++) {
 					clear_compiler_function(varfuncs + n);
 					clear_compiler_function(vargetresidualfuncs + n);
@@ -2131,7 +2131,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 					cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
 					if (!(cur_tok && cur_tok->token_flags & TOKEN_MISC_OP && cur_tok->num_chars == 1 && cur_tok->chars[0] == ']')) {
 						f->token_error_num = token_offset;
-						f->errorcode = M_COMPERR_WRONG_SYMBOL;
+						f->errorcode = ORCUS_COMPERR_WRONG_SYMBOL;
 						for (orcus_int n = 0; n <= i->args_out; n++) {
 							clear_compiler_function(varfuncs + n);
 							clear_compiler_function(vargetresidualfuncs + n);
@@ -2151,7 +2151,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 					cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
 					if (!(cur_tok)) {
 						f->token_error_num = token_offset;
-						f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+						f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 						for (orcus_int n = 0; n <= i->args_out; n++) {
 							clear_compiler_function(varfuncs + n);
 							clear_compiler_function(vargetresidualfuncs + n);
@@ -2165,7 +2165,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 					}
 					else if (!(cur_tok->token_flags & TOKEN_ENV_VAR)) {
 						f->token_error_num = token_offset;
-						f->errorcode = M_COMPERR_NO_NAMED_VARIABLE;
+						f->errorcode = ORCUS_COMPERR_NO_NAMED_VARIABLE;
 						for (orcus_int n = 0; n <= i->args_out; n++) {
 							clear_compiler_function(varfuncs + n);
 							clear_compiler_function(vargetresidualfuncs + n);
@@ -2186,7 +2186,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 					/*
 					orcus_int ci = compiler_info_add_constant_string_from_token(i, cur_tok);
 					if (ci == -1) {
-						f->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+						f->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 						f->token_error_num = token_offset;
 						return 0;
 					}
@@ -2260,7 +2260,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 			i->args_out++;
 		}
 		else if (i->args_out) {
-			f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
+			f->errorcode = ORCUS_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
 			f->token_error_num = token_offset;
 			return 0;
 		}
@@ -2269,7 +2269,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		if (!cur_tok) {
 			if (i->args_out) {
 				f->token_error_num = token_offset;
-				f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+				f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 				for (orcus_int n = 0; n < i->args_out; n++) {
 					clear_compiler_function(varfuncs + n);
 					clear_compiler_function(vargetresidualfuncs + n);
@@ -2301,7 +2301,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		cur_tok = m_compile_get_next_token(tokens, num_tokens, token_offset);
 		if (!cur_tok) {
 			f->token_error_num = token_offset;
-			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 			for (orcus_int n = 0; n < i->args_out; n++) {
 				clear_compiler_function(varfuncs + n);
 				clear_compiler_function(vargetresidualfuncs + n);
@@ -2315,7 +2315,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		}
 		else if (!(cur_tok->token_flags & (TOKEN_MISC_OP | TOKEN_SELFMODIFY_OP))) {
 			f->token_error_num = token_offset;
-			f->errorcode = M_COMPERR_WRONG_SYMBOL;
+			f->errorcode = ORCUS_COMPERR_WRONG_SYMBOL;
 			for (orcus_int n = 0; n < i->args_out; n++) {
 				clear_compiler_function(varfuncs + n);
 				clear_compiler_function(vargetresidualfuncs + n);
@@ -2392,7 +2392,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 				if (i->args_out) { //if we need another arg...
 					if (!cur_tok) { //we need tokens
 						f->token_error_num = token_offset;
-						f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+						f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 						return 0;
 					}
 					else if (cur_tok->num_chars == 1 && cur_tok->chars[0] == ',' && (cur_tok->token_flags & TOKEN_MISC_OP)) { //and need a comma seperator
@@ -2406,7 +2406,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 						continue;
 					}
 					else {
-						f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
+						f->errorcode = ORCUS_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
 						f->token_error_num = token_offset;
 						for (orcus_int n = 0; n < i->args_out; n++) {
 							clear_compiler_function(varfuncs + n);
@@ -2435,7 +2435,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		}
 		else if (cur_tok->token_flags & TOKEN_SELFMODIFY_OP) { //assignment & modification
 			if (i->args_out>1) { //self-modification can only work on 1 var.
-				f->errorcode = M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
+				f->errorcode = ORCUS_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT;
 				f->token_error_num = token_offset;
 				for (orcus_int n = 0; n < i->args_out; n++) {
 					clear_compiler_function(varfuncs + n);
@@ -2509,7 +2509,7 @@ orcus_int m_compile_read_statment(compiler_function* f, compiler_token* tokens,o
 		else {
 			//delete_compiler_function(getvarfunc);
 			f->token_error_num = token_offset;
-			f->errorcode = M_COMPERR_NO_OPERATION_FOUND;
+			f->errorcode = ORCUS_COMPERR_NO_OPERATION_FOUND;
 			for (orcus_int n = 0; n < i->args_out; n++) {
 				clear_compiler_function(varfuncs + n);
 				clear_compiler_function(vargetresidualfuncs + n);
@@ -2567,11 +2567,11 @@ orcus_int m_compile_parse_while_loop(compiler_function* f, compiler_token* token
 	
 	cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	if(!cur_tok){
-		f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+		f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 		f->token_error_num = token_offset;
 		return 0;
 	} else if( !(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"do")) ){
-		f->errorcode = M_COMPERR_WHILE_NEEDS_DO;
+		f->errorcode = ORCUS_COMPERR_WHILE_NEEDS_DO;
 		f->token_error_num = token_offset;
 		return 0;
 	}
@@ -2596,14 +2596,14 @@ orcus_int m_compile_parse_while_loop(compiler_function* f, compiler_token* token
 		
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num = token_offset;
 			return 0;
 		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"end") ){
 			token_offset++;
 			break;
 		}else{
-			f->errorcode = M_COMPERR_WRONG_SYMBOL;
+			f->errorcode = ORCUS_COMPERR_WRONG_SYMBOL;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -2661,7 +2661,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 	if(f->errorcode){
 		return 0;
 	}else if(!o){
-		f->errorcode=M_COMPERR_NO_VARIABLE;
+		f->errorcode=ORCUS_COMPERR_NO_VARIABLE;
 		f->token_error_num=token_offset;
 		return 0;
 	}
@@ -2669,7 +2669,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 	
 	cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 	if( !(cur_tok&& cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"then")) ){
-		f->errorcode=M_COMPERR_IF_NEEDS_THEN;
+		f->errorcode=ORCUS_COMPERR_IF_NEEDS_THEN;
 		f->token_error_num=token_offset;
 		return 0;
 	}
@@ -2698,7 +2698,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 		
 		cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode = M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode = ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num = token_offset;
 			return 0;
 		}else if(cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"elseif") ){
@@ -2716,7 +2716,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 			if(f->errorcode){
 				return 0;
 			}else if(!o){
-				f->errorcode=M_COMPERR_NO_VARIABLE;
+				f->errorcode=ORCUS_COMPERR_NO_VARIABLE;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -2728,7 +2728,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 			
 			cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 			if( !(cur_tok&& cur_tok->token_flags & TOKEN_KEYWORD && token_matches_chars(cur_tok,"then")) ){
-				f->errorcode=M_COMPERR_IF_NEEDS_THEN;
+				f->errorcode=ORCUS_COMPERR_IF_NEEDS_THEN;
 				f->token_error_num=token_offset;
 				return 0;
 			}
@@ -2755,7 +2755,7 @@ orcus_int m_compile_parse_if_statement(compiler_function* f, compiler_token* tok
 			
 			break;
 		}else{
-			f->errorcode = M_COMPERR_WRONG_SYMBOL;
+			f->errorcode = ORCUS_COMPERR_WRONG_SYMBOL;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -2793,17 +2793,17 @@ orcus_int m_compile_read_keyword_block(compiler_function* f, compiler_token* tok
 		token_offset++;
 		compiler_token* cur_tok=m_compile_get_next_token(tokens,num_tokens,token_offset);
 		if(!cur_tok){
-			f->errorcode=M_COMPERR_NO_MORE_TOKENS;
+			f->errorcode=ORCUS_COMPERR_NO_MORE_TOKENS;
 			f->token_error_num=token_offset;
 			return 0;
 		}else if(!(cur_tok->token_flags & TOKEN_ENV_VAR) ){
-			f->errorcode=M_COMPERR_NO_NAMED_VARIABLE;
+			f->errorcode=ORCUS_COMPERR_NO_NAMED_VARIABLE;
 			f->token_error_num=token_offset;
 			return 0;
 		}
 		add_instruction(f,M_OPCODE_JMPR, token_offset);
 		if(!compiler_info_add_goto_jump(ci,cur_tok,f->number_instructions+ci->additional_instructions)){
-			f->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+			f->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 			f->token_error_num=token_offset;
 			return 0;
 		}
@@ -2858,7 +2858,7 @@ compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens,orcus
 				}else{ //break
 					add_instruction(out, M_OPCODE_JMPR, token_offset);
 					if(!compiler_info_add_loop_endjump(ci,out->number_instructions+ci->additional_instructions)){
-						out->errorcode=M_COMPERR_MEMORY_ALLOCATION;
+						out->errorcode=ORCUS_COMPERR_MEMORY_ALLOCATION;
 						out->token_error_num=token_offset;
 						break;
 					}
@@ -2867,7 +2867,7 @@ compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens,orcus
 				token_offset++;
 				o3=1;
 			}else{
-				out->errorcode=M_COMPERR_LOOPKEYWORD_WRONG_SPOT;
+				out->errorcode=ORCUS_COMPERR_LOOPKEYWORD_WRONG_SPOT;
 				out->token_error_num=token_offset;
 				break;
 			}
@@ -2901,7 +2901,7 @@ compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens,orcus
 		}
 		void* nptr=realloc(out->instructions, sizeof(orcus_opcode) * (spaceneeded + out->number_instructions));
 		if (!nptr) {
-			out->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			out->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			return out;
 		}
 		out->instructions = (orcus_opcode*)nptr;
@@ -2909,7 +2909,7 @@ compiler_function* orcus_compile_tokens_to_bytecode(compiler_token* tokens,orcus
 		
 		nptr = realloc(out->instruction_tokens, sizeof(orcus_int) * (spaceneeded + out->number_instructions));
 		if (!nptr) {
-			out->errorcode = M_COMPERR_MEMORY_ALLOCATION;
+			out->errorcode = ORCUS_COMPERR_MEMORY_ALLOCATION;
 			return out;
 		}
 		out->instruction_tokens = (orcus_int*)nptr;
@@ -2979,49 +2979,49 @@ void orcus_compile_mstring(orcus_string* str, orcus_variable* out, bool remove_d
 		const char* reason;
 
 		switch (func.errorcode) {	
-			case M_COMPERR_MEMORY_ALLOCATION:
+			case ORCUS_COMPERR_MEMORY_ALLOCATION:
 				reason = "failed to allocate memory";
 				break;
-			case M_COMPERR_NO_MORE_TOKENS:
+			case ORCUS_COMPERR_NO_MORE_TOKENS:
 				reason = "no more tokens";
 				break;
-			case M_COMPERR_MALFORMED_NUMBER:
+			case ORCUS_COMPERR_MALFORMED_NUMBER:
 				reason = "malformed number";
 				break;
-			case M_COMPERR_WRONG_SYMBOL:
+			case ORCUS_COMPERR_WRONG_SYMBOL:
 				reason = "wrong symbol";
 				break;
-			case M_COMPERR_NO_OPERATION_FOUND:
+			case ORCUS_COMPERR_NO_OPERATION_FOUND:
 				reason = "no operation performed";
 				break;
-			case M_COMPERR_WHILE_NEEDS_DO:
+			case ORCUS_COMPERR_WHILE_NEEDS_DO:
 				reason = "while requires 'do' keyword";
 				break;
-			case M_COMPERR_IF_NEEDS_THEN:
+			case ORCUS_COMPERR_IF_NEEDS_THEN:
 				reason = "if requires 'then' keyword";
 				break;
-			case M_COMPERR_LOOPKEYWORD_WRONG_SPOT:
+			case ORCUS_COMPERR_LOOPKEYWORD_WRONG_SPOT:
 				reason = "invalid location, must be in a loop";
 				break;
-			case M_COMPERR_ARRAY_NOT_CLOSED:
+			case ORCUS_COMPERR_ARRAY_NOT_CLOSED:
 				reason = "array was not closed, expected ']'";
 				break;
-			case M_COMPERR_TABLE_NOT_CLOSED:
+			case ORCUS_COMPERR_TABLE_NOT_CLOSED:
 				reason = "table was not closed, expected '}'";
 				break;
-			case M_COMPERR_CALL_NOT_CLOSED:
+			case ORCUS_COMPERR_CALL_NOT_CLOSED:
 				reason = "function was not closed, expected ')'";
 				break;
-			case M_COMPERR_NESTEDSTATMENT_NOT_CLOSED:
+			case ORCUS_COMPERR_NESTEDSTATMENT_NOT_CLOSED:
 				reason = "parenthesis was not closed, expected ')'";
 				break;
-			case M_COMPERR_NO_VARIABLE:
+			case ORCUS_COMPERR_NO_VARIABLE:
 				reason = "unable to find variable statment";
 				break;
-			case M_COMPERR_NO_NAMED_VARIABLE:
+			case ORCUS_COMPERR_NO_NAMED_VARIABLE:
 				reason = "unable to find named variable";
 				break;
-			case M_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT:
+			case ORCUS_COMPERR_REQUIRES_EXPLICIT_ASSIGNMENT:
 				reason = "explicit variable assignment required";
 				break;
 			default:

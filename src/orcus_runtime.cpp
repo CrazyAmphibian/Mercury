@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 		else if(arg_is_string(argv[i], "--version") || arg_is_string(argv[i], "-v") || arg_is_string(argv[i], "/v")){
-			printf("Merecury version %i.%i, %u bit\n", ORCUS_VERSION, ORCUS_VERSION_PATCH, (unsigned int)(sizeof(orcus_int) << 3));
+			printf("Orcus version %i.%i, %u bit\n", ORCUS_VERSION, ORCUS_VERSION_PATCH, (unsigned int)(sizeof(orcus_int) << 3));
 			return 0;
 		}
 		else if (arg_is_string(argv[i], "-i") || arg_is_string(argv[i], "--interactive") || arg_is_string(argv[i], "/i")) {

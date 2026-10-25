@@ -40,7 +40,7 @@ void orcus_lib_io_open(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 	orcus_variable mode_var;
 	orcus_popstack(M,&mode_var);
 	if (mode_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &mode_var, ORCUS_TYPE_STRING, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &mode_var, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&mode_var);
 		return;
 	}
@@ -49,7 +49,7 @@ void orcus_lib_io_open(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 	orcus_variable file_var;
 	orcus_popstack(M,&file_var);
 	if (file_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&file_var);
 		return;
 	}
@@ -115,7 +115,7 @@ void orcus_lib_io_open(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 
 		orcus_filewrapper* fw = (orcus_filewrapper*)malloc(sizeof(orcus_filewrapper));
 		if (!fw) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			fclose(F);
 			return;
 		}
@@ -156,7 +156,7 @@ void orcus_lib_io_read(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 	if (args_in > 2) {
 		orcus_popstack(M, &offset_var);
 		if (offset_var.type != ORCUS_TYPE_INT) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &offset_var, ORCUS_TYPE_INT, 3);
+			orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &offset_var, ORCUS_TYPE_INT, 3);
 			orcus_release_var(&offset_var);
 			return;
 		}
@@ -170,7 +170,7 @@ void orcus_lib_io_read(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 	if (args_in > 1) {
 		orcus_popstack(M, &length_var);
 		if (length_var.type != ORCUS_TYPE_INT && length_var.type) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &length_var, ORCUS_TYPE_INT, 2);
+			orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &length_var, ORCUS_TYPE_INT, 2);
 			orcus_release_var(&length_var);
 			return;
 		}
@@ -185,7 +185,7 @@ void orcus_lib_io_read(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 	orcus_variable file_var;
 	orcus_popstack(M, &file_var);
 	if (file_var.type != ORCUS_TYPE_FILE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
 		orcus_release_var(&file_var);
 		return;
 	}
@@ -209,7 +209,7 @@ void orcus_lib_io_read(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 		else {
 			char* s = (char*)malloc(sizeof(char) * len );
 			if (!s) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			rewind(F);
@@ -217,7 +217,7 @@ void orcus_lib_io_read(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 			size_t num_r=fread(s, sizeof(char), len, F);
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			str->ptr = s;
@@ -249,7 +249,7 @@ void orcus_lib_io_close(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 	orcus_variable file_var;
 	orcus_popstack(M, &file_var);
 	if (file_var.type != ORCUS_TYPE_FILE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
 		orcus_release_var(&file_var);
 		return;
 	}
@@ -275,7 +275,7 @@ void orcus_lib_io_write(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 	if (args_in > 2) {
 		orcus_popstack(M, &offset_var);
 		if (offset_var.type != ORCUS_TYPE_INT) {
-			orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &offset_var, ORCUS_TYPE_INT, 3);
+			orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &offset_var, ORCUS_TYPE_INT, 3);
 			orcus_release_var(&offset_var);
 			return;
 		}
@@ -288,7 +288,7 @@ void orcus_lib_io_write(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 	orcus_variable data_var;
 	orcus_popstack(M, &data_var);
 	if (data_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &data_var, ORCUS_TYPE_STRING, 2);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &data_var, ORCUS_TYPE_STRING, 2);
 		orcus_release_var(&data_var);
 		return;
 	}
@@ -296,7 +296,7 @@ void orcus_lib_io_write(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 	orcus_variable file_var;
 	orcus_popstack(M, &file_var);
 	if (file_var.type != ORCUS_TYPE_FILE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
 		orcus_release_var(&file_var);
 		return;
 	}
@@ -338,7 +338,7 @@ void orcus_lib_io_getfiles(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 	orcus_variable dir_var;
 	orcus_popstack(M,&dir_var);
 	if (dir_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&dir_var);
 		return;
 	}
@@ -374,7 +374,7 @@ void orcus_lib_io_getfiles(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 				char* fn = FindFileData.cFileName;
 				orcus_string* s = orcus_cstring_to_mstring(fn, strlen(fn));
 				if (!s) {
-					orcus_raise_error(M, M_ERROR_ALLOCATION);
+					orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 					return;
 				}
 				orcus_variable v;
@@ -399,7 +399,7 @@ void orcus_lib_io_getfiles(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 			if (ent->d_type == DT_REG) {
 				orcus_string* s = orcus_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
 				if (!s) {
-					orcus_raise_error(M, M_ERROR_ALLOCATION);
+					orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 					return;
 				}
 				orcus_variable v;
@@ -434,7 +434,7 @@ void orcus_lib_io_getdirs(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_variable dir_var;
 	orcus_popstack(M, &dir_var);
 	if (dir_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&dir_var);
 		return;
 	}
@@ -471,7 +471,7 @@ void orcus_lib_io_getdirs(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 				char* fn = FindFileData.cFileName;
 				orcus_string* s = orcus_cstring_to_mstring(fn, strlen(fn));
 				if (!s) {
-					orcus_raise_error(M, M_ERROR_ALLOCATION);
+					orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 					return;
 				}
 				orcus_variable v;
@@ -496,7 +496,7 @@ void orcus_lib_io_getdirs(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 			if (ent->d_type == DT_DIR && strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")) {
 				orcus_string* s = orcus_cstring_to_mstring(ent->d_name, strlen(ent->d_name));
 				if (!s) {
-					orcus_raise_error(M, M_ERROR_ALLOCATION);
+					orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 					return;
 				}
 				orcus_variable v;
@@ -535,7 +535,7 @@ void orcus_lib_io_lines(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 	orcus_variable fil_var;
 	orcus_popstack(M, &fil_var);
 	if (fil_var.type != ORCUS_TYPE_FILE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &fil_var, ORCUS_TYPE_FILE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &fil_var, ORCUS_TYPE_FILE, 1);
 		orcus_release_var(&fil_var);
 		return;
 	}
@@ -553,7 +553,7 @@ void orcus_lib_io_lines(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 		rewind(f);
 		char* buffer=(char*)malloc(total_len);
 		if (!buffer && total_len) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		if (total_len) { //support for empty file reading
@@ -567,7 +567,7 @@ void orcus_lib_io_lines(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 				if (run_end - run_start) {
 					orcus_string* s = orcus_cstring_to_mstring(buffer+ run_start, run_end -run_start);
 					if (!s) {
-						orcus_raise_error(M, M_ERROR_ALLOCATION);
+						orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 						free(buffer);
 						orcus_destroyarray(arr);
 						return;
@@ -585,7 +585,7 @@ void orcus_lib_io_lines(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 				if (run_end - run_start) {
 					orcus_string* s = orcus_cstring_to_mstring(buffer + run_start, run_end - run_start);
 					if (!s) {
-						orcus_raise_error(M, M_ERROR_ALLOCATION);
+						orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 						free(buffer);
 						orcus_destroyarray(arr);
 						return;
@@ -626,7 +626,7 @@ void orcus_lib_io_post(orcus_state* const ORCUS_CPP_restrict M, const orcus_int 
 	orcus_variable str_var;
 	orcus_popstack(M,&str_var);
 	if (str_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_nonpointer(M, M_ERROR_WRONG_TYPE, str_var.type, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_nonpointer(M, ORCUS_ERROR_WRONG_TYPE, str_var.type, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&str_var);
 		return;
 	}
@@ -648,7 +648,7 @@ void orcus_lib_io_prompt(orcus_state* const ORCUS_CPP_restrict M, const orcus_in
 	orcus_int len = 0;
 	char* c = (char*)malloc(sizec);
 	if (!c) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		return;
 	}
 
@@ -661,7 +661,7 @@ void orcus_lib_io_prompt(orcus_state* const ORCUS_CPP_restrict M, const orcus_in
 			sizec += 200;
 			void* n=realloc(c, sizec);
 			if (!n) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				return;
 			}
 			c = (char*)n;
@@ -671,7 +671,7 @@ void orcus_lib_io_prompt(orcus_state* const ORCUS_CPP_restrict M, const orcus_in
 	if (args_out) {
 		orcus_string* s= orcus_cstring_promote_to_mstring(c, len);
 		if (!s) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		orcus_variable v;
@@ -699,7 +699,7 @@ void orcus_lib_io_remove(orcus_state* const ORCUS_CPP_restrict M, const orcus_in
 	orcus_variable dir_var;
 	orcus_popstack(M, &dir_var);
 	if (dir_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&dir_var);
 		return;
 	}
@@ -735,7 +735,7 @@ void orcus_lib_io_removedir(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_variable dir_var;
 	orcus_popstack(M, &dir_var);
 	if (dir_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&dir_var);
 		return;
 	}
@@ -780,7 +780,7 @@ void orcus_lib_io_createdir(orcus_state* const ORCUS_CPP_restrict M, const orcus
 	orcus_variable dir_var;
 	orcus_popstack(M, &dir_var);
 	if (dir_var.type != ORCUS_TYPE_STRING) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &dir_var, ORCUS_TYPE_STRING, 1);
 		orcus_release_var(&dir_var);
 		return;
 	}
@@ -854,7 +854,7 @@ void orcus_lib_io_input(orcus_state* const ORCUS_CPP_restrict M, const orcus_int
 	if (args_out) {
 		orcus_string* s = orcus_cstring_to_mstring((const char*)c, desired_length);
 		if (!s) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		orcus_variable v;
@@ -1229,7 +1229,7 @@ void orcus_lib_io_serialize(orcus_state* const ORCUS_CPP_restrict M, const orcus
 		if (!str) {
 			free(chars);
 			free(pointerscovered);
-			orcus_raise_error_nonpointer(M, M_ERROR_ALLOCATION);
+			orcus_raise_error_nonpointer(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		str->ptr = (char*)chars;
@@ -1519,7 +1519,7 @@ void orcus_lib_io_deserialize(orcus_state* const ORCUS_CPP_restrict M, const orc
 
 	if (in.type != ORCUS_TYPE_STRING) {
 		orcus_release_var(&in);
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_STRING, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &in, ORCUS_TYPE_STRING, 1);
 		return;
 	}
 
@@ -1558,7 +1558,7 @@ void orcus_lib_io_cwd(orcus_state* const ORCUS_CPP_restrict M, const orcus_int a
 		buffer = getcwd(buffer, 0);
 		#endif
 		if (!buffer) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 			return;
 		}
@@ -1566,7 +1566,7 @@ void orcus_lib_io_cwd(orcus_state* const ORCUS_CPP_restrict M, const orcus_int a
 		orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 		if (!str) {
 			free(buffer);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 			return;
 		}
@@ -1597,7 +1597,7 @@ void orcus_lib_io_executabledirectory(orcus_state* const ORCUS_CPP_restrict M, c
 		char* buffer = (char*)malloc(PATH_MAX + 2);
 #endif
 		if (!buffer) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 			return;
 		}
@@ -1622,7 +1622,7 @@ void orcus_lib_io_executabledirectory(orcus_state* const ORCUS_CPP_restrict M, c
 		orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 		if (!str) {
 			free(buffer);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 			return;
 		}
@@ -1653,7 +1653,7 @@ void orcus_lib_io_filelength(orcus_state* const ORCUS_CPP_restrict M, const orcu
 	orcus_variable file_var;
 	orcus_popstack(M, &file_var);
 	if (file_var.type != ORCUS_TYPE_FILE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &file_var, ORCUS_TYPE_FILE, 1);
 		orcus_release_var(&file_var);
 		return;
 	}
@@ -1692,7 +1692,7 @@ void orcus_lib_io_userdirectory(orcus_state* const ORCUS_CPP_restrict M, const o
 		char* buffer = (char*)malloc(PATH_MAX + 2);
 #endif
 		if (!buffer) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 0);
 			return;
 		}
@@ -1700,7 +1700,7 @@ void orcus_lib_io_userdirectory(orcus_state* const ORCUS_CPP_restrict M, const o
 		orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 		if (!str) {
 			free(buffer);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out);
 			return;
 		}

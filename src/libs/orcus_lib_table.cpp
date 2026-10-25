@@ -15,7 +15,7 @@ void orcus_lib_table_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 	orcus_variable tab_var;
 	orcus_popstack(M,&tab_var);
 	if (tab_var.type != ORCUS_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
@@ -31,14 +31,14 @@ void orcus_lib_table_copy(orcus_state* const ORCUS_CPP_restrict M, const orcus_i
 
 		st_n.values=(orcus_variable*)malloc(sizeof(orcus_variable) * st_o.size);
 		if (!st_n.values) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 		
 		st_n.keys = (orcus_variable*)malloc(sizeof(orcus_variable) * st_o.size);
 		if (!st_n.keys) {
 			free(st_n.values);
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			return;
 		}
 
@@ -70,7 +70,7 @@ void orcus_lib_table_flush(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 	orcus_variable tab_var;
 	orcus_popstack(M, &tab_var);
 	if (tab_var.type != ORCUS_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
@@ -96,14 +96,14 @@ void orcus_lib_table_flush(orcus_state* const ORCUS_CPP_restrict M, const orcus_
 		st.size -= subtracted_size;
 		void* nptr=realloc(st.keys, sizeof(orcus_variable) * st.size);
 		if (!nptr && st.size) { //we're decreasing the size (or keeping the same) so this should theoretically never fail. but still. be safe.
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			orcus_release_var(&tab_var);
 			return;
 		}
 		st.keys = (orcus_variable*)nptr;
 		nptr = realloc(st.values, sizeof(orcus_variable) * st.size);
 		if (!nptr && st.size) {
-			orcus_raise_error(M, M_ERROR_ALLOCATION);
+			orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 			orcus_release_var(&tab_var);
 			return;
 		}
@@ -126,7 +126,7 @@ void orcus_lib_table_getkeys(orcus_state* const ORCUS_CPP_restrict M, const orcu
 
 	orcus_array* arr = orcus_newarray();
 	if (!arr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		orcus_discard_top_of_stack(M);
 		return;
 	}
@@ -134,7 +134,7 @@ void orcus_lib_table_getkeys(orcus_state* const ORCUS_CPP_restrict M, const orcu
 	orcus_variable tab_var;
 	orcus_popstack(M, &tab_var);
 	if (tab_var.type != ORCUS_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
@@ -145,7 +145,7 @@ void orcus_lib_table_getkeys(orcus_state* const ORCUS_CPP_restrict M, const orcu
 		if (!st.size)continue;
 		for (orcus_int i = 0; i < st.size; i++) { //for each value
 			if (!orcus_setarray(arr, st.keys + i, counter)) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				orcus_destroyarray(arr);
 				orcus_release_var(&tab_var);
 				return;
@@ -179,7 +179,7 @@ void orcus_lib_table_getvalues(orcus_state* const ORCUS_CPP_restrict M, const or
 
 	orcus_array* arr = orcus_newarray();
 	if (!arr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		orcus_discard_top_of_stack(M);
 		return;
 	}
@@ -187,7 +187,7 @@ void orcus_lib_table_getvalues(orcus_state* const ORCUS_CPP_restrict M, const or
 	orcus_variable tab_var;
 	orcus_popstack(M, &tab_var);
 	if (tab_var.type != ORCUS_TYPE_TABLE) {
-		orcus_raise_error_firstargpointeronly(M, M_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
+		orcus_raise_error_firstargpointeronly(M, ORCUS_ERROR_WRONG_TYPE_VARIABLEPROVIDED, &tab_var, ORCUS_TYPE_TABLE, 1);
 		orcus_release_var(&tab_var);
 		return;
 	}
@@ -198,7 +198,7 @@ void orcus_lib_table_getvalues(orcus_state* const ORCUS_CPP_restrict M, const or
 		if (!st.size)continue;
 		for (orcus_int i = 0; i < st.size; i++) { //for each value
 			if (!orcus_setarray(arr, st.values + i, counter)) {
-				orcus_raise_error(M, M_ERROR_ALLOCATION);
+				orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 				orcus_destroyarray(arr);
 				orcus_release_var(&tab_var);
 				return;
@@ -323,7 +323,7 @@ void orcus_lib_table_keyswithvalue(orcus_state* const ORCUS_CPP_restrict M, cons
 
 	orcus_array* arr = orcus_newarray();
 	if (!arr) {
-		orcus_raise_error(M, M_ERROR_ALLOCATION);
+		orcus_raise_error(M, ORCUS_ERROR_ALLOCATION);
 		orcus_discard_top_of_stack(M);
 		return;
 	}
