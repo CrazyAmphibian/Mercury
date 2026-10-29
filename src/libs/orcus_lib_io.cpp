@@ -1335,7 +1335,7 @@ bool orcus_deserialize_variable(orcus_variable* out,const unsigned char* chars,c
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->references = 1;
+			str->references = 0;
 			out->type = ORCUS_TYPE_STRING;
 			out->data.p = str;
 			}
@@ -1347,7 +1347,7 @@ bool orcus_deserialize_variable(orcus_variable* out,const unsigned char* chars,c
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->references = 1;
+			str->references = 0;
 			str->size = 1;
 			str->ptr = (char*)malloc(1);
 			if (!str->ptr) { free(str); return false; }
@@ -1369,7 +1369,7 @@ bool orcus_deserialize_variable(orcus_variable* out,const unsigned char* chars,c
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->references = 1;
+			str->references = 0;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1391,7 +1391,7 @@ bool orcus_deserialize_variable(orcus_variable* out,const unsigned char* chars,c
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->references = 1;
+			str->references = 0;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1413,7 +1413,7 @@ bool orcus_deserialize_variable(orcus_variable* out,const unsigned char* chars,c
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->references = 1;
+			str->references = 0;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
@@ -1435,7 +1435,7 @@ bool orcus_deserialize_variable(orcus_variable* out,const unsigned char* chars,c
 			orcus_string* str = (orcus_string*)malloc(sizeof(orcus_string));
 			if (!str)return false;
 			memset(str, 0, sizeof(orcus_string));
-			str->references = 1;
+			str->references = 0;
 			str->size = needed_size;
 			str->ptr = (char*)malloc(needed_size);
 			if (!str->ptr) { free(str); return false; }
