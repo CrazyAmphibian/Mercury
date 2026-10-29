@@ -1267,28 +1267,33 @@ void ORCUS_BYTECODE_LEN(orcus_state* const ORCUS_CPP_restrict M) { //LENgth
 		return;
 	}
 	orcus_variable* var = M->stack + M->sizeofstack -1;
+	orcus_int len;
 	switch (var->type) {
 	case ORCUS_TYPE_ARRAY:
-		
+		len = orcus_array_len((orcus_array*)var->data.p) + 1;
+		orcus_release_var(var);
 		var->type = ORCUS_TYPE_INT;
-		var->data.i = orcus_array_len((orcus_array*)var->data.p)+1;
+		var->data.i = len;
 		break;
 	case ORCUS_TYPE_STRING:
 		
+		
+		len = ((orcus_string*)var->data.p)->size;
+		orcus_release_var(var);
 		var->type = ORCUS_TYPE_INT;
-		var->data.i = ((orcus_string*)var->data.p)->size;
+		var->data.i = len;
 		break;
 	case ORCUS_TYPE_TABLE:
-		
-		var->type = ORCUS_TYPE_INT;
 		{
-			orcus_int n = 0;
+			len = 0;
 			orcus_table* t = ((orcus_table*)var->data.p);
 			for (uint8_t i = 0; i < ORCUS_NUMBER_OF_TYPES; i++) {
-				n += t->data[i].size;
+				len += t->data[i].size;
 			}
-			var->data.i = n;
-		}
+			orcus_release_var(var);
+			var->type = ORCUS_TYPE_INT;
+			var->data.i = len;
+		}	
 		break;
 	default:
 		orcus_raise_error_nonpointer(M, ORCUS_ERROR_INDEX_INVALID_TYPE, var->type);
