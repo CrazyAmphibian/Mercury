@@ -46,7 +46,7 @@ typedef float orcus_float;
 #endif
 
 #define ORCUS_VERSION 6
-#define ORCUS_VERSION_PATCH 0
+#define ORCUS_VERSION_PATCH 1
 
 #define ORCUS
 #if defined(DEBUG) || defined(_DEBUG)
