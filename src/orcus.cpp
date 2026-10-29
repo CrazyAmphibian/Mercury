@@ -87,7 +87,7 @@ orcus_string* orcus_copystring(const orcus_string* const ORCUS_CPP_restrict str)
 		nstr->size = str->size;
 		nstr->constant = true;
 		nstr->ptr = str->ptr;
-		nstr->references = 1;
+		nstr->references = 0;
 		return nstr;
 	}
 	else {
@@ -1113,10 +1113,7 @@ orcus_int orcus_array_len(const orcus_array* const ORCUS_CPP_restrict arr) {
 orcus_string* orcus_tostring(const orcus_variable* const ORCUS_CPP_restrict var) {
 	orcus_string* tstr=nullptr;
 
-	char tout[256];
-	for (int i = 0; i < 256; i++) {
-		tout[i] = '\0';
-	}
+	char tout[256] = { '\0' };
 	int tint;
 
 	switch (var->type) {
