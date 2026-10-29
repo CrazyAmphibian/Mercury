@@ -1032,9 +1032,6 @@ void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcu
 	orcus_string* s = (orcus_string*)strvar.data.p;
 
 	orcus_int pc = 0;
-	char* buffer = (char*)malloc(sizeof(char) * 200);
-	orcus_int sbuf = 200;
-	orcus_int cc = 0;
 
 	orcus_string* outstr = (orcus_string*)malloc(sizeof(orcus_string));
 	if (!outstr) {
@@ -1053,10 +1050,6 @@ void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcu
 	*/
 
 	while (pc<s->size) {
-		orcus_int na1 = 0; //numeric argument 1
-		orcus_int na2 = 0; //numeric argument 2
-		unsigned char setargs = 0;
-		unsigned char tacker = 0;
 		char c = s->ptr[pc];
 		if (c == '%') {
 			pc++;
@@ -1069,7 +1062,6 @@ void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcu
 			pc++;
 		}
 	}
-	free(buffer);
 
 	for (orcus_int i = 1; i < args_in; i++) {
 		orcus_release_var(var_t + i - 1);
@@ -1079,7 +1071,7 @@ void orcus_lib_string_format(orcus_state* const ORCUS_CPP_restrict M, const orcu
 	orcus_release_var(&strvar);
 	
 	strvar.type = ORCUS_TYPE_STRING;
-	strvar.data.p = outstr; //orcus_cstring_to_mstring(buffer, cc);
+	strvar.data.p = outstr;
 	orcus_pushstack(M, &strvar);
 
 	ORCUS_CFUNCTION_ENSURE_CORRECT_NUMBER_OUTPUT_ARGS(M, args_out, 1);
