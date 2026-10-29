@@ -1232,10 +1232,16 @@ void ORCUS_BYTECODE_CALL(orcus_state* const ORCUS_CPP_restrict M) { //CALL funct
 		FM->sizeofstack -= args_out - arg_defecit;
 		M->sizeofstack += args_out;
 		
-
+		//protect the output variables from being freed if their only refrenes are stored in the to-be-deleted enviromental table
+		for (orcus_int n = M->sizeofstack; n > M->sizeofstack - args_out; n--) {
+			orcus_increment_variable_refrence_count(M->stack + n -1);
+		}
 		FM->bytecode = previous;//so the bytecode isn't freed
 		orcus_clearstate(FM);
-
+		//then remove the refs we just added
+		for (orcus_int n = M->sizeofstack; n > M->sizeofstack - args_out; n--) {
+			orcus_decrement_variable_refrence_count(M->stack + n - 1);
+		}
 
 		}
 		
