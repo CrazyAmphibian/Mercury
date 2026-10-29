@@ -2086,7 +2086,7 @@ void ORCUS_BYTECODE_SET_KCS(orcus_state* const ORCUS_CPP_restrict M) {
 		orcus_decrement_variable_refrence_count(st.values + sz);
 		orcus_release_var(st.values + sz);
 		st.values[sz] = *value;
-		M->sizeofstack--;
+		M->sizeofstack-=2;
 		return;
 	nextstring:
 		{}
